@@ -54,10 +54,6 @@ tailwind.config = { theme: { extend: {
         <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M3 5.5A1.5 1.5 0 014.5 4h11A1.5 1.5 0 0117 5.5v9a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 013 14.5v-9z" stroke="currentColor" stroke-width="1.4"/><path d="M3 8h14M7.5 8v8" stroke="currentColor" stroke-width="1.4"/></svg>Overview</a>
       <a data-view="products" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2">
         <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M10 2.5l6.5 3.5v8L10 17.5 3.5 14V6L10 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M3.5 6l6.5 3.5L16.5 6M10 9.5v8" stroke="currentColor" stroke-width="1.4"/></svg>Products</a>
-      <a data-view="pricing" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2">
-        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M3 5.5h14M3 10h14M3 14.5h9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Pricing tables</a>
-      <a data-view="calculator" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2">
-        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><rect x="4" y="2.5" width="12" height="15" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 6h6M7 9.5h2M11 9.5h2M7 13h2M11 13h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Calculator</a>
       <a data-view="formulation" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2">
         <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M4 4h12M4 10h12M4 16h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="15" cy="15" r="2.5" stroke="currentColor" stroke-width="1.4"/></svg>Printoka Formulation</a>
     </nav>
@@ -92,121 +88,57 @@ async function api(p){ const r = await fetch(p); if(!r.ok) throw new Error(r.sta
 const views = {};
 
 views.overview = async () => {
-  const cs = await api("/api/crawl-status");
-  const prods = await api("/api/products");
+  const ps = await api("/api/printoka/product-status");
+  const formed = ps.filter(p=>p.formulated);
+  const best = formed.length ? Math.min(...formed.map(p=>p.accuracy)) : null;
   const el = document.createElement("div"); el.className="fade max-w-[1080px]";
   el.innerHTML = `
     <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Overview</h1>
-    <p class="text-slate-500 text-[13.5px] mt-0.5 mb-6">Live pricing intelligence crawled from Excard.</p>
+    <p class="text-slate-500 text-[13.5px] mt-0.5 mb-6">Printoka's own formula-driven pricing — independent, offline.</p>
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-      ${card("Price points", NUM(cs.price_points))}
-      ${card("Combinations priced", NUM(cs.done))}
-      ${card("Crawl complete", cs.pct + "%")}
+      ${card("Products formulated", NUM(formed.length))}
+      ${card("Products tracked", NUM(ps.length))}
+      ${card("Best accuracy", best!=null ? best+"% median" : "—")}
       ${card("Pricing tiers", "4", "Platinum · Gold · Silver · Cash")}
     </div>
-    <div class="bg-white rounded-xl border hairline shadow-card p-5 mb-4">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="font-semibold text-[15px] text-ink">Crawl progress</h3>
-        <span class="text-[12.5px] text-slate-400">${NUM(cs.done)} of ${NUM(cs.total)} combinations</span>
-      </div>
-      ${progress(cs.pct)}
-      <div class="flex gap-5 mt-3 text-[12.5px] text-slate-500">
-        <span>✅ done ${NUM(cs.done)}</span><span>⏳ pending ${NUM(cs.pending)}</span>
-        <span>↻ in progress ${NUM(cs.in_progress)}</span><span>⚠ failed ${NUM(cs.failed)}</span>
-      </div>
-    </div>
     <div class="bg-white rounded-xl border hairline shadow-card p-5">
-      <h3 class="font-semibold text-[15px] text-ink mb-3">Products</h3>
-      ${prods.map(p=>`<div class="flex items-center gap-3 py-2 border-b hairline last:border-0">
+      <h3 class="font-semibold text-[15px] text-ink mb-3">Formulated products</h3>
+      ${formed.length ? formed.map(p=>`<div class="flex items-center gap-3 py-2 border-b hairline last:border-0">
         <div class="h-8 w-8 rounded-lg brand-gradient grid place-items-center text-white text-[11px] font-bold">${p.name[0]}</div>
         <div class="flex-1"><div class="font-semibold text-slate-800 text-[13.5px]">${p.name}</div>
-          <div class="text-[11.5px] text-slate-400">${NUM(p.combos_priced)} combos · ${NUM(p.price_points)} prices</div></div>
-        ${statusPill(p.status)}</div>`).join("")}
+          <div class="text-[11.5px] text-slate-400">accuracy ${p.accuracy}% median</div></div>
+        <span class="text-[12px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5">formulated</span></div>`).join("") : '<div class="text-slate-400 text-[13px]">None yet.</div>'}
     </div>`;
   return el;
 };
 
 views.products = async () => {
-  const prods = await api("/api/products");
+  const prods = await api("/api/printoka/product-status");
   const el = document.createElement("div"); el.className="fade max-w-[1080px]";
   el.innerHTML = `
     <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Products</h1>
-    <p class="text-slate-500 text-[13.5px] mb-5">${prods.length} product(s) tracked.</p>
+    <p class="text-slate-500 text-[13.5px] mb-5">${prods.length} product(s) tracked · ${prods.filter(p=>p.formulated).length} formulated.</p>
     <div class="bg-white rounded-xl border hairline shadow-card overflow-hidden">
       <table class="w-full text-[13.5px]">
         <thead class="text-slate-400 text-[12px] uppercase tracking-wide"><tr class="border-b hairline">
           <th class="text-left font-semibold px-4 py-2.5">Product</th>
           <th class="text-left font-semibold px-4 py-2.5">Category</th>
-          <th class="text-right font-semibold px-4 py-2.5">Combos priced</th>
-          <th class="text-right font-semibold px-4 py-2.5">Price points</th>
-          <th class="text-right font-semibold px-4 py-2.5">Pending</th>
+          <th class="text-right font-semibold px-4 py-2.5">Combos initiated</th>
+          <th class="text-right font-semibold px-4 py-2.5">Accuracy test result</th>
           <th class="text-left font-semibold px-4 py-2.5">Status</th></tr></thead>
         <tbody>${prods.map(p=>`<tr class="border-b hairline last:border-0 hover:bg-slate-50/60">
           <td class="px-4 py-3"><div class="flex items-center gap-3"><div class="h-8 w-8 rounded-lg brand-gradient grid place-items-center text-white text-[11px] font-bold">${p.name[0]}</div>
             <div><div class="font-semibold text-slate-800">${p.name}</div><div class="text-[11.5px] text-slate-400 font-mono">prod_${p.id}</div></div></div></td>
           <td class="px-4 py-3 text-slate-500">${p.category||"—"}</td>
-          <td class="px-4 py-3 text-right tabular-nums font-medium text-slate-700">${NUM(p.combos_priced)}</td>
-          <td class="px-4 py-3 text-right tabular-nums text-slate-600">${NUM(p.price_points)}</td>
-          <td class="px-4 py-3 text-right tabular-nums text-slate-500">${NUM(p.pending)}</td>
-          <td class="px-4 py-3">${statusPill(p.status)}</td></tr>`).join("")}</tbody>
+          <td class="px-4 py-3 text-right tabular-nums font-medium text-slate-700">${NUM(p.combos_initiated)}</td>
+          <td class="px-4 py-3 text-right tabular-nums text-slate-600">${p.accuracy!=null? p.accuracy+"% median":"—"}</td>
+          <td class="px-4 py-3">${p.formulated
+            ? '<span class="inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2 py-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>formulated</span>'
+            : '<span class="inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-500 bg-slate-50 border border-slate-200 rounded-full px-2 py-0.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>not formulated</span>'}</td></tr>`).join("")}</tbody>
       </table>
     </div>`;
   return el;
 };
-
-let pricingState = { offset:0, limit:25, size:"", color:"", tier:"" };
-views.pricing = async () => {
-  const el = document.createElement("div"); el.className="fade max-w-[1080px]";
-  el.innerHTML = `
-    <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Pricing tables</h1>
-    <p class="text-slate-500 text-[13.5px] mb-4">Every captured price point — exactly as structured on Excard.</p>
-    <div class="flex flex-wrap items-center gap-2 mb-3">
-      <select id="f_size" class="fieldsel rounded-lg border hairline bg-white px-2.5 py-1.5 text-[13px]"><option value="">All sizes</option></select>
-      <select id="f_color" class="fieldsel rounded-lg border hairline bg-white px-2.5 py-1.5 text-[13px]"><option value="">4C & 4C+4C</option><option>4C</option><option>4C+4C</option></select>
-      <select id="f_tier" class="fieldsel rounded-lg border hairline bg-white px-2.5 py-1.5 text-[13px]"><option value="">All tiers</option><option>Platinum</option><option>Gold</option><option>Silver</option><option>Cash</option></select>
-      <span id="p_total" class="ml-auto text-[12.5px] text-slate-400"></span>
-    </div>
-    <div class="bg-white rounded-xl border hairline shadow-card overflow-x-auto">
-      <table class="w-full text-[13px] whitespace-nowrap">
-        <thead class="text-slate-400 text-[11.5px] uppercase tracking-wide bg-slate-50/70"><tr class="border-b hairline">
-          ${["Size","Paper","Lamination","Delivery","Color","Qty","Tier","Price"].map(h=>`<th class="text-left font-semibold px-4 py-2.5">${h}</th>`).join("")}
-        </tr></thead><tbody id="p_rows"></tbody>
-      </table>
-    </div>
-    <div class="flex items-center justify-between mt-3 text-[13px]">
-      <button id="p_prev" class="px-3 py-1.5 rounded-lg border hairline hover:bg-slate-50 disabled:opacity-40">← Prev</button>
-      <span id="p_page" class="text-slate-500"></span>
-      <button id="p_next" class="px-3 py-1.5 rounded-lg border hairline hover:bg-slate-50 disabled:opacity-40">Next →</button>
-    </div>`;
-  setTimeout(initPricing, 0);
-  return el;
-};
-
-async function initPricing(){
-  const o = await api("/api/options");
-  $("f_size").innerHTML = '<option value="">All sizes</option>' + o.sizes.map(s=>`<option>${s}</option>`).join("");
-  $("f_size").value=pricingState.size; $("f_color").value=pricingState.color; $("f_tier").value=pricingState.tier;
-  const reload = ()=>{ pricingState.offset=0; loadPricing(); };
-  $("f_size").onchange=e=>{pricingState.size=e.target.value;reload();};
-  $("f_color").onchange=e=>{pricingState.color=e.target.value;reload();};
-  $("f_tier").onchange=e=>{pricingState.tier=e.target.value;reload();};
-  $("p_prev").onclick=()=>{ if(pricingState.offset>0){pricingState.offset-=pricingState.limit;loadPricing();} };
-  $("p_next").onclick=()=>{ pricingState.offset+=pricingState.limit;loadPricing(); };
-  loadPricing();
-}
-async function loadPricing(){
-  const s=pricingState; const q=new URLSearchParams({limit:s.limit,offset:s.offset});
-  if(s.size)q.set("size",s.size); if(s.color)q.set("color_mode",s.color); if(s.tier)q.set("tier",s.tier);
-  const d = await api("/api/pricing?"+q);
-  $("p_rows").innerHTML = d.rows.map(r=>`<tr class="border-b hairline last:border-0 hover:bg-slate-50/60 tabular-nums">
-    <td class="px-4 py-2.5 text-slate-600">${r.size}</td><td class="px-4 py-2.5 text-slate-600">${r.paper}</td>
-    <td class="px-4 py-2.5 text-slate-500">${r.lamination}</td><td class="px-4 py-2.5 text-slate-500">${r.delivery}</td>
-    <td class="px-4 py-2.5 text-slate-500">${r.color_mode}</td><td class="px-4 py-2.5">${NUM(r.quantity)}</td>
-    <td class="px-4 py-2.5 text-slate-500">${r.tier}</td><td class="px-4 py-2.5 font-semibold text-slate-800">${RM(r.price)}${r.suffix||""}</td></tr>`).join("");
-  $("p_total").textContent = NUM(d.total)+" rows";
-  $("p_page").textContent = `${NUM(d.offset+1)}–${NUM(Math.min(d.offset+d.limit,d.total))} of ${NUM(d.total)}`;
-  $("p_prev").disabled = d.offset<=0; $("p_next").disabled = d.offset+d.limit>=d.total;
-}
 
 // ---------------- calculator view ----------------
 let calc = { ladder:null, colormode:"4C", buytier:"Platinum", token:0, mult:1 };
@@ -357,7 +289,7 @@ function card(label,value,sub){ return `<div class="bg-white rounded-xl border h
 function progress(pct){ return `<div class="h-2.5 rounded-full bg-slate-100 overflow-hidden"><div class="h-full brand-gradient" style="width:${pct}%"></div></div>`; }
 function statusPill(s){ const m={active:"emerald",done:"sky",unsupported:"slate"}[s]||"slate";
   return `<span class="inline-flex items-center gap-1.5 text-[12px] font-medium text-${m}-700 bg-${m}-50 border border-${m}-100 rounded-full px-2 py-0.5"><span class="h-1.5 w-1.5 rounded-full bg-${m}-500"></span>${s}</span>`; }
-const titles={overview:"Overview",products:"Products",pricing:"Pricing tables",calculator:"Calculator",formulation:"Printoka Formulation"};
+const titles={overview:"Overview",products:"Products",formulation:"Printoka Formulation"};
 
 async function go(name){
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===name));

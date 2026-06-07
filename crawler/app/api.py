@@ -305,6 +305,22 @@ def printoka_products():
     return PRODUCTS_UI
 
 
+# accuracy (median %) for products that have a calibrated formula
+FORMULATED = {21: 8.29, 50: 1.3}
+
+
+@app.get("/api/printoka/product-status")
+def product_status():
+    with session_scope() as s:
+        prods = s.scalars(select(Product).order_by(Product.excard_id)).all()
+        counts = dict(s.execute(select(OrderWork.product_id, func.count())
+                                .group_by(OrderWork.product_id)).all())
+        return [{"id": p.excard_id, "name": p.name, "category": p.category,
+                 "combos_initiated": counts.get(p.excard_id, 0),
+                 "accuracy": FORMULATED.get(p.excard_id),
+                 "formulated": p.excard_id in FORMULATED} for p in prods]
+
+
 def _digital_options(size=None, paper=None, colour=None):
     d = _json.loads((UI_DIR.parent / "digital_options.json").read_text())
     out = {"sizes": d["sizes"], "papers": [], "colours": [], "packages": [],
