@@ -7,8 +7,12 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
 - **Calculator UI = product-aware.** Printoka Formulation tab has a **Product selector**
   (21 Loose Sheet Litho / 50 Loose Sheet Digital) → cascade Size→Paper→Colour→Package→Qty,
   each product uses its OWN formula + shows its OWN accuracy badge.
-- **Crawl UI removed** (no Crawl-status tab, no crawl-status calls, no prices badge). App
-  opens on the Formulation view. We do NOT crawl anymore.
+- **UI cleaned to formula-only** (we do NOT crawl anymore). Nav = Overview, Products,
+  Printoka Formulation (removed Crawl status, Pricing tables, Calculator + their views/badges).
+  Overview = formula-focused (products formulated / tracked / best accuracy; no crawl bar).
+  Products table columns: Combos initiated · Accuracy test result · Status (formulated /
+  not formulated) — via `/api/printoka/product-status`. (Legacy views.calculator/pricing JS
+  remain but are unreachable; can be deleted later.)
 - **Digital Loose Sheet (50) formula = DONE & meets bar:** click-based pure formula,
   held-out **median 1.3%, 86% within 5%** (calibrated on 2,052-pt spot sample). gamma≈1.0
   (digital flat — no real volume discount). Engine: `app/digital_engine.py`,
