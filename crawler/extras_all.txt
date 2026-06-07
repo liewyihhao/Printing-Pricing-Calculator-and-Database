@@ -1,0 +1,14 @@
+17:22:35 [info     ] browser.launched               channel=msedge headless=True
+17:22:38 [info     ] login.start                    url=https://www.excard.com.my/login
+17:23:13 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+-- after Simili 80gsm - Best  --
+-- after Gloss Art Paper 100g --
+-- after Gloss Art Card 250gs --
+ALL FINISHING/ADD-ON CONTROLS:
+  [select] : ['Track Order', 'Product']
+  [select] ddlHotStamping: ['- Not Required -', '1C (Front)', '1C (Back)', '2C (Front)', '2C (Back)']
+  [select] ddlRoundCorner: ['Not Required', '- Required -']
+  [select] rblEnvelope: ['- Not Required -', '108mm x 159mm - Pink A6', '110mm x 220mm - White DL', '133mm x 102mm - Cream A7', '162mm x 114mm - White A6', '162mm x 229mm - Pink A5', '162mm x 229mm - White A5', '215mm x 114mm - Pink DL']
+  [radio] rblFoldSelection: ['Not Required', 'Standard', 'Custom']
+  [radio] rblPunchHole: ['Not Required', 'Hole Punching (3mm)', 'Hole Punching (6mm)']
+  [select] rblLaminationSide: ['- Please Select -', 'Matte Lamination (Front)', 'Matte Lamination (Both)', 'Gloss Lamination (Front)', 'Gloss Lamination (Both)', 'UV Varnish (Front)', 'UV Varnish (Both)', 'Gloss Waterbase Varnish (Front)']

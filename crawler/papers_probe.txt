@@ -1,0 +1,5 @@
+05:50:44 [info     ] browser.launched               channel=msedge headless=True
+05:50:44 [info     ] login.start                    url=https://www.excard.com.my/login
+05:51:08 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+3xA4 (297mm x 630mm) -> papers: ['Simili 80gsm - Best Seller', 'Simili 100gsm - Best Seller', 'Simili 140gsm - Best Seller', 'Gloss Art Paper 100gsm - Best Seller', 'Gloss Art Paper 128gsm - Best Seller', 'Gloss Art Paper 150gsm - Best Seller', 'Matte Art Paper 130gsm - Best Seller', 'Gloss Art Card 230gsm (2 sides coated)', 'Gloss Art Card 250gsm (2 sides coated) - Best Seller', 'Gloss Art Card 310gsm (2 sides coated)', 'Gloss Art Card 360gsm (2 sides coated)']
+4xA4 (297mm x 840mm) -> papers: ['Simili 80gsm - Best Seller', 'Simili 100gsm - Best Seller', 'Simili 140gsm - Best Seller', 'Gloss Art Paper 100gsm - Best Seller', 'Gloss Art Paper 128gsm - Best Seller', 'Gloss Art Paper 150gsm - Best Seller', 'Matte Art Paper 130gsm - Best Seller', 'Gloss Art Card 250gsm (2 sides coated) - Best Seller']

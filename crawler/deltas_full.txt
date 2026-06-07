@@ -1,0 +1,12 @@
+23:06:48 [info     ] browser.launched               channel=msedge headless=True
+23:06:50 [info     ] login.start                    url=https://www.excard.com.my/login
+23:07:21 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+BASE A4/GlossCard250/4C-Front/Normal/1000: 245.0
+  Folding Standard: 245.0 d= 0.0
+  Punch 3mm: 252.25 d= 7.25
+  RoundCorner: 275.3 d= 30.3
+  HotStamp 1C-F: 245.0 d= 0.0
+  Matte Lam-F: 362.6 d= 117.6
+  Envelope: 287.4 d= 42.4
+BASE2 4C-Both: 268.0
+  Folding Standard @4C-Both: 268.0 d= 0.0

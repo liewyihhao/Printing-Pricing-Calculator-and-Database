@@ -1,0 +1,10 @@
+05:54:47 [info     ] browser.launched               channel=msedge headless=True
+05:54:48 [info     ] login.start                    url=https://www.excard.com.my/login
+05:55:12 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+SIZE -> True
+PAPER -> True
+COLOUR elem count= 1
+COLOUR opts= ['- Please Select -', '1C (Both)', '4C (Both)']
+COLOUR -> False
+PACKAGE opts= ['Normal', '2in1', '3in1', '4in1', '5in1', '6in1', '7in1', '8in1', '9in1', '10in1']
+PACKAGE -> True

@@ -1,0 +1,4 @@
+BEFORE: {'done': 282, 'pending': 2986, 'skipped': 1132}
+valid (size,paper) pairs: 72
+requeued 872 wrongly-skipped configs
+AFTER: {'skipped': 260, 'pending': 3858, 'done': 282}

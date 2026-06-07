@@ -1,0 +1,17 @@
+05:48:28 [info     ] browser.launched               channel=msedge headless=True
+05:48:30 [warning  ] order.session_unusable_reloging_in
+05:48:30 [info     ] login.start                    url=https://www.excard.com.my/login
+05:48:55 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+05:49:18 [warning  ] order.configure_failed         paper=Simili 80gsm - Best Seller size=3xA4 (297mm x 630mm)
+05:49:43 [warning  ] order.configure_failed         paper=Simili 100gsm - Best Seller size=3xA4 (297mm x 630mm)
+05:50:06 [warning  ] order.configure_failed         paper=Simili 80gsm - Best Seller size=4xA4 (297mm x 840mm)
+05:50:30 [warning  ] order.configure_failed         paper=Simili 100gsm - Best Seller size=4xA4 (297mm x 840mm)
+05:50:54 [warning  ] order.configure_failed         paper=Simili 80gsm - Best Seller size=4xA5 (210mm x 594mm)
+05:51:17 [warning  ] order.configure_failed         paper=Simili 100gsm - Best Seller size=4xA5 (210mm x 594mm)
+05:51:42 [warning  ] order.configure_failed         paper=Simili 80gsm - Best Seller size=A1 (594mm x 840mm)
+05:52:05 [warning  ] order.configure_failed         paper=Simili 80gsm - Best Seller size=A1 (594mm x 840mm)
+05:52:41 [error    ] order.error                    error=Exception('Locator.count: Connection closed while reading from the driver')
+05:52:41 [warning  ] browser.channel_unavailable    channel=msedge error=Exception
+05:52:41 [warning  ] browser.channel_unavailable    channel=chrome error=Exception
+05:52:41 [warning  ] browser.fallback_bundled_chromium
+05:52:41 [warning  ] order.relaunch_retry           attempt=0 error=Exception('BrowserType.launch: Connection closed while reading from the driver') retry_in_s=15

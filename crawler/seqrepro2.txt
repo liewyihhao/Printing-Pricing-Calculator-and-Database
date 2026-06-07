@@ -1,0 +1,8 @@
+06:25:02 [info     ] browser.launched               channel=msedge headless=True
+prior#0 3xA4  configure=False
+prior#1 3xA4  configure=False
+prior#2 4xA4  configure=False
+prior#3 4xA4  configure=False
+prior#4 4xA5  configure=False
+prior#5 4xA5  configure=False
+AFTER 6 priors: A1/Simili80/4C-Front configure=True qtys=27

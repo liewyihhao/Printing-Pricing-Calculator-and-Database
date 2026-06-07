@@ -1,0 +1,8 @@
+06:11:51 [info     ] browser.launched               channel=msedge headless=True
+06:11:51 [info     ] login.start                    url=https://www.excard.com.my/login
+06:12:15 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+SIZE -> True
+PAPER opts= ['- Please Select -', 'Simili 80gsm - Best Seller', 'Simili 100gsm - Best Seller', 'Simili 140gsm - Best Seller', 'Gloss Art Paper 100gsm - Best Seller', 'Gloss Art Paper 128gsm - Best Seller', 'Gloss Art Paper 150gsm - Best Seller', 'Matte Art Paper 130gsm - Best Seller', 'Gloss Art Card 250gsm (2 sides coated) - Best Seller']
+PAPER -> True
+COLOUR opts= ['- Please Select -', '4C (Front)', '4C (Both)']
+COLOUR(4C Front) -> True

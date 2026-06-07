@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "refero-design": {
+      "source": "referodesign/refero_skill",
+      "sourceType": "github",
+      "skillPath": "SKILL.md",
+      "computedHash": "1a8693b617be5be1a70ab7f4d64ff0365c5a93dda938ef034d704e0fe6270b50"
+    }
+  }
+}

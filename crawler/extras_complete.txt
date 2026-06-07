@@ -1,0 +1,22 @@
+23:25:26 [info     ] browser.launched               channel=msedge headless=True
+23:25:27 [info     ] login.start                    url=https://www.excard.com.my/login
+23:25:57 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+TOTAL PAPERS: 11
+[Simili 80gsm - Best Seller        ] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblPunchHole']
+[Simili 100gsm - Best Seller       ] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblPunchHole']
+[Simili 140gsm - Best Seller       ] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblPunchHole']
+[Gloss Art Paper 100gsm - Best Sell] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblPunchHole']
+[Gloss Art Paper 128gsm - Best Sell] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblPunchHole']
+[Gloss Art Paper 150gsm - Best Sell] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblLaminationSide', 'rblPunchHole']
+[Matte Art Paper 130gsm - Best Sell] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblPunchHole']
+[Gloss Art Card 230gsm (2 sides coa] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblLaminationSide', 'rblPunchHole']
+[Gloss Art Card 250gsm (2 sides coa] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblLaminationSide', 'rblPunchHole']
+[Gloss Art Card 310gsm (2 sides coa] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblLaminationSide', 'rblPunchHole']
+[Gloss Art Card 360gsm (2 sides coa] finishing controls: ['ddlHotStamping', 'ddlRoundCorner', 'rblEnvelope', 'rblFoldSelection', 'rblLaminationSide', 'rblPunchHole']
+=== COMPLETE UNION OF FINISHING/ADD-ON CONTROLS ===
+  [sel] ddlHotStamping: ['- Not Required -', '1C (Front)', '1C (Back)', '2C (Front)', '2C (Back)']
+  [sel] ddlRoundCorner: ['Not Required', '- Required -']
+  [sel] rblEnvelope: ['- Not Required -', '108mm x 159mm - Pink A6', '110mm x 220mm - White DL', '133mm x 102mm - Cream A7', '162mm x 114mm - White A6', '162mm x 229mm - Pink A5', '162mm x 229mm - White A5', '215mm x 114mm - Pink DL']
+  [rad] rblFoldSelection: ['Not Required', 'Required']
+  [sel] rblLaminationSide: ['- Not Required -', 'Matte Lamination (Front)', 'Matte Lamination (Both)', 'Gloss Lamination (Front)', 'Gloss Lamination (Both)', 'UV Varnish (Front)']
+  [rad] rblPunchHole: ['Not Required', 'Hole Punching (3mm)', 'Hole Punching (6mm)']

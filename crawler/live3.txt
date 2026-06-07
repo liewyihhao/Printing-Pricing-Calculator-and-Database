@@ -1,0 +1,62 @@
+06:57:46 [info     ] browser.launched               channel=msedge headless=True
+06:57:48 [warning  ] order.session_unusable_reloging_in
+06:57:48 [info     ] login.start                    url=https://www.excard.com.my/login
+06:58:08 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+06:58:08 [info     ] order.crawl_start              workers=1
+06:58:36 [warning  ] order.configure_failed         colour=1C (Front) package=Normal paper=Gloss Art Card 230gsm (2 sides coated) size=A2 (420mm x 594mm)
+06:58:59 [warning  ] order.configure_failed         colour=1C (Both) package=Normal paper=Gloss Art Card 230gsm (2 sides coated) size=A2 (420mm x 594mm)
+06:59:21 [warning  ] order.configure_failed         colour=1C (Front) package=Normal paper=Gloss Art Card 250gsm (2 sides coated) - Best Seller size=A2 (420mm x 594mm)
+06:59:43 [warning  ] order.configure_failed         colour=1C (Both) package=Normal paper=Gloss Art Card 250gsm (2 sides coated) - Best Seller size=A2 (420mm x 594mm)
+07:00:06 [warning  ] order.configure_failed         colour=1C (Front) package=Normal paper=Gloss Art Card 310gsm (2 sides coated) size=A2 (420mm x 594mm)
+07:00:31 [warning  ] order.configure_failed         colour=1C (Both) package=Normal paper=Gloss Art Card 310gsm (2 sides coated) size=A2 (420mm x 594mm)
+07:00:54 [warning  ] order.configure_failed         colour=1C (Front) package=Normal paper=Gloss Art Card 360gsm (2 sides coated) size=A2 (420mm x 594mm)
+07:01:18 [warning  ] order.configure_failed         colour=1C (Both) package=Normal paper=Gloss Art Card 360gsm (2 sides coated) size=A2 (420mm x 594mm)
+07:01:41 [warning  ] order.configure_failed         colour=1C (Front) package=Normal paper=Simili 140gsm - Best Seller size=A3 (297mm x 420mm)
+07:01:41 [info     ] order.recycle_context          processed=9 worker=1
+07:02:10 [warning  ] order.configure_failed         colour=1C (Both) package=Normal paper=Simili 140gsm - Best Seller size=A3 (297mm x 420mm)
+07:02:33 [warning  ] order.configure_failed         colour=1C (Front) package=Normal paper=Gloss Art Paper 100gsm - Best Seller size=A3 (297mm x 420mm)
+07:02:57 [warning  ] order.configure_failed         colour=1C (Both) package=Normal paper=Gloss Art Paper 100gsm - Best Seller size=A3 (297mm x 420mm)
+07:03:23 [warning  ] order.configure_failed         colour=1C (Front) package=Normal paper=Gloss Art Paper 128gsm - Best Seller size=A3 (297mm x 420mm)
+07:03:46 [warning  ] order.configure_failed         colour=1C (Both) package=Normal paper=Gloss Art Paper 128gsm - Best Seller size=A3 (297mm x 420mm)
+07:04:08 [warning  ] order.configure_failed         colour=1C (Front) package=Normal paper=Gloss Art Paper 150gsm - Best Seller size=A3 (297mm x 420mm)
+07:04:35 [warning  ] order.configure_failed         colour=1C (Both) package=Normal paper=Gloss Art Paper 150gsm - Best Seller size=A3 (297mm x 420mm)
+07:04:36 [error    ] order.error                    error=Error('Page.goto: Page crashed\nCall log:\n  - navigating to "https://www.excard.com.my/spec/Litho/Loose_Sheet", waiting until "domcontentloaded"\n') worker=1
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "C:\Users\User\OneDrive\Desktop\Printoka.com\crawler\app\__main__.py", line 4, in <module>
+    main()
+  File "C:\Users\User\OneDrive\Desktop\Printoka.com\crawler\app\cli.py", line 233, in main
+    asyncio.run(crawl_orders(limit=args.limit, workers=args.workers))
+  File "C:\Users\User\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Local\Programs\Python\Python312\Lib\asyncio\runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\AppData\Local\Programs\Python\Python312\Lib\asyncio\base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\User\OneDrive\Desktop\Printoka.com\crawler\app\order_runner.py", line 292, in crawl_orders
+    await asyncio.gather(*[
+  File "C:\Users\User\OneDrive\Desktop\Printoka.com\crawler\app\order_runner.py", line 262, in _worker_loop
+    page = await _new_page(browser, save_state=False)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\OneDrive\Desktop\Printoka.com\crawler\app\order_runner.py", line 176, in _new_page
+    await page.goto(SPEC_URL, wait_until="domcontentloaded")
+  File "C:\Users\User\OneDrive\Desktop\Printoka.com\crawler\.venv\Lib\site-packages\playwright\async_api\_generated.py", line 8973, in goto
+    await self._impl_obj.goto(
+  File "C:\Users\User\OneDrive\Desktop\Printoka.com\crawler\.venv\Lib\site-packages\playwright\_impl\_page.py", line 551, in goto
+    return await self._main_frame.goto(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\OneDrive\Desktop\Printoka.com\crawler\.venv\Lib\site-packages\playwright\_impl\_frame.py", line 145, in goto
+    await self._channel.send("goto", locals_to_params(locals()))
+  File "C:\Users\User\OneDrive\Desktop\Printoka.com\crawler\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 61, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\OneDrive\Desktop\Printoka.com\crawler\.venv\Lib\site-packages\playwright\_impl\_connection.py", line 528, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.Error: Page.goto: net::ERR_ABORTED at https://www.excard.com.my/spec/Litho/Loose_Sheet
+Call log:
+  - navigating to "https://www.excard.com.my/spec/Litho/Loose_Sheet", waiting until "domcontentloaded"
+

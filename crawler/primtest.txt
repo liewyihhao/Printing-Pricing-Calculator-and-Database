@@ -1,0 +1,12 @@
+06:42:06 [info     ] browser.launched               channel=msedge headless=True
+06:42:08 [warning  ] order.session_unusable_reloging_in
+06:42:08 [info     ] login.start                    url=https://www.excard.com.my/login
+06:42:29 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+06:45:16 [info     ] order.captured                 colour=4C (Front) delivery=98 package=Normal paper=Gloss Art Paper 100gsm - Best Seller quantities=27 size=A1 (594mm x 840mm)
+CASE-A single-ctx Gloss Art Paper 10 4C (Front): rows=27
+06:48:13 [info     ] order.captured                 colour=4C (Both) delivery=98 package=Normal paper=Gloss Art Paper 128gsm - Best Seller quantities=27 size=A1 (594mm x 840mm)
+CASE-A single-ctx Gloss Art Paper 12 4C (Both): rows=27
+06:51:20 [info     ] order.captured                 colour=4C (Front) delivery=98 package=Normal paper=Gloss Art Paper 100gsm - Best Seller quantities=27 size=A1 (594mm x 840mm)
+CASE-B primer+worker Gloss Art Paper 10 4C (Front): rows=27
+06:54:14 [info     ] order.captured                 colour=4C (Both) delivery=98 package=Normal paper=Gloss Art Paper 128gsm - Best Seller quantities=27 size=A1 (594mm x 840mm)
+CASE-B primer+worker Gloss Art Paper 12 4C (Both): rows=27

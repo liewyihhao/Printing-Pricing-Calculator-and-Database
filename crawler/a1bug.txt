@@ -1,0 +1,34 @@
+DB A1 paper x status:
+  skipped      x 40  Gloss Art Card 230gsm (2 sides coated)
+  done         x  2  Gloss Art Card 250gsm (2 sides coated) - Best Seller
+  skipped      x 38  Gloss Art Card 250gsm (2 sides coated) - Best Seller
+  skipped      x 40  Gloss Art Card 310gsm (2 sides coated)
+  skipped      x 40  Gloss Art Card 360gsm (2 sides coated)
+  done         x 20  Gloss Art Paper 100gsm - Best Seller
+  skipped      x 20  Gloss Art Paper 100gsm - Best Seller
+  done         x 20  Gloss Art Paper 128gsm - Best Seller
+  skipped      x 20  Gloss Art Paper 128gsm - Best Seller
+  done         x 20  Gloss Art Paper 150gsm - Best Seller
+  skipped      x 20  Gloss Art Paper 150gsm - Best Seller
+  done         x 16  Matte Art Paper 130gsm - Best Seller
+  skipped      x 24  Matte Art Paper 130gsm - Best Seller
+  done         x 20  Simili 100gsm - Best Seller
+  skipped      x 20  Simili 100gsm - Best Seller
+  done         x 20  Simili 140gsm - Best Seller
+  skipped      x 20  Simili 140gsm - Best Seller
+  done         x 20  Simili 80gsm - Best Seller
+  skipped      x 20  Simili 80gsm - Best Seller
+05:13:38 [info     ] browser.launched               channel=msedge headless=True
+05:13:41 [info     ] login.start                    url=https://www.excard.com.my/login
+05:14:07 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+LIVE A1 paper options (exact):
+   "- Please Select -"
+   "Simili 80gsm - Best Seller"
+   "Simili 100gsm - Best Seller"
+   "Simili 140gsm - Best Seller"
+   "Gloss Art Paper 100gsm - Best Seller"
+   "Gloss Art Paper 128gsm - Best Seller"
+   "Gloss Art Paper 150gsm - Best Seller"
+   "Matte Art Paper 130gsm - Best Seller"
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller"
+Matte130 exact-match present: True

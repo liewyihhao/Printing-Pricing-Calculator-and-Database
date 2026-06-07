@@ -1,0 +1,28 @@
+{
+ "test": "held-out configs (25%)",
+ "sample_points": 3450,
+ "test_points": 838,
+ "configs": 146,
+ "mape": 19.64,
+ "median": 8.29,
+ "within_3pct": 25.3,
+ "within_5pct": 37.1,
+ "within_10pct": 53.8,
+ "under_predict_pct": 57.2,
+ "by_paper": {
+  "Simili": 7.3,
+  "Gloss Art Paper": 14.4,
+  "Matte Art Paper": 6.6,
+  "Gloss Art Card": 4.1
+ },
+ "by_size": {
+  "4xA4 (297mm x 840mm)": 19.0,
+  "4xA5 (210mm x 594mm)": 29.6,
+  "A1 (594mm x 840mm)": 20.3,
+  "A2 (420mm x 594mm)": 4.3,
+  "A3 (297mm x 420mm)": 5.3,
+  "A4 (210mm x 297mm)": 6.6,
+  "A5 (148mm x 210mm)": 4.8,
+  "A6 (148mm x 105mm)": 23.1
+ }
+}

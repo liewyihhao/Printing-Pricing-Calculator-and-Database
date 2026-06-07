@@ -1,0 +1,25 @@
+06:33:44 [info     ] browser.launched               channel=msedge headless=True
+06:33:47 [warning  ] order.session_unusable_reloging_in
+06:33:47 [info     ] login.start                    url=https://www.excard.com.my/login
+06:34:08 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+06:34:08 [info     ] order.crawl_start              workers=1
+06:34:38 [warning  ] order.configure_failed         paper=Gloss Art Paper 100gsm - Best Seller size=A1 (594mm x 840mm)
+06:35:02 [warning  ] order.configure_failed         paper=Gloss Art Paper 128gsm - Best Seller size=A1 (594mm x 840mm)
+06:35:23 [warning  ] order.configure_failed         paper=Gloss Art Paper 128gsm - Best Seller size=A1 (594mm x 840mm)
+06:35:46 [warning  ] order.configure_failed         paper=Gloss Art Paper 150gsm - Best Seller size=A1 (594mm x 840mm)
+06:36:11 [warning  ] order.configure_failed         paper=Gloss Art Paper 150gsm - Best Seller size=A1 (594mm x 840mm)
+06:36:36 [warning  ] order.configure_failed         paper=Matte Art Paper 130gsm - Best Seller size=A1 (594mm x 840mm)
+06:36:57 [warning  ] order.configure_failed         paper=Matte Art Paper 130gsm - Best Seller size=A1 (594mm x 840mm)
+06:37:22 [warning  ] order.configure_failed         paper=Gloss Art Card 250gsm (2 sides coated) - Best Seller size=A1 (594mm x 840mm)
+06:37:46 [warning  ] order.configure_failed         paper=Gloss Art Card 250gsm (2 sides coated) - Best Seller size=A1 (594mm x 840mm)
+06:37:46 [info     ] order.recycle_context          processed=9 worker=1
+06:38:18 [warning  ] order.configure_failed         paper=Simili 140gsm - Best Seller size=A2 (420mm x 594mm)
+06:38:39 [warning  ] order.configure_failed         paper=Simili 140gsm - Best Seller size=A2 (420mm x 594mm)
+06:39:03 [warning  ] order.configure_failed         paper=Gloss Art Paper 100gsm - Best Seller size=A2 (420mm x 594mm)
+06:39:29 [warning  ] order.configure_failed         paper=Gloss Art Paper 100gsm - Best Seller size=A2 (420mm x 594mm)
+06:39:53 [warning  ] order.configure_failed         paper=Gloss Art Paper 128gsm - Best Seller size=A2 (420mm x 594mm)
+06:40:17 [warning  ] order.configure_failed         paper=Gloss Art Paper 128gsm - Best Seller size=A2 (420mm x 594mm)
+06:40:39 [warning  ] order.configure_failed         paper=Gloss Art Paper 150gsm - Best Seller size=A2 (420mm x 594mm)
+06:41:01 [warning  ] order.configure_failed         paper=Gloss Art Paper 150gsm - Best Seller size=A2 (420mm x 594mm)
+06:41:22 [warning  ] order.configure_failed         paper=Matte Art Paper 130gsm - Best Seller size=A2 (420mm x 594mm)
+06:41:22 [info     ] order.recycle_context          processed=18 worker=1

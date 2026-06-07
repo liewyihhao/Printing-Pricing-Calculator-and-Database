@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Printoka — Pricing Intelligence</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          display: ['Poppins', 'sans-serif'],
+        },
+        colors: {
+          ink: '#0a0a0a',
+          slate: {
+            50: '#f6f8fb', 100: '#eef1f6', 150: '#e6eaf1',
+            200: '#dde3ec', 400: '#8792a8', 500: '#5f6b80',
+            600: '#414b5e', 700: '#2c3444', 900: '#0e1525',
+          },
+          brand: { 500: '#635bff', 600: '#5147e0' }, // stripe-ish indigo accent
+        },
+        boxShadow: {
+          card: '0 1px 2px rgba(16,24,40,.05), 0 1px 3px rgba(16,24,40,.06)',
+          pop: '0 4px 12px rgba(16,24,40,.08), 0 12px 32px rgba(16,24,40,.10)',
+        },
+      },
+    },
+  };
+</script>
+<style>
+  body { -webkit-font-smoothing: antialiased; }
+  .brand-orb {
+    background: conic-gradient(from 210deg,#ff3d2e,#ff8a00,#ffd000,#39c46e,#1fa2ff,#7b5bff,#ff3d2e);
+  }
+  .brand-text {
+    background: linear-gradient(90deg,#ff5a2e,#ff8a00,#1fa2ff,#7b5bff);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .brand-gradient {
+    background: linear-gradient(99deg,#ff5a2e 0%,#ff8a00 28%,#7b5bff 72%,#1fa2ff 100%);
+  }
+  .hairline { border-color: #e9edf3; }
+  .nav-item { transition: background .12s, color .12s; }
+  .nav-item:hover { background:#f1f3f8; }
+  .nav-item.active { background:#eef0fe; color:#5147e0; }
+  .nav-item.active svg { color:#5147e0; }
+  ::-webkit-scrollbar{ width:10px; height:10px; }
+  ::-webkit-scrollbar-thumb{ background:#d7dde7; border-radius:8px; border:3px solid #fff; }
+  .tab-underline { box-shadow: inset 0 -2px 0 #5147e0; color:#1a2233; }
+  .fade-in { animation: fade .25s ease both; }
+  @keyframes fade { from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+  .range-thumb::-webkit-slider-thumb{ -webkit-appearance:none; height:18px; width:18px; border-radius:50%; background:#fff; border:2px solid #5147e0; box-shadow:0 1px 3px rgba(0,0,0,.2); cursor:pointer; margin-top:-7px;}
+  .range-thumb{ -webkit-appearance:none; height:4px; border-radius:4px; background:#dde3ec; }
+</style>
+</head>
+<body class="font-sans bg-slate-50 text-slate-900">
+
+<div class="flex min-h-screen">
+
+  <!-- ============ SIDEBAR ============ -->
+  <aside class="hidden lg:flex w-[248px] shrink-0 flex-col border-r hairline bg-white">
+    <div class="flex items-center gap-2.5 px-5 h-16">
+      <div class="brand-orb h-7 w-7 rounded-full shadow-sm"></div>
+      <span class="font-display font-semibold text-[17px] tracking-tight text-ink">printoka</span>
+    </div>
+
+    <!-- account switcher -->
+    <div class="px-3">
+      <button class="w-full flex items-center justify-between rounded-lg border hairline px-3 py-2 text-left hover:bg-slate-50 transition">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="h-6 w-6 rounded-md brand-gradient shrink-0"></div>
+          <div class="min-w-0">
+            <div class="text-[13px] font-semibold text-slate-700 truncate leading-tight">Yushan Corp</div>
+            <div class="text-[11px] text-slate-400 leading-tight">Pricing workspace</div>
+          </div>
+        </div>
+        <svg class="h-4 w-4 text-slate-400 shrink-0" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto px-3 mt-3 space-y-0.5 text-[13.5px] text-slate-600 font-medium" id="nav">
+      <a data-view="overview" class="nav-item active flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer">
+        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M3 5.5A1.5 1.5 0 014.5 4h11A1.5 1.5 0 0117 5.5v9a1.5 1.5 0 01-1.5 1.5h-11A1.5 1.5 0 013 14.5v-9z" stroke="currentColor" stroke-width="1.4"/><path d="M3 8h14M7.5 8v8" stroke="currentColor" stroke-width="1.4"/></svg>
+        Overview
+      </a>
+      <a data-view="products" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer">
+        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M10 2.5l6.5 3.5v8L10 17.5 3.5 14V6L10 2.5z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M3.5 6l6.5 3.5L16.5 6M10 9.5v8" stroke="currentColor" stroke-width="1.4"/></svg>
+        Products
+      </a>
+      <a data-view="pricing" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer">
+        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M3 5.5h14M3 10h14M3 14.5h9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Pricing tables
+      </a>
+      <a data-view="calculator" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer">
+        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><rect x="4" y="2.5" width="12" height="15" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 6h6M7 9.5h2M11 9.5h2M7 13h2M11 13h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Price calculator
+      </a>
+      <a data-view="analysis" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer">
+        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M3 16V4M3 16h14M6 13l3-4 3 2 4-6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Cost analysis
+      </a>
+      <a data-view="crawls" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer">
+        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M10 3a7 7 0 100 14 7 7 0 000-14z" stroke="currentColor" stroke-width="1.4"/><path d="M10 6.5V10l2.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        Crawl jobs
+      </a>
+
+      <div class="pt-4 pb-1 px-3 text-[11px] uppercase tracking-wide text-slate-400 font-semibold">Developers</div>
+      <a data-view="api" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer">
+        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M7.5 5L3 10l4.5 5M12.5 5L17 10l-4.5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        API & webhooks
+      </a>
+      <a data-view="settings" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2 cursor-pointer">
+        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" stroke="currentColor" stroke-width="1.4"/><path d="M16 10a6 6 0 00-.1-1.1l1.5-1.2-1.5-2.6-1.8.7a6 6 0 00-1.9-1.1L11.8 2.7H8.2L7.9 4.6a6 6 0 00-1.9 1.1l-1.8-.7-1.5 2.6L4.1 8.9A6 6 0 004 10c0 .4 0 .8.1 1.1l-1.5 1.2 1.5 2.6 1.8-.7a6 6 0 001.9 1.1l.3 1.9h3.6l.3-1.9a6 6 0 001.9-1.1l1.8.7 1.5-2.6-1.5-1.2c.1-.3.1-.7.1-1.1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+        Settings
+      </a>
+    </nav>
+
+    <div class="p-3 border-t hairline">
+      <div class="flex items-center gap-2.5 px-2 py-1.5">
+        <div class="h-8 w-8 rounded-full bg-slate-700 text-white grid place-items-center text-[12px] font-semibold">YC</div>
+        <div class="min-w-0 flex-1">
+          <div class="text-[12.5px] font-semibold text-slate-700 truncate">yushancorporation</div>
+          <div class="text-[11px] text-slate-400 truncate">Owner</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============ MAIN ============ -->
+  <div class="flex-1 flex flex-col min-w-0">
+
+    <!-- top bar -->
+    <header class="sticky top-0 z-20 h-16 bg-white/85 backdrop-blur border-b hairline flex items-center gap-3 px-4 sm:px-6">
+      <div class="lg:hidden brand-orb h-7 w-7 rounded-full"></div>
+      <div class="relative flex-1 max-w-md">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M14 14l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <input placeholder="Search products, combinations, SKUs…" class="w-full rounded-lg bg-slate-100 focus:bg-white border border-transparent focus:border-brand-500/40 focus:ring-2 focus:ring-brand-500/15 pl-9 pr-3 py-2 text-[13.5px] outline-none transition placeholder:text-slate-400" />
+      </div>
+      <div class="flex items-center gap-1.5 ml-auto">
+        <span class="hidden sm:inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1">
+          <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Live data
+        </span>
+        <button class="h-9 w-9 grid place-items-center rounded-lg hover:bg-slate-100 text-slate-500">
+          <svg class="h-[18px] w-[18px]" viewBox="0 0 20 20" fill="none"><path d="M10 3a4 4 0 00-4 4c0 4-1.5 5-1.5 5h11S14 11 14 7a4 4 0 00-4-4zM8.5 15.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <button class="brand-gradient text-white text-[13px] font-semibold rounded-lg px-3.5 py-2 shadow-sm hover:opacity-95 transition flex items-center gap-1.5">
+          <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M4 10h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          New crawl
+        </button>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6" id="main"><!-- views injected --></main>
+  </div>
+</div>
+
+<script>
+// ---------- mock data ----------
+const products = [
+  { id:'prod_litho21', name:'Litho Loose Sheet', cat:'Offset / Litho', combos:4860, base:38.00, status:'Synced', updated:'2 min ago' },
+  { id:'prod_namecard', name:'Name Card — Art Card', cat:'Offset', combos:1240, base:18.00, status:'Synced', updated:'12 min ago' },
+  { id:'prod_flyer', name:'Flyer / Leaflet', cat:'Offset', combos:3120, base:45.00, status:'Synced', updated:'1 h ago' },
+  { id:'prod_booklet', name:'Booklet — Saddle Stitch', cat:'Offset', combos:8740, base:120.00, status:'Syncing', updated:'now' },
+  { id:'prod_sticker', name:'Sticker & Label', cat:'Digital', combos:2210, base:60.00, status:'Synced', updated:'3 h ago' },
+  { id:'prod_brochure', name:'Brochure — Folded', cat:'Offset', combos:5380, base:80.00, status:'Stale', updated:'2 d ago' },
+];
+const parseRM = v => 'RM ' + Number(v).toLocaleString('en-MY',{minimumFractionDigits:2,maximumFractionDigits:2});
+
+// ---------- views ----------
+const views = {};
+
+views.overview = () => `
+  <div class="fade-in max-w-[1100px]">
+    <div class="flex items-end justify-between gap-4 mb-6">
+      <div>
+        <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Overview</h1>
+        <p class="text-slate-500 text-[13.5px] mt-0.5">Pricing intelligence across all crawled Excard products.</p>
+      </div>
+      <div class="hidden sm:flex items-center rounded-lg border hairline bg-white text-[13px] font-medium text-slate-600 overflow-hidden">
+        <button class="px-3 py-1.5 tab-underline">7 days</button>
+        <button class="px-3 py-1.5 hover:bg-slate-50">30 days</button>
+        <button class="px-3 py-1.5 hover:bg-slate-50">All time</button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      ${[
+        ['Combinations stored','25,550','+1,240','up'],
+        ['Products tracked','6','+0','flat'],
+        ['Avg. margin opportunity','34.2%','+2.1%','up'],
+        ['Pricing accuracy','99.4%','+0.3%','up'],
+      ].map(([l,v,d,t])=>`
+        <div class="bg-white rounded-xl border hairline shadow-card p-4">
+          <div class="text-[12.5px] text-slate-500 font-medium">${l}</div>
+          <div class="mt-1.5 text-[22px] font-semibold tracking-tight text-ink">${v}</div>
+          <div class="mt-1 text-[12px] font-medium ${t==='up'?'text-emerald-600':'text-slate-400'} flex items-center gap-1">
+            ${t==='up'?'<svg class="h-3 w-3" viewBox="0 0 12 12" fill="none"><path d="M6 9V3m0 0L3.5 5.5M6 3l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>':''}${d} vs last week
+          </div>
+        </div>`).join('')}
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-4">
+      <div class="lg:col-span-2 bg-white rounded-xl border hairline shadow-card p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold text-[15px] text-ink">Estimated cost vs. selling price</h3>
+          <span class="text-[12px] text-slate-400">Litho Loose Sheet · 1,000 qty</span>
+        </div>
+        ${sparkChart()}
+        <div class="flex gap-5 mt-4 text-[12.5px]">
+          <span class="flex items-center gap-1.5 text-slate-500"><span class="h-2.5 w-2.5 rounded-sm bg-brand-500"></span>Est. production cost</span>
+          <span class="flex items-center gap-1.5 text-slate-500"><span class="h-2.5 w-2.5 rounded-sm" style="background:#ff8a00"></span>Suggested selling price</span>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border hairline shadow-card p-5">
+        <h3 class="font-semibold text-[15px] text-ink mb-3">Recent crawl jobs</h3>
+        <div class="space-y-3">
+          ${[
+            ['Litho /21','Completed','4,860 rows','emerald'],
+            ['Booklet','Running','62%','amber'],
+            ['Brochure','Queued','—','slate'],
+          ].map(([n,s,m,c])=>`
+            <div class="flex items-center gap-3">
+              <span class="h-2 w-2 rounded-full bg-${c}-500"></span>
+              <div class="flex-1 min-w-0">
+                <div class="text-[13px] font-medium text-slate-700 truncate">${n}</div>
+                <div class="text-[11.5px] text-slate-400">${s} · ${m}</div>
+              </div>
+            </div>`).join('')}
+        </div>
+        <button onclick="go('crawls')" class="mt-4 w-full text-[13px] font-semibold text-brand-600 hover:text-brand-500 text-left">View all jobs →</button>
+      </div>
+    </div>
+  </div>`;
+
+views.products = () => `
+  <div class="fade-in max-w-[1100px]">
+    <div class="flex items-end justify-between gap-4 mb-5">
+      <div>
+        <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Products</h1>
+        <p class="text-slate-500 text-[13.5px] mt-0.5">${products.length} products · ${products.reduce((a,p)=>a+p.combos,0).toLocaleString()} combinations indexed.</p>
+      </div>
+      <button class="brand-gradient text-white text-[13px] font-semibold rounded-lg px-3.5 py-2 shadow-sm hover:opacity-95">+ Add product</button>
+    </div>
+    <div class="bg-white rounded-xl border hairline shadow-card overflow-hidden">
+      <div class="flex items-center gap-2 px-4 py-2.5 border-b hairline text-[13px]">
+        <button class="px-2.5 py-1 rounded-md bg-slate-100 font-medium text-slate-700">All</button>
+        <button class="px-2.5 py-1 rounded-md hover:bg-slate-50 text-slate-500">Offset</button>
+        <button class="px-2.5 py-1 rounded-md hover:bg-slate-50 text-slate-500">Digital</button>
+        <span class="ml-auto text-slate-400 text-[12.5px]">Sorted by last updated</span>
+      </div>
+      <table class="w-full text-[13.5px]">
+        <thead class="text-slate-400 text-[12px] uppercase tracking-wide">
+          <tr class="border-b hairline">
+            <th class="text-left font-semibold px-4 py-2.5">Product</th>
+            <th class="text-left font-semibold px-4 py-2.5 hidden sm:table-cell">Category</th>
+            <th class="text-right font-semibold px-4 py-2.5">Combinations</th>
+            <th class="text-right font-semibold px-4 py-2.5 hidden md:table-cell">Base price</th>
+            <th class="text-left font-semibold px-4 py-2.5">Status</th>
+            <th class="text-right font-semibold px-4 py-2.5 hidden lg:table-cell">Updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${products.map(p=>`
+            <tr class="border-b hairline last:border-0 hover:bg-slate-50/60 cursor-pointer" onclick="go('pricing')">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-3">
+                  <div class="h-8 w-8 rounded-lg brand-gradient/90 brand-gradient grid place-items-center text-white text-[11px] font-bold">${p.name[0]}</div>
+                  <div>
+                    <div class="font-semibold text-slate-800">${p.name}</div>
+                    <div class="text-[11.5px] text-slate-400 font-mono">${p.id}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-slate-500 hidden sm:table-cell">${p.cat}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-slate-700 font-medium">${p.combos.toLocaleString()}</td>
+              <td class="px-4 py-3 text-right tabular-nums text-slate-600 hidden md:table-cell">${parseRM(p.base)}</td>
+              <td class="px-4 py-3">${statusPill(p.status)}</td>
+              <td class="px-4 py-3 text-right text-slate-400 text-[12.5px] hidden lg:table-cell">${p.updated}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+  </div>`;
+
+views.pricing = () => `
+  <div class="fade-in max-w-[1100px]">
+    <div class="flex items-center gap-2 text-[13px] text-slate-400 mb-2">
+      <span onclick="go('products')" class="hover:text-slate-600 cursor-pointer">Products</span> / <span class="text-slate-600 font-medium">Litho Loose Sheet</span>
+    </div>
+    <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Pricing table</h1>
+    <p class="text-slate-500 text-[13.5px] mb-5">Every captured combination, exactly as structured on Excard. <span class="font-mono text-slate-400">prod_litho21</span></p>
+    <div class="bg-white rounded-xl border hairline shadow-card overflow-x-auto">
+      <table class="w-full text-[13px] whitespace-nowrap">
+        <thead class="text-slate-400 text-[11.5px] uppercase tracking-wide bg-slate-50/70">
+          <tr class="border-b hairline">
+            ${['Size','Material','Print side','Color','Finishing','Qty','Excard price','Est. cost','Suggested'].map(h=>`<th class="text-left font-semibold px-4 py-2.5">${h}</th>`).join('')}
+          </tr>
+        </thead>
+        <tbody class="tabular-nums">
+          ${pricingRows()}
+        </tbody>
+      </table>
+    </div>
+    <p class="text-[12px] text-slate-400 mt-3">Showing 8 of 4,860 combinations · <span class="text-brand-600 font-medium cursor-pointer">Export CSV</span></p>
+  </div>`;
+
+views.calculator = () => `
+  <div class="fade-in max-w-[920px]">
+    <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Price calculator</h1>
+    <p class="text-slate-500 text-[13.5px] mb-6">Configure a job and get a live cost + suggested selling price. Mirrors the Printoka public API flow.</p>
+    <div class="grid md:grid-cols-[1fr_320px] gap-5">
+      <div class="bg-white rounded-xl border hairline shadow-card p-5 space-y-5">
+        ${selectField('Product','product',['Litho Loose Sheet','Name Card','Flyer / Leaflet'])}
+        ${selectField('Size','size',['A4 (210×297)','A5 (148×210)','A6 (105×148)'])}
+        ${selectField('Material','material',['80gsm Woodfree','100gsm Art','128gsm Art Card','157gsm Art Card'])}
+        <div class="grid grid-cols-2 gap-4">
+          ${segField('Print side','side',['Single','Double'])}
+          ${segField('Color','color',['4C+0','4C+4C'])}
+        </div>
+        ${segField('Finishing','finish',['None','Matt Lam.','Gloss Lam.','Spot UV'])}
+        <div>
+          <label class="block text-[13px] font-medium text-slate-600 mb-2">Quantity <span id="qtyval" class="text-brand-600 font-semibold float-right">1,000</span></label>
+          <input id="qty" type="range" min="100" max="10000" step="100" value="1000" class="range-thumb w-full" oninput="recalc()" />
+          <div class="flex justify-between text-[11px] text-slate-400 mt-1"><span>100</span><span>10,000</span></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border hairline shadow-card p-5 h-fit sticky top-20">
+        <div class="text-[12.5px] font-semibold text-slate-400 uppercase tracking-wide mb-3">Quote</div>
+        <div class="space-y-2.5 text-[13px]">
+          ${quoteLine('Material cost','m_mat')}
+          ${quoteLine('Printing cost','m_print')}
+          ${quoteLine('Setup / plates','m_setup')}
+          ${quoteLine('Finishing','m_finish')}
+        </div>
+        <div class="border-t hairline my-3"></div>
+        <div class="flex justify-between text-[13.5px] font-medium text-slate-600">
+          <span>Est. production cost</span><span id="m_cost" class="tabular-nums">—</span>
+        </div>
+        <div class="flex justify-between items-center text-[12.5px] text-slate-400 mt-1">
+          <span>Markup <span id="markval">35%</span></span>
+          <input id="markup" type="range" min="10" max="80" value="35" class="range-thumb w-28" oninput="recalc()">
+        </div>
+        <div class="brand-gradient rounded-lg mt-4 p-3.5 text-white">
+          <div class="text-[12px] opacity-80">Suggested selling price</div>
+          <div id="m_sell" class="text-[26px] font-display font-semibold tracking-tight leading-tight">—</div>
+          <div id="m_margin" class="text-[12px] opacity-80 mt-0.5">—</div>
+        </div>
+        <button class="mt-3 w-full border hairline rounded-lg py-2 text-[13px] font-semibold text-slate-700 hover:bg-slate-50">Save as price rule</button>
+      </div>
+    </div>
+  </div>`;
+
+views.analysis = () => `
+  <div class="fade-in max-w-[1000px]">
+    <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Cost analysis</h1>
+    <p class="text-slate-500 text-[13.5px] mb-6">Reverse-engineered production economics inferred from 25,550 price points.</p>
+    <div class="grid md:grid-cols-2 gap-4 mb-4">
+      ${[
+        ['Offset plate setup','RM 28.00 / plate','High','92'],
+        ['Digital threshold','≤ 250 qty switches digital','Medium','78'],
+        ['Economies of scale','−7.4% cost per qty-tier','High','88'],
+        ['Lamination increment','+RM 0.018 / sheet','High','90'],
+      ].map(([t,v,conf,score])=>`
+        <div class="bg-white rounded-xl border hairline shadow-card p-4">
+          <div class="flex items-start justify-between">
+            <div>
+              <div class="text-[13.5px] font-semibold text-slate-800">${t}</div>
+              <div class="text-[13px] text-slate-500 mt-0.5">${v}</div>
+            </div>
+            ${confPill(conf)}
+          </div>
+          <div class="mt-3 flex items-center gap-2">
+            <div class="flex-1 h-1.5 rounded-full bg-slate-100 overflow-hidden"><div class="h-full brand-gradient" style="width:${score}%"></div></div>
+            <span class="text-[12px] font-semibold text-slate-500 tabular-nums">${score}%</span>
+          </div>
+        </div>`).join('')}
+    </div>
+    <div class="bg-white rounded-xl border hairline shadow-card p-5">
+      <h3 class="font-semibold text-[15px] text-ink mb-1">Quantity scaling curve</h3>
+      <p class="text-[12.5px] text-slate-400 mb-4">Unit cost decreases logarithmically — classic offset gang-run behavior.</p>
+      ${sparkChart(true)}
+    </div>
+  </div>`;
+
+views.crawls = () => `
+  <div class="fade-in max-w-[1000px]">
+    <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Crawl jobs</h1>
+    <p class="text-slate-500 text-[13.5px] mb-5">Resumable, checkpointed crawls of excard.com.my.</p>
+    <div class="bg-white rounded-xl border hairline shadow-card divide-y hairline">
+      ${[
+        ['#1042','Litho /21','Completed','100','4,860 rows · 6m 12s','emerald'],
+        ['#1041','Booklet','Running','62','5,420 / 8,740 rows','amber'],
+        ['#1040','Brochure','Queued','0','waiting for worker','slate'],
+        ['#1039','Sticker & Label','Completed','100','2,210 rows · 3m 02s','emerald'],
+        ['#1038','Name Card','Failed → retried','100','recovered from checkpoint','emerald'],
+      ].map(([id,n,s,prog,m,c])=>`
+        <div class="flex items-center gap-4 px-5 py-3.5">
+          <span class="font-mono text-[12px] text-slate-400 w-12">${id}</span>
+          <div class="flex-1 min-w-0">
+            <div class="text-[13.5px] font-semibold text-slate-800">${n}</div>
+            <div class="text-[12px] text-slate-400">${m}</div>
+          </div>
+          <div class="hidden sm:block w-32">
+            <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden"><div class="h-full bg-${c}-500" style="width:${prog}%"></div></div>
+          </div>
+          <span class="text-[12px] font-medium text-${c}-700 bg-${c}-50 border border-${c}-100 rounded-full px-2.5 py-1 whitespace-nowrap">${s}</span>
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+views.api = () => `
+  <div class="fade-in max-w-[860px]">
+    <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">API & webhooks</h1>
+    <p class="text-slate-500 text-[13.5px] mb-6">Connect Printoka's storefront to live pricing.</p>
+    <div class="bg-white rounded-xl border hairline shadow-card p-5 mb-4">
+      <div class="text-[13px] font-semibold text-slate-700 mb-2">Test API key</div>
+      <div class="flex items-center gap-2 bg-slate-900 rounded-lg px-3 py-2.5 font-mono text-[12.5px] text-slate-300">
+        <span class="text-emerald-400">pk_test_</span>printoka_4f9c…a82b
+        <button class="ml-auto text-slate-400 hover:text-white">Copy</button>
+      </div>
+    </div>
+    <div class="bg-slate-900 rounded-xl shadow-card p-5 overflow-x-auto">
+      <div class="text-[11.5px] text-slate-400 uppercase tracking-wide mb-3 font-semibold">POST /v1/calculate-price</div>
+<pre class="text-[12.5px] leading-relaxed font-mono"><span class="text-slate-500">curl</span> https://api.printoka.com/v1/calculate-price <span class="text-slate-500">\\</span>
+  -H <span class="text-emerald-400">"Authorization: Bearer pk_test_…"</span> \\
+  -d <span class="text-amber-300">product</span>=<span class="text-sky-300">litho_loose_sheet</span> \\
+  -d <span class="text-amber-300">size</span>=<span class="text-sky-300">A4</span> -d <span class="text-amber-300">material</span>=<span class="text-sky-300">128gsm</span> \\
+  -d <span class="text-amber-300">finishing</span>=<span class="text-sky-300">matt_lam</span> -d <span class="text-amber-300">qty</span>=<span class="text-sky-300">1000</span></pre>
+    </div>
+  </div>`;
+
+views.settings = () => `
+  <div class="fade-in max-w-[700px]">
+    <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Settings</h1>
+    <p class="text-slate-500 text-[13.5px] mb-6">Workspace and crawl configuration.</p>
+    <div class="bg-white rounded-xl border hairline shadow-card divide-y hairline">
+      ${[
+        ['Source URL','excard.com.my/price-list/Litho/21'],
+        ['Crawl schedule','Daily · 02:00 MYT'],
+        ['Default markup','35% · min margin 20%'],
+        ['Rounding rule','Psychological · .90 ending'],
+        ['Session','Persistent · auto-refresh on timeout'],
+      ].map(([k,v])=>`
+        <div class="flex items-center justify-between px-5 py-3.5">
+          <span class="text-[13.5px] text-slate-500">${k}</span>
+          <span class="text-[13.5px] font-medium text-slate-800">${v}</span>
+        </div>`).join('')}
+    </div>
+  </div>`;
+
+// ---------- helpers ----------
+function statusPill(s){
+  const map={Synced:'emerald',Syncing:'sky',Stale:'amber'};
+  const c=map[s]||'slate';
+  return `<span class="inline-flex items-center gap-1.5 text-[12px] font-medium text-${c}-700 bg-${c}-50 border border-${c}-100 rounded-full px-2 py-0.5"><span class="h-1.5 w-1.5 rounded-full bg-${c}-500"></span>${s}</span>`;
+}
+function confPill(c){
+  const map={High:'emerald',Medium:'amber',Low:'slate'};
+  return `<span class="text-[11px] font-semibold text-${map[c]}-700 bg-${map[c]}-50 border border-${map[c]}-100 rounded-full px-2 py-0.5">${c} conf.</span>`;
+}
+function selectField(label,id,opts){
+  return `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${label}</label>
+    <div class="relative">
+      <select id="${id}" onchange="recalc()" class="w-full appearance-none rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700 outline-none focus:border-brand-500/50 focus:ring-2 focus:ring-brand-500/15">
+        ${opts.map(o=>`<option>${o}</option>`).join('')}
+      </select>
+      <svg class="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" viewBox="0 0 20 20" fill="none"><path d="M7 8l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div></div>`;
+}
+function segField(label,id,opts){
+  return `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${label}</label>
+    <div class="flex rounded-lg border hairline overflow-hidden text-[12.5px] font-medium" id="${id}" data-seg>
+      ${opts.map((o,i)=>`<button onclick="seg(this)" data-v="${o}" class="flex-1 px-2 py-2 ${i===0?'bg-brand-500 text-white':'text-slate-600 hover:bg-slate-50'} border-l first:border-l-0 hairline">${o}</button>`).join('')}
+    </div></div>`;
+}
+function quoteLine(label,id){
+  return `<div class="flex justify-between text-slate-500"><span>${label}</span><span id="${id}" class="tabular-nums text-slate-700">—</span></div>`;
+}
+function sparkChart(single){
+  // simple inline SVG area chart
+  const a=[28,30,33,31,36,40,38,44,48,46,52,58];
+  const b=[42,45,49,47,54,60,58,66,72,69,78,86];
+  const w=560,h=150,max=95;
+  const path=(arr)=>arr.map((v,i)=>`${(i/(arr.length-1))*w},${h-(v/max)*h}`).join(' ');
+  return `<svg viewBox="0 0 ${w} ${h}" class="w-full h-[150px]" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#635bff" stop-opacity=".18"/><stop offset="1" stop-color="#635bff" stop-opacity="0"/></linearGradient>
+      <linearGradient id="g2" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#ff8a00" stop-opacity=".16"/><stop offset="1" stop-color="#ff8a00" stop-opacity="0"/></linearGradient>
+    </defs>
+    ${single?'':`<polygon points="0,${h} ${path(b)} ${w},${h}" fill="url(#g2)"/><polyline points="${path(b)}" fill="none" stroke="#ff8a00" stroke-width="2"/>`}
+    <polygon points="0,${h} ${path(a)} ${w},${h}" fill="url(#g1)"/>
+    <polyline points="${path(a)}" fill="none" stroke="#635bff" stroke-width="2"/>
+  </svg>`;
+}
+function pricingRows(){
+  const rows=[
+    ['A4','128gsm','Single','4C+0','None','500','42.00','27.30','58.00'],
+    ['A4','128gsm','Single','4C+0','Matt Lam.','500','58.00','38.10','79.00'],
+    ['A4','128gsm','Double','4C+4C','None','500','76.00','49.40','103.00'],
+    ['A4','128gsm','Double','4C+4C','Gloss Lam.','1000','118.00','77.90','159.00'],
+    ['A5','100gsm','Single','4C+0','None','1000','55.00','35.80','74.00'],
+    ['A5','100gsm','Double','4C+4C','None','1000','92.00','60.20','124.00'],
+    ['A6','80gsm','Single','4C+0','None','1000','38.00','24.10','51.00'],
+    ['A6','80gsm','Double','4C+4C','Spot UV','2000','210.00','142.00','283.00'],
+  ];
+  return rows.map(r=>`<tr class="border-b hairline last:border-0 hover:bg-slate-50/60">
+    ${r.slice(0,6).map(c=>`<td class="px-4 py-2.5 text-slate-600">${c}</td>`).join('')}
+    <td class="px-4 py-2.5 font-medium text-slate-800">RM ${r[6]}</td>
+    <td class="px-4 py-2.5 text-slate-500">RM ${r[7]}</td>
+    <td class="px-4 py-2.5 font-semibold text-emerald-600">RM ${r[8]}</td>
+  </tr>`).join('');
+}
+
+// ---------- calculator logic ----------
+function seg(btn){
+  const grp=btn.closest('[data-seg]');
+  [...grp.children].forEach(b=>{b.className=b.className.replace('bg-brand-500','').replace('text-white','')+' text-slate-600 hover:bg-slate-50';});
+  btn.className='flex-1 px-2 py-2 bg-brand-500 text-white border-l first:border-l-0 hairline';
+  recalc();
+}
+function recalc(){
+  const q=+(document.getElementById('qty')?.value||1000);
+  document.getElementById('qtyval') && (document.getElementById('qtyval').textContent=q.toLocaleString());
+  const matSel=document.getElementById('material')?.selectedIndex||0;
+  const sizeSel=document.getElementById('size')?.selectedIndex||0;
+  const colorEl=document.querySelector('#color .bg-brand-500')?.dataset.v||'4C+0';
+  const sideEl=document.querySelector('#side .bg-brand-500')?.dataset.v||'Single';
+  const finEl=document.querySelector('#finish .bg-brand-500')?.dataset.v||'None';
+
+  const matRate=[0.018,0.024,0.030,0.036][matSel];
+  const sizeMul=[1,0.62,0.36][sizeSel];
+  const sheets=q;
+  const mat=sheets*matRate*sizeMul + 12;
+  const colorMul=colorEl==='4C+4C'?1.8:1;
+  const sideMul=sideEl==='Double'?1.7:1;
+  const print=sheets*0.012*sizeMul*colorMul*sideMul;
+  const setup=28*(colorEl==='4C+4C'?8:4)*(sideEl==='Double'?1.3:1)/1; // plate setup
+  const finMap={'None':0,'Matt Lam.':0.018,'Gloss Lam.':0.020,'Spot UV':0.055};
+  const finish=sheets*finMap[finEl]*sizeMul;
+  // economies of scale
+  const scale=Math.max(0.62,1-Math.log10(q/100)*0.10);
+  const cost=(mat+print+setup+finish)*scale;
+
+  const mk=+(document.getElementById('markup')?.value||35);
+  document.getElementById('markval') && (document.getElementById('markval').textContent=mk+'%');
+  let sell=cost*(1+mk/100);
+  sell=Math.floor(sell)-0.10; // psychological rounding
+  const margin=((sell-cost)/sell*100);
+
+  const set=(id,v)=>{const e=document.getElementById(id); if(e) e.textContent=v;};
+  set('m_mat',parseRM(mat)); set('m_print',parseRM(print)); set('m_setup',parseRM(setup)); set('m_finish',parseRM(finish));
+  set('m_cost',parseRM(cost)); set('m_sell',parseRM(sell));
+  set('m_margin',`Margin ${margin.toFixed(1)}% · ${parseRM(sell/q)} / unit`);
+}
+
+// ---------- router ----------
+function go(name){
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===name));
+  document.getElementById('main').innerHTML=views[name]();
+  document.getElementById('main').scrollTop=0;
+  if(name==='calculator') recalc();
+}
+document.getElementById('nav').addEventListener('click',e=>{
+  const a=e.target.closest('a[data-view]'); if(a) go(a.dataset.view);
+});
+go('overview');
+</script>
+</body>
+</html>

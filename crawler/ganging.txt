@@ -1,0 +1,8 @@
+11:50:58 [info     ] browser.launched               channel=msedge headless=True
+11:51:03 [warning  ] order.session_unusable_reloging_in
+11:51:03 [info     ] login.start                    url=https://www.excard.com.my/login
+11:51:21 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+11:51:22 [info     ] order.crawl_start              workers=1
+11:54:24 [info     ] order.captured                 colour=1C (Both) delivery=98 package=4in1 paper=Simili 100gsm - Best Seller quantities=20 size=A2 (420mm x 594mm)
+11:57:42 [info     ] order.captured                 colour=4C (Front) delivery=98 package=5in1 paper=Simili 100gsm - Best Seller quantities=20 size=A2 (420mm x 594mm)
+12:00:07 [error    ] order.error                    error=TargetClosedError('Locator.check: Target page, context or browser has been closed\nCall log:\n  - waiting for locator("input[name=\'ctl00$mainContent$order_spec

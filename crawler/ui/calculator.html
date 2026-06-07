@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Printoka — Price Calculator</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans:['Inter','system-ui','sans-serif'], display:['Poppins','sans-serif'] },
+  colors: { ink:'#061b31', brand:{50:'#fff1ec',500:'#ff5a2e',600:'#e6491c',700:'#c43c14'},
+    slate:{50:'#f8fafd',100:'#f1f5f9',200:'#e5edf5',300:'#d8d6df',400:'#64748d',500:'#50617a',600:'#42526b',700:'#2c3a4f',900:'#061b31'} },
+  boxShadow:{
+    card:'0 0 0 1px rgba(60,66,87,.04), 0 2px 5px 0 rgba(60,66,87,.06), 0 1px 1.5px 0 rgba(0,0,0,.04)',
+    pop:'0 0 0 1px rgba(60,66,87,.06), 0 7px 14px 0 rgba(60,66,87,.10), 0 3px 6px 0 rgba(0,0,0,.06)' } } } };
+</script>
+<style>
+  html{color-scheme:light}
+  body{-webkit-font-smoothing:antialiased;letter-spacing:-0.006em;font-feature-settings:"ss01","cv05"}
+  h1{text-wrap:balance;letter-spacing:-0.018em}
+  .tabular-nums,td,th{font-variant-numeric:tabular-nums}
+  .brand-orb{background:conic-gradient(from 210deg,#ff3d2e,#ff8a00,#ffd000,#39c46e,#1fa2ff,#7b5bff,#ff3d2e)}
+  .brand-gradient{background:linear-gradient(99deg,#ff5a2e 0%,#ff8a00 28%,#7b5bff 72%,#1fa2ff 100%)}
+  .hairline{border-color:#e3e8ef}
+  .fieldsel{transition:border .12s,box-shadow .12s}
+  .fieldsel:focus{outline:none;border-color:rgba(255,90,46,.55);box-shadow:0 0 0 3px rgba(255,90,46,.16)}
+  .range-thumb::-webkit-slider-thumb{-webkit-appearance:none;height:18px;width:18px;border-radius:50%;background:#fff;border:2px solid #ff5a2e;box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:pointer;margin-top:-7px}
+  .range-thumb{-webkit-appearance:none;height:4px;border-radius:4px;background:#e5edf5}
+  .fade{animation:f .25s ease both}@keyframes f{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .seg.active{background:#ff5a2e;color:#fff}
+  .tierbtn.active{border-color:#ff5a2e;background:#fff1ec;color:#c43c14}
+</style>
+</head>
+<body class="font-sans bg-slate-50 text-slate-900 min-h-screen">
+
+<header class="h-16 bg-white border-b hairline flex items-center px-5 sm:px-8 gap-2.5">
+  <div class="brand-orb h-7 w-7 rounded-full shadow-sm"></div>
+  <span class="font-display font-semibold text-[17px] tracking-tight text-ink">printoka</span>
+  <span class="text-slate-300 mx-1">/</span>
+  <span class="text-[14px] text-slate-500 font-medium">Price Calculator</span>
+  <span id="livebadge" class="ml-auto hidden sm:inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1">
+    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span><span id="livetext">live data</span>
+  </span>
+</header>
+
+<main class="max-w-[980px] mx-auto px-4 sm:px-8 py-8">
+  <div class="mb-6">
+    <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Loose Sheet pricing</h1>
+    <p class="text-slate-500 text-[13.5px] mt-0.5">Real Excard prices from the crawl. Configure a job to see costs and your suggested selling price.</p>
+  </div>
+
+  <div class="grid md:grid-cols-[1fr_360px] gap-5">
+    <!-- config -->
+    <div class="bg-white rounded-xl border hairline shadow-card p-5 space-y-5">
+      <div>
+        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Size</label>
+        <select id="size" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700"></select>
+      </div>
+      <div>
+        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Paper</label>
+        <select id="paper" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700" disabled></select>
+      </div>
+      <div>
+        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Lamination / Finishing</label>
+        <select id="lamination" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700" disabled></select>
+      </div>
+      <div>
+        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Delivery</label>
+        <select id="delivery" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700"></select>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Print color</label>
+          <div id="colormode" class="flex rounded-lg border hairline overflow-hidden text-[12.5px] font-medium"></div>
+        </div>
+        <div>
+          <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity</label>
+          <select id="quantity" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700" disabled></select>
+        </div>
+      </div>
+      <div id="status" class="text-[12.5px] text-slate-400"></div>
+    </div>
+
+    <!-- quote -->
+    <div class="bg-white rounded-xl border hairline shadow-card p-5 h-fit md:sticky md:top-6">
+      <div class="text-[12.5px] font-semibold text-slate-400 uppercase tracking-wide mb-3">Excard cost — by tier</div>
+      <div id="tiers" class="space-y-1.5 text-[13px]">
+        <div class="text-slate-400 text-[13px]">Configure a job to see prices…</div>
+      </div>
+
+      <div id="markupbox" class="hidden">
+        <div class="border-t hairline my-4"></div>
+        <div class="text-[12.5px] font-semibold text-slate-400 uppercase tracking-wide mb-2">Your selling price</div>
+        <div class="flex items-center justify-between text-[12.5px] text-slate-500 mb-1">
+          <span>Buy at tier</span>
+          <div id="buytier" class="flex gap-1"></div>
+        </div>
+        <div class="flex items-center justify-between text-[12.5px] text-slate-500 mt-2">
+          <span>Markup <span id="markval" class="text-brand-600 font-semibold">35%</span></span>
+          <input id="markup" type="range" min="0" max="100" value="35" class="range-thumb w-32" />
+        </div>
+        <div class="brand-gradient rounded-lg mt-3 p-3.5 text-white">
+          <div class="text-[12px] opacity-80">Suggested selling price</div>
+          <div id="sell" class="text-[26px] font-display font-semibold tracking-tight leading-tight">—</div>
+          <div id="sellmeta" class="text-[12px] opacity-80 mt-0.5">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const API = location.origin.startsWith("http") ? "" : "http://localhost:8000";
+const $ = id => document.getElementById(id);
+const RM = v => "RM " + Number(v).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
+const TIERS = ["Platinum","Gold","Silver","Cash"];
+let state = { ladder:null, colormode:null, buytier:"Platinum" };
+let quoteToken = 0;  // guards against stale async responses
+
+async function api(path){ const r = await fetch(API+path); if(!r.ok) throw new Error(r.status); return r.json(); }
+
+function fill(sel, items, placeholder){
+  sel.innerHTML = `<option value="">${placeholder}</option>` +
+    items.map(i=>`<option value="${encodeURIComponent(i)}">${i}</option>`).join("");
+}
+
+async function init(){
+  try{
+    const sum = await api("/api/summary");
+    $("livetext").textContent = sum.price_points.toLocaleString() + " prices • " + sum.combinations_priced + " combos";
+    const o = await api("/api/options");
+    fill($("size"), o.sizes, "Select size…");
+    $("delivery").innerHTML = Object.entries(o.deliveries)
+      .map(([c,n])=>`<option value="${c}">${n}</option>`).join("");
+    // color mode segmented
+    ["4C","4C+4C"].forEach((m,i)=>{
+      const b=document.createElement("button");
+      b.className="seg flex-1 px-2 py-2 "+(i===0?"active":"text-slate-600 hover:bg-slate-50")+" border-l first:border-l-0 hairline";
+      b.textContent=m; b.dataset.v=m;
+      b.onclick=()=>{ document.querySelectorAll('#colormode .seg').forEach(x=>x.classList.remove('active','text-slate-600'));
+        b.classList.add('active'); state.colormode=m; renderQuote(); };
+      $("colormode").appendChild(b);
+    });
+    state.colormode="4C";
+    // buy-tier chips
+    TIERS.forEach((t,i)=>{
+      const b=document.createElement("button");
+      b.className="tierbtn px-2 py-0.5 rounded-md border hairline text-[11.5px] "+(i===0?"active":"");
+      b.textContent=t; b.dataset.t=t;
+      b.onclick=()=>{ document.querySelectorAll('#buytier .tierbtn').forEach(x=>x.classList.remove('active'));
+        b.classList.add('active'); state.buytier=t; renderSell(); };
+      $("buytier").appendChild(b);
+    });
+  }catch(e){ $("status").textContent="Could not reach the API. Is it running on :8000?"; $("livebadge").classList.add("hidden"); }
+}
+
+$("size").onchange = async () => {
+  const size = decodeURIComponent($("size").value);
+  reset(["paper","lamination","quantity"]); clearQuote();
+  if(!size) return;
+  const o = await api(`/api/options?size=${encodeURIComponent(size)}`);
+  fill($("paper"), o.papers, "Select paper…"); $("paper").disabled=false;
+};
+$("paper").onchange = async () => {
+  const size=decodeURIComponent($("size").value), paper=decodeURIComponent($("paper").value);
+  reset(["lamination","quantity"]); clearQuote();
+  if(!paper) return;
+  const o = await api(`/api/options?size=${encodeURIComponent(size)}&paper=${encodeURIComponent(paper)}`);
+  fill($("lamination"), o.laminations, "Select finishing…"); $("lamination").disabled=false;
+};
+$("lamination").onchange = loadQuote;
+$("delivery").onchange = () => { if($("lamination").value) loadQuote(); };
+$("quantity").onchange = renderQuote;
+$("markup").oninput = () => { $("markval").textContent=$("markup").value+"%"; renderSell(); };
+
+function reset(ids){ ids.forEach(id=>{ $(id).innerHTML=""; $(id).disabled=true; }); }
+function clearQuote(){ state.ladder=null; $("tiers").innerHTML='<div class="text-slate-400 text-[13px]">Configure a job to see prices…</div>'; $("markupbox").classList.add("hidden"); }
+
+async function loadQuote(){
+  const size=decodeURIComponent($("size").value), paper=decodeURIComponent($("paper").value),
+        lam=decodeURIComponent($("lamination").value), del=$("delivery").value;
+  if(!size||!paper||!lam||!del) return;
+  const token = ++quoteToken;
+  const prevQty = $("quantity").value;
+  $("status").textContent="Loading prices…";
+  try{
+    const q = await api(`/api/quote?size=${encodeURIComponent(size)}&paper=${encodeURIComponent(paper)}&lamination=${encodeURIComponent(lam)}&delivery=${del}`);
+    if(token !== quoteToken) return;  // a newer request superseded this one
+    state.ladder=q.ladder;
+    $("quantity").innerHTML=q.quantities.map(n=>`<option value="${n}">${n.toLocaleString()}</option>`).join("");
+    // Preserve the user's quantity if it still exists for this combination.
+    if(prevQty && q.quantities.includes(parseInt(prevQty))) $("quantity").value=prevQty;
+    $("quantity").disabled=false;
+    if(!q.color_modes.includes(state.colormode)) state.colormode=q.color_modes[0];
+    $("status").textContent="";
+    renderQuote();
+  }catch(e){ if(token===quoteToken){ $("status").textContent="No pricing for this exact combination."; clearQuote(); } }
+}
+
+function renderQuote(){
+  if(!state.ladder){ return; }
+  const qty=parseInt($("quantity").value);
+  const modeData=state.ladder[state.colormode]||{};
+  const row=modeData[qty];
+  if(!row){ $("tiers").innerHTML='<div class="text-slate-400 text-[13px]">No price for this quantity.</div>'; return; }
+  $("tiers").innerHTML = TIERS.filter(t=>t in row).map(t=>`
+    <div class="flex items-center justify-between py-1">
+      <span class="text-slate-500">${t}</span>
+      <span class="tabular-nums font-medium text-slate-800">${RM(row[t])}</span>
+    </div>`).join("");
+  $("markupbox").classList.remove("hidden");
+  renderSell();
+}
+
+function renderSell(){
+  if(!state.ladder) return;
+  const qty=parseInt($("quantity").value);
+  const row=(state.ladder[state.colormode]||{})[qty]; if(!row) return;
+  const cost=row[state.buytier]; if(cost==null) return;
+  const mk=parseInt($("markup").value);
+  const sell=cost*(1+mk/100);
+  $("sell").textContent=RM(sell);
+  $("sellmeta").textContent=`cost ${RM(cost)} (${state.buytier}) · margin ${(((sell-cost)/sell)*100).toFixed(1)}% · ${RM(sell/qty)}/unit`;
+}
+
+init();
+</script>
+</body>
+</html>

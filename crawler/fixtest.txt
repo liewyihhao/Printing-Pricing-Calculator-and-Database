@@ -1,0 +1,8 @@
+05:20:08 [info     ] browser.launched               channel=msedge headless=True
+05:20:09 [info     ] login.start                    url=https://www.excard.com.my/login
+05:20:38 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+05:27:28 [info     ] order.captured                 colour=4C (Front) delivery=98 package=Normal paper=Gloss Art Card 250gsm (2 sides coated) - Best Seller quantities=39 size=A1 (594mm x 840mm)
+CAPTURED rows: 39
+  qty 100: before=611.25
+  qty 200: before=680.35
+  qty 300: before=755.55

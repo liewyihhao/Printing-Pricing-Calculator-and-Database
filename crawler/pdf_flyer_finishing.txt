@@ -1,0 +1,63 @@
+===== PAGE 1 =====
+Artwork Specification Flyer, Brochure - Hole Punching, Perforation & Creasing
+1
+Bleeding : 2mm Margin (Safe Zone) : 5mm
+Artwork Dimension (Refer Diagram)
+* Safe zone = 5mm is applicable for panel size for perforation, creasing and folding.
+For panel size less than safe zone area, for example minimum creasing panel = 4mm,
+it is not advice to put important item into the panel.
+200mm x 287mm
+Example
+Chosen A4 Size is
+210mm x 297mm 210mm x 297mm214mm x 301mm
+Actual SizeBleeding Size Safe Zone Size
+210mm
+297mm
+Final artwork file format : Adobe Acrobat Document (*.pdf)
+File Resolution : 300dpi
+Color Mode : Process CMYK mode
+FILE FORMAT
+You must convert to curve, or create outline, or convert to path (depending on your illustration software) all fonts
+before you convert or export your raw file to PDF file format.
+Minimum font size : 5pts
+FONTS
+Line Weight : ≥ 0.25pts for all lines.
+Color Mode : Process CMYK mode
+LINE WEIGHT
+Never apply any crop mark or trapping onto the files.
+MARKING & TRAPPING
+FLYER, BROCHURE
+===== PAGE 2 =====
+Artwork Specification Flyer, Brochure - Hole Punching, Perforation & Creasing
+2
+Hole punching position : Center of the edges (either Top / Bottom / Left / Right)
+Gap for hole punching : 8mm from the edges
+Please indicate clearly the actual position for hole punching at Page 1.
+For Page 1, hole punching must used Pantone 355C (Green) to indicate.
+Example :
+Top Bottom Left Right
+CMYK Artwork + Hole Punching
+Page 1
+SUBMIT ARTWORK FOR FLYER, BROCURE WITH HOLE PUNCHING
+CMYK Artwork
+Page 2
+A
+8mm
+FLYER, BROCHURE WITH HOLE PUNCHING
+===== PAGE 3 =====
+Artwork Specification Flyer, Brochure - Hole Punching, Perforation & Creasing
+3
+Perforation Line : 1 - 6
+Minimum Panel Distance : 45mm
+45mm
+Cross Perforation is NOT allowed, for example :
+45mm 45mm 45mm 45mm 45mm 45mm
+FLYER, BROCHURE WITH PERFORATION
+===== PAGE 4 =====
+Artwork Specification Flyer, Brochure - Hole Punching, Perforation & Creasing
+4
+Creasing Line : 1 - 6
+Minimum Panel Distance : 4mm
+4mm 4mm
+*Please make sure to download our template Product Size Templates to check artwork macth with fold/crease line.
+FLYER, BROCHURE WITH CREASING

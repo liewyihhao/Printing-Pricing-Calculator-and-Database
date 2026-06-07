@@ -1,0 +1,79 @@
+sampling 56 configs for product 50...
+17:29:00 [info     ] browser.launched               channel=msedge headless=True
+17:29:00 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+17:29:19 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+17:33:30 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Simili 100gsm size=297mm x 420mm (A3) total=38
+17:37:57 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Paper 128gsm size=297mm x 420mm (A3) total=76
+17:42:18 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Matte Art Paper 130gsm size=297mm x 420mm (A3) total=114
+17:46:58 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 250gsm (2 side coated) size=297mm x 420mm (A3) total=152
+17:52:00 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 360gsm (2 side coated) size=297mm x 420mm (A3) total=190
+17:56:43 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Linen 240gsm size=297mm x 420mm (A3) total=228
+17:56:43 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+17:57:02 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+18:01:26 [info     ] spot.captured                  colour=4C (Front) n=38 paper=Gloss Art Paper 128gsm size=297mm x 420mm (A3) total=266
+18:05:49 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Simili 100gsm size=210mm x 297mm (A4) total=304
+18:10:07 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Paper 128gsm size=210mm x 297mm (A4) total=342
+18:14:33 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Matte Art Paper 130gsm size=210mm x 297mm (A4) total=380
+18:18:59 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 250gsm (2 side coated) size=210mm x 297mm (A4) total=418
+18:23:22 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 360gsm (2 side coated) size=210mm x 297mm (A4) total=456
+18:23:22 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+18:23:44 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+18:27:58 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Linen 240gsm size=210mm x 297mm (A4) total=494
+18:32:20 [info     ] spot.captured                  colour=4C (Front) n=38 paper=Gloss Art Paper 128gsm size=210mm x 297mm (A4) total=532
+18:36:40 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Simili 100gsm size=148mm x 210mm (A5) total=570
+18:41:06 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Paper 128gsm size=148mm x 210mm (A5) total=608
+18:45:47 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Matte Art Paper 130gsm size=148mm x 210mm (A5) total=646
+18:50:12 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 250gsm (2 side coated) size=148mm x 210mm (A5) total=684
+18:50:13 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+18:50:37 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+18:54:59 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 360gsm (2 side coated) size=148mm x 210mm (A5) total=722
+18:59:14 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Linen 240gsm size=148mm x 210mm (A5) total=760
+19:03:27 [info     ] spot.captured                  colour=4C (Front) n=38 paper=Gloss Art Paper 128gsm size=148mm x 210mm (A5) total=798
+19:07:44 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Simili 100gsm size=105mm x 148mm (A6) total=836
+19:12:01 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Paper 128gsm size=105mm x 148mm (A6) total=874
+19:16:21 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Matte Art Paper 130gsm size=105mm x 148mm (A6) total=912
+19:16:22 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+19:16:47 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+19:21:05 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 250gsm (2 side coated) size=105mm x 148mm (A6) total=950
+19:25:17 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 360gsm (2 side coated) size=105mm x 148mm (A6) total=988
+19:29:40 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Linen 240gsm size=105mm x 148mm (A6) total=1026
+19:34:00 [info     ] spot.captured                  colour=4C (Front) n=38 paper=Gloss Art Paper 128gsm size=105mm x 148mm (A6) total=1064
+19:34:26 [warning  ] spot.skip                      colour=4C (Both) paper=Simili 100gsm size=74mm x 105mm (A7)
+19:38:37 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Paper 128gsm size=74mm x 105mm (A7) total=1102
+19:38:38 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+19:38:59 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+19:43:16 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Matte Art Paper 130gsm size=74mm x 105mm (A7) total=1140
+19:47:31 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 250gsm (2 side coated) size=74mm x 105mm (A7) total=1178
+19:51:50 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 360gsm (2 side coated) size=74mm x 105mm (A7) total=1216
+19:56:00 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Linen 240gsm size=74mm x 105mm (A7) total=1254
+20:00:31 [info     ] spot.captured                  colour=4C (Front) n=38 paper=Gloss Art Paper 128gsm size=74mm x 105mm (A7) total=1292
+20:04:53 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Simili 100gsm size=99mm x 210mm (DL) total=1330
+20:04:53 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+20:05:15 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+20:09:30 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Paper 128gsm size=99mm x 210mm (DL) total=1368
+20:13:51 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Matte Art Paper 130gsm size=99mm x 210mm (DL) total=1406
+20:18:08 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 250gsm (2 side coated) size=99mm x 210mm (DL) total=1444
+20:22:27 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 360gsm (2 side coated) size=99mm x 210mm (DL) total=1482
+20:26:44 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Linen 240gsm size=99mm x 210mm (DL) total=1520
+20:31:05 [info     ] spot.captured                  colour=4C (Front) n=38 paper=Gloss Art Paper 128gsm size=99mm x 210mm (DL) total=1558
+20:31:05 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+20:31:26 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+20:35:33 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Simili 100gsm size=198mm x 210mm - (2DL) total=1596
+20:39:54 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Paper 128gsm size=198mm x 210mm - (2DL) total=1634
+20:44:06 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Matte Art Paper 130gsm size=198mm x 210mm - (2DL) total=1672
+20:48:23 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 250gsm (2 side coated) size=198mm x 210mm - (2DL) total=1710
+20:52:39 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 360gsm (2 side coated) size=198mm x 210mm - (2DL) total=1748
+20:57:00 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Linen 240gsm size=198mm x 210mm - (2DL) total=1786
+20:57:00 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+20:57:26 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+21:01:30 [info     ] spot.captured                  colour=4C (Front) n=38 paper=Gloss Art Paper 128gsm size=198mm x 210mm - (2DL) total=1824
+21:05:50 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Simili 100gsm size=310mm x 445mm total=1862
+21:10:05 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Paper 128gsm size=310mm x 445mm total=1900
+21:14:25 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Matte Art Paper 130gsm size=310mm x 445mm total=1938
+21:19:00 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 250gsm (2 side coated) size=310mm x 445mm total=1976
+21:23:47 [info     ] spot.captured                  colour=4C (Both) n=38 paper=Gloss Art Card 360gsm (2 side coated) size=310mm x 445mm total=2014
+21:23:48 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+21:24:11 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+21:24:29 [warning  ] spot.skip                      colour=4C (Both) paper=Linen 240gsm size=310mm x 445mm
+21:28:40 [info     ] spot.captured                  colour=4C (Front) n=38 paper=Gloss Art Paper 128gsm size=310mm x 445mm total=2052
+21:28:40 [info     ] spot.done                      points=2052 product=50

@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "printoka-api",
+      "runtimeExecutable": "C:/Users/User/OneDrive/Desktop/Printoka.com/crawler/.venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "uvicorn", "app.api:app", "--app-dir", "C:/Users/User/OneDrive/Desktop/Printoka.com/crawler", "--port", "8010", "--reload"],
+      "port": 8010
+    }
+  ]
+}

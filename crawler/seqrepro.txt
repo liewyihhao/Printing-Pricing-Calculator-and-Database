@@ -1,0 +1,8 @@
+06:15:52 [info     ] browser.launched               channel=msedge headless=True
+06:15:52 [info     ] login.start                    url=https://www.excard.com.my/login
+06:16:16 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+#0 3xA4 ( 4C (Front) configure=False qtys=0
+#1 4xA4 ( 4C (Front) configure=False qtys=0
+#2 4xA5 ( 4C (Front) configure=False qtys=0
+#3 A1 (59 4C (Front) configure=True qtys=27
+#4 A1 (59 4C (Both) configure=True qtys=27

@@ -1,0 +1,9 @@
+05:45:11 [info     ] browser.launched               channel=msedge headless=True
+05:45:11 [info     ] login.start                    url=https://www.excard.com.my/login
+05:45:35 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+login ok= True url= https://www.excard.com.my/home-member
+spec url= https://www.excard.com.my/spec/Litho/Loose_Sheet
+title= Excard | Online Printing Malaysia : Business Card, Name Card, Invoice, Bill Book, Receipt, Tax Invoice, Flyer, Brochure, Loose Sheet, Sticker, Road Tax Sticker
+SIZE_SEL count= 1
+PAPER_SEL count= 1
+BODY[:600]= 'Track Order\nProduct\n\nTrack Order\n\nView all\n \n \n \n1\n \n\n14158598\n\nRM\n957.70\nAll Products\nLabels & Stickers\nPackaging & Boxes\nLarge Formats\nApparels & Gifts\nDesign & Template\nHelp Center\n/\nChat Consultant\nEN\nMYR (RM)\nFlyer, Brochure (Offset)\n\nLet them be your silence promoter around the world.\n\n4.33 / 5 \xa0 | \xa0 36 Reviews\n\n > Flyer, Brochure (Offset)\nProduct Spec\nArtwork Spec\nProduct Size Template\nPrice List\nInspire Zone\n\t\n\n\t\nSize\t\n- Please Select -\nA1 (594mm x 840mm)\nA2 (420mm x 594mm)\nA3 (297mm x 420mm)\nA4 (210mm x 297mm)\nA5 (148mm x 210mm)\nA6 (148mm x 105mm)\n3xA4 (297mm x 630mm)\n4xA4 (297mm x 84'

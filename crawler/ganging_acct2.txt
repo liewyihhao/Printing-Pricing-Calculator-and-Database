@@ -1,0 +1,10 @@
+13:42:25 [info     ] browser.launched               channel=msedge headless=True
+13:42:32 [warning  ] order.session_unusable_reloging_in account=2
+13:42:32 [info     ] login.start                    url=https://www.excard.com.my/login user=tkp***
+13:42:50 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+13:42:50 [info     ] order.crawl_start              account=2 product=21
+13:47:57 [error    ] order.error                    error=TimeoutError('Locator.check: Timeout 30000ms exceeded.\nCall log:\n  - waiting for locator("input[name=\'ctl00$mainContent$order_spec_controller1$order_spec_sta
+13:47:57 [info     ] browser.launched               channel=msedge headless=True
+13:48:27 [warning  ] order.relaunch_retry           attempt=0 error=TimeoutError('Page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to "https://www.excard.com.my/spec/Litho/L retry_in_s=15
+13:48:43 [info     ] browser.launched               channel=msedge headless=True
+13:49:13 [warning  ] order.relaunch_retry           attempt=1 error=TimeoutError('Page.goto: Timeout 30000ms exceeded.\nCall log:\n  - navigating to "https://www.excard.com.my/spec/Litho/L retry_in_s=30
