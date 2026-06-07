@@ -129,7 +129,10 @@
       "Bash(git branch *)",
       "Bash(timeout 120 git push -u origin main)",
       "Bash(timeout 120 git pull origin main --allow-unrelated-histories --no-edit)",
-      "Bash(timeout 120 git push origin main)"
+      "Bash(timeout 120 git push origin main)",
+      "Bash(git add *)",
+      "Bash(grep -E \"\\\\.env$|session_state\")",
+      "Bash(git -c user.name=\"Printoka\" -c user.email=\"liewyhao@gmail.com\" commit -q -m \"Update HANDOFF.md \\(latest state\\) + root README pointing to it\")"
     ]
   }
 }

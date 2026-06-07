@@ -1,6 +1,37 @@
 # Printoka Pricing Calculator — Project Handoff
 
 _For continuing in a new Claude Code chat. Read this first._
+_Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
+
+## ⭐ LATEST STATE (most recent first)
+- **Calculator UI = product-aware.** Printoka Formulation tab has a **Product selector**
+  (21 Loose Sheet Litho / 50 Loose Sheet Digital) → cascade Size→Paper→Colour→Package→Qty,
+  each product uses its OWN formula + shows its OWN accuracy badge.
+- **Crawl UI removed** (no Crawl-status tab, no crawl-status calls, no prices badge). App
+  opens on the Formulation view. We do NOT crawl anymore.
+- **Digital Loose Sheet (50) formula = DONE & meets bar:** click-based pure formula,
+  held-out **median 1.3%, 86% within 5%** (calibrated on 2,052-pt spot sample). gamma≈1.0
+  (digital flat — no real volume discount). Engine: `app/digital_engine.py`,
+  params `output/printoka_params_digital.json`, KPI `output/spot_test_report_50.json`.
+- **Litho Loose Sheet (21) formula:** pure formula `app/cost_engine.py`, ~8% median
+  (4–7% common A2–A5, 20–30% extremes; offset step-pricing limit). KPI
+  `output/spot_test_report.json`. Could improve common sizes via per-size calibration.
+- **API endpoints (product-aware):** `/api/printoka/products`, `/api/printoka/options?product=`,
+  `/api/printoka/quote?product=&size=&paper=&colour=&qty=&package=`, `/api/printoka/kpi?product=`.
+  Litho options come from OrderWork(status='done'); Digital options from `digital_options.json`.
+- **Booklet source captured** in `crawler/booklet_docs/` (8 PDFs: litho+digital spec +
+  saddle/perfect-bind soft/hard finishing) — ready for the next build (products 19 & 37).
+- **Calibration principle (user):** OFFSET drops per-unit strongly with qty (gamma<1);
+  DIGITAL stays flat (gamma≈1). Apply per product. Excard = reference only; target 3–5%.
+- **GitHub:** liewyihhao/Printing-Pricing-Calculator-and-Database (branch main). Secrets
+  (.env, 3 accounts + PG) are git-ignored — NOT in the repo; recreate from .env.example.
+
+## NEXT TASK (Booklet — products 19 Litho & 37 Digital)
+Read `crawler/booklet_docs/*.txt`. Discover all options (poll async dropdowns), put in the
+UI product selector, spot-sample sufficiently, calibrate per binding type (Saddle Stitch /
+Perfect Binding soft/hard), validate to 3–5%, make live in preview. Booklet price scales with
+PAGE COUNT (content sheets) + cover + binding; offset gamma<1, digital gamma≈1.
+
 
 ## Goal
 Build Printoka's **own offline, formula-driven** print-pricing calculator that mirrors
