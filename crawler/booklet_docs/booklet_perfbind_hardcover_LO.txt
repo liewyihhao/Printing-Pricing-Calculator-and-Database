@@ -1,0 +1,255 @@
+===== PAGE 1 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+1
+Bleeding : Bleed OUT the background 3mm on all sides from Trim Size. 
+Safe Zone Area : 
+i)   Allocate 5mm (inwards from Trim Size) along all sides EXCEPT for the sides along the spine.
+     (5mm inside (y+6, x-5) parameter)
+Creasing Line : The creasing line will be made at the 11mm point from spine.
+Extra 20mm of Gloss Art Paper 150gsm will fold in for each sides of the booklet.
+mm
+5mm
+Groove
+Groove
+SPINE
+Y + 6
+Outer Cover 
+Diagram 1.1
+Outer Cover
+ARTWORK PREPARATION
+USE OF PRODUCT SIZE TEMPLATE
+2. If you booklet has blank pages, leave the pages empty.
+1. PLEASE USE OUR PRODUCT SIZE TEMPLATE to you prepare your artwork.
+Note : Ensure all important text and image DO NOT GO OVER the safe zone area
+===== PAGE 2 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+2
+Bleeding : Bleed OUT the background 3mm on all sides from Trim Size. Refer Diagram 1.2
+Safe Zone Area : 
+i)   Allocate 5mm (inwards from Trim Size) along all sides EXCEPT 
+Inner Paper (Front)
+INNER PAPER
+- 15mm for the Right side of the edge of LEFT Page. (Inner Paper Front 1 & Inner Paper Front 3)
+- 15mm for the Left side of the edge of RIGHT Page. (Inner Paper Front 2)
+   (Refer Diagram 1.2)
+5mm
+297mm
+5mm 5mm
+297mm
+Safe Zone
+Inner Paper
+front 2
+Safe Zone
+Inner Paper
+front 1
+Example : A4 size inner paper 
+Inner Paper (Front) 
+Diagram 1.2
+===== PAGE 3 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+3
+Bleeding : Bleed OUT the background 3mm on all sides from Trim Size. Refer Diagram 1.3
+Safe Zone Area : 
+i)   Allocate 5mm (inwards from Trim Size) along all sides EXCEPT 
+Inner Paper (Back)
+- 15mm for the Right side of the edge of LEFT Page. (Inner Paper Back 2)
+- 15mm for the Left side of the edge of RIGHT Page. (Inner Paper Back 1 & Inner Paper Back 3)
+   (Refer Diagram 1.3)
+Example : A4 size inner paper 
+5mm 5mm
+297mm
+5mm
+297mm
+Inner Paper (Back)
+Diagram 1.3
+===== PAGE 4 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+5pts
+Bleeding : Bleed OUT the background 3mm on all sides from Trim Size. Refer Diagram 1.4
+Safe Zone Area : 
+i)   Allocate 5mm (inwards from Trim Size) along all sides EXCEPT 
+Content Pages
+-15mm from left side of the edge for RIGHT page.
+-15mm from right side of the edge for LEFT page.
+Content 
+Diagram 1.4
+5mm 5mm
+297mm
+4
+===== PAGE 5 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+5
+Reference :
+Table of Paper Material
+Content
+Thickness / sheet (mm)
+0.095
+0.122
+0.080
+0.104
+0.130
+0.100
+0.120
+0.140
+Simili 80 gsm
+Simili 100 gsm
+Gloss Art Paper 100 gsm
+Gloss Art Paper 128 gsm
+Gloss Art Paper 150 gsm
+Matte Art Paper 100 gsm
+Matte Art Paper 130 gsm
+Matte Art Paper 150 gsm
+Spine Calculations for Perfect Binding Hardcover Booklet with 48 Content Pages
+Content: Gloss Art Paper 100gsm (48 pages / 24 sheets)
+Spine = [(0.080 x 24) + 4mm + 1.5mm]
+          = 1.92mm + 4mm + 1.5mm
+          = 7.42mm (rounded up to next bigger value)
+          = 8mm
+Spine Calculations for Perfect Binding Hardcover Booklet with 48 Content Pages
+Content: Simili Paper 100gsm (48 pages / 24 sheets)
+Spine = [(0.122 x 24) + 4mm + 1.5mm]
+          = 2.928mm + 4mm + 1.5mm
+          = 8.428mm (rounded up to next bigger value)
+          = 9mm
+Spine = (Contents thickness x Total sheets) + 4mm +1.5mm
+1. 1.5mm is the thickness of the inner paper
+2. 4mm is the thickness of 2 chipboard 1500
+NOTES/REMARKS:
+1. Please take note that the text and picture should kept away 15mm from the book centre, to avoid the related content from
+    getting ‘lost’ into the binding area.
+2. If the booklet pages number is in descending order (such as religious books, etc.) please informour customer Experience
+    Specialist Team (CES) via Feedback, email or phone call.
+3. Remove all template guidelines and descriptions before submitting your files.
+4. Avoid use borders in your design as it makes any uneven trimming more visible.
+5. Avoid cross-page design or placing any text or images, across two pages. Cross-page design will not line up perfectly.
+   (We will not accept reject claims related to artwork not joining perfectly.)
+6. Avoid repeating wide areas of the same solid colours.
+7. Booklets with perfect  binding open up only 160 degrees. Avoid the booklet open to 180 degrees.
+===== PAGE 6 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+If booklet has a blank page, leave the page empty but remember 
+to REMOVE all guidelines
+Arrange pages according to spec. (refer sample below)
+PREPARING  FILE FOR PRINTING 
+ARTWORK FILE
+This is the file we will use for printing. Please publish your final work as follows:
+Content : Content pages follow sequence in 1 PDF file
+Outer Cover (Front & Back) in 1 PDF file
+3. Content pages info (1 PDF file)
+2. Inner Cover & paper (Front & Back) (1 PDF file)
+During the ordering process, you must submit these set of files to us:
+1. Outer Cover (Front & Back) (1 PDF file)
+ARTWORK FILE 
+Example : Booklet with 48 pages
+File 1 : Outer coverabc.pdf
+Page 1 – Outer cover (Front & Cover)
+GrooveGroove
+Spine
+Outer Cover (Front & Back)
+6
+===== PAGE 7 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+File 2 : Inner paper front&back.pdf
+Inner paper (Back)
+Inner paper (Front)
+7
+===== PAGE 8 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+File 3 : - contentabc.pdf 
+Page 1 - Content 1
+Page 2 - Content 2
+Page 3 - Content 3
+and so on...
+Page 43 - Content 43
+Page 44 - Content 44
+Example :
+1. Outer Cover Front
+2. Inner Paper 1
+3. Inner Paper 2
+4. Inner Paper 3
+5. Content 1
+6. Content 2
+7. …..........
+8. Content 48
+9. Inner Paper Back 3
+10. Inner Paper Back 2
+11. Inner Paper Back 1
+12.Outer Cover Back
+Physical Arrangement of artwork in Hardcover :
+8
+===== PAGE 9 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+9
+Note:
+OR
+1. Avoid wording or image which cross pages. Any objects which cross pages are unlikely to line up perfectly. 
+    We will not accept reject claimed that the printed artwork not joining perfectly.
+2. Tolerance for vertical alignment for cross pages artwork is 2mm.Please refer diagram 1 for the illustration.
+3. Folding tolerance for booklet is 2mm.When having the artwork with different colour background, 
+    it have tendency the colour appear in another page after folding. Please refer diagram 2 for illustration.
+Page 1
+2mm gap for misalignment
+2mm gap for misalignment
+Page 2 Page 1 Page 2
+Diagram 1 : Tolerance for vertical alignment for cross pages artwork.
+OR
+Actual artwork After Folding
+Page 1 Page 2
+Diagram 2 : Folding tolerance for booklet.
+Page 1 Page 2
+Note: It can be either white colour appear in page 1
+or grey colour appear in page 2
+Folding line
+2mm gap misalignment 
+after folding
+2mm gap for misalignment
+2mm gap for misalignment
+===== PAGE 10 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+To avoid error, extra cost and delay, we have prepared a comprehensive checklist to assist you in preparing 
+your artwork successfully. Please ensure every step stated complied in your artwork.
+ARTWORK
+Artwork is prepared in our Product Size Template.
+Background design expanded to Full Bleed size.
+Vital elements are within Safe Zone.
+No crop marks are applied. 
+IMAGES
+All images are in CMYK colour mode.
+Colour / Grayscale images resolution are set to or above 300dpi.
+Scanned line Art/Black & White images resolution are set to or above 1200dpi.
+Never manipulate images in vector software.
+All background, design effects, and images has been merged and converted to a TIFF file.
+FONTS
+No fonts less than 5pts.
+Curve / Path / Create outline all fonts.
+LINE
+No lines less than 0.25pts.
+Artwork is saved in required file format : Adobe acrobat Document 4 – Ver 1.3 (*.pdf).
+Resolution : 300dpi.
+Colour Mode : CMYK colour mode.
+Total File Size (front and back design) : Smaller than 20 MB.
+INK COVERAGE
+Total of CMYK colour ink coverage should not exceed 240% 
+(which will occur if ink coverage exceeds 240%).
+TEXT
+All text in solid black or grey must fill in only black percentage (CMY=0 , K=100).
+COLOUR
+Only CMYK colour mode is used in your artwork.
+No colour tints that contain less than 10%.
+10
+===== PAGE 11 =====
+Artwork Specification Perfect Binding Booklet Hardcover Artwork Specification
+PDF FILE FORMAT
+All pages are placed in the correct sequence you want them to be.
+Artwork File is arrange according to our specification and published to a PDF file.
+FINISHING
+For full details of how to prepare your artwork for finishing such as Spot UV and Hot Stamping kindly refer to the 
+General Guidelines at our website.
+Terms and Conditions:
+1. Reject or refund claims pertaining to any dissatisfaction in printing quality caused by incomplete process mentioned above 
+    will not be entertained. 
+2. We will not held any responsibility for any misplacement , blurry picture/images , misspellings/ typo errors in Member's artwork.
+3. By submit your order and artwork files, you agree to these terms and conditions.
+Other than hyphen (-) and underscore(_), your filename does not include any other marks or symbols.
+No overprint setting is used 
+11

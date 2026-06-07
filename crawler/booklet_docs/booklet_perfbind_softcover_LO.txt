@@ -1,0 +1,244 @@
+===== PAGE 1 =====
+Artwork Specification Perfect Binding Booklet Softcover Artwork Specification
+SOFTCOVER (PORTRAIT) 
+ARTWORK PREPARATION
+USE OF PRODUCT SIZE TEMPLATE 
+1. PLEASE USE OUR PRODUCT SIZE TEMPLATE to prepare your artwork.
+2. If your booklet has blank pages, leave the pages empty.
+Note : Ensure all important text and image DO NOT GO OVER the safe zone area.
+Creasing Line : The creasing line will be made at the 8mm point from spine.
+Bledding : Bleed OUT the background 3mm on all sides from Trim Size. Refer Diagram 1.1 
+Safe Zone Area : 
+(i)  Allocate 5mm (inwards from Trim Size) along alll sides EXCEPT for the sides along the spine.
+     Refer Diagram 1.1
+(ii) Allocate 13mm for the sides along the spine. (13mm away from spine).
+     Refer (a) and (b) i Diagram 1.1
+Creasing Line
+mm mm
+8 8
+Safe Zone 5mm
+13mm
+Safe ZoneSafe Zone
+13mm
+Bleeding
+3mm Outer Cover
+Diagram 1.1
+1
+===== PAGE 2 =====
+Artwork Specification Perfect Binding Booklet Softcover Artwork Specification
+13mm 13mm
+8
+13mm
+8
+13mm
+8mm
+2
+===== PAGE 3 =====
+Artwork Specification Perfect Binding Booklet Softcover Artwork Specification
+SOFTCOVER (LANDSCAPE) 
+Front
+Outer Cover 
+Back
+Creasing Line
+Outer Cover
+Diagram 2.1
+Spine
+Outer Cover 
+Safe Zone 5mm
+13mm 13mm
+8
+mm
+8
+mm
+ba
+Safe ZoneSafe Zone
+3mm
+Bleeding
+i) Allocate 5mm (inwards from Trim Size) along all sides EXCEPT for the sides along the spine.
+   Refer Diagram 2.1 
+ii) Allocate 13mm for the sides along the spine (13mm away from spine)
+   Refer (a) and (b) in Diagram 2.1
+: Safe Zone Area
+The creasing line will be made at the 8mm point from spine.: Creasing Line
+Bleed OUT the background 3mm on all sides from Trim Size. Refer Diagram 2.1: Bleeding
+Note : Ensure all important text and image DO NOT GO OVER the safe zone area. 
+GENERAL ARTWORK DIMENSION
+3
+===== PAGE 4 =====
+Artwork Specification Perfect Binding Booklet Softcover Artwork Specification
+i) Allocate 5mm (inwards from Trim Size) along all sides EXCEPT for the sides along the spine.
+   Refer Diagram 2.2
+ii) Allocate 13mm for the sides along the spine (13mm away from spine)
+   Refer (c) and (d) in Diagram 2.2
+: Safe Zone Area
+Only Gloss Water Based Varnish.: Optional Finishing
+The creasing line will be made at the 8mm point from spine.: Creasing Line
+Bleed OUT the background 3mm on all sides from Trim Size. Refer Diagram 2.2: Bleeding
+Note : Spine CANNOT contain any artwork.
+         : For Inner Cover, 5mm from spine MUST be blank (no artwork)
+Note: Ensure all important text and image DO NOT GO OVER the safe zone area. 
+Inner Cover
+Diagram 2.2
+Creasing Line
+Spine Back
+Inner Cover 
+Front
+Inner Cover 
+8
+mm
+8
+mm
+13mm
+c
+Safe Zone
+13mm
+d
+Safe Zone
+Safe Zone 5mm
+3mm
+Bleeding
+Blank
+ 5mm
+Blank
+ 5mm
+4
+===== PAGE 5 =====
+Artwork Specification Perfect Binding Booklet Softcover Artwork Specification
+Content Pages 
+Content 
+Diagram 2.3
+Left Page Right Page
+15mm
+297mm
+210mm
+3mm 3mm 297mm
+15mm
+Bleeding
+3mm
+3mm
+3mm
+Safe Zone 5mm e
+Safe Zone
+f
+Safe Zone
+i) Allocate 5mm (inwards from Trim Size) along all sides EXCEPT for the sides along the spine.
+   Refer Diagram 2.3
+ii) Allocate 15mm for the sides along the spine (15mm away from spine)
+   Refer (e) and (f) in Diagram 2.3
+: Safe Zone Area
+Bleed OUT the background 3mm on all sides from Trim Size. Refer Diagram 2.3: Bleeding
+5pts
+5
+===== PAGE 6 =====
+Artwork Specification Perfect Binding Booklet Softcover Artwork Specification
+NOTES/REMARKS:
+1. Please take note that the text and picture should kept away 15mm from the book centre, to avoid the related content from
+    getting ‘lost’ into the binding area.
+2. If the booklet pages number is in descending order (such as religious books, etc.) please informour customer Experience
+    Specialist Team (CES) via Feedback, email or phone call.
+3. Remove all template guidelines and descriptions before submitting your files.
+4. Avoid use borders in your design as it makes any uneven trimming more visible.
+5. Avoid cross-page design or placing any text or images, across two pages. Cross-page design will not line up perfectly.
+   (We will not accept reject claims related to artwork not joining perfectly.)
+6. Avoid repeating wide areas of the same solid colours.
+7. Booklets with perfect  binding open up only 160 degrees. Avoid the booklet open to 180 degrees.
+ 
+Table of Paper Material
+Cover
+Content
+Thickness / sheet (mm)
+Art Card 230gsm
+Art Card 250gsm
+Art Card 310gsm
+0.25
+0.275
+0.355
+0.098
+0.122
+0.069
+0.080
+0.104
+0.125
+Simili 80 gsm
+Simili 100 gsm
+Gloss Art Paper 80 gsm
+Gloss Art Paper 100 gsm
+Gloss Art Paper 128gsm
+Gloss Art Paper 150 gsm
+Spine Calculations for Perfect Binding Booklet with 4 Cover pages + 80 Content Pages
+Cover: Gloss Art Card 250gsm
+Content: Gloss Art Paper 100gsm (80 pages / 40 sheets)
+Spine = [(0.080 x 40) + (2 x 0.275)] x 110%
+          = [3.2 + 0.55] x 110%
+          = 4.125 (rounded up to next bigger value)
+          = 5mm
+Spine Calculations for Perfect Binding Booklet with 4 Cover pages + 48 Content Pages
+Cover: Gloss Art Card 250gsm
+Content: Gloss Art Paper 100gsm (48 pages / 24 sheets)
+Spine = [(0.080 x 24) + (2 x 0.275)] x 110%
+          = [1.92 + 0.55] x 110%
+          = 2.717 (rounded up to next bigger value)
+          = 3mm
+Spine Calculations for Perfect Binding Booklet with 4 Cover pages + 32 Content Pages
+Cover: Gloss Art Card 250gsm
+Content: Gloss Art Paper 150gsm (32 pages / 16 sheets)
+Spine = [(0.125 x 16) + (2 x 0.275)] x 110%
+          = [2 + 0.55] x 110%
+          = 2.805 (rounded up to next bigger value)
+          = 3mm
+6
+===== PAGE 7 =====
+Artwork Specification Perfect Binding Booklet Softcover Artwork Specification
+7
+===== PAGE 8 =====
+Artwork Specification Perfect Binding Booklet Softcover Artwork Specification
+8
+===== PAGE 9 =====
+Artwork Specification Perfect Binding Booklet Softcover Artwork Specification
+To avoid error, extra cost and delay, we have prepared a comprehensive checklist to assist you in preparing 
+your artwork successfully. Please ensure every step stated complied in your artwork.
+ARTWORK
+Artwork is prepared in our Product Size Template.
+Background design expanded to Full Bleed size.
+Vital elements are within Safe Zone.
+No crop marks are applied. 
+IMAGES
+All images are in CMYK colour mode.
+Colour / Grayscale images resolution are set to or above 300dpi.
+Scanned line Art/Black & White images resolution are set to or above 1200dpi.
+Never manipulate images in vector software.
+All background, design effects, and images has been merged and converted to a TIFF file.
+FONTS
+No fonts less than 5pts.
+Curve / Path / Create outline all fonts.
+LINE
+No lines less than 0.25pts.
+Artwork is saved in required file format : Adobe acrobat Document 4 – Ver 1.3 (*.pdf).
+Resolution : 300dpi.
+Colour Mode : CMYK colour mode.
+Total File Size (front and back design) : Smaller than 20 MB.
+INK COVERAGE
+Total of CMYK colour ink coverage should not exceed 240% 
+(which will occur if ink coverage exceeds 240%).
+TEXT
+All text in solid black or grey must fill in only black percentage (CMY=0 , K=100).
+COLOUR
+Only CMYK colour mode is used in your artwork.
+No colour tints that contain less than 10%.
+9
+===== PAGE 10 =====
+Artwork Specification Perfect Binding Booklet Softcover Artwork Specification
+PDF FILE FORMAT
+All pages are placed in the correct sequence you want them to be.
+Artwork File is arrange according to our specification and published to a PDF file.
+FINISHING
+For full details of how to prepare your artwork for finishing such as Spot UV and Hot Stamping kindly refer to the 
+General Guidelines at our website.
+Terms and Conditions:
+1. Reject or refund claims pertaining to any dissatisfaction in printing quality caused by incomplete process mentioned above 
+    will not be entertained. 
+2. We will not held any responsibility for any misplacement , blurry picture/images , misspellings/ typo errors in Member's artwork.
+3. By submit your order and artwork files, you agree to these terms and conditions.
+Other than hyphen (-) and underscore(_), your filename does not include any other marks or symbols.
+No overprint setting is used 
+10

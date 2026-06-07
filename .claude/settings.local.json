@@ -123,7 +123,12 @@
       "Bash(echo \"SPOT EXITED $?\")",
       "Bash(git check-ignore *)",
       "Bash(.venv/Scripts/python.exe -c \"import json; d=json.load\\(open\\('output/spot_samples_50.json'\\)\\); print\\('points:', len\\(d\\)\\); import collections; c=collections.Counter\\(\\(x['size'][:18],x['colour']\\) for x in d\\); print\\('configs sampled:', len\\(c\\)\\)\")",
-      "Bash(timeout 280 .venv/Scripts/python.exe -m app.digital_engine)"
+      "Bash(timeout 280 .venv/Scripts/python.exe -m app.digital_engine)",
+      "Bash(git -c user.name=Printoka -c user.email=liewyhao@gmail.com commit -q -m '@ *)",
+      "Bash(git remote *)",
+      "Bash(git branch *)",
+      "Bash(timeout 120 git push -u origin main)",
+      "Bash(timeout 120 git pull origin main --allow-unrelated-histories --no-edit)"
     ]
   }
 }

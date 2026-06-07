@@ -78,8 +78,21 @@ Pending tasks (see TaskList / below):
   Rules in PDFs (pdf_flyer_LO.txt, pdf_flyer_finishing.txt, pdf_flyer_digital.txt). "Mix not
   allowed" for fold/crease/perf/holepunch.
 - **#13 Delivery** — West/East Malaysia (weight × courier rate, user to provide rates).
-- **#14 Booklet** — deep cover/content configurator, async-loading dropdowns (poll). Structure
-  in booklet_structure.txt / DIGITAL... notes. Pricing strategy TBD (huge combo space).
+- **#14 Booklet — TWO products: Litho (19) + Digital (37).** Deep cover/content configurator
+  with ASYNC-loading dropdowns (must poll). Live URLs: /spec/Litho/Booklet, /spec/Digital/Booklet.
+  Dimensions (from booklet_structure.txt): Orientation, Size(A4/A5/B5/A6/B5+), Page count
+  (depends on cover+binding: SaddleStitch 8-80, PerfectBinding 36-292), Cover Type (Soft/Hard),
+  Binding (Saddle Stitch / Perfect Binding), Cover paper+print colour+hot stamping,
+  Content paper+print colour, Outer/Inner (rbOuterInner OO/OI), + extras (chkExtraQty,
+  Jawi/Quran, rush). SOURCE DOCS (full text) in **crawler/booklet_docs/**:
+  booklet_litho_spec.txt, booklet_digital_spec.txt, booklet_{saddle,perfbind_softcover,
+  perfbind_hardcover}_{LO,DO}.txt — read these for exact papers/binding/page/finishing rules.
+  TODO for new chat: (1) full option discovery for products 19 & 37 (poll the cascade),
+  register combos + wire into UI product selector; (2) build pricing — note Booklet price
+  scales with PAGE COUNT (content sheets) + cover + binding; offset booklet has volume
+  economy (gamma<1), digital booklet flatter (gamma~1) — same offset-vs-digital principle;
+  (3) spot-test sample (sufficient size) + calibrate per binding type + validate to 3-5%;
+  finishing shared with offset/digital loose sheet. Combo space is large -> sample smartly.
 - Litho **per-size calibration** to pull common sizes to ~5% (user to confirm).
 
 ## REFERENCE FILES (in crawler/)

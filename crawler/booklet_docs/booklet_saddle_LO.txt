@@ -1,0 +1,370 @@
+===== PAGE 1 =====
+Artwork Specification Saddle Stitching Booklet Artwork Specification
+Saddle Stitching Booklet - Artwork Specification
+*This is only applicable to inner sheet no.1 to no. 8.
+Bleeding 
+Margin
+:
+:
+3mm from all sides of the edge (Artwork Dimension)
+5mm from all sides of the edge (Safe Zone)
+Artwork Dimension - Portrait  
+Safe ZoneSafe Zone
+Left Page Right Page
+5mm
+3mm
+3mm
+Bleeding
+5mm
+1. PLEASE USE OUR PRODUCT SIZE TEMPLATE to prepare your artwork.
+2. If your booklet has blank pages, leave the pages empty.
+Use Of Product Size Template
+210 x 297
+148 x 210
+105 x 148
+190 x 266
+200 x 287
+138 x 200
+95 x 138
+180 x 256
+216 x 303
+154 x 216
+111 x 154
+196 x 272
+Example:
+A4 size booklet
+Bleeding size (Green line): 
+426mm x 303mm
+Book size (Red line): 
+210mm x 297mm
+Margin-Safe zone(Blue line): 
+200mm x 287mm
+Avoid designing border
+/ content too close to trim size
+Document Page Layout
+(Artwork Dimension)
+A4
+A5
+A6
+B5+
+Book Size (mm)
+Trim Size (Red)
+Paper Margin (mm)
+Safe Zone (Blue)
+Bleeding (mm)
+Page Layout (Green)
+297mm
+420mm
+Saddle Stitch
+(Applicable for pages equal/below 32pp. **printed pages in multiple of 4)
+Saddle Stitch Booklet Open Size
+1
+===== PAGE 2 =====
+Bleeding size (Green line)
+Book size (Red line)
+Margin-Safe zone(Blue line)
+:
+:
+:
+216mm x 303mm
+210mm x 297mm
+200mm x 287mm
+A4 size booklet
+Example:
+Saddle Stitch Booklet Closed Size
+Safe Zone
+5mm
+3mm
+5mm
+297mm
+210mm
+Artwork Specification Saddle Stitching Booklet Artwork Specification
+2
+===== PAGE 3 =====
+Artwork Specification Saddle Stitching Booklet Artwork Specification
+Safe ZoneSafe Zone
+Left Page Right Page
+10mm 10mm
+5mm 5mm
+5mm 5mm
+297mm
+210mm 210mm
+Bleeding
+3mm
+SADDLE STITCHING BOOKLET -  ARTWORK SPECIFICATION 
+*This is only applicable to inner sheet no.9 and above.
+Bleeding 
+Margin
+:
+:
+3mm from all sides of the edge (Artwork Dimension)
+5mm from all sides of the edge (Safe Zone) except,
+10 mm from Right sides of the edge of Right Page
+10 mm from Left sides of the edge of Left Page
+Artwork Dimension - Portrait  
+210 x 297
+148 x 210
+105 x 148
+190 x 266
+195 x 287
+133 x 200
+90 x 138
+175 x 256
+216 x 303
+154 x 216
+111 x 154
+196 x 272
+Avoid designing border
+/ content too close to trim size
+Document Page Layout
+(Artwork Dimension)
+A4
+A5
+A6
+B5+
+Paper Margin (mm)
+Safe Zone (Blue)
+(Applicable for pages equal/above 36pp. **printed pages in multiple of 4)
+Book Size (mm)
+Trim Size (Red)
+Bleeding (mm)
+Page Layout (Green)
+3
+===== PAGE 4 =====
+Artwork Specification Saddle Stitching Booklet Artwork Specification
+Safe ZoneSafe Zone
+Left Page Right Page
+5mm
+3mm
+3mm
+Bleeding
+5mm
+Example:
+A4 Saddle-Stiching Open size
+Bleeding size (Green line): 
+216mm x 600mm
+Book size (Red line): 
+210mm x 594mm
+Margin-Safe zone(Blue line): 
+200mm x 287mm
+210mm
+594mm
+Saddle Stitch
+Diagram of Artwork Dimension:
+SADDLE STITCHING BOOKLET - ARTWORK SPECIFICATION
+Bleeding 
+Margin
+:
+:
+3mm from all sides of the edge (Artwork Dimension)
+5mm from all sides of the edge (Safe Zone)
+Artwork Dimension - Landscape
+210 x 297
+148 x 210
+200 x 287
+138 x 200
+216 x 303
+154 x 216
+Avoid designing border
+/ content too close to trim size
+Document Page Layout
+(Artwork Dimension)
+A4
+A5
+Paper Margin (mm)
+Safe Zone (Blue)
+Example:
+A4 Saddle-Stiching closed-size
+Bleeding size (Green line): 
+216mm x 303mm
+Book size (Red line): 
+210mm x 297mm
+Margin-Safe zone(Blue line): 
+200mm x 287mm
+210mm
+297mm
+Safe Zone
+Left Page
+5mm
+3mm
+3mm
+Bleeding
+5mm
+*This is only applicable to inner sheet no.1 to no. 8.
+(Applicable for pages equal/below 32pp. **printed pages in multiple of 4)
+Book Size (mm)
+Trim Size (Red)
+Bleeding (mm)
+Page Layout (Green)
+4
+===== PAGE 5 =====
+Artwork Specification Saddle Stitching Booklet Artwork Specification
+Safe ZoneSafe Zone
+Left Page Right Page
+5mm
+3mm
+3mm
+Bleeding
+5mm
+Example:
+A4 Saddle-Stiching Open size
+Bleeding size (Green line): 
+216mm x 600mm
+Book size (Red line): 
+210mm x 594mm
+Margin-Safe zone(Blue line): 
+200mm x 287mm
+210mm
+594mm
+Saddle Stitch
+Diagram of Artwork Dimension:
+SADDLE STITCHING BOOKLET - ARTWORK SPECIFICATION
+Bleeding 
+Margin
+:
+:
+3mm from all sides of the edge (Artwork Dimension)
+5mm from all sides of the edge (Safe Zone)
+Artwork Dimension - Landscape
+210 x 297
+148 x 210
+200 x 287
+138 x 200
+216 x 303
+154 x 216
+Avoid designing border
+/ content too close to trim size
+Document Page Layout
+(Artwork Dimension)
+A4
+A5
+Paper Margin (mm)
+Safe Zone (Blue)
+Example:
+A4 Saddle-Stiching closed-size
+Bleeding size (Green line): 
+216mm x 303mm
+Book size (Red line): 
+210mm x 297mm
+Margin-Safe zone(Blue line): 
+200mm x 287mm
+210mm
+297mm
+Safe Zone
+Left Page
+5mm
+3mm
+3mm
+Bleeding
+5mm
+*This is only applicable to inner sheet no.1 to no. 8.
+(Applicable for pages equal/below 32pp. **printed pages in multiple of 4)
+Book Size (mm)
+Trim Size (Red)
+Bleeding (mm)
+Page Layout (Green)
+5
+===== PAGE 6 =====
+Artwork Specification Saddle Stitching Booklet Artwork Specification
+NOTE:
+OR
+1. Avoid wording or image which cross pages. Any objects which cross pages are unlikely to line up perfectly. 
+    We will not accept reject claimed that the printed artwork not joining perfectly.
+2. Tolerance for vertical alignment for cross pages artwork is 2mm.Please refer diagram 1 for the illustration.
+3. Folding tolerance for booklet is 2mm.When having the artwork with different colour background, 
+    it have tendency the colour appear in another page after folding. Please refer diagram 2 for illustration.
+Page 1
+2mm gap for misalignment
+2mm gap for misalignment
+Page 2 Page 1 Page 2
+Diagram 1 : Tolerance for vertical alignment for cross pages artwork.
+OR
+Actual artwork After Folding
+Page 1 Page 2
+Diagram 2 : Folding tolerance for booklet.
+Page 1 Page 2
+Note: It can be either white colour appear in page 1
+or grey colour appear in page 2
+Folding line
+2mm gap misalignment 
+after folding
+2mm gap for misalignment
+2mm gap for misalignment
+6
+===== PAGE 7 =====
+1. Avoid objects which borders. Objects which borders make uneven trimming more visible. We will not accept reject
+    claimed that the uneven trimming for object with border.
+2. Tolerance for uneven trimming is 2mm. Please refer diagram 3 for the illustration.
+Diagram 3 : Artwork with border.
+Artwork Precaution - Artwork with Borders
+Desired Outcome Actual Outcome
+1. Colours tend to vary from page to page. The difference may be more obvious to the eye when the same solid colour
+    appears on the adjacent page as well. Please refer diagram 4 for the illustration.
+Diagram 4 : Avoid Artwork with Repeating Wide Areas of the Same Solid Colours
+Artwork Precaution - Avoid Artwork with Repeating Wide Areas of the Same Solid Colours
+Page 1 Page 2
+7
+===== PAGE 8 =====
+Preparing File For Printing
+**Common booklet pages are open from Right to Left, for customer who required the pages to open from
+   Left to Right, kindly prepare the files in reverse way.
+   
+During the ordering process, artwork MUST be saved in PDF FORMAT
+1. This is the file we will use for printing. Please publish your final artwork into a PDF file.
+2. Please arrange your pages according to our specification. (refer example below)
+2. If your booklet has a blank page, leave the page empty but remember to remove all guidelines.
+Example : 12-page booklet saved in a PDF file:
+Page 1.  Front Cover  
+Page 2.  Inside Front Cover
+Page 3.  Content 1 
+Page 4.  Content 2  
+Page 5.  Content 3  
+Page 6.  Content 4  
+Page 7.  Content 5  
+Page 8.  Content 6  
+Page 9.  Content 7  
+Page 10.  Content 8  
+Page 11.  Inside Back Cover  
+Page 12.  Back Cover  
+Artwork File Preparation Method
+Artwork Specification Saddle Stitching Booklet Artwork Specification
+8
+===== PAGE 9 =====
+STANDARD CHECKLIST :
+COLOUR
+Use ONLY CMYK colour mode in your artwork
+Always refer to our CMYK COLOUR REFERENCE KIT (CMYK Colour Reference Manual and
+spot colour toning reference) while working with colour.
+No colour tints (toning) lower than 10%
+Do not set black colour to (C=100 M= 100 Y= 100 K= 100)
+Total of CMYK colour ink coverage should not exceed 240%
+Make sure the value between colours are at least 10% of different. (Tint / toning effect more obvious)
+LINE
+Line weight not less than 0.25points
+(Not applicable for Pre-Inked stamp,spot UV,Hot Stamping)
+IMAGES
+All images are in CMYK colour mode
+Resolution of all images are set to or above 300dpi. 
+Scanned line Art/Black & White images resolution are set to or above 1200dpi.
+Do not manipulate images using a layout program
+TEXT
+No font less than 5points
+Curve / Path / Create outline all fonts
+ARTWORK
+Artwork is prepared in our Product Size Templates
+Background design expand to Full Bleed size
+Vital elements are within Safe Zone
+Ensure artwork orientation
+No crop mark are applied
+DESIGN
+All images have been exported / converted : Background, design effects, photos, images to TIFF files (not including text / vector images)
+Never manipulate images in layout program resolution: 300 dpi
+Color Mode: CMYK color mode
+FILE FORMAT
+Artwork is saved in required file format : Adobe acrobat Document 4 – Ver 1.3 (*.pdf)
+Resolution: 300 dpi
+Color Mode: CMYK color mode
+Finishing type: Artistic Finishing
+**Please refer to the general artwork specification
+Artwork Specification Saddle Stitching Booklet Artwork Specification
+9
