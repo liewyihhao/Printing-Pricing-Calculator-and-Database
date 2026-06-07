@@ -1,0 +1,11 @@
+{
+ "product": 50,
+ "test": "held-out configs (25%)",
+ "sample_points": 2052,
+ "median": 1.3,
+ "within_3pct": 79,
+ "within_5pct": 86,
+ "within_10pct": 92,
+ "mape": 2.5,
+ "under_predict_pct": 53
+}

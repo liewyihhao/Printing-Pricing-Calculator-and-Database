@@ -1,8 +1,12 @@
-INFO:     Started server process [28628]
+INFO:     Started server process [10376]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
 INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
-INFO:     127.0.0.1:59500 - "GET /api/order/options HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59502 - "GET /api/order/options?size=A4+%28210mm+x+297mm%29 HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59503 - "GET /api/printoka/quote?size=A4+%28210mm+x+297mm%29&paper=Gloss+Art+Card+250gsm+%282+sides+coated%29+-+Best+Seller&colour=4C+%28Both%29&qty=1000&package=Normal HTTP/1.1" 200 OK
-INFO:     127.0.0.1:59504 - "GET /api/printoka/kpi HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65402 - "GET /api/printoka/products HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65403 - "GET /api/printoka/options?product=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65404 - "GET /api/printoka/kpi?product=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65405 - "GET /api/printoka/kpi?product=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65406 - "GET /api/printoka/kpi?product=21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65407 - "GET /api/printoka/kpi?product=21 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65408 - "GET /api/printoka/quote?product=50&size=148mm+x+210mm+%28A5%29&paper=Gloss+Art+Card+230gsm+%282+side+coated%29&colour=4C+%28Both%29&qty=1000 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:65409 - "GET /api/printoka/quote?product=21&size=A4+%28210mm+x+297mm%29&paper=Gloss+Art+Card+250gsm+%282+sides+coated%29+-+Best+Seller&colour=4C+%28Both%29&qty=1000 HTTP/1.1" 200 OK

@@ -60,8 +60,6 @@ tailwind.config = { theme: { extend: {
         <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><rect x="4" y="2.5" width="12" height="15" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M7 6h6M7 9.5h2M11 9.5h2M7 13h2M11 13h2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Calculator</a>
       <a data-view="formulation" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2">
         <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M4 4h12M4 10h12M4 16h7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="15" cy="15" r="2.5" stroke="currentColor" stroke-width="1.4"/></svg>Printoka Formulation</a>
-      <a data-view="crawl" class="nav-item flex items-center gap-3 rounded-lg px-3 py-2">
-        <svg class="h-[18px] w-[18px] text-slate-400" viewBox="0 0 20 20" fill="none"><path d="M10 3a7 7 0 100 14 7 7 0 000-14z" stroke="currentColor" stroke-width="1.4"/><path d="M10 6.5V10l2.5 1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Crawl status</a>
     </nav>
     <div class="p-3 border-t hairline">
       <div class="flex items-center gap-2.5 px-2 py-1.5">
@@ -210,23 +208,6 @@ async function loadPricing(){
   $("p_prev").disabled = d.offset<=0; $("p_next").disabled = d.offset+d.limit>=d.total;
 }
 
-views.crawl = async () => {
-  const cs = await api("/api/crawl-status");
-  const el = document.createElement("div"); el.className="fade max-w-[760px]";
-  el.innerHTML = `
-    <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Crawl status</h1>
-    <p class="text-slate-500 text-[13.5px] mb-5">Resumable, checkpointed crawl of excard.com.my.</p>
-    <div class="bg-white rounded-xl border hairline shadow-card p-5 mb-4">
-      ${progress(cs.pct)}
-      <div class="text-center mt-2 text-[13px] text-slate-500">${NUM(cs.done)} / ${NUM(cs.total)} combinations (${cs.pct}%)</div>
-    </div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-      ${card("Done", NUM(cs.done))}${card("Pending", NUM(cs.pending))}
-      ${card("In progress", NUM(cs.in_progress))}${card("Failed", NUM(cs.failed))}
-    </div>`;
-  return el;
-};
-
 // ---------------- calculator view ----------------
 let calc = { ladder:null, colormode:"4C", buytier:"Platinum", token:0, mult:1 };
 views.calculator = async () => {
@@ -314,11 +295,11 @@ views.formulation = async () => {
   const el=document.createElement("div"); el.className="fade max-w-[920px]";
   el.innerHTML=`
     <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Printoka Formulation</h1>
-    <p class="text-slate-500 text-[13.5px] mb-4">Our own offline pricing engine — interpolation + scaling over captured data, with physics-based weight. Excard is a reference only.</p>
-    <div id="f_kpi" class="mb-5 text-[12.5px] text-slate-400">Loading accuracy…</div>
+    <p class="text-slate-500 text-[13.5px] mb-4">Our own offline pricing formula (first-principles print costing) + physics-based weight. Excard is a reference only.</p>
+    <div id="f_kpi" class="mb-5 text-[12.5px] text-slate-400">Select a product…</div>
     <div class="grid md:grid-cols-[1fr_350px] gap-5">
       <div class="bg-white rounded-xl border hairline shadow-card p-5 space-y-4">
-        ${selField("Size","f_size")}${selField("Paper","f_paper",true)}${selField("Print colour","f_colour",true)}${selField("Package (ganging)","f_package",true)}
+        ${selField("Product","f_product")}${selField("Size","f_size",true)}${selField("Paper","f_paper",true)}${selField("Print colour","f_colour",true)}${selField("Package (ganging)","f_package",true)}
         <div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity (any value)</label>
           <input id="f_qty" type="number" min="1" value="1000" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></div>
         <p class="text-[11.5px] text-slate-400">Only valid Excard combinations are selectable. Quantity accepts any number — the formula interpolates.</p>
@@ -333,12 +314,18 @@ views.formulation = async () => {
   setTimeout(initForm,0);
   return el;
 };
+function fpid(){ const n=dv($("f_product")); const p=(window._fprods||[]).find(x=>x.name===n); return p?p.id:null; }
+async function loadKpi(){ const pid=fpid(); if(!pid){ $("f_kpi").textContent="Select a product…"; return; }
+  try{ const k=await api(`/api/printoka/kpi?product=${pid}`);
+    if(k.median!=null) $("f_kpi").innerHTML=`<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">Accuracy vs Excard (spot-test): median ${k.median}% · ${k.within_5pct}% within 5% · ${k.within_10pct}% within 10%</span>`;
+    else $("f_kpi").innerHTML=`<span class="text-amber-600">${k.note||'not calibrated yet'}</span>`;
+  }catch(e){ $("f_kpi").textContent="(accuracy unavailable)"; } }
 async function initForm(){
-  try{ const k=await api("/api/printoka/kpi?sample=0.2");
-    $("f_kpi").innerHTML=`<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">Accuracy vs Excard (20% sample): median ${k.median}% · ${k.within_5pct}% within 5% · ${k.within_10pct}% within 10%</span>`;
-  }catch(e){ $("f_kpi").textContent="(accuracy unavailable)"; }
-  const o=await api("/api/order/options"); fillSel($("f_size"),o.sizes,"Select size…");
-  const opt=(x)=>api(`/api/order/options?${x}`);
+  const prods=await api("/api/printoka/products"); window._fprods=prods;
+  fillSel($("f_product"), prods.map(p=>p.name), "Select product…");
+  const opt=(x)=>api(`/api/printoka/options?product=${fpid()}&${x}`);
+  $("f_product").onchange=async()=>{ resetSel(["f_size","f_paper","f_colour","f_package"]); clearF(); const pid=fpid(); if(!pid)return;
+    fillSel($("f_size"),(await api(`/api/printoka/options?product=${pid}`)).sizes,"Select size…"); $("f_size").disabled=false; loadKpi(); };
   $("f_size").onchange=async()=>{ const s=dv($("f_size")); resetSel(["f_paper","f_colour","f_package"]); clearF(); if(!s)return;
     fillSel($("f_paper"),(await opt(`size=${encodeURIComponent(s)}`)).papers,"Select paper…"); $("f_paper").disabled=false; };
   $("f_paper").onchange=async()=>{ const s=dv($("f_size")),p=dv($("f_paper")); resetSel(["f_colour","f_package"]); clearF(); if(!p)return;
@@ -349,9 +336,9 @@ async function initForm(){
 }
 function clearF(){ $("f_out").innerHTML='<div class="text-slate-400">Configure a job…</div>'; }
 async function loadForm(){
-  const s=dv($("f_size")),p=dv($("f_paper")),c=dv($("f_colour")),pk=dv($("f_package")),qty=parseInt($("f_qty").value||"0");
-  if(!s||!p||!c||!pk||!qty)return; $("f_status").textContent="Calculating…";
-  try{ const q=await api(`/api/printoka/quote?size=${encodeURIComponent(s)}&paper=${encodeURIComponent(p)}&colour=${encodeURIComponent(c)}&package=${encodeURIComponent(pk)}&qty=${qty}`);
+  const pid=fpid(),s=dv($("f_size")),p=dv($("f_paper")),c=dv($("f_colour")),pk=dv($("f_package")),qty=parseInt($("f_qty").value||"0");
+  if(!pid||!s||!p||!c||!pk||!qty)return; $("f_status").textContent="Calculating…";
+  try{ const q=await api(`/api/printoka/quote?product=${pid}&size=${encodeURIComponent(s)}&paper=${encodeURIComponent(p)}&colour=${encodeURIComponent(c)}&package=${encodeURIComponent(pk)}&qty=${qty}`);
     $("f_status").textContent="";
     if(q.printoka_cash==null){ $("f_out").innerHTML='<div class="text-amber-600">No basis to price this combo yet.</div>'; return; }
     const t=q.tiers||{};
@@ -370,7 +357,7 @@ function card(label,value,sub){ return `<div class="bg-white rounded-xl border h
 function progress(pct){ return `<div class="h-2.5 rounded-full bg-slate-100 overflow-hidden"><div class="h-full brand-gradient" style="width:${pct}%"></div></div>`; }
 function statusPill(s){ const m={active:"emerald",done:"sky",unsupported:"slate"}[s]||"slate";
   return `<span class="inline-flex items-center gap-1.5 text-[12px] font-medium text-${m}-700 bg-${m}-50 border border-${m}-100 rounded-full px-2 py-0.5"><span class="h-1.5 w-1.5 rounded-full bg-${m}-500"></span>${s}</span>`; }
-const titles={overview:"Overview",products:"Products",pricing:"Pricing tables",calculator:"Calculator",formulation:"Printoka Formulation",crawl:"Crawl status"};
+const titles={overview:"Overview",products:"Products",pricing:"Pricing tables",calculator:"Calculator",formulation:"Printoka Formulation"};
 
 async function go(name){
   document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('active',a.dataset.view===name));
@@ -380,7 +367,7 @@ async function go(name){
 }
 $("nav").addEventListener("click",e=>{ const a=e.target.closest('a[data-view]'); if(a) go(a.dataset.view); });
 
-(async()=>{ try{ const s=await api("/api/summary"); $("livetext").textContent=NUM(s.price_points)+" prices"; }catch(e){ $("livebadge").classList.add("hidden"); } go("overview"); })();
+$("livetext").textContent="formula engine"; go("formulation");
 </script>
 </body>
 </html>

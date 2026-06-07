@@ -295,36 +295,67 @@ def order_status_api():
 
 
 # ---------- Printoka Formulation (our own engine) ----------
+import json as _json
+PRODUCTS_UI = [{"id": 21, "name": "Loose Sheet — Litho (Offset)"},
+               {"id": 50, "name": "Loose Sheet — Digital"}]
+
+
+@app.get("/api/printoka/products")
+def printoka_products():
+    return PRODUCTS_UI
+
+
+def _digital_options(size=None, paper=None, colour=None):
+    d = _json.loads((UI_DIR.parent / "digital_options.json").read_text())
+    out = {"sizes": d["sizes"], "papers": [], "colours": [], "packages": [],
+           "deliveries": {}}
+    if size:
+        out["papers"] = [p for p in d["papers_by_size"].get(size, []) if "Out of Stock" not in p]
+    if size and paper:
+        out["colours"] = ["4C (Both)", "4C (Front)"]
+    if size and paper and colour:
+        out["packages"] = ["Normal", "2in1", "3in1", "4in1", "5in1"]
+    return out
+
+
+@app.get("/api/printoka/options")
+def printoka_options(product: int = Query(21), size: str | None = None,
+                     paper: str | None = None, colour: str | None = None):
+    if product == 50:
+        return _digital_options(size, paper, colour)
+    return order_options(size, paper, colour)   # Litho: from OrderWork combos
+
+
 @app.get("/api/printoka/quote")
 def printoka_quote(size: str = Query(...), paper: str = Query(...),
                    colour: str = Query(...), qty: int = Query(...),
-                   package: str = Query("Normal")):
-    """Pure-formula price (cost engine) + physics weight. No stored prices."""
-    from . import cost_engine, formulation
+                   package: str = Query("Normal"), product: int = Query(21)):
+    """Pure-formula price (per-product engine) + physics weight. No stored prices."""
+    from . import cost_engine, digital_engine, formulation
     try:
-        cash = cost_engine.cash_price(size, paper, colour, qty)
+        if product == 50:
+            cash = digital_engine.cash_price(size, paper, colour, qty)
+            tiers = digital_engine.tiers(cash); wt = digital_engine.weight_kg(size, paper, qty)
+        else:
+            cash = cost_engine.cash_price(size, paper, colour, qty)
+            tiers = formulation.tiers(cash); wt = formulation.weight_kg(size, paper, qty)
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
     return {"config": {"size": size, "paper": paper, "colour": colour,
-                       "package": package, "qty": qty},
+                       "package": package, "qty": qty, "product": product},
             "printoka_cash": round(cash, 2), "method": "formula",
-            "tiers": cost_engine.tiers(cash) if hasattr(cost_engine, "tiers")
-                     else formulation.tiers(cash),
-            "weight_kg": formulation.weight_kg(size, paper, qty),
-            "excard_cash": None, "delta_pct": None}
+            "tiers": tiers, "weight_kg": wt, "excard_cash": None, "delta_pct": None}
 
 
 @app.get("/api/printoka/kpi")
-def printoka_kpi(sample: float = Query(0.2, ge=0.05, le=1.0)):
-    """Accuracy is validated by SPOT-TESTS against Excard (prices are no longer
-    stored). Returns the latest spot-test report if present, else a notice."""
-    rep = UI_DIR.parent / "output" / "spot_test_report.json"
+def printoka_kpi(product: int = Query(21)):
+    """Per-product spot-test accuracy report (Excard = reference; no stored prices)."""
+    name = "spot_test_report_50.json" if product == 50 else "spot_test_report.json"
+    rep = UI_DIR.parent / "output" / name
     if rep.exists():
-        import json as _j
-        return _j.loads(rep.read_text())
-    return {"status": "no_stored_prices",
-            "note": "Crawled prices removed. Accuracy is validated via spot-tests "
-                    "against Excard; run a spot-test to populate this KPI."}
+        return _json.loads(rep.read_text())
+    return {"status": "not_calibrated",
+            "note": "No spot-test report yet for this product."}
 
 
 @app.get("/")
