@@ -1,0 +1,387 @@
+{
+ "product": "Business Card",
+ "cardTypes": {
+  "standard": {
+   "label": "Standard Card",
+   "sizes": [
+    "54mm \u00d7 89mm",
+    "52mm \u00d7 86mm",
+    "50mm \u00d7 89mm",
+    "54mm \u00d7 86mm",
+    "Other (Custom Size)"
+   ],
+   "papers": [
+    "Gloss Art Card 250gsm (2 side coated)",
+    "Gloss Art Card 310gsm (2 side coated)",
+    "Gloss Art Card 360gsm (2 side coated)",
+    "Matte Art Card 250gsm",
+    "Linen 240gsm",
+    "Metal Ice 250gsm",
+    "Synthetic Paper 180micron (0.18mm)",
+    "Super White 250gsm",
+    "Suwen 240gsm"
+   ],
+   "colours": [
+    "4C (Both)",
+    "4C (Front)"
+   ],
+   "laminations": [
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Both)",
+    "Gloss Water Based Varnish (Both)(Free)"
+   ],
+   "qty": [
+    "50",
+    "100",
+    "200",
+    "300",
+    "400",
+    "500",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1000",
+    "2000",
+    "3000",
+    "4000",
+    "5000",
+    "6000",
+    "7000",
+    "8000",
+    "9000",
+    "10000"
+   ],
+   "packages": [
+    "Normal (1 Design)",
+    "2 In 1 (2 Designs)",
+    "3 In 1 (3 Designs)",
+    "4 In 1 (4 Designs)",
+    "5 In 1 (5 Designs)",
+    "6 In 1 (6 Designs)",
+    "7 In 1 (7 Designs)",
+    "8 In 1 (8 Designs)",
+    "9 In 1 (9 Designs)",
+    "10 In 1 (10 Designs)"
+   ],
+   "OrderDesc": "Standard"
+  },
+  "thin_fold": {
+   "label": "Thin Fold",
+   "sizes": [
+    "54mm \u00d7 178mm (Open Size)",
+    "52mm \u00d7 172mm (Open Size)",
+    "50mm \u00d7 172mm (Open Size)",
+    "52mm \u00d7 156mm (Open Size)",
+    "Other (Custom Size)"
+   ],
+   "papers": [
+    "Gloss Art Card 250gsm (2 side coated)",
+    "Gloss Art Card 310gsm (2 side coated)",
+    "Gloss Art Card 360gsm (2 side coated)",
+    "Matte Art Card 250gsm",
+    "Linen 240gsm",
+    "Metal Ice 250gsm",
+    "Synthetic Paper 180micron (0.18mm)",
+    "Super White 250gsm",
+    "Suwen 240gsm"
+   ],
+   "colours": [
+    "4C (Both)",
+    "4C (Front)"
+   ],
+   "laminations": [
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Both)",
+    "Gloss Water Based Varnish (Both)(Free)",
+    "Soft Touch Lamination (Both)"
+   ],
+   "qty": [
+    "50",
+    "100",
+    "200",
+    "300",
+    "400",
+    "500",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1000",
+    "2000",
+    "3000",
+    "4000",
+    "5000",
+    "6000",
+    "7000",
+    "8000",
+    "9000",
+    "10000"
+   ],
+   "packages": [
+    "Normal (1 Design)",
+    "2 In 1 (2 Designs)",
+    "3 In 1 (3 Designs)",
+    "4 In 1 (4 Designs)",
+    "5 In 1 (5 Designs)",
+    "6 In 1 (6 Designs)",
+    "7 In 1 (7 Designs)",
+    "8 In 1 (8 Designs)",
+    "9 In 1 (9 Designs)",
+    "10 In 1 (10 Designs)"
+   ],
+   "OrderDesc": "Folded"
+  },
+  "fat_fold": {
+   "label": "Fat Fold",
+   "sizes": [
+    "89mm \u00d7 108mm (Open Size)",
+    "86mm \u00d7 104mm (Open Size)",
+    "86mm \u00d7 100mm (Open Size)",
+    "86mm \u00d7 88mm (Open Size)",
+    "Other (Custom Size)"
+   ],
+   "papers": [
+    "Gloss Art Card 250gsm (2 side coated)",
+    "Gloss Art Card 310gsm (2 side coated)",
+    "Gloss Art Card 360gsm (2 side coated)",
+    "Matte Art Card 250gsm",
+    "Linen 240gsm",
+    "Metal Ice 250gsm",
+    "Synthetic Paper 180micron (0.18mm)",
+    "Super White 250gsm",
+    "Suwen 240gsm"
+   ],
+   "colours": [
+    "4C (Both)",
+    "4C (Front)"
+   ],
+   "laminations": [
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Both)",
+    "Gloss Water Based Varnish (Both)(Free)",
+    "Soft Touch Lamination (Both)"
+   ],
+   "qty": [
+    "50",
+    "100",
+    "200",
+    "300",
+    "400",
+    "500",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1000",
+    "2000",
+    "3000",
+    "4000",
+    "5000",
+    "6000",
+    "7000",
+    "8000",
+    "9000",
+    "10000"
+   ],
+   "packages": [
+    "Normal (1 Design)",
+    "2 In 1 (2 Designs)",
+    "3 In 1 (3 Designs)",
+    "4 In 1 (4 Designs)",
+    "5 In 1 (5 Designs)",
+    "6 In 1 (6 Designs)",
+    "7 In 1 (7 Designs)",
+    "8 In 1 (8 Designs)",
+    "9 In 1 (9 Designs)",
+    "10 In 1 (10 Designs)"
+   ],
+   "OrderDesc": "Folded"
+  },
+  "custom_die_cut": {
+   "label": "Custom Die-Cut",
+   "sizes": [
+    "54mm \u00d7 89mm",
+    "52mm x 86mm",
+    "50mm x 89mm",
+    "54mm x 86mm",
+    "Other (Custom Size)"
+   ],
+   "papers": [
+    "Gloss Art Card 250gsm (2 side coated)",
+    "Gloss Art Card 310gsm (2 side coated)",
+    "Matte Art Card 250gsm",
+    "Linen 240gsm",
+    "Metal Ice 250gsm",
+    "Synthetic Paper 180micron (0.18mm)",
+    "Super White 250gsm",
+    "Suwen 240gsm"
+   ],
+   "colours": [
+    "4C (Both)",
+    "4C (Front)"
+   ],
+   "laminations": [
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Both)",
+    "Gloss Water Based Varnish (Both)(Free)",
+    "Soft Touch Lamination (Both)"
+   ],
+   "qty": [
+    "50",
+    "100",
+    "200",
+    "300",
+    "400",
+    "500",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1000",
+    "2000",
+    "3000",
+    "4000",
+    "5000",
+    "6000",
+    "7000",
+    "8000",
+    "9000",
+    "10000"
+   ],
+   "packages": [
+    "Normal (1 Design)",
+    "2 In 1 (2 Designs)",
+    "3 In 1 (3 Designs)",
+    "4 In 1 (4 Designs)",
+    "5 In 1 (5 Designs)",
+    "6 In 1 (6 Designs)",
+    "7 In 1 (7 Designs)",
+    "8 In 1 (8 Designs)",
+    "9 In 1 (9 Designs)",
+    "10 In 1 (10 Designs)"
+   ],
+   "OrderDesc": "Custom Die-Cut"
+  },
+  "plastic_card": {
+   "label": "Plastic Card",
+   "sizes": [
+    "54mm \u00d7 89mm"
+   ],
+   "papers": [
+    "Frosted Plastic Card 0.4mm (400 micron)"
+   ],
+   "colours": [
+    "4C",
+    "4C & White"
+   ],
+   "laminations": [
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Both)",
+    "Gloss Water Based Varnish (Both)(Free)"
+   ],
+   "qty": [
+    "50",
+    "100",
+    "200",
+    "300",
+    "400",
+    "500",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1000",
+    "2000",
+    "3000",
+    "4000",
+    "5000",
+    "6000",
+    "7000",
+    "8000",
+    "9000",
+    "10000"
+   ],
+   "packages": [
+    "Normal (1 Design)",
+    "2 In 1 (2 Designs)",
+    "3 In 1 (3 Designs)",
+    "4 In 1 (4 Designs)",
+    "5 In 1 (5 Designs)",
+    "6 In 1 (6 Designs)",
+    "7 In 1 (7 Designs)",
+    "8 In 1 (8 Designs)",
+    "9 In 1 (9 Designs)",
+    "10 In 1 (10 Designs)"
+   ],
+   "OrderDesc": "Standard"
+  }
+ },
+ "value_maps": {
+  "size": {
+   "54mm \u00d7 89mm": "54mm x 89mm",
+   "52mm \u00d7 86mm": "52mm x 86mm",
+   "50mm \u00d7 89mm": "50mm x 89mm",
+   "54mm \u00d7 86mm": "54mm x 86mm",
+   "54mm \u00d7 178mm (Open Size)": "54mm x 178mm",
+   "52mm \u00d7 172mm (Open Size)": "52mm x 172mm",
+   "50mm \u00d7 172mm (Open Size)": "50mm x 172mm",
+   "52mm \u00d7 156mm (Open Size)": "52mm x 156mm",
+   "89mm \u00d7 108mm (Open Size)": "89mm x 108mm",
+   "86mm \u00d7 104mm (Open Size)": "86mm x 104mm",
+   "86mm \u00d7 100mm (Open Size)": "86mm x 100mm",
+   "86mm \u00d7 88mm (Open Size)": "86mm x 88mm",
+   "52mm x 86mm": "52mm x 86mm",
+   "50mm x 89mm": "50mm x 89mm",
+   "54mm x 86mm": "54mm x 86mm"
+  },
+  "paper": {
+   "Gloss Art Card 250gsm (2 side coated)": "Gloss Art Card 250gsm",
+   "Gloss Art Card 310gsm (2 side coated)": "Gloss Art Card 310gsm",
+   "Gloss Art Card 360gsm (2 side coated)": "Gloss Art Card 360gsm",
+   "Matte Art Card 250gsm": "Matte Art Card 250gsm",
+   "Linen 240gsm": "Linen 240gsm",
+   "Metal Ice 250gsm": "Metal Ice 250gsm",
+   "Synthetic Paper 180micron (0.18mm)": "Synthetic Paper 180micron",
+   "Super White 250gsm": "Super White 250gsm",
+   "Suwen 240gsm": "Suwen 240gsm",
+   "Frosted Plastic Card 0.4mm (400 micron)": "0.4mm Frosted Plastic Card"
+  },
+  "lamination": {
+   "Gloss Lamination (Both)": "",
+   "Matte Lamination (Both)": "",
+   "Gloss Water Based Varnish (Both)(Free)": "",
+   "Soft Touch Lamination (Both)": "Soft Touch Lamination (Both)"
+  },
+  "hotStamping": {
+   "No Hot Stamping": "",
+   "1C (Front)": "",
+   "1C (Back)": "",
+   "1C (Front) + 1C (Back)": "",
+   "1C (Front) + 2C (Back)": "",
+   "2C (Front)": "",
+   "2C (Back)": "",
+   "2C (Front) + 1C (Back)": "",
+   "2C (Front) + 2C (Back)": ""
+  },
+  "embossing": {
+   "Not Required": "",
+   "Embossing Front": "",
+   "Embossing Back": ""
+  }
+ },
+ "finishing": {
+  "roundCorner": [
+   "no",
+   "required"
+  ],
+  "holePunch": [
+   "no",
+   "3mm",
+   "5mm"
+  ],
+  "spotUV_options": [
+   "No Required"
+  ]
+ }
+}

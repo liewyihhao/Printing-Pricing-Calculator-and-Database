@@ -13,7 +13,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import select, func, distinct, and_
@@ -296,8 +296,12 @@ def order_status_api():
 
 # ---------- Printoka Formulation (our own engine) ----------
 import json as _json
-PRODUCTS_UI = [{"id": 21, "name": "Loose Sheet — Litho (Offset)"},
-               {"id": 50, "name": "Loose Sheet — Digital"}]
+PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
+               {"id": 21, "name": "Loose Sheet — Litho (Offset)"},
+               {"id": 50, "name": "Loose Sheet — Digital"},
+               {"id": 19, "name": "Booklet — Litho (Offset)"},
+               {"id": 37, "name": "Booklet — Digital"}]
+BOOKLET_IDS = (19, 37)
 
 
 @app.get("/api/printoka/products")
@@ -309,16 +313,210 @@ def printoka_products():
 FORMULATED = {21: 8.29, 50: 1.3}
 
 
+def _accuracy(product_id: int):
+    """Calibrated median % for a product: static map, else its spot-test report
+    (booklet engines write spot_test_report_<id>.json)."""
+    if product_id in FORMULATED:
+        return FORMULATED[product_id]
+    name = "spot_test_report_bizcard.json" if product_id == 1 else f"spot_test_report_{product_id}.json"
+    rep = UI_DIR.parent / "output" / name
+    if rep.exists():
+        try:
+            return _json.loads(rep.read_text()).get("median")
+        except Exception:
+            return None
+    return None
+
+
+def _booklet_valid_count(product_id: int) -> int:
+    f = UI_DIR.parent / "output" / f"booklet_options_{product_id}.json"
+    if not f.exists():
+        return 0
+    try:
+        c = _json.loads(f.read_text()).get("combos", {})
+        return sum(1 for v in c.values() if v)
+    except Exception:
+        return 0
+
+
 @app.get("/api/printoka/product-status")
 def product_status():
+    """Drives the calculator's product picker — PRODUCTS_UI is authoritative so
+    formula-only products (e.g. v4 Business Card, not in the crawl DB) appear too."""
     with session_scope() as s:
-        prods = s.scalars(select(Product).order_by(Product.excard_id)).all()
         counts = dict(s.execute(select(OrderWork.product_id, func.count())
                                 .group_by(OrderWork.product_id)).all())
-        return [{"id": p.excard_id, "name": p.name, "category": p.category,
-                 "combos_initiated": counts.get(p.excard_id, 0),
-                 "accuracy": FORMULATED.get(p.excard_id),
-                 "formulated": p.excard_id in FORMULATED} for p in prods]
+    out = []
+    for p in PRODUCTS_UI:
+        pid = p["id"]
+        acc = _accuracy(pid)
+        combos = counts.get(pid, 0) or _booklet_valid_count(pid)
+        out.append({"id": pid, "name": p["name"], "combos_initiated": combos,
+                    "accuracy": acc, "formulated": acc is not None})
+    return out
+
+
+# ---------- Booklet (products 19 & 37): richer cascade ----------
+def _booklet_opts(product_id: int) -> dict:
+    f = UI_DIR.parent / "output" / f"booklet_options_{product_id}.json"
+    return _json.loads(f.read_text()) if f.exists() else {"combos": {}}
+
+
+@app.get("/api/printoka/booklet/options")
+def booklet_options(product: int = Query(...), orientation: str | None = None,
+                    size: str | None = None, ordertype: str | None = None,
+                    binding: str | None = None, page: str | None = None,
+                    cover: str | None = None):
+    """Cascade for the booklet form. Each provided level filters the next."""
+    combos = _booklet_opts(product).get("combos", {})
+    valid = {k: v for k, v in combos.items() if v}
+    keys = [k.split("|") for k in valid]  # [orient, size, ordertype, binding]
+
+    def distinct(idx, *fixed):
+        seen = []
+        for parts, k in zip(keys, valid):
+            if all(parts[i] == val for i, val in fixed) and parts[idx] not in seen:
+                seen.append(parts[idx])
+        return seen
+
+    out = {"orientations": distinct(0), "sizes": [], "ordertypes": [],
+           "bindings": [], "pages": [], "covers": [], "contents": [],
+           "colours": [], "outer_inner": [], "qty": []}
+    if orientation:
+        out["sizes"] = distinct(1, (0, orientation))
+    if orientation and size:
+        out["ordertypes"] = distinct(2, (0, orientation), (1, size))
+    if orientation and size and ordertype:
+        out["bindings"] = distinct(3, (0, orientation), (1, size), (2, ordertype))
+    if orientation and size and ordertype and binding:
+        key = f"{orientation}|{size}|{ordertype}|{binding}"
+        v = valid.get(key)
+        if v:
+            out["pages"] = v["pages"]
+            out["covers"] = list(v["covers"].keys())
+            out["colours"] = v["content_colours"]
+            out["outer_inner"] = v["outer_inner"]
+            out["qty"] = v["qty"]
+            if cover and cover in v["covers"]:
+                out["contents"] = v["covers"][cover]["content_papers"]
+    return out
+
+
+@app.get("/api/printoka/booklet/quote")
+def booklet_quote(product: int = Query(...), orientation: str = Query(...),
+                  size: str = Query(...), ordertype: str = Query(...),
+                  binding: str = Query(...), page: str = Query(...),
+                  cover: str = Query(...), content: str = Query(...),
+                  colour: str = Query("4C (Both)"), qty: int = Query(...),
+                  outer_inner: str = Query("4C: 4 Colour Outer Only")):
+    from . import booklet_engine as be
+    try:
+        cash = be.cash_price(size, page, ordertype, binding, cover, content,
+                             colour, qty, product_id=product)
+        wt = be.weight_kg(size, page, ordertype, binding, cover, content, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    return {"config": {"product": product, "orientation": orientation, "size": size,
+                       "ordertype": ordertype, "binding": binding, "page": page,
+                       "cover": cover, "content": content, "colour": colour,
+                       "qty": qty, "outer_inner": outer_inner},
+            "printoka_cash": round(cash, 2), "method": "formula",
+            "tiers": be.tiers(cash), "weight_kg": wt}
+
+
+# ---------- Generic schema (drives the schema-aware calculator UI) ----------
+# Each product family declares an ordered field cascade. The UI renders fields in
+# order, fetches options per field from `options` (passing all selected `depends`),
+# reads the field's `optionsKey` from the response, and calls `quote` when complete.
+# Adding/curating a product here makes it appear in the calculator automatically.
+FIELD_SCHEMAS = {
+    "loose": {"options": "/api/printoka/options", "quote": "/api/printoka/quote",
+              "fields": [
+                  {"key": "size", "label": "Size", "optionsKey": "sizes", "depends": []},
+                  {"key": "paper", "label": "Paper", "optionsKey": "papers", "depends": ["size"]},
+                  {"key": "colour", "label": "Print colour", "optionsKey": "colours", "depends": ["size", "paper"]},
+                  {"key": "package", "label": "Package (ganging)", "optionsKey": "packages", "depends": ["size", "paper", "colour"]},
+              ]},
+    "bizcard": {"options": "/api/printoka/bizcard/options", "quote": "/api/printoka/bizcard/quote",
+                "fields": [
+                    {"key": "cardType", "label": "Card type", "optionsKey": "cardTypes", "depends": []},
+                    {"key": "size", "label": "Size", "optionsKey": "sizes", "depends": ["cardType"]},
+                    {"key": "paper", "label": "Paper", "optionsKey": "papers", "depends": ["cardType"]},
+                    {"key": "colour", "label": "Print colour", "optionsKey": "colours", "depends": ["cardType"]},
+                ]},
+    "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
+                "fields": [
+                    {"key": "orientation", "label": "Orientation", "optionsKey": "orientations", "depends": []},
+                    {"key": "size", "label": "Size", "optionsKey": "sizes", "depends": ["orientation"]},
+                    {"key": "ordertype", "label": "Cover type", "optionsKey": "ordertypes", "depends": ["orientation", "size"]},
+                    {"key": "binding", "label": "Binding", "optionsKey": "bindings", "depends": ["orientation", "size", "ordertype"]},
+                    {"key": "page", "label": "Pages (incl. cover)", "optionsKey": "pages", "depends": ["orientation", "size", "ordertype", "binding"]},
+                    {"key": "cover", "label": "Cover paper", "optionsKey": "covers", "depends": ["orientation", "size", "ordertype", "binding"]},
+                    {"key": "content", "label": "Content paper", "optionsKey": "contents", "depends": ["orientation", "size", "ordertype", "binding", "cover"]},
+                    {"key": "colour", "label": "Content print colour", "optionsKey": "colours", "depends": ["orientation", "size", "ordertype", "binding"]},
+                ]},
+}
+
+
+def _family(product_id: int) -> str:
+    if product_id in (19, 37):
+        return "booklet"
+    if product_id in (1,):  # business card (added when calibrated)
+        return "bizcard"
+    return "loose"
+
+
+@app.get("/api/printoka/schema")
+def printoka_schema(product: int = Query(...)):
+    fam = _family(product)
+    sch = FIELD_SCHEMAS.get(fam)
+    if not sch:
+        return JSONResponse({"error": f"no schema for product {product}"}, status_code=404)
+    name = next((p["name"] for p in PRODUCTS_UI if p["id"] == product), str(product))
+    return {"id": product, "name": name, "family": fam,
+            "accuracy": _accuracy(product),
+            "options_endpoint": sch["options"], "quote_endpoint": sch["quote"],
+            "fields": sch["fields"]}
+
+
+# ---------- Business Card (v4 product, id 1) ----------
+_BC_LABELS = {"Standard Card": "standard", "Thin Fold": "thin_fold",
+              "Fat Fold": "fat_fold", "Custom Die-Cut": "custom_die_cut",
+              "Plastic Card": "plastic_card"}
+
+
+@app.get("/api/printoka/bizcard/options")
+def bizcard_options(product: int = Query(1), cardType: str | None = None):
+    from .bizcard_sampler import CARDTYPES, PAPERS, PLASTIC_PAPER
+    out = {"cardTypes": list(_BC_LABELS.keys()), "sizes": [], "papers": [], "colours": []}
+    if cardType:
+        key = _BC_LABELS.get(cardType, cardType)
+        ct = CARDTYPES.get(key)
+        if ct:
+            _od, sizes, colours, _custom = ct
+            out["sizes"] = sizes
+            out["papers"] = [PLASTIC_PAPER] if key == "plastic_card" else PAPERS
+            out["colours"] = colours
+    return out
+
+
+@app.get("/api/printoka/bizcard/quote")
+def bizcard_quote(product: int = Query(1), cardType: str = Query(...),
+                  size: str = Query(...), paper: str = Query(...),
+                  colour: str = Query(...), qty: int = Query(...),
+                  package: str = Query("Normal")):
+    from . import bizcard_engine as BE
+    key = _BC_LABELS.get(cardType, cardType)
+    mult = package_multiplier(package)
+    try:
+        cash = BE.cash_price(key, size, paper, colour, qty) * mult
+        wt = BE.weight_kg(size, paper, qty) * mult
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    return {"config": {"product": product, "cardType": cardType, "size": size,
+                       "paper": paper, "colour": colour, "qty": qty, "package": package},
+            "printoka_cash": round(cash, 2), "method": "formula",
+            "tiers": BE.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 def _digital_options(size=None, paper=None, colour=None):
@@ -374,11 +572,47 @@ def printoka_kpi(product: int = Query(21)):
             "note": "No spot-test report yet for this product."}
 
 
+@app.post("/api/printoka/feedback")
+async def feedback(request: Request):
+    """Capture user pricing feedback → output/feedback.jsonl (one JSON per line),
+    so it can be reviewed and fed into recalibration."""
+    import datetime
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+    body["ts"] = datetime.datetime.now().isoformat(timespec="seconds")
+    fp = UI_DIR.parent / "output" / "feedback.jsonl"
+    with fp.open("a", encoding="utf-8") as f:
+        f.write(_json.dumps(body, ensure_ascii=False) + "\n")
+    return {"ok": True, "saved": str(fp.name)}
+
+
+@app.get("/api/printoka/feedback")
+def feedback_list():
+    fp = UI_DIR.parent / "output" / "feedback.jsonl"
+    if not fp.exists():
+        return {"count": 0, "items": []}
+    items = [_json.loads(l) for l in fp.read_text(encoding="utf-8").splitlines() if l.strip()]
+    return {"count": len(items), "items": items[-50:]}
+
+
 @app.get("/")
-def dashboard():
-    return FileResponse(UI_DIR / "dashboard.html")
+def calculator():
+    # The calculator is the primary page (what the preview opens).
+    return FileResponse(UI_DIR / "calculator.html")
 
 
 @app.get("/calculator")
-def calculator():
+def calculator_alias():
     return FileResponse(UI_DIR / "calculator.html")
+
+
+@app.get("/standalone")
+def standalone():
+    return FileResponse(UI_DIR / "calculator_standalone.html")
+
+
+@app.get("/dashboard")
+def dashboard():
+    return FileResponse(UI_DIR / "dashboard.html")

@@ -231,7 +231,8 @@ views.formulation = async () => {
     <div id="f_kpi" class="mb-5 text-[12.5px] text-slate-400">Select a product…</div>
     <div class="grid md:grid-cols-[1fr_350px] gap-5">
       <div class="bg-white rounded-xl border hairline shadow-card p-5 space-y-4">
-        ${selField("Product","f_product")}${selField("Size","f_size",true)}${selField("Paper","f_paper",true)}${selField("Print colour","f_colour",true)}${selField("Package (ganging)","f_package",true)}
+        ${selField("Product","f_product")}
+        <div id="f_fields" class="space-y-4"></div>
         <div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity (any value)</label>
           <input id="f_qty" type="number" min="1" value="1000" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></div>
         <p class="text-[11.5px] text-slate-400">Only valid Excard combinations are selectable. Quantity accepts any number — the formula interpolates.</p>
@@ -252,25 +253,74 @@ async function loadKpi(){ const pid=fpid(); if(!pid){ $("f_kpi").textContent="Se
     if(k.median!=null) $("f_kpi").innerHTML=`<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">Accuracy vs Excard (spot-test): median ${k.median}% · ${k.within_5pct}% within 5% · ${k.within_10pct}% within 10%</span>`;
     else $("f_kpi").innerHTML=`<span class="text-amber-600">${k.note||'not calibrated yet'}</span>`;
   }catch(e){ $("f_kpi").textContent="(accuracy unavailable)"; } }
+const BOOKLET=[19,37];
+function isBooklet(pid){ return BOOKLET.includes(pid); }
 async function initForm(){
   const prods=await api("/api/printoka/products"); window._fprods=prods;
   fillSel($("f_product"), prods.map(p=>p.name), "Select product…");
-  const opt=(x)=>api(`/api/printoka/options?product=${fpid()}&${x}`);
-  $("f_product").onchange=async()=>{ resetSel(["f_size","f_paper","f_colour","f_package"]); clearF(); const pid=fpid(); if(!pid)return;
-    fillSel($("f_size"),(await api(`/api/printoka/options?product=${pid}`)).sizes,"Select size…"); $("f_size").disabled=false; loadKpi(); };
+  $("f_product").onchange=async()=>{ clearF(); const pid=fpid(); if(!pid){ $("f_fields").innerHTML=""; return; }
+    loadKpi(); isBooklet(pid)?initBookletFields(pid):initLooseFields(pid); };
+  $("f_qty").oninput=()=>{ clearTimeout(window._ft); window._ft=setTimeout(loadForm,350); };
+}
+// ---- Loose Sheet (21 / 50) ----
+function initLooseFields(pid){
+  $("f_fields").innerHTML=selField("Size","f_size",true)+selField("Paper","f_paper",true)
+    +selField("Print colour","f_colour",true)+selField("Package (ganging)","f_package",true);
+  const opt=(x)=>api(`/api/printoka/options?product=${pid}&${x}`);
+  (async()=>{ fillSel($("f_size"),(await api(`/api/printoka/options?product=${pid}`)).sizes,"Select size…"); $("f_size").disabled=false; })();
   $("f_size").onchange=async()=>{ const s=dv($("f_size")); resetSel(["f_paper","f_colour","f_package"]); clearF(); if(!s)return;
     fillSel($("f_paper"),(await opt(`size=${encodeURIComponent(s)}`)).papers,"Select paper…"); $("f_paper").disabled=false; };
   $("f_paper").onchange=async()=>{ const s=dv($("f_size")),p=dv($("f_paper")); resetSel(["f_colour","f_package"]); clearF(); if(!p)return;
     fillSel($("f_colour"),(await opt(`size=${encodeURIComponent(s)}&paper=${encodeURIComponent(p)}`)).colours,"Select colour…"); $("f_colour").disabled=false; };
   $("f_colour").onchange=async()=>{ const s=dv($("f_size")),p=dv($("f_paper")),c=dv($("f_colour")); resetSel(["f_package"]); clearF(); if(!c)return;
     fillSel($("f_package"),(await opt(`size=${encodeURIComponent(s)}&paper=${encodeURIComponent(p)}&colour=${encodeURIComponent(c)}`)).packages,"Select package…"); $("f_package").disabled=false; };
-  $("f_package").onchange=loadForm; $("f_qty").oninput=()=>{ clearTimeout(window._ft); window._ft=setTimeout(loadForm,350); };
+  $("f_package").onchange=loadForm;
+}
+// ---- Booklet (19 / 37) ----
+function initBookletFields(pid){
+  $("f_fields").innerHTML=selField("Orientation","b_orient",true)+selField("Size","b_size",true)
+    +selField("Cover type","b_ordertype",true)+selField("Binding","b_binding",true)
+    +selField("Pages (incl. cover)","b_page",true)+selField("Cover paper","b_cover",true)
+    +selField("Content paper","b_content",true)+selField("Content print colour","b_colour",true);
+  const bopt=(x)=>api(`/api/printoka/booklet/options?product=${pid}&${x}`);
+  const enc=encodeURIComponent;
+  const sel=id=>dv($(id));
+  (async()=>{ fillSel($("b_orient"),(await bopt("")).orientations,"Select…"); $("b_orient").disabled=false; })();
+  $("b_orient").onchange=async()=>{ resetSel(["b_size","b_ordertype","b_binding","b_page","b_cover","b_content","b_colour"]); clearF();
+    const o=sel("b_orient"); if(!o)return; fillSel($("b_size"),(await bopt(`orientation=${enc(o)}`)).sizes,"Select…"); $("b_size").disabled=false; };
+  $("b_size").onchange=async()=>{ resetSel(["b_ordertype","b_binding","b_page","b_cover","b_content","b_colour"]); clearF();
+    const o=sel("b_orient"),s=sel("b_size"); if(!s)return; fillSel($("b_ordertype"),(await bopt(`orientation=${enc(o)}&size=${enc(s)}`)).ordertypes,"Select…"); $("b_ordertype").disabled=false; };
+  $("b_ordertype").onchange=async()=>{ resetSel(["b_binding","b_page","b_cover","b_content","b_colour"]); clearF();
+    const o=sel("b_orient"),s=sel("b_size"),ot=sel("b_ordertype"); if(!ot)return;
+    fillSel($("b_binding"),(await bopt(`orientation=${enc(o)}&size=${enc(s)}&ordertype=${enc(ot)}`)).bindings,"Select…"); $("b_binding").disabled=false; };
+  $("b_binding").onchange=async()=>{ resetSel(["b_page","b_cover","b_content","b_colour"]); clearF();
+    const o=sel("b_orient"),s=sel("b_size"),ot=sel("b_ordertype"),b=sel("b_binding"); if(!b)return;
+    const r=await bopt(`orientation=${enc(o)}&size=${enc(s)}&ordertype=${enc(ot)}&binding=${enc(b)}`);
+    fillSel($("b_page"),r.pages,"Select pages…"); $("b_page").disabled=false;
+    fillSel($("b_cover"),r.covers,"Select cover…"); $("b_cover").disabled=false;
+    fillSel($("b_colour"),r.colours,"Select colour…"); $("b_colour").disabled=false; };
+  $("b_cover").onchange=async()=>{ resetSel(["b_content"]); clearF();
+    const o=sel("b_orient"),s=sel("b_size"),ot=sel("b_ordertype"),b=sel("b_binding"),cv=sel("b_cover"); if(!cv)return;
+    const r=await bopt(`orientation=${enc(o)}&size=${enc(s)}&ordertype=${enc(ot)}&binding=${enc(b)}&cover=${enc(cv)}`);
+    fillSel($("b_content"),r.contents,"Select content…"); $("b_content").disabled=false; };
+  $("b_page").onchange=loadForm; $("b_content").onchange=loadForm; $("b_colour").onchange=loadForm;
 }
 function clearF(){ $("f_out").innerHTML='<div class="text-slate-400">Configure a job…</div>'; }
 async function loadForm(){
-  const pid=fpid(),s=dv($("f_size")),p=dv($("f_paper")),c=dv($("f_colour")),pk=dv($("f_package")),qty=parseInt($("f_qty").value||"0");
-  if(!pid||!s||!p||!c||!pk||!qty)return; $("f_status").textContent="Calculating…";
-  try{ const q=await api(`/api/printoka/quote?product=${pid}&size=${encodeURIComponent(s)}&paper=${encodeURIComponent(p)}&colour=${encodeURIComponent(c)}&package=${encodeURIComponent(pk)}&qty=${qty}`);
+  const pid=fpid(),qty=parseInt($("f_qty").value||"0"); if(!pid||!qty)return;
+  const enc=encodeURIComponent; $("f_status").textContent="Calculating…";
+  try{
+    let q;
+    if(isBooklet(pid)){
+      const o=dv($("b_orient")),s=dv($("b_size")),ot=dv($("b_ordertype")),b=dv($("b_binding")),
+            pg=dv($("b_page")),cv=dv($("b_cover")),ct=dv($("b_content")),cl=dv($("b_colour"));
+      if(!o||!s||!ot||!b||!pg||!cv||!ct||!cl){ $("f_status").textContent=""; return; }
+      q=await api(`/api/printoka/booklet/quote?product=${pid}&orientation=${enc(o)}&size=${enc(s)}&ordertype=${enc(ot)}&binding=${enc(b)}&page=${enc(pg)}&cover=${enc(cv)}&content=${enc(ct)}&colour=${enc(cl)}&qty=${qty}`);
+    } else {
+      const s=dv($("f_size")),p=dv($("f_paper")),c=dv($("f_colour")),pk=dv($("f_package"));
+      if(!s||!p||!c||!pk){ $("f_status").textContent=""; return; }
+      q=await api(`/api/printoka/quote?product=${pid}&size=${enc(s)}&paper=${enc(p)}&colour=${enc(c)}&package=${enc(pk)}&qty=${qty}`);
+    }
     $("f_status").textContent="";
     if(q.printoka_cash==null){ $("f_out").innerHTML='<div class="text-amber-600">No basis to price this combo yet.</div>'; return; }
     const t=q.tiers||{};

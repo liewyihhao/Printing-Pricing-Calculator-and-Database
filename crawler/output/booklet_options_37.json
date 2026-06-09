@@ -1,0 +1,2784 @@
+{
+ "product_id": 37,
+ "method": "Digital",
+ "spec_url": "https://www.excard.com.my/spec/Digital/Booklet",
+ "combos": {
+  "Portrait|A4 (210mm x 297mm)|Soft Cover|Saddle Stitch": {
+   "pages": [
+    "8",
+    "12",
+    "16",
+    "20",
+    "24",
+    "28",
+    "32",
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80"
+   ],
+   "covers": {
+    "Gloss Art Card 230gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)",
+      "Gloss Art Card 250gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Card 310gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Gloss Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 100gsm"
+     ]
+    },
+    "Gloss Art Paper 128gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm"
+     ]
+    },
+    "Gloss Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm"
+     ]
+    },
+    "Linen 240gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Linen 240gsm"
+     ]
+    },
+    "Matte Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Matte Art Paper 100gsm"
+     ]
+    },
+    "Matte Art Paper 130gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Matte Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Metal Ice 250gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Metal Ice 250gsm"
+     ]
+    },
+    "Simili 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm"
+     ]
+    },
+    "Simili 140gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Simili 140gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Simili 80gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm"
+     ]
+    },
+    "Super White 240gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Super White 240gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|A4 (210mm x 297mm)|Soft Cover|Perfect Binding": {
+   "pages": [
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Card 230gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Gloss Art Card 310gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|A4 (210mm x 297mm)|Hard Cover|Saddle Stitch": null,
+  "Portrait|A4 (210mm x 297mm)|Hard Cover|Perfect Binding": {
+   "pages": [
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|A5 (148mm x 210mm)|Soft Cover|Saddle Stitch": {
+   "pages": [
+    "8",
+    "12",
+    "16",
+    "20",
+    "24",
+    "28",
+    "32",
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80"
+   ],
+   "covers": {
+    "Gloss Art Card 230gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)",
+      "Gloss Art Card 250gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Card 310gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Gloss Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 100gsm"
+     ]
+    },
+    "Gloss Art Paper 128gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm"
+     ]
+    },
+    "Gloss Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm"
+     ]
+    },
+    "Linen 240gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Linen 240gsm"
+     ]
+    },
+    "Matte Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Matte Art Paper 100gsm"
+     ]
+    },
+    "Matte Art Paper 130gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Matte Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Metal Ice 250gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Metal Ice 250gsm"
+     ]
+    },
+    "Simili 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm"
+     ]
+    },
+    "Simili 140gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Simili 140gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Simili 80gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm"
+     ]
+    },
+    "Super White 240gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Super White 240gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|A5 (148mm x 210mm)|Soft Cover|Perfect Binding": {
+   "pages": [
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Card 230gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|A5 (148mm x 210mm)|Hard Cover|Saddle Stitch": null,
+  "Portrait|A5 (148mm x 210mm)|Hard Cover|Perfect Binding": {
+   "pages": [
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|B5 (176mm x 250mm)|Soft Cover|Saddle Stitch": {
+   "pages": [
+    "8",
+    "12",
+    "16",
+    "20",
+    "24",
+    "28",
+    "32",
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80"
+   ],
+   "covers": {
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Card 250gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 100gsm"
+     ]
+    },
+    "Gloss Art Paper 128gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm"
+     ]
+    },
+    "Simili 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|B5 (176mm x 250mm)|Soft Cover|Perfect Binding": {
+   "pages": [
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm"
+     ]
+    },
+    "Gloss Art Card 310gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|B5 (176mm x 250mm)|Hard Cover|Saddle Stitch": null,
+  "Portrait|B5 (176mm x 250mm)|Hard Cover|Perfect Binding": {
+   "pages": [
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|A6 (105mm x 148mm)|Soft Cover|Saddle Stitch": {
+   "pages": [
+    "8",
+    "12",
+    "16",
+    "20",
+    "24",
+    "28",
+    "32",
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80"
+   ],
+   "covers": {
+    "Gloss Art Card 230gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)",
+      "Gloss Art Card 250gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 100gsm"
+     ]
+    },
+    "Gloss Art Paper 128gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm"
+     ]
+    },
+    "Gloss Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm"
+     ]
+    },
+    "Linen 240gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Linen 240gsm"
+     ]
+    },
+    "Matte Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Matte Art Paper 100gsm"
+     ]
+    },
+    "Matte Art Paper 130gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Matte Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Metal Ice 250gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Simili 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Simili 140gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Simili 140gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Simili 80gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm"
+     ]
+    },
+    "Super White 240gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Super White 240gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|A6 (105mm x 148mm)|Soft Cover|Perfect Binding": {
+   "pages": [
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Card 230gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|A6 (105mm x 148mm)|Hard Cover|Saddle Stitch": null,
+  "Portrait|A6 (105mm x 148mm)|Hard Cover|Perfect Binding": null,
+  "Portrait|B5+ (190mm x 266mm)|Soft Cover|Saddle Stitch": {
+   "pages": [
+    "8",
+    "12",
+    "16",
+    "20",
+    "24",
+    "28",
+    "32",
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80"
+   ],
+   "covers": {
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Card 250gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 100gsm"
+     ]
+    },
+    "Gloss Art Paper 128gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm"
+     ]
+    },
+    "Simili 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|B5+ (190mm x 266mm)|Soft Cover|Perfect Binding": {
+   "pages": [
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm"
+     ]
+    },
+    "Gloss Art Card 310gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Portrait|B5+ (190mm x 266mm)|Hard Cover|Saddle Stitch": null,
+  "Portrait|B5+ (190mm x 266mm)|Hard Cover|Perfect Binding": {
+   "pages": [
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Landscape|A4 (210mm x 297mm)|Soft Cover|Saddle Stitch": null,
+  "Landscape|A4 (210mm x 297mm)|Soft Cover|Perfect Binding": null,
+  "Landscape|A4 (210mm x 297mm)|Hard Cover|Saddle Stitch": null,
+  "Landscape|A4 (210mm x 297mm)|Hard Cover|Perfect Binding": null,
+  "Landscape|A5 (148mm x 210mm)|Soft Cover|Saddle Stitch": {
+   "pages": [
+    "8",
+    "12",
+    "16",
+    "20",
+    "24",
+    "28",
+    "32",
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80"
+   ],
+   "covers": {
+    "Gloss Art Card 230gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)",
+      "Gloss Art Card 250gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Card 310gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)",
+      "Gloss Art Card 250gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)",
+      "Gloss Art Card 250gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Paper 128gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)",
+      "Gloss Art Card 250gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm"
+     ]
+    },
+    "Linen 240gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm"
+     ]
+    },
+    "Matte Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Matte Art Paper 100gsm"
+     ]
+    },
+    "Matte Art Paper 130gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Matte Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Metal Ice 250gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Metal Ice 250gsm"
+     ]
+    },
+    "Simili 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm"
+     ]
+    },
+    "Simili 140gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Simili 140gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Simili 80gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm"
+     ]
+    },
+    "Super White 240gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Super White 240gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Landscape|A5 (148mm x 210mm)|Soft Cover|Perfect Binding": {
+   "pages": [
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Card 230gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Gloss Art Card 310gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Landscape|A5 (148mm x 210mm)|Hard Cover|Saddle Stitch": null,
+  "Landscape|A5 (148mm x 210mm)|Hard Cover|Perfect Binding": {
+   "pages": [
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80",
+    "84",
+    "88",
+    "92",
+    "96",
+    "100",
+    "104",
+    "108",
+    "112",
+    "116",
+    "120",
+    "124",
+    "128",
+    "132",
+    "136",
+    "140",
+    "144",
+    "148",
+    "152",
+    "156",
+    "160",
+    "164",
+    "168",
+    "172",
+    "176",
+    "180",
+    "184",
+    "188",
+    "192",
+    "196",
+    "200",
+    "204",
+    "208",
+    "212",
+    "216",
+    "220",
+    "224",
+    "228",
+    "232",
+    "236",
+    "240",
+    "244",
+    "248",
+    "252",
+    "256",
+    "260",
+    "264",
+    "268",
+    "272",
+    "276",
+    "280",
+    "284",
+    "288",
+    "292"
+   ],
+   "covers": {
+    "Gloss Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Landscape|B5 (176mm x 250mm)|Soft Cover|Saddle Stitch": {
+   "pages": [
+    "8",
+    "12",
+    "16",
+    "20",
+    "24",
+    "28",
+    "32",
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80"
+   ],
+   "covers": {
+    "Gloss Art Card 230gsm (2 sides coated)": {
+     "colours": [],
+     "content_papers": []
+    },
+    "Gloss Art Card 250gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm",
+      "Gloss Art Card 230gsm (2 sides coated)",
+      "Gloss Art Card 250gsm (2 sides coated)"
+     ]
+    },
+    "Gloss Art Card 310gsm (2 sides coated)": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm",
+      "Matte Art Paper 150gsm"
+     ]
+    },
+    "Gloss Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 100gsm"
+     ]
+    },
+    "Gloss Art Paper 128gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Gloss Art Paper 100gsm"
+     ]
+    },
+    "Gloss Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm"
+     ]
+    },
+    "Linen 240gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Linen 240gsm"
+     ]
+    },
+    "Matte Art Paper 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Matte Art Paper 100gsm"
+     ]
+    },
+    "Matte Art Paper 130gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Matte Art Paper 150gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Metal Ice 250gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Metal Ice 250gsm"
+     ]
+    },
+    "Simili 100gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Gloss Art Paper 150gsm",
+      "Metal Ice 250gsm"
+     ]
+    },
+    "Simili 140gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm",
+      "Simili 100gsm",
+      "Simili 140gsm",
+      "Gloss Art Paper 100gsm",
+      "Gloss Art Paper 128gsm",
+      "Matte Art Paper 100gsm",
+      "Matte Art Paper 130gsm"
+     ]
+    },
+    "Simili 80gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm"
+     ]
+    },
+    "Super White 240gsm": {
+     "colours": [
+      "4C"
+     ],
+     "content_papers": [
+      "Simili 80gsm"
+     ]
+    }
+   },
+   "content_colours": [
+    "1C (Both)",
+    "4C (Both)"
+   ],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "qty": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "300",
+    "400",
+    "500"
+   ]
+  },
+  "Landscape|B5 (176mm x 250mm)|Soft Cover|Perfect Binding": null,
+  "Landscape|B5 (176mm x 250mm)|Hard Cover|Saddle Stitch": null,
+  "Landscape|B5 (176mm x 250mm)|Hard Cover|Perfect Binding": null,
+  "Landscape|A6 (105mm x 148mm)|Soft Cover|Saddle Stitch": null,
+  "Landscape|A6 (105mm x 148mm)|Soft Cover|Perfect Binding": null,
+  "Landscape|A6 (105mm x 148mm)|Hard Cover|Saddle Stitch": null,
+  "Landscape|A6 (105mm x 148mm)|Hard Cover|Perfect Binding": null,
+  "Landscape|B5+ (190mm x 266mm)|Soft Cover|Saddle Stitch": null,
+  "Landscape|B5+ (190mm x 266mm)|Soft Cover|Perfect Binding": null,
+  "Landscape|B5+ (190mm x 266mm)|Hard Cover|Saddle Stitch": null,
+  "Landscape|B5+ (190mm x 266mm)|Hard Cover|Perfect Binding": null
+ }
+}

@@ -1,0 +1,12 @@
+{
+ "product": 19,
+ "test": "held-out configs (25%)",
+ "sample_points": 1122,
+ "median": 9.89,
+ "within_3pct": 14,
+ "within_5pct": 24,
+ "within_10pct": 51,
+ "mape": 13.24,
+ "under_predict_pct": 41,
+ "method": "pure formula (booklet)"
+}

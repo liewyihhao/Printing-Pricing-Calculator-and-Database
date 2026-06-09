@@ -4,6 +4,93 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **STANDALONE, NO-SERVER CALCULATOR** = `ui/calculator_standalone.html` (just
+  double-click — no uvicorn, no network). All 5 formulas + calibrated params +
+  option cascades are BAKED into the one file; the Python engines are ported to JS
+  and **verified to match Python to the cent (12/12 configs via node)**. This is the
+  primary deliverable — crawling/API are now only for occasional audit/recalibration.
+  - Built by `python -m app.build_standalone` (reads params + options + accuracy,
+    injects them into `ui/_standalone_template.html` → emits the standalone). **Re-run
+    this after recalibrating ANY engine** to refresh the baked-in numbers.
+  - Embeds: litho/digital/booklet-19/booklet-37/bizcard params; loose-21 cascade
+    (from DB status='done'), digital_options, booklet_options_19/37 combos, bizcard
+    cardtypes. JS engine ports live in the template (cashLitho/Digital/Booklet/Bizcard).
+  - The local server (`/calculator`) still exists for the live/auto-updating flow,
+    but is optional. Runtime pricing NEVER calls Excard.
+- **NEW schema-driven CALCULATOR UI** at `ui/calculator.html` (served `/calculator`).
+  Stripe-themed, Excard-ordering-like: product picker (cards w/ accuracy badge) →
+  dynamic cascade fields → live price panel (Cash + Platinum/Gold/Silver tiers +
+  per-unit + weight). **Fully API-driven & auto-updating:** it reads
+  `/api/printoka/product-status` (products), `/api/printoka/schema?product=ID`
+  (field cascade per product), then each field's options + the quote from the
+  endpoints the schema names. Add/curate a product in `PRODUCTS_UI` +
+  `FIELD_SCHEMAS` (api.py) and it appears automatically — no UI edits.
+  `FIELD_SCHEMAS` families: `loose` (21/50), `booklet` (19/37), `bizcard` (1).
+- **BUSINESS CARD (v4) = BUILT, calibrated & LIVE in calculator (product id 1).**
+  - **NEW PLATFORM:** `v4.excard.com.my` is a different site from www (still ASP.NET
+    under a new skin). Its SPA prices via a JSON API — we call it DIRECTLY (no
+    browser, no member login):
+    `POST https://devv2.excard.com.my/Product/CheckPrice`
+    headers `Authorization: Basic ExcardAPI:EXCARDPNCAPI` + `Api-Key: RjvaNM0xSDxcKyneFhFFxek42Nrnd4FuE9rScoHQ`,
+    body `{"type":"Business card","spec":[{Product,OrderDesc,Size,Orientation,Paper,
+    Quantity,Package,PrintColour,Lamination,HotStamping…,RoundCorner,HolePunch,
+    Embossing,Folding,Country,Courier,IsCustomSize}]}` → returns `{Price,Weight,…}`.
+    Client: `app/bizcard_api.py` (`price()/check_price()/make_spec()`).
+  - **Value rules (form label → API):** Size `×`→`x`, strip `(Open Size)`/`(Custom Size)`;
+    Paper = strip `(…)`; Lamination exact (`Gloss Waterbase Varnish (Both)`, etc.);
+    **Package N = pure ×N multiplier** (not sampled); base price uses `Lamination=""`.
+    OrderDesc: `Standard/Thin Fold/Fat Fold/Custom Die-Cut/Plastic Card`.
+  - **Options** (cardType→size/paper/colour) hard-listed from spec+API in
+    `app/bizcard_sampler.py CARDTYPES/PAPERS`. **Sampler** `app/bizcard_sampler.py`
+    calls the API directly (threaded) — 5,800 pts in ~2 min → `output/bizcard_samples.json`.
+  - **Engine** `app/bizcard_engine.py`: business card is offset gang-up + best-seller
+    promo pricing (q300/500/1000/5000/10000 discounted; q400/600/6000–9000 spike;
+    paper cost is per-MATERIAL not ∝gsm) — a smooth formula caps ~18%. So the engine
+    stores a **per-config quantity curve** (`cardType|size|paper|colour → {qty:log cash}`)
+    and **log-interpolates** for arbitrary qty. **EXACT at Excard's breakpoint
+    quantities (median 0%)**; held-out-quantity interpolation median **6.1%**. All
+    selectable option-combos are sampled, so the dropdown quantities are exact.
+    Params `output/bizcard_params.json`, KPI `output/spot_test_report_bizcard.json`.
+  - **API:** `/api/printoka/bizcard/options` + `/bizcard/quote` (id 1, package ×N).
+  - Recon scripts (dev): `app/bizcard_probe.py`, `app/bizcard_api_probe.py`,
+    `app/bizcard_discover.py` (the form→API map capture is superseded by direct API
+    probing; `bizcard_options.json` is unused by runtime).
+  - **TODO (not yet):** finishing add-ons (lamination/Spot UV/hot stamping/embossing/
+    round corner/hole punch/creasing) — sample on-vs-off deltas via the API and add as
+    additive terms; custom-die-cut arbitrary sizes (currently nearest-size area-scaled).
+- **BOOKLET (products 19 Litho & 37 Digital) = BUILT & LIVE in UI.** Full cascade
+  discovered, priced by pure formula, wired into the product selector.
+  - **Cascade (learned from live form):** orientation → size → ordertype(Soft/Hard)
+    → binding(Saddle/Perfect) → page → **coverPaper → {coverColour, contentPaper →
+    contentColour}**. KEY GOTCHA: content papers populate ONLY after a cover paper is
+    chosen, and obey "cover ≥ content thickness" — so options are nested under each
+    cover. Papers populate only after a page is selected. Hardcover ⇒ Perfect Binding
+    only; Landscape ⇒ A4/A5 only. Saddle pages 8–80; Perfect 36–292 (soft) / 56–292
+    (hard) — live form exceeds the PDF's 80.
+  - **Options:** `output/booklet_options_{19,37}.json` (nested tree; 20 valid combos
+    for 19, 18 for 37). Discovered via `app/booklet_discovery.py` (`probe` | `walk`).
+  - **Engine:** `app/booklet_engine.py`. Physical model — `cash = margin*(setup +
+    variable*qty^gamma)`, where `setup = base_setup[binding] + plate_cost*plates`
+    (make-ready amortised over the run = the real volume economy) and `variable =
+    p_paper*paper_kg + p_imp*plates` (per-book material + printing). Offset booklet is
+    ~LINEAR in qty (gamma≈0.85–1.0); volume economy comes from amortising plates, NOT
+    a steep power law. plates = cover(4 or 8 if Outer&Inner) + content_sheets×(8 for
+    4C both / 2 for 1C both); content_sheets = content_pages/4.
+  - **Accuracy (held-out 25% of configs):** **Digital (37) median 2.1%, 58% ≤5%**
+    (gamma 0.99, flat — the achievable win). **Litho (19) median ~9.9%, 51% ≤10%**
+    (offset's step/promo pricing caps a smooth formula ~8–10%, as expected). Params
+    `output/booklet_params_{19,37}.json`; KPI `output/spot_test_report_{19,37}.json`.
+  - **Sampler:** `app/booklet_sampler.py` + `app/booklet_capture.py` (cascade-aware).
+    Capture has a **stale-price guard** (a larger qty must yield a different cash, else
+    re-toggle/skip — fixes the bug where qty didn't recompute) + per-step configure
+    logging. Samples: `output/booklet_samples_{19,37}.json` (~1100 pts each, all 3
+    binding types). Run: `python -m app.booklet_sampler <id> <account>` (resumable).
+  - **API/UI:** `/api/printoka/booklet/options` (cascade) + `/api/printoka/booklet/quote`
+    (formula+tiers+weight). dashboard.html Formulation tab renders the booklet
+    configurator when product 19/37 is selected; KPI badge reads spot_test_report.
+  - **NOTE:** sampler is fragile to network drops (DNS) + occasional hangs — kill
+    `python.exe`+headless `msedge.exe` and re-run (resumes). Two browsers on one
+    laptop starve; serialize. 37 hardcover required 2 resumes after stalls.
 - **Calculator UI = product-aware.** Printoka Formulation tab has a **Product selector**
   (21 Loose Sheet Litho / 50 Loose Sheet Digital) → cascade Size→Paper→Colour→Package→Qty,
   each product uses its OWN formula + shows its OWN accuracy badge.
@@ -30,11 +117,21 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
 - **GitHub:** liewyihhao/Printing-Pricing-Calculator-and-Database (branch main). Secrets
   (.env, 3 accounts + PG) are git-ignored — NOT in the repo; recreate from .env.example.
 
-## NEXT TASK (Booklet — products 19 Litho & 37 Digital)
-Read `crawler/booklet_docs/*.txt`. Discover all options (poll async dropdowns), put in the
-UI product selector, spot-sample sufficiently, calibrate per binding type (Saddle Stitch /
-Perfect Binding soft/hard), validate to 3–5%, make live in preview. Booklet price scales with
-PAGE COUNT (content sheets) + cover + binding; offset gamma<1, digital gamma≈1.
+## NEXT TASK (booklet is DONE — remaining polish / next products)
+Booklet (19 & 37) is fully built & live (see LATEST STATE). Remaining/optional:
+- **Improve 37 tail:** median is 2.1% but MAPE ~16% — a tail of larger errors
+  (likely 1C colour or extreme pages/hardcover). Add per-binding gamma or a colour
+  term if tighter ≤5% coverage is wanted.
+- **Improve 19 common cases:** per-binding/per-page calibration could pull common
+  saddle configs under ~5% (offset extremes will stay high — accepted).
+- **Finishing/add-ons** (#12) still pending for ALL products: lamination, Spot UV,
+  hot stamping, embossing, folding, etc. Booklet cover finishing rules are in
+  `booklet_docs/booklet_*_{LO,DO}.txt` (process days + qty≥300 gating).
+- **Page×content-paper edge validity:** discovery captured cover→content sets at the
+  smallest page; the live form narrows content papers as pages grow (spec tables).
+  Not enforced in UI yet — the engine prices any in-range page regardless.
+- **Delivery** (#13): weight×courier rate, West/East Malaysia (rates from user).
+- Next products beyond booklet: see `PRODUCTS_CHECKLIST.md`.
 
 
 ## Goal

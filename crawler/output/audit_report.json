@@ -1,0 +1,129 @@
+[
+ {
+  "product": "Business Card (1) \u2014 LIVE API, interpolation",
+  "n": 174,
+  "median": 1.33,
+  "mean_mape": 4.86,
+  "within_5pct": 64.4,
+  "within_10pct": 79.9,
+  "max": 33.8,
+  "worst_over_10pct": [
+   [
+    56.19,
+    84.9,
+    33.8
+   ],
+   [
+    76.61,
+    108.0,
+    29.1
+   ],
+   [
+    16.06,
+    22.1,
+    27.3
+   ],
+   [
+    419.54,
+    572.3,
+    26.7
+   ],
+   [
+    59.33,
+    79.1,
+    25.0
+   ],
+   [
+    115.46,
+    147.25,
+    21.6
+   ],
+   [
+    329.66,
+    417.55,
+    21.0
+   ],
+   [
+    36.95,
+    46.5,
+    20.5
+   ]
+  ]
+ },
+ {
+  "product": "Loose Sheet \u2014 Digital (50)",
+  "n": 1231,
+  "median": 1.03,
+  "mean_mape": 2.23,
+  "within_5pct": 87.7,
+  "within_10pct": 92.9,
+  "max": 23.3,
+  "worst_over_10pct": [
+   [
+    27.19,
+    22.05,
+    23.3
+   ],
+   [
+    27.14,
+    22.05,
+    23.1
+   ],
+   [
+    25.24,
+    20.95,
+    20.5
+   ],
+   [
+    26.17,
+    22.05,
+    18.7
+   ],
+   [
+    28.17,
+    24.25,
+    16.2
+   ],
+   [
+    29.15,
+    25.35,
+    15.0
+   ],
+   [
+    998.3,
+    1165.4,
+    14.3
+   ],
+   [
+    1262.48,
+    1472.6,
+    14.3
+   ]
+  ]
+ },
+ {
+  "product": "Booklet \u2014 Litho (19) [curve, held-out qty]",
+  "n": 91,
+  "median": 0.53,
+  "mean_mape": 0.73,
+  "within_5pct": 100.0,
+  "within_10pct": 100.0,
+  "max": 2.4,
+  "worst_over_10pct": []
+ },
+ {
+  "product": "Booklet \u2014 Digital (37) [curve, held-out qty]",
+  "n": 93,
+  "median": 1.58,
+  "mean_mape": 2.14,
+  "within_5pct": 90.3,
+  "within_10pct": 100.0,
+  "max": 5.7,
+  "worst_over_10pct": []
+ },
+ {
+  "product": "Loose Sheet \u2014 Litho (21)",
+  "n": 0,
+  "note": "no stored ground truth \u2014 re-sample required"
+ }
+]

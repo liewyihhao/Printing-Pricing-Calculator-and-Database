@@ -3,229 +3,265 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Printoka — Price Calculator</title>
+<title>Printoka — Pricing Calculator</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
 <script>
 tailwind.config = { theme: { extend: {
   fontFamily: { sans:['Inter','system-ui','sans-serif'], display:['Poppins','sans-serif'] },
-  colors: { ink:'#061b31', brand:{50:'#fff1ec',500:'#ff5a2e',600:'#e6491c',700:'#c43c14'},
-    slate:{50:'#f8fafd',100:'#f1f5f9',200:'#e5edf5',300:'#d8d6df',400:'#64748d',500:'#50617a',600:'#42526b',700:'#2c3a4f',900:'#061b31'} },
+  colors: { ink:'#061b31', brand:{50:'#fff1ec',100:'#ffe3d8',500:'#ff5a2e',600:'#e6491c',700:'#c43c14'},
+    slate:{50:'#f8fafd',100:'#f1f5f9',150:'#e9eef4',200:'#e5edf5',300:'#d8d6df',400:'#64748d',500:'#50617a',600:'#42526b',700:'#2c3a4f',900:'#061b31'} },
   boxShadow:{
     card:'0 0 0 1px rgba(60,66,87,.04), 0 2px 5px 0 rgba(60,66,87,.06), 0 1px 1.5px 0 rgba(0,0,0,.04)',
     pop:'0 0 0 1px rgba(60,66,87,.06), 0 7px 14px 0 rgba(60,66,87,.10), 0 3px 6px 0 rgba(0,0,0,.06)' } } } };
 </script>
 <style>
-  html{color-scheme:light}
-  body{-webkit-font-smoothing:antialiased;letter-spacing:-0.006em;font-feature-settings:"ss01","cv05"}
-  h1{text-wrap:balance;letter-spacing:-0.018em}
+  html{color-scheme:light} body{-webkit-font-smoothing:antialiased;letter-spacing:-0.006em}
+  h1,h2,h3{text-wrap:balance;letter-spacing:-0.018em;font-weight:600}
   .tabular-nums,td,th{font-variant-numeric:tabular-nums}
   .brand-orb{background:conic-gradient(from 210deg,#ff3d2e,#ff8a00,#ffd000,#39c46e,#1fa2ff,#7b5bff,#ff3d2e)}
   .brand-gradient{background:linear-gradient(99deg,#ff5a2e 0%,#ff8a00 28%,#7b5bff 72%,#1fa2ff 100%)}
   .hairline{border-color:#e3e8ef}
   .fieldsel{transition:border .12s,box-shadow .12s}
   .fieldsel:focus{outline:none;border-color:rgba(255,90,46,.55);box-shadow:0 0 0 3px rgba(255,90,46,.16)}
-  .range-thumb::-webkit-slider-thumb{-webkit-appearance:none;height:18px;width:18px;border-radius:50%;background:#fff;border:2px solid #ff5a2e;box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:pointer;margin-top:-7px}
-  .range-thumb{-webkit-appearance:none;height:4px;border-radius:4px;background:#e5edf5}
+  .fieldsel:disabled{background:#f8fafd;color:#9aa7ba;cursor:not-allowed}
+  .prodcard{transition:border .12s,box-shadow .12s,transform .12s;cursor:pointer}
+  .prodcard:hover{box-shadow:0 7px 14px 0 rgba(60,66,87,.10)}
+  .prodcard.active{border-color:#ff5a2e;background:#fff8f5}
+  .prodcard.active .pc-orb{box-shadow:0 0 0 3px #ffe3d8}
+  .qchip{transition:all .1s;cursor:pointer}
+  .qchip.active{background:#ff5a2e;color:#fff;border-color:#ff5a2e}
   .fade{animation:f .25s ease both}@keyframes f{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
-  .seg.active{background:#ff5a2e;color:#fff}
-  .tierbtn.active{border-color:#ff5a2e;background:#fff1ec;color:#c43c14}
+  .pricepulse{animation:pp .4s ease both}@keyframes pp{0%{opacity:.35}100%{opacity:1}}
+  ::-webkit-scrollbar{width:10px;height:10px}::-webkit-scrollbar-thumb{background:#d8d6df;border-radius:8px;border:3px solid #f8fafd}
 </style>
 </head>
-<body class="font-sans bg-slate-50 text-slate-900 min-h-screen">
-
-<header class="h-16 bg-white border-b hairline flex items-center px-5 sm:px-8 gap-2.5">
+<body class="font-sans bg-slate-50 text-slate-900">
+<header class="sticky top-0 z-20 h-16 bg-white/85 backdrop-blur border-b hairline flex items-center gap-3 px-4 sm:px-8">
   <div class="brand-orb h-7 w-7 rounded-full shadow-sm"></div>
   <span class="font-display font-semibold text-[17px] tracking-tight text-ink">printoka</span>
-  <span class="text-slate-300 mx-1">/</span>
-  <span class="text-[14px] text-slate-500 font-medium">Price Calculator</span>
-  <span id="livebadge" class="ml-auto hidden sm:inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1">
-    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span><span id="livetext">live data</span>
-  </span>
+  <span class="text-slate-300">/</span>
+  <span class="font-display font-semibold text-[15px] text-slate-600">Pricing Calculator</span>
+  <a href="/dashboard" class="ml-auto text-[12.5px] font-medium text-slate-500 hover:text-brand-700">Dashboard →</a>
 </header>
 
-<main class="max-w-[980px] mx-auto px-4 sm:px-8 py-8">
-  <div class="mb-6">
-    <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Loose Sheet pricing</h1>
-    <p class="text-slate-500 text-[13.5px] mt-0.5">Real Excard prices from the crawl. Configure a job to see costs and your suggested selling price.</p>
-  </div>
+<main class="max-w-[1180px] mx-auto px-4 sm:px-8 py-7">
+  <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Simulate a quote</h1>
+  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-6">Pick a product, choose options exactly like the Excard ordering page, and get our formula price live — across every membership tier.</p>
 
-  <div class="grid md:grid-cols-[1fr_360px] gap-5">
+  <!-- product picker -->
+  <div id="prodgrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-7"></div>
+
+  <!-- calculator -->
+  <div id="calc" class="hidden grid md:grid-cols-[1fr_372px] gap-5">
     <!-- config -->
-    <div class="bg-white rounded-xl border hairline shadow-card p-5 space-y-5">
-      <div>
-        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Size</label>
-        <select id="size" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700"></select>
+    <div class="bg-white rounded-xl border hairline shadow-card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="cfgtitle" class="font-semibold text-[15px] text-ink">Configuration</h3>
+        <span id="acc" class="text-[12px]"></span>
       </div>
-      <div>
-        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Paper</label>
-        <select id="paper" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700" disabled></select>
+      <div id="fields" class="space-y-4"></div>
+      <div class="mt-4">
+        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity</label>
+        <input id="qty" type="number" min="1" value="1000" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">
+        <div id="qchips" class="flex flex-wrap gap-1.5 mt-2"></div>
+        <p class="text-[11.5px] text-slate-400 mt-2">Any quantity works — the formula interpolates between Excard's breakpoints.</p>
       </div>
-      <div>
-        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Lamination / Finishing</label>
-        <select id="lamination" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700" disabled></select>
+      <div class="mt-4">
+        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Delivery destination</label>
+        <select id="dest" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></select>
+        <p class="text-[11.5px] text-slate-400 mt-2">Delivery = courier rate per kg × order weight (rounded up), from Excard's reference rates.</p>
       </div>
-      <div>
-        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Delivery</label>
-        <select id="delivery" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700"></select>
-      </div>
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Print color</label>
-          <div id="colormode" class="flex rounded-lg border hairline overflow-hidden text-[12.5px] font-medium"></div>
-        </div>
-        <div>
-          <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity</label>
-          <select id="quantity" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px] text-slate-700" disabled></select>
-        </div>
-      </div>
-      <div id="status" class="text-[12.5px] text-slate-400"></div>
+      <div id="status" class="text-[12.5px] text-slate-400 mt-3"></div>
     </div>
-
-    <!-- quote -->
-    <div class="bg-white rounded-xl border hairline shadow-card p-5 h-fit md:sticky md:top-6">
-      <div class="text-[12.5px] font-semibold text-slate-400 uppercase tracking-wide mb-3">Excard cost — by tier</div>
-      <div id="tiers" class="space-y-1.5 text-[13px]">
-        <div class="text-slate-400 text-[13px]">Configure a job to see prices…</div>
+    <!-- price panel -->
+    <div class="bg-white rounded-xl border hairline shadow-card h-fit md:sticky md:top-20 overflow-hidden">
+      <div class="brand-gradient px-5 py-4 text-white">
+        <div class="text-[11.5px] font-medium opacity-90 uppercase tracking-wide">Estimated price (Cash)</div>
+        <div id="bigprice" class="font-display text-[30px] font-semibold tracking-tight mt-0.5">RM —</div>
+        <div id="perunit" class="text-[12px] opacity-90"></div>
       </div>
-
-      <div id="markupbox" class="hidden">
-        <div class="border-t hairline my-4"></div>
-        <div class="text-[12.5px] font-semibold text-slate-400 uppercase tracking-wide mb-2">Your selling price</div>
-        <div class="flex items-center justify-between text-[12.5px] text-slate-500 mb-1">
-          <span>Buy at tier</span>
-          <div id="buytier" class="flex gap-1"></div>
+      <div class="p-5">
+        <div class="text-[12px] font-semibold text-slate-400 uppercase tracking-wide mb-2">By membership tier</div>
+        <div id="tiers" class="space-y-1.5 text-[13px]"><div class="text-slate-400">Configure a job…</div></div>
+        <div id="deliv" class="mt-2 pt-2 border-t hairline text-[13px] hidden">
+          <div class="flex items-center justify-between py-1"><span class="text-slate-500" id="deliv_label">Delivery</span><span id="deliv_fee" class="tabular-nums text-slate-700"></span></div>
+          <div class="flex items-center justify-between py-1 font-semibold"><span class="text-ink">Total (Cash + delivery)</span><span id="deliv_total" class="tabular-nums text-ink"></span></div>
         </div>
-        <div class="flex items-center justify-between text-[12.5px] text-slate-500 mt-2">
-          <span>Markup <span id="markval" class="text-brand-600 font-semibold">35%</span></span>
-          <input id="markup" type="range" min="0" max="100" value="35" class="range-thumb w-32" />
+        <div id="meta" class="mt-3 pt-3 border-t hairline space-y-1.5 text-[12px] hidden">
+          <div class="flex justify-between"><span class="text-slate-400">Weight (est.)</span><span id="m_wt" class="tabular-nums text-slate-600"></span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Chargeable weight</span><span id="m_cw" class="tabular-nums text-slate-600"></span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Per unit (Cash)</span><span id="m_pu" class="tabular-nums text-slate-600"></span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Method</span><span id="m_method" class="text-slate-500 text-[11px]"></span></div>
         </div>
-        <div class="brand-gradient rounded-lg mt-3 p-3.5 text-white">
-          <div class="text-[12px] opacity-80">Suggested selling price</div>
-          <div id="sell" class="text-[26px] font-display font-semibold tracking-tight leading-tight">—</div>
-          <div id="sellmeta" class="text-[12px] opacity-80 mt-0.5">—</div>
+        <div id="bd" class="mt-3 pt-3 border-t hairline text-[12px] hidden">
+          <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">How this price is derived</div>
+          <div class="flex justify-between py-0.5"><span class="text-slate-500">Material (paper)</span><span id="bd_mat" class="tabular-nums text-slate-700"></span></div>
+          <div class="flex justify-between py-0.5"><span class="text-slate-500">Printing (ink · plates · setup)</span><span id="bd_print" class="tabular-nums text-slate-700"></span></div>
+          <div class="flex justify-between py-0.5"><span class="text-slate-500">Finishing</span><span id="bd_fin" class="tabular-nums text-slate-700"></span></div>
+          <div class="flex justify-between py-0.5"><span class="text-slate-500">Delivery</span><span id="bd_del" class="tabular-nums text-slate-700"></span></div>
+          <div class="flex justify-between py-1 mt-1 border-t hairline font-semibold"><span class="text-ink">Grand total</span><span id="bd_total" class="tabular-nums text-ink"></span></div>
+          <p class="text-[10.5px] text-slate-400 mt-1.5">Material is an estimate from paper weight × rate; printing is the remainder of our cash price. Finishing & delivery are exact add-ons.</p>
         </div>
+        <div id="fb" class="mt-3 pt-3 border-t hairline hidden">
+          <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">Feedback on this price</div>
+          <textarea id="fb_text" rows="2" placeholder="e.g. Excard quotes RM X for this — too high/low…" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[12.5px]"></textarea>
+          <div class="flex items-center gap-2 mt-1.5">
+            <button id="fb_send" class="rounded-lg bg-ink text-white text-[12px] font-medium px-3 py-1.5 hover:opacity-90">Send feedback</button>
+            <span id="fb_status" class="text-[11.5px] text-slate-400"></span>
+          </div>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-3">Tiers: Cash → Silver −4% → Gold −8% → Platinum −14%. Excard is a reference only; this is Printoka's own formula.</p>
       </div>
     </div>
   </div>
 </main>
 
 <script>
-const API = location.origin.startsWith("http") ? "" : "http://localhost:8000";
 const $ = id => document.getElementById(id);
+const enc = encodeURIComponent;
 const RM = v => "RM " + Number(v).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
 const TIERS = ["Platinum","Gold","Silver","Cash"];
-let state = { ladder:null, colormode:null, buytier:"Platinum" };
-let quoteToken = 0;  // guards against stale async responses
+const QCHIPS = [100,250,500,1000,2000,5000,10000];
+// Delivery = courier RM/kg × chargeable weight (ceil to whole kg, min 1), from Excard reference rates.
+const DELIVERY = [
+  {code:"99", label:"West Malaysia", rate:6},
+  {code:"98", label:"East Malaysia", rate:10},
+  {code:"96", label:"Singapore", rate:6},
+  {code:"100", label:"Thailand (Bangkok)", rate:6},
+];
+function deliveryFee(weightKg, code){ const d=DELIVERY.find(x=>x.code===code)||DELIVERY[0];
+  const kg=Math.max(1, Math.ceil(weightKg||0)); return {fee:d.rate*kg, kg, rate:d.rate, label:d.label}; }
+async function api(p){ const r=await fetch(p); if(!r.ok) throw new Error(r.status); return r.json(); }
 
-async function api(path){ const r = await fetch(API+path); if(!r.ok) throw new Error(r.status); return r.json(); }
+let S = { pid:null, schema:null, values:{}, fields:[], t:null };
 
-function fill(sel, items, placeholder){
-  sel.innerHTML = `<option value="">${placeholder}</option>` +
-    items.map(i=>`<option value="${encodeURIComponent(i)}">${i}</option>`).join("");
-}
-
-async function init(){
-  try{
-    const sum = await api("/api/summary");
-    $("livetext").textContent = sum.price_points.toLocaleString() + " prices • " + sum.combinations_priced + " combos";
-    const o = await api("/api/options");
-    fill($("size"), o.sizes, "Select size…");
-    $("delivery").innerHTML = Object.entries(o.deliveries)
-      .map(([c,n])=>`<option value="${c}">${n}</option>`).join("");
-    // color mode segmented
-    ["4C","4C+4C"].forEach((m,i)=>{
-      const b=document.createElement("button");
-      b.className="seg flex-1 px-2 py-2 "+(i===0?"active":"text-slate-600 hover:bg-slate-50")+" border-l first:border-l-0 hairline";
-      b.textContent=m; b.dataset.v=m;
-      b.onclick=()=>{ document.querySelectorAll('#colormode .seg').forEach(x=>x.classList.remove('active','text-slate-600'));
-        b.classList.add('active'); state.colormode=m; renderQuote(); };
-      $("colormode").appendChild(b);
-    });
-    state.colormode="4C";
-    // buy-tier chips
-    TIERS.forEach((t,i)=>{
-      const b=document.createElement("button");
-      b.className="tierbtn px-2 py-0.5 rounded-md border hairline text-[11.5px] "+(i===0?"active":"");
-      b.textContent=t; b.dataset.t=t;
-      b.onclick=()=>{ document.querySelectorAll('#buytier .tierbtn').forEach(x=>x.classList.remove('active'));
-        b.classList.add('active'); state.buytier=t; renderSell(); };
-      $("buytier").appendChild(b);
-    });
-  }catch(e){ $("status").textContent="Could not reach the API. Is it running on :8000?"; $("livebadge").classList.add("hidden"); }
-}
-
-$("size").onchange = async () => {
-  const size = decodeURIComponent($("size").value);
-  reset(["paper","lamination","quantity"]); clearQuote();
-  if(!size) return;
-  const o = await api(`/api/options?size=${encodeURIComponent(size)}`);
-  fill($("paper"), o.papers, "Select paper…"); $("paper").disabled=false;
-};
-$("paper").onchange = async () => {
-  const size=decodeURIComponent($("size").value), paper=decodeURIComponent($("paper").value);
-  reset(["lamination","quantity"]); clearQuote();
-  if(!paper) return;
-  const o = await api(`/api/options?size=${encodeURIComponent(size)}&paper=${encodeURIComponent(paper)}`);
-  fill($("lamination"), o.laminations, "Select finishing…"); $("lamination").disabled=false;
-};
-$("lamination").onchange = loadQuote;
-$("delivery").onchange = () => { if($("lamination").value) loadQuote(); };
-$("quantity").onchange = renderQuote;
-$("markup").oninput = () => { $("markval").textContent=$("markup").value+"%"; renderSell(); };
-
-function reset(ids){ ids.forEach(id=>{ $(id).innerHTML=""; $(id).disabled=true; }); }
-function clearQuote(){ state.ladder=null; $("tiers").innerHTML='<div class="text-slate-400 text-[13px]">Configure a job to see prices…</div>'; $("markupbox").classList.add("hidden"); }
-
-async function loadQuote(){
-  const size=decodeURIComponent($("size").value), paper=decodeURIComponent($("paper").value),
-        lam=decodeURIComponent($("lamination").value), del=$("delivery").value;
-  if(!size||!paper||!lam||!del) return;
-  const token = ++quoteToken;
-  const prevQty = $("quantity").value;
-  $("status").textContent="Loading prices…";
-  try{
-    const q = await api(`/api/quote?size=${encodeURIComponent(size)}&paper=${encodeURIComponent(paper)}&lamination=${encodeURIComponent(lam)}&delivery=${del}`);
-    if(token !== quoteToken) return;  // a newer request superseded this one
-    state.ladder=q.ladder;
-    $("quantity").innerHTML=q.quantities.map(n=>`<option value="${n}">${n.toLocaleString()}</option>`).join("");
-    // Preserve the user's quantity if it still exists for this combination.
-    if(prevQty && q.quantities.includes(parseInt(prevQty))) $("quantity").value=prevQty;
-    $("quantity").disabled=false;
-    if(!q.color_modes.includes(state.colormode)) state.colormode=q.color_modes[0];
-    $("status").textContent="";
-    renderQuote();
-  }catch(e){ if(token===quoteToken){ $("status").textContent="No pricing for this exact combination."; clearQuote(); } }
-}
-
-function renderQuote(){
-  if(!state.ladder){ return; }
-  const qty=parseInt($("quantity").value);
-  const modeData=state.ladder[state.colormode]||{};
-  const row=modeData[qty];
-  if(!row){ $("tiers").innerHTML='<div class="text-slate-400 text-[13px]">No price for this quantity.</div>'; return; }
-  $("tiers").innerHTML = TIERS.filter(t=>t in row).map(t=>`
-    <div class="flex items-center justify-between py-1">
-      <span class="text-slate-500">${t}</span>
-      <span class="tabular-nums font-medium text-slate-800">${RM(row[t])}</span>
+async function loadProducts(){
+  const ps = await api("/api/printoka/product-status");
+  const formed = ps.filter(p=>p.formulated);
+  $("prodgrid").innerHTML = formed.map(p=>`
+    <div class="prodcard bg-white rounded-xl border hairline shadow-card p-4" data-id="${p.id}">
+      <div class="flex items-center gap-2.5">
+        <div class="pc-orb h-9 w-9 rounded-lg brand-gradient grid place-items-center text-white text-[13px] font-bold">${p.name[0]}</div>
+        <div class="min-w-0">
+          <div class="font-semibold text-slate-800 text-[13px] leading-tight truncate">${p.name}</div>
+          <div class="text-[11px] text-emerald-600 font-medium mt-0.5">±${p.accuracy}% median</div>
+        </div>
+      </div>
     </div>`).join("");
-  $("markupbox").classList.remove("hidden");
-  renderSell();
+  $("prodgrid").querySelectorAll(".prodcard").forEach(c=>
+    c.onclick=()=>selectProduct(parseInt(c.dataset.id)));
+  $("dest").innerHTML = DELIVERY.map(d=>`<option value="${d.code}">${d.label} — RM${d.rate}/kg</option>`).join("");
+  $("dest").onchange = quote;
+  if(formed.length) selectProduct(formed[0].id);
 }
 
-function renderSell(){
-  if(!state.ladder) return;
-  const qty=parseInt($("quantity").value);
-  const row=(state.ladder[state.colormode]||{})[qty]; if(!row) return;
-  const cost=row[state.buytier]; if(cost==null) return;
-  const mk=parseInt($("markup").value);
-  const sell=cost*(1+mk/100);
-  $("sell").textContent=RM(sell);
-  $("sellmeta").textContent=`cost ${RM(cost)} (${state.buytier}) · margin ${(((sell-cost)/sell)*100).toFixed(1)}% · ${RM(sell/qty)}/unit`;
+async function selectProduct(pid){
+  S.pid = pid; S.values = {};
+  $("prodgrid").querySelectorAll(".prodcard").forEach(c=>
+    c.classList.toggle("active", parseInt(c.dataset.id)===pid));
+  const sch = await api(`/api/printoka/schema?product=${pid}`);
+  S.schema = sch; S.fields = sch.fields;
+  $("calc").classList.remove("hidden"); $("calc").classList.add("fade");
+  $("cfgtitle").textContent = sch.name;
+  $("acc").innerHTML = sch.accuracy!=null
+    ? `<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">±${sch.accuracy}% vs Excard</span>` : "";
+  $("fields").innerHTML = S.fields.map(f=>`
+    <div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
+      <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">
+        <option value="">—</option></select></div>`).join("");
+  S.fields.forEach((f,i)=>{ $(`f_${f.key}`).onchange = ()=>onChange(i); });
+  $("qchips").innerHTML = QCHIPS.map(q=>`<button class="qchip rounded-md border hairline px-2.5 py-1 text-[12px] text-slate-600" data-q="${q}">${q.toLocaleString()}</button>`).join("");
+  $("qchips").querySelectorAll(".qchip").forEach(b=>b.onclick=()=>{ $("qty").value=b.dataset.q; markChips(); quote(); });
+  $("qty").oninput = ()=>{ markChips(); clearTimeout(S.t); S.t=setTimeout(quote,300); };
+  markChips();
+  await populateFrom(0);
+}
+function markChips(){ const v=$("qty").value; $("qchips").querySelectorAll(".qchip").forEach(b=>b.classList.toggle("active",b.dataset.q===v)); }
+
+function fillSelect(sel, opts){
+  const cur=sel.value;
+  sel.innerHTML = `<option value="">Select…</option>` + opts.map(o=>`<option>${o}</option>`).join("");
+  if(cur && opts.includes(cur)) sel.value=cur;
 }
 
-init();
+async function onChange(idx){
+  const f = S.fields[idx];
+  const v = $(`f_${f.key}`).value;
+  if(v) S.values[f.key]=v; else delete S.values[f.key];
+  for(let j=idx+1;j<S.fields.length;j++) delete S.values[S.fields[j].key];
+  await populateFrom(idx+1);
+}
+
+async function populateFrom(startIdx){
+  for(let i=startIdx;i<S.fields.length;i++){
+    const f=S.fields[i], sel=$(`f_${f.key}`);
+    const ready=f.depends.every(d=>S.values[d]);
+    if(!ready){ sel.disabled=true; sel.innerHTML='<option value="">—</option>'; delete S.values[f.key]; continue; }
+    const params = f.depends.map(d=>`${d}=${enc(S.values[d])}`).join("&");
+    let opts=[];
+    try{ const r=await api(`${S.schema.options_endpoint}?product=${S.pid}${params?'&'+params:''}`); opts=r[f.optionsKey]||[]; }
+    catch(e){ opts=[]; }
+    fillSelect(sel,opts); sel.disabled=false;
+    if(S.values[f.key] && !opts.includes(S.values[f.key])) delete S.values[f.key];
+    if(S.values[f.key]) sel.value=S.values[f.key];
+  }
+  quote();
+}
+
+async function quote(){
+  const qty=parseInt($("qty").value||"0");
+  const complete = S.fields.every(f=>S.values[f.key]);
+  if(!complete || !qty){ $("status").textContent=""; clearPrice("Configure a job…"); return; }
+  $("status").textContent="Calculating…";
+  const params = S.fields.map(f=>`${f.key}=${enc(S.values[f.key])}`).join("&");
+  try{
+    const q=await api(`${S.schema.quote_endpoint}?product=${S.pid}&${params}&qty=${qty}`);
+    $("status").textContent="";
+    if(q.printoka_cash==null){ clearPrice("No basis to price this combo."); return; }
+    const t=q.tiers||{};
+    $("bigprice").textContent=RM(q.printoka_cash); $("bigprice").classList.remove("pricepulse"); void $("bigprice").offsetWidth; $("bigprice").classList.add("pricepulse");
+    $("perunit").textContent = qty? RM(q.printoka_cash/qty)+" / unit" : "";
+    $("tiers").innerHTML = TIERS.map(tn=>`<div class="flex items-center justify-between py-1">
+      <span class="text-slate-500">${tn}</span><span class="tabular-nums font-medium text-ink">${RM(t[tn])}</span></div>`).join("");
+    // delivery (per-kg × chargeable weight) + grand total
+    const dv=deliveryFee(q.weight_kg, $("dest").value);
+    $("deliv").classList.remove("hidden");
+    $("deliv_label").textContent=`Delivery — ${dv.label} (${dv.kg} kg × RM${dv.rate})`;
+    $("deliv_fee").textContent=RM(dv.fee);
+    $("deliv_total").textContent=RM(q.printoka_cash + dv.fee);
+    $("meta").classList.remove("hidden");
+    $("m_wt").textContent=(q.weight_kg!=null?q.weight_kg+" kg":"—");
+    $("m_cw").textContent=dv.kg+" kg";
+    $("m_pu").textContent=qty?RM(q.printoka_cash/qty):"—";
+    $("m_method").textContent=q.method||"formula";
+    // price breakdown (material estimate from paper weight; printing = remainder)
+    const PAPER_RM=8.0;
+    const finishing = q.finishing_cost || 0;
+    const material = Math.min(q.printoka_cash, (q.weight_kg||0)/1.2065*PAPER_RM);
+    const printing = Math.max(0, q.printoka_cash - material - finishing);
+    $("bd").classList.remove("hidden");
+    $("bd_mat").textContent=RM(material); $("bd_print").textContent=RM(printing);
+    $("bd_fin").textContent=RM(finishing); $("bd_del").textContent=RM(dv.fee);
+    $("bd_total").textContent=RM(q.printoka_cash+dv.fee);
+    $("fb").classList.remove("hidden"); window._lastQuote={product:S.pid,values:S.values,qty,dest:$("dest").value,cash:q.printoka_cash};
+  }catch(e){ $("status").textContent="Could not price this combination."; clearPrice("—"); }
+}
+function clearPrice(msg){ $("bigprice").textContent="RM —"; $("perunit").textContent=""; $("tiers").innerHTML=`<div class="text-slate-400">${msg}</div>`; ["meta","deliv","bd","fb"].forEach(id=>{const e=$(id); if(e)e.classList.add("hidden");}); }
+// feedback -> server log
+document.addEventListener("click", async e=>{
+  if(e.target && e.target.id==="fb_send"){
+    const txt=$("fb_text").value.trim(); if(!txt){ $("fb_status").textContent="Type something first."; return; }
+    $("fb_status").textContent="Sending…";
+    try{ await fetch("/api/printoka/feedback",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({...(window._lastQuote||{}), feedback:txt})});
+      $("fb_status").textContent="Saved — thanks! It'll be used to improve the formula."; $("fb_text").value="";
+    }catch(err){ $("fb_status").textContent="Could not save (is the server running?)."; }
+  }
+});
+
+loadProducts().catch(()=>{ $("prodgrid").innerHTML='<div class="text-rose-600 text-[13px]">Could not load products. Is the API running?</div>'; });
 </script>
 </body>
 </html>

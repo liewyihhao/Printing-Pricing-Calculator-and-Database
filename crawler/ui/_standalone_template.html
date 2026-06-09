@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Printoka — Pricing Calculator (standalone)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<script>
+tailwind.config = { theme: { extend: {
+  fontFamily: { sans:['Inter','system-ui','sans-serif'], display:['Poppins','sans-serif'] },
+  colors: { ink:'#061b31', brand:{50:'#fff1ec',100:'#ffe3d8',500:'#ff5a2e',600:'#e6491c',700:'#c43c14'},
+    slate:{50:'#f8fafd',100:'#f1f5f9',150:'#e9eef4',200:'#e5edf5',300:'#d8d6df',400:'#64748d',500:'#50617a',600:'#42526b',700:'#2c3a4f',900:'#061b31'} },
+  boxShadow:{ card:'0 0 0 1px rgba(60,66,87,.04), 0 2px 5px 0 rgba(60,66,87,.06), 0 1px 1.5px 0 rgba(0,0,0,.04)' } } } };
+</script>
+<style>
+  html{color-scheme:light} body{-webkit-font-smoothing:antialiased;letter-spacing:-0.006em}
+  h1,h2,h3{text-wrap:balance;letter-spacing:-0.018em;font-weight:600}
+  .tabular-nums{font-variant-numeric:tabular-nums}
+  .brand-orb{background:conic-gradient(from 210deg,#ff3d2e,#ff8a00,#ffd000,#39c46e,#1fa2ff,#7b5bff,#ff3d2e)}
+  .brand-gradient{background:linear-gradient(99deg,#ff5a2e 0%,#ff8a00 28%,#7b5bff 72%,#1fa2ff 100%)}
+  .hairline{border-color:#e3e8ef}
+  .fieldsel{transition:border .12s,box-shadow .12s}
+  .fieldsel:focus{outline:none;border-color:rgba(255,90,46,.55);box-shadow:0 0 0 3px rgba(255,90,46,.16)}
+  .fieldsel:disabled{background:#f8fafd;color:#9aa7ba;cursor:not-allowed}
+  .prodcard{transition:border .12s,box-shadow .12s;cursor:pointer}
+  .prodcard:hover{box-shadow:0 7px 14px 0 rgba(60,66,87,.10)}
+  .prodcard.active{border-color:#ff5a2e;background:#fff8f5}
+  .prodcard.active .pc-orb{box-shadow:0 0 0 3px #ffe3d8}
+  .qchip{transition:all .1s;cursor:pointer}.qchip.active{background:#ff5a2e;color:#fff;border-color:#ff5a2e}
+  .fade{animation:f .25s ease both}@keyframes f{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  .pricepulse{animation:pp .4s ease both}@keyframes pp{0%{opacity:.35}100%{opacity:1}}
+</style>
+</head>
+<body class="font-sans bg-slate-50 text-slate-900">
+<header class="sticky top-0 z-20 h-16 bg-white/85 backdrop-blur border-b hairline flex items-center gap-3 px-4 sm:px-8">
+  <div class="brand-orb h-7 w-7 rounded-full shadow-sm"></div>
+  <span class="font-display font-semibold text-[17px] tracking-tight text-ink">printoka</span>
+  <span class="text-slate-300">/</span>
+  <span class="font-display font-semibold text-[15px] text-slate-600">Pricing Calculator</span>
+  <span class="ml-auto inline-flex items-center gap-1.5 text-[12px] font-medium text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>offline · no server</span>
+</header>
+
+<main class="max-w-[1180px] mx-auto px-4 sm:px-8 py-7">
+  <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Simulate a quote</h1>
+  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-6">Self-contained — formulas &amp; calibrated parameters are baked into this file. No server, no network.</p>
+  <div id="prodgrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-7"></div>
+  <div id="calc" class="hidden grid md:grid-cols-[1fr_372px] gap-5">
+    <div class="bg-white rounded-xl border hairline shadow-card p-5">
+      <div class="flex items-center justify-between mb-4">
+        <h3 id="cfgtitle" class="font-semibold text-[15px] text-ink">Configuration</h3>
+        <span id="acc" class="text-[12px]"></span>
+      </div>
+      <div id="fields" class="space-y-4"></div>
+      <div class="mt-4">
+        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity</label>
+        <input id="qty" type="number" min="1" value="1000" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">
+        <div id="qchips" class="flex flex-wrap gap-1.5 mt-2"></div>
+        <p class="text-[11.5px] text-slate-400 mt-2">Any quantity works — the formula interpolates between Excard's breakpoints.</p>
+      </div>
+      <div class="mt-4">
+        <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Delivery destination</label>
+        <select id="dest" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></select>
+        <p class="text-[11.5px] text-slate-400 mt-2">Delivery = courier rate per kg × order weight (rounded up), from Excard's reference rates.</p>
+      </div>
+      <div id="status" class="text-[12.5px] text-slate-400 mt-3"></div>
+    </div>
+    <div class="bg-white rounded-xl border hairline shadow-card h-fit md:sticky md:top-20 overflow-hidden">
+      <div class="brand-gradient px-5 py-4 text-white">
+        <div class="text-[11.5px] font-medium opacity-90 uppercase tracking-wide">Estimated price (Cash)</div>
+        <div id="bigprice" class="font-display text-[30px] font-semibold tracking-tight mt-0.5">RM —</div>
+        <div id="perunit" class="text-[12px] opacity-90"></div>
+      </div>
+      <div class="p-5">
+        <div class="text-[12px] font-semibold text-slate-400 uppercase tracking-wide mb-2">By membership tier</div>
+        <div id="tiers" class="space-y-1.5 text-[13px]"><div class="text-slate-400">Configure a job…</div></div>
+        <div id="deliv" class="mt-2 pt-2 border-t hairline text-[13px] hidden">
+          <div class="flex items-center justify-between py-1"><span class="text-slate-500" id="deliv_label">Delivery</span><span id="deliv_fee" class="tabular-nums text-slate-700"></span></div>
+          <div class="flex items-center justify-between py-1 font-semibold"><span class="text-ink">Total (Cash + delivery)</span><span id="deliv_total" class="tabular-nums text-ink"></span></div>
+        </div>
+        <div id="meta" class="mt-3 pt-3 border-t hairline space-y-1.5 text-[12px] hidden">
+          <div class="flex justify-between"><span class="text-slate-400">Weight (est.)</span><span id="m_wt" class="tabular-nums text-slate-600"></span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Chargeable weight</span><span id="m_cw" class="tabular-nums text-slate-600"></span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Per unit (Cash)</span><span id="m_pu" class="tabular-nums text-slate-600"></span></div>
+          <div class="flex justify-between"><span class="text-slate-400">Method</span><span id="m_method" class="text-slate-500 text-[11px]"></span></div>
+        </div>
+        <p class="text-[11px] text-slate-400 mt-3">Tiers: Cash → Silver −4% → Gold −8% → Platinum −14%. Printoka's own formula; Excard is a reference only.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const DATA = /*__DATA__*/;
+const $ = id => document.getElementById(id);
+const RM = v => "RM " + Number(v).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
+const TIERS = ["Platinum","Gold","Silver","Cash"];
+const TIER_DISC = {Cash:0,Silver:0.04,Gold:0.08,Platinum:0.14};
+const QCHIPS = [100,250,500,1000,2000,5000,10000];
+const WF = 1.2065;
+const DELIVERY = [
+  {code:"99", label:"West Malaysia", rate:6},
+  {code:"98", label:"East Malaysia", rate:10},
+  {code:"96", label:"Singapore", rate:6},
+  {code:"100", label:"Thailand (Bangkok)", rate:6},
+];
+function deliveryFee(weightKg, code){ const d=DELIVERY.find(x=>x.code===code)||DELIVERY[0];
+  const kg=Math.max(1, Math.ceil(weightKg||0)); return {fee:d.rate*kg, kg, rate:d.rate, label:d.label}; }
+
+// ---------- shared helpers ----------
+function dims(s){ const m=/(\d+)\s*mm\s*x\s*(\d+)\s*mm/.exec(s||""); return m?[+m[1],+m[2]]:[0,0]; }
+function gsm(p,def){ const m=/(\d+)\s*gsm/.exec(p||""); if(m)return +m[1]; return /micron/i.test(p||"")?180:def; }
+function stripParens(p){ return (p||"").replace(/\s*\(.*?\)/g,"").trim(); }
+function tiers(cash){ const o={}; for(const t of TIERS) o[t]=Math.round(cash*(1-TIER_DISC[t])*100)/100; return o; }
+
+// ---------- LITHO (loose 21) ----------
+const CATS_L=["Simili","Gloss Art Paper","Matte Art Paper","Gloss Art Card"];
+function catL(p){ for(let i=0;i<CATS_L.length;i++) if((p||"").toLowerCase().includes(CATS_L[i].toLowerCase()))return i; return 0; }
+function platesL(c){ const col=c.startsWith("4C")?4:1, sides=/Both/.test(c)?2:1; return col*sides; }
+function cashLitho(P,size,paper,colour,qty){
+  const [w,h]=dims(size), a=w*h/1e6, g=gsm(paper,128), pl=platesL(colour), cat=catL(paper);
+  const [plate_rate,setup,margin,gamma,ink_rate]=P, paperc=P[5+cat];
+  const unit=paperc*a*g/1000 + ink_rate*pl*a;
+  return margin*(plate_rate*pl+setup+unit*Math.pow(qty,gamma));
+}
+// ---------- DIGITAL (loose 50) ----------
+const CATS_D=["Simili","Gloss Art Paper","Matte Art Paper","Gloss Art Card","Fine Card"];
+const FINE_D=["Linen","Metal Ice","Synthetic","Super White","Suwen","Vellum"];
+function catD(p){ p=(p||"").toLowerCase(); if(FINE_D.some(f=>p.includes(f.toLowerCase())))return 4;
+  for(let i=0;i<4;i++) if(p.includes(CATS_D[i].toLowerCase()))return i; return 1; }
+function upsD(w,h){ const W=320-8,H=450-8;
+  const a=Math.floor(W/(w+4))*Math.floor(H/(h+4)), b=Math.floor(W/(h+4))*Math.floor(H/(w+4));
+  return Math.max(1,a,b); }
+function cashDigital(PP,size,paper,colour,qty){
+  const P=PP.params; const [w,h]=dims(size), g=gsm(paper,250), sides=/Both/.test(colour)?2:1, cat=catD(paper);
+  const [setup,margin,gamma,c4]=P, paperc=P[4+cat];
+  const sheets=Math.ceil(qty/upsD(w,h)), sra3kg=(320*450/1e6)*g/1000;
+  const varc=(sides*c4+sra3kg*paperc)*sheets*Math.pow(qty,gamma-1);
+  return margin*(setup+varc);
+}
+// ---------- BOOKLET (19/37) ----------
+function bindIdx(ot,b){ if(/Saddle/.test(b))return 0; return /Hard/.test(ot)?2:1; }
+function contentPages(page,b){ const p=+page; return /Saddle/.test(b)?Math.max(0,p-4):p; }
+function cashBooklet(P,size,page,ot,binding,cover,content,colour,qty){
+  const [w,h]=dims(size), area=w*h/1e6, cpages=contentPages(page,binding), cs=cpages/4;
+  const cover_kg=2*area*gsm(cover,250)/1000, content_kg=cs*2*area*gsm(content,250)/1000;
+  const paper_kg=cover_kg+content_kg, sheets=1+cs;
+  const cover_plates=4 /* Outer Only */, content_pps=/4C/.test(colour)?8:2;
+  const plates=cover_plates+cs*content_pps, b=bindIdx(ot,binding);
+  const margin=P[0],gamma=P[1],base=P[2+b],plate_cost=P[5],p_paper=P[6],p_imp=P[7];
+  const setup=base+plate_cost*plates, variable=p_paper*paper_kg+p_imp*plates;
+  return margin*(setup+variable*Math.pow(qty,gamma));
+}
+function weightBooklet(size,page,ot,binding,cover,content,qty){
+  const [w,h]=dims(size), area=w*h/1e6, cpages=contentPages(page,binding);
+  const per=2*area*gsm(cover,250)/1000 + (cpages/2)*area*gsm(content,250)/1000;
+  return Math.round(per*qty*WF*100)/100;
+}
+// ---------- BUSINESS CARD (1) ----------
+function bcKey(ct,size,paper,colour){ const [w,h]=dims(size); return `${ct}|${w}x${h}|${stripParens(paper)}|${colour}`; }
+function interpLog(qs,ys,x){ if(x<=qs[0])return ys[0]; if(x>=qs[qs.length-1])return ys[ys.length-1];
+  for(let i=1;i<qs.length;i++) if(x<=qs[i]){ const t=(x-qs[i-1])/(qs[i]-qs[i-1]); return ys[i-1]+t*(ys[i]-ys[i-1]); } return ys[ys.length-1]; }
+function cashBizcard(P,ct,size,paper,colour,qty){
+  const curves=P.curves; let key=bcKey(ct,size,paper,colour), areaAdj=0;
+  if(!curves[key]){ const [w,h]=dims(size), area=w*h, suf=`|${stripParens(paper)}|${colour}`;
+    let cand=Object.keys(curves).filter(k=>k.startsWith(ct+"|")&&k.endsWith(suf));
+    if(!cand.length) cand=Object.keys(curves).filter(k=>k.startsWith(ct+"|"));
+    if(!cand.length) cand=Object.keys(curves);
+    const karea=k=>{const [ww,hh]=k.split("|")[1].split("x");return +ww*+hh;};
+    key=cand.reduce((b,k)=>Math.abs(karea(k)-area)<Math.abs(karea(b)-area)?k:b,cand[0]);
+    areaAdj=Math.log(Math.max(area,1)/Math.max(karea(key),1)); }
+  const curve=curves[key], qs=Object.keys(curve).map(Number).sort((a,b)=>a-b);
+  const ys=qs.map(q=>curve[String(q)]);
+  return Math.exp(interpLog(qs,ys,+qty)+areaAdj);
+}
+
+// ---------- option cascades (local) ----------
+function localOptions(prod, fieldKey, V){
+  const src=prod.optsrc, O=DATA.options;
+  if(src==="loose21"){ const C=O.loose21;
+    if(fieldKey==="size") return Object.keys(C).sort();
+    if(fieldKey==="paper") return Object.keys(C[V.size]||{}).sort();
+    if(fieldKey==="colour") return Object.keys((C[V.size]||{})[V.paper]||{}).sort();
+    if(fieldKey==="package") return ((C[V.size]||{})[V.paper]||{})[V.colour]||[]; }
+  if(src==="digital50"){ const D=O.digital50;
+    if(fieldKey==="size") return D.sizes;
+    if(fieldKey==="paper") return (D.papers_by_size[V.size]||[]).filter(p=>!/Out of Stock/.test(p));
+    if(fieldKey==="colour") return ["4C (Both)","4C (Front)"];
+    if(fieldKey==="package") return ["Normal","2in1","3in1","4in1","5in1"]; }
+  if(src==="booklet19"||src==="booklet37"){ const combos=O[src];
+    const valid=Object.keys(combos).filter(k=>combos[k]); const parts=k=>k.split("|");
+    const dist=(idx,fix)=>{ const seen=[]; for(const k of valid){const p=parts(k);
+      if(fix.every(([i,v])=>p[i]===v) && !seen.includes(p[idx])) seen.push(p[idx]);} return seen; };
+    if(fieldKey==="orientation") return dist(0,[]);
+    if(fieldKey==="size") return dist(1,[[0,V.orientation]]);
+    if(fieldKey==="ordertype") return dist(2,[[0,V.orientation],[1,V.size]]);
+    if(fieldKey==="binding") return dist(3,[[0,V.orientation],[1,V.size],[2,V.ordertype]]);
+    const key=`${V.orientation}|${V.size}|${V.ordertype}|${V.binding}`, v=combos[key];
+    if(!v) return [];
+    if(fieldKey==="page") return v.pages;
+    if(fieldKey==="cover") return Object.keys(v.covers);
+    if(fieldKey==="colour") return v.content_colours;
+    if(fieldKey==="content") return (v.covers[V.cover]||{}).content_papers||[]; }
+  if(src==="bizcard"){ const B=O.bizcard;
+    if(fieldKey==="cardType") return Object.keys(B);
+    const ct=B[V.cardType]; if(!ct) return [];
+    if(fieldKey==="size") return ct.sizes;
+    if(fieldKey==="paper") return ct.papers;
+    if(fieldKey==="colour") return ct.colours; }
+  return [];
+}
+
+function localQuote(prod, V, qty){
+  const pk=DATA.engineByProduct[prod.id], P=DATA.params[pk]; let cash, wt;
+  if(prod.engine==="litho"){ cash=cashLitho(P,V.size,V.paper,V.colour,qty);
+    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,128)*qty/1000*WF*100)/100; }
+  else if(prod.engine==="digital"){ cash=cashDigital(P,V.size,V.paper,V.colour,qty);
+    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*100)/100; }
+  else if(prod.engine==="booklet"){ cash=cashBooklet(P,V.size,V.page,V.ordertype,V.binding,V.cover,V.content,V.colour,qty);
+    wt=weightBooklet(V.size,V.page,V.ordertype,V.binding,V.cover,V.content,qty); }
+  else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
+    cash=cashBizcard(P,ct,V.size,V.paper,V.colour,qty);
+    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*1000)/1000; }
+  return { printoka_cash: Math.round(cash*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula" };
+}
+
+// ---------- UI ----------
+let S={prod:null,values:{},fields:[],t:null};
+function renderProducts(){
+  $("prodgrid").innerHTML = DATA.products.map(p=>`
+    <div class="prodcard bg-white rounded-xl border hairline shadow-card p-4" data-id="${p.id}">
+      <div class="flex items-center gap-2.5">
+        <div class="pc-orb h-9 w-9 rounded-lg brand-gradient grid place-items-center text-white text-[13px] font-bold">${p.name[0]}</div>
+        <div class="min-w-0"><div class="font-semibold text-slate-800 text-[13px] leading-tight truncate">${p.name}</div>
+          <div class="text-[11px] text-emerald-600 font-medium mt-0.5">${p.accuracy!=null?'±'+p.accuracy+'% median':'formula'}</div></div>
+      </div></div>`).join("");
+  $("prodgrid").querySelectorAll(".prodcard").forEach(c=>c.onclick=()=>selectProduct(+c.dataset.id));
+  $("dest").innerHTML = DELIVERY.map(d=>`<option value="${d.code}">${d.label} — RM${d.rate}/kg</option>`).join("");
+  $("dest").onchange = quote;
+  if(DATA.products.length) selectProduct(DATA.products[0].id);
+}
+function selectProduct(id){
+  const prod=DATA.products.find(p=>p.id===id); S.prod=prod; S.values={}; S.fields=prod.fields;
+  $("prodgrid").querySelectorAll(".prodcard").forEach(c=>c.classList.toggle("active",+c.dataset.id===id));
+  $("calc").classList.remove("hidden"); $("calc").classList.add("fade");
+  $("cfgtitle").textContent=prod.name;
+  $("acc").innerHTML = prod.accuracy!=null?`<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">±${prod.accuracy}% vs Excard</span>`:"";
+  $("fields").innerHTML = S.fields.map(f=>`<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
+    <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"><option value="">—</option></select></div>`).join("");
+  S.fields.forEach((f,i)=>$(`f_${f.key}`).onchange=()=>onChange(i));
+  $("qchips").innerHTML = QCHIPS.map(q=>`<button class="qchip rounded-md border hairline px-2.5 py-1 text-[12px] text-slate-600" data-q="${q}">${q.toLocaleString()}</button>`).join("");
+  $("qchips").querySelectorAll(".qchip").forEach(b=>b.onclick=()=>{ $("qty").value=b.dataset.q; markChips(); quote(); });
+  $("qty").oninput=()=>{ markChips(); clearTimeout(S.t); S.t=setTimeout(quote,250); };
+  markChips(); populateFrom(0);
+}
+function markChips(){ const v=$("qty").value; $("qchips").querySelectorAll(".qchip").forEach(b=>b.classList.toggle("active",b.dataset.q===v)); }
+function fillSelect(sel,opts){ const cur=sel.value;
+  sel.innerHTML=`<option value="">Select…</option>`+opts.map(o=>`<option>${o}</option>`).join("");
+  if(cur&&opts.includes(cur)) sel.value=cur; }
+function onChange(idx){ const f=S.fields[idx], v=$(`f_${f.key}`).value;
+  if(v)S.values[f.key]=v; else delete S.values[f.key];
+  for(let j=idx+1;j<S.fields.length;j++) delete S.values[S.fields[j].key];
+  populateFrom(idx+1); }
+function populateFrom(start){
+  for(let i=start;i<S.fields.length;i++){ const f=S.fields[i], sel=$(`f_${f.key}`);
+    const ready=f.depends.every(d=>S.values[d]);
+    if(!ready){ sel.disabled=true; sel.innerHTML='<option value="">—</option>'; delete S.values[f.key]; continue; }
+    const opts=localOptions(S.prod,f.key,S.values); fillSelect(sel,opts); sel.disabled=false;
+    if(S.values[f.key]&&!opts.includes(S.values[f.key])) delete S.values[f.key];
+    if(S.values[f.key]) sel.value=S.values[f.key]; }
+  quote();
+}
+function quote(){
+  const qty=parseInt($("qty").value||"0"), complete=S.fields.every(f=>S.values[f.key]);
+  if(!complete||!qty){ $("status").textContent=""; clearPrice("Configure a job…"); return; }
+  try{ const q=localQuote(S.prod,S.values,qty);
+    $("bigprice").textContent=RM(q.printoka_cash); $("bigprice").classList.remove("pricepulse"); void $("bigprice").offsetWidth; $("bigprice").classList.add("pricepulse");
+    $("perunit").textContent=RM(q.printoka_cash/qty)+" / unit";
+    $("tiers").innerHTML=TIERS.map(t=>`<div class="flex items-center justify-between py-1"><span class="text-slate-500">${t}</span><span class="tabular-nums font-medium text-ink">${RM(q.tiers[t])}</span></div>`).join("");
+    const dv=deliveryFee(q.weight_kg, $("dest").value);
+    $("deliv").classList.remove("hidden");
+    $("deliv_label").textContent=`Delivery — ${dv.label} (${dv.kg} kg × RM${dv.rate})`;
+    $("deliv_fee").textContent=RM(dv.fee);
+    $("deliv_total").textContent=RM(q.printoka_cash+dv.fee);
+    $("meta").classList.remove("hidden"); $("m_wt").textContent=q.weight_kg+" kg"; $("m_cw").textContent=dv.kg+" kg"; $("m_pu").textContent=RM(q.printoka_cash/qty); $("m_method").textContent=q.method;
+    $("status").textContent="";
+  }catch(e){ $("status").textContent="Could not price this combination."; clearPrice("—"); }
+}
+function clearPrice(msg){ $("bigprice").textContent="RM —"; $("perunit").textContent=""; $("tiers").innerHTML=`<div class="text-slate-400">${msg}</div>`; $("meta").classList.add("hidden"); const d=$("deliv"); if(d)d.classList.add("hidden"); }
+renderProducts();
+</script>
+</body>
+</html>
