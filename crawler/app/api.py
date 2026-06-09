@@ -309,8 +309,10 @@ def printoka_products():
     return PRODUCTS_UI
 
 
-# accuracy (median %) for products that have a calibrated formula
-FORMULATED = {21: 8.29, 50: 1.3}
+# accuracy = MEASURED median % vs Excard (output/audit_report.json). Curve-based
+# products are exact at Excard's order quantities; this median is the held-out /
+# custom-quantity interpolation error.
+FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6}
 
 
 def _accuracy(product_id: int):

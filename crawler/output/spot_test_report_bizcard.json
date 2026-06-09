@@ -1,11 +1,11 @@
 {
  "product": "business_card",
  "test": "held-out quantities (interpolation); option-combos all sampled",
- "sample_points": 9570,
- "median": 3.85,
- "within_3pct": 46,
- "within_5pct": 53,
- "within_10pct": 69,
- "mape": 7.75,
+ "sample_points": 26100,
+ "median": 5.63,
+ "within_3pct": 44,
+ "within_5pct": 48,
+ "within_10pct": 66,
+ "mape": 8.6,
  "method": "per-config quantity curve + log interpolation"
 }

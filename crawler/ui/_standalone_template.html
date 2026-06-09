@@ -85,6 +85,21 @@ tailwind.config = { theme: { extend: {
           <div class="flex justify-between"><span class="text-slate-400">Per unit (Cash)</span><span id="m_pu" class="tabular-nums text-slate-600"></span></div>
           <div class="flex justify-between"><span class="text-slate-400">Method</span><span id="m_method" class="text-slate-500 text-[11px]"></span></div>
         </div>
+        <div id="bd" class="mt-3 pt-3 border-t hairline text-[12px] hidden">
+          <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">How this price is derived</div>
+          <div class="flex justify-between py-0.5"><span class="text-slate-500">Material (paper)</span><span id="bd_mat" class="tabular-nums text-slate-700"></span></div>
+          <div class="flex justify-between py-0.5"><span class="text-slate-500">Printing (ink · plates · setup)</span><span id="bd_print" class="tabular-nums text-slate-700"></span></div>
+          <div class="flex justify-between py-0.5"><span class="text-slate-500">Finishing</span><span id="bd_fin" class="tabular-nums text-slate-700"></span></div>
+          <div class="flex justify-between py-0.5"><span class="text-slate-500">Delivery</span><span id="bd_del" class="tabular-nums text-slate-700"></span></div>
+          <div class="flex justify-between py-1 mt-1 border-t hairline font-semibold"><span class="text-ink">Grand total</span><span id="bd_total" class="tabular-nums text-ink"></span></div>
+          <p class="text-[10.5px] text-slate-400 mt-1.5">Material is estimated from paper weight × rate; printing is the remainder. Delivery is exact.</p>
+        </div>
+        <div id="fb" class="mt-3 pt-3 border-t hairline hidden">
+          <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">Feedback on this price</div>
+          <textarea id="fb_text" rows="2" placeholder="e.g. Excard quotes RM X for this…" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[12.5px]"></textarea>
+          <button id="fb_send" class="mt-1.5 rounded-lg bg-ink text-white text-[12px] font-medium px-3 py-1.5 hover:opacity-90">Copy feedback to clipboard</button>
+          <span id="fb_status" class="text-[11.5px] text-slate-400 ml-2"></span>
+        </div>
         <p class="text-[11px] text-slate-400 mt-3">Tiers: Cash → Silver −4% → Gold −8% → Platinum −14%. Printoka's own formula; Excard is a reference only.</p>
       </div>
     </div>
@@ -211,13 +226,22 @@ function localOptions(prod, fieldKey, V){
   return [];
 }
 
+function curveLookup(curveset, key, qty){
+  const c=curveset&&curveset[key];
+  if(c && Object.keys(c).length>=2){ const qs=Object.keys(c).map(Number).sort((a,b)=>a-b);
+    return Math.exp(interpLog(qs, qs.map(q=>c[String(q)]), +qty)); }
+  return null;
+}
 function localQuote(prod, V, qty){
-  const pk=DATA.engineByProduct[prod.id], P=DATA.params[pk]; let cash, wt;
-  if(prod.engine==="litho"){ cash=cashLitho(P,V.size,V.paper,V.colour,qty);
+  const pk=DATA.engineByProduct[prod.id], P=DATA.params[pk], C=DATA.curves||{}; let cash, wt;
+  if(prod.engine==="litho"){
+    cash=curveLookup(C.loose21, `${V.size}|${V.paper}|${V.colour}`, qty) ?? cashLitho(P,V.size,V.paper,V.colour,qty);
     const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,128)*qty/1000*WF*100)/100; }
   else if(prod.engine==="digital"){ cash=cashDigital(P,V.size,V.paper,V.colour,qty);
     const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*100)/100; }
-  else if(prod.engine==="booklet"){ cash=cashBooklet(P,V.size,V.page,V.ordertype,V.binding,V.cover,V.content,V.colour,qty);
+  else if(prod.engine==="booklet"){
+    const ck=`${V.size}|${V.page}|${V.ordertype}|${V.binding}|${V.cover}|${V.content}|${V.colour}`;
+    cash=curveLookup(C[pk], ck, qty) ?? cashBooklet(P,V.size,V.page,V.ordertype,V.binding,V.cover,V.content,V.colour,qty);
     wt=weightBooklet(V.size,V.page,V.ordertype,V.binding,V.cover,V.content,qty); }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
     cash=cashBizcard(P,ct,V.size,V.paper,V.colour,qty);
@@ -284,10 +308,23 @@ function quote(){
     $("deliv_fee").textContent=RM(dv.fee);
     $("deliv_total").textContent=RM(q.printoka_cash+dv.fee);
     $("meta").classList.remove("hidden"); $("m_wt").textContent=q.weight_kg+" kg"; $("m_cw").textContent=dv.kg+" kg"; $("m_pu").textContent=RM(q.printoka_cash/qty); $("m_method").textContent=q.method;
+    const PAPER_RM=8.0, material=Math.min(q.printoka_cash,(q.weight_kg||0)/1.2065*PAPER_RM), printing=Math.max(0,q.printoka_cash-material);
+    $("bd").classList.remove("hidden");
+    $("bd_mat").textContent=RM(material); $("bd_print").textContent=RM(printing); $("bd_fin").textContent=RM(0); $("bd_del").textContent=RM(dv.fee);
+    $("bd_total").textContent=RM(q.printoka_cash+dv.fee);
+    $("fb").classList.remove("hidden"); window._lastQuote={product:prod.name,values:S.values,qty,dest:$("dest").value,cash:q.printoka_cash};
     $("status").textContent="";
   }catch(e){ $("status").textContent="Could not price this combination."; clearPrice("—"); }
 }
-function clearPrice(msg){ $("bigprice").textContent="RM —"; $("perunit").textContent=""; $("tiers").innerHTML=`<div class="text-slate-400">${msg}</div>`; $("meta").classList.add("hidden"); const d=$("deliv"); if(d)d.classList.add("hidden"); }
+function clearPrice(msg){ $("bigprice").textContent="RM —"; $("perunit").textContent=""; $("tiers").innerHTML=`<div class="text-slate-400">${msg}</div>`; ["meta","deliv","bd","fb"].forEach(id=>{const e=$(id); if(e)e.classList.add("hidden");}); }
+document.addEventListener("click", e=>{
+  if(e.target && e.target.id==="fb_send"){
+    const txt=$("fb_text").value.trim(); if(!txt){ $("fb_status").textContent="Type something first."; return; }
+    const payload=JSON.stringify({...(window._lastQuote||{}), feedback:txt});
+    navigator.clipboard.writeText(payload).then(()=>{ $("fb_status").textContent="Copied — paste it back to Claude to act on."; },
+      ()=>{ $("fb_status").textContent="Copy failed; select & copy: "+payload; });
+  }
+});
 renderProducts();
 </script>
 </body>

@@ -36,13 +36,9 @@ def loose_cascade():
 
 
 def accuracy():
-    acc = {21: 8.29, 50: 1.3}
-    for pid, fn in [(19, "spot_test_report_19.json"), (37, "spot_test_report_37.json"),
-                    (1, "spot_test_report_bizcard.json")]:
-        r = _load(fn)
-        if r:
-            acc[pid] = r.get("median")
-    return acc
+    # MEASURED median % vs Excard (output/audit_report.json). Curve products are
+    # exact at Excard's order quantities; this is the custom-quantity interp error.
+    return {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6}
 
 
 def build_data():
@@ -100,6 +96,11 @@ def build_data():
             "booklet19": _load("booklet_params_19.json")["params"],
             "booklet37": _load("booklet_params_37.json")["params"],
             "bizcard": _load("bizcard_params.json"),
+        },
+        "curves": {
+            "booklet19": _load("booklet_curve_19.json", {}),
+            "booklet37": _load("booklet_curve_37.json", {}),
+            "loose21": _load("loose_curve_21.json", {}),
         },
         "options": {
             "loose21": loose_cascade(),

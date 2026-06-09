@@ -52,7 +52,55 @@ def _predict(p, a, gsm, plates, qty, cat):
     return margin * (plate_rate * plates + setup + unit * np.power(qty, gamma))
 
 
+import math
+_CURVE_CACHE = {}
+
+
+def _curve_key(size, paper, colour):
+    return f"{size}|{paper}|{colour}"
+
+
+def _load_curves():
+    if "c" not in _CURVE_CACHE:
+        f = PARAMS_FILE.parent / "loose_curve_21.json"
+        _CURVE_CACHE["c"] = json.loads(f.read_text()) if f.exists() else {}
+    return _CURVE_CACHE["c"]
+
+
+def _interp_log(curve, qty):
+    qs = sorted(int(q) for q in curve); ys = [curve[str(q)] for q in qs]; x = float(qty)
+    if x <= qs[0]:
+        return ys[0]
+    if x >= qs[-1]:
+        return ys[-1]
+    for i in range(1, len(qs)):
+        if x <= qs[i]:
+            t = (x - qs[i-1]) / (qs[i] - qs[i-1])
+            return ys[i-1] + t * (ys[i] - ys[i-1])
+    return ys[-1]
+
+
+def build_curves():
+    """Per-config Excard price curves from output/spot_samples_21.json (exact prices
+    for sampled configs; the smooth formula stays as fallback for unsampled combos)."""
+    data = json.loads((PARAMS_FILE.parent / "spot_samples_21.json").read_text())
+    curves = {}
+    for r in data:
+        if not r.get("cash"):
+            continue
+        curves.setdefault(_curve_key(r["size"], r["paper"], r["colour"]),
+                          {})[str(int(r["qty"]))] = math.log(r["cash"])
+    (PARAMS_FILE.parent / "loose_curve_21.json").write_text(json.dumps(curves))
+    _CURVE_CACHE.pop("c", None)
+    return len(curves)
+
+
 def cash_price(size, paper_label, colour_side, qty, params=None):
+    # 1) exact per-config curve (interpolated across qty) where we sampled Excard
+    curve = _load_curves().get(_curve_key(size, paper_label, colour_side))
+    if curve and len(curve) >= 2:
+        return float(math.exp(_interp_log(curve, qty)))
+    # 2) fallback: calibrated smooth formula for unsampled combos
     if params is None:
         params = load_params()
     return float(_predict(np.array(params), np.array([area_m2(size)]),

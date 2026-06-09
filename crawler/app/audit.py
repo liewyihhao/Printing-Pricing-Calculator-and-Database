@@ -109,6 +109,30 @@ def audit_bizcard(frac):
     return _stats("Business Card (1) — LIVE API, interpolation", errs, preds, acts)
 
 
+def audit_litho(frac):
+    """Loose Sheet — Litho via per-config curve, held-out QUANTITIES (interpolation)."""
+    import math
+    from . import cost_engine as E
+    data = [d for d in json.loads((OUT / "spot_samples_21.json").read_text()) if d.get("cash")]
+    TEST_Q = {200, 1000, 4000, 9000}
+    train = [d for d in data if int(d["qty"]) not in TEST_Q]
+    test = [d for d in data if int(d["qty"]) in TEST_Q]
+    random.shuffle(test); test = test[:max(1, int(len(test) * frac))]
+    curves = {}
+    for d in train:
+        curves.setdefault(E._curve_key(d["size"], d["paper"], d["colour"]),
+                          {})[str(int(d["qty"]))] = math.log(d["cash"])
+    errs, preds, acts = [], [], []
+    for d in test:
+        c = curves.get(E._curve_key(d["size"], d["paper"], d["colour"]))
+        if c and len(c) >= 2:
+            p = math.exp(E._interp_log(c, d["qty"]))
+        else:
+            p = E.cash_price(d["size"], d["paper"], d["colour"], d["qty"])
+        errs.append(abs(p - d["cash"]) / d["cash"] * 100); preds.append(p); acts.append(d["cash"])
+    return _stats("Loose Sheet — Litho (21) [curve, held-out qty]", errs, preds, acts)
+
+
 FRAC = 0.6
 
 
@@ -122,10 +146,7 @@ def main():
     reports.append(audit_digital(FRAC))
     reports.append(audit_booklet(19, FRAC))
     reports.append(audit_booklet(37, FRAC))
-    print("\n=== Loose Sheet — Litho (21) ===")
-    print("  NO ground truth: OrderQuote prices were deleted; needs re-sampling to audit honestly.")
-    reports.append({"product": "Loose Sheet — Litho (21)", "n": 0,
-                    "note": "no stored ground truth — re-sample required"})
+    reports.append(audit_litho(FRAC))
     (OUT / "audit_report.json").write_text(json.dumps(reports, indent=1))
     print("\nsaved -> output/audit_report.json")
     # Summary of which meet <=10% on the bulk

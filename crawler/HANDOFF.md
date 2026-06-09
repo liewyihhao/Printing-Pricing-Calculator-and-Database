@@ -4,6 +4,24 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **ACCURACY (measured, honest — `app/audit.py`, ≥60% vs Excard ground truth):**
+  All products use **per-config Excard price CURVES** (exact at Excard's order
+  quantities) with the smooth formula as fallback for unsampled combos:
+  - Booklet-Litho (19): median 0.5%, **100% within 10%** (held-out qty)
+  - Booklet-Digital (37): median 1.6%, **100% within 10%**
+  - Loose-Sheet-Digital (50): median 1.0%, **93% within 10%**
+  - Loose-Sheet-Litho (21): RE-SAMPLED (`spot_samples_21.json`, 147 cfg / 3,424 pts),
+    curve `loose_curve_21.json`, median 1.7%, **88% within 10%** (`cost_engine.build_curves()`)
+  - Business Card (1): dense re-sample (26,100 pts, qty every 50/100/250), median ~0%
+    at order quantities. NOTE: a tail of CUSTOM in-between quantities (e.g. 1,250)
+    still exceeds 10% because Excard's between-tier pricing is discontinuous
+    (3,250 costs MORE than 3,500). Standard order quantities are exact.
+  - Curves are gitignored data rebuilt by: `python -m app.{booklet_engine 19/37, cost_engine, bizcard_engine}`
+    (cost_engine/booklet expose `build_curves()`), then `python -m app.build_standalone`.
+  - `output/audit_report.json` is the source of truth for the accuracy badges.
+- **Delivery, price breakdown & feedback** live in BOTH UIs now. Standalone feedback
+  copies a JSON to clipboard (no server); server calculator POSTs to
+  `/api/printoka/feedback` → `output/feedback.jsonl`.
 - **STANDALONE, NO-SERVER CALCULATOR** = `ui/calculator_standalone.html` (just
   double-click — no uvicorn, no network). All 5 formulas + calibrated params +
   option cascades are BAKED into the one file; the Python engines are ported to JS
