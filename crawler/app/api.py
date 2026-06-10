@@ -445,6 +445,17 @@ FIELD_SCHEMAS = {
                     {"key": "size", "label": "Size", "optionsKey": "sizes", "depends": ["cardType"]},
                     {"key": "paper", "label": "Paper", "optionsKey": "papers", "depends": ["cardType"]},
                     {"key": "colour", "label": "Print colour", "optionsKey": "colours", "depends": ["cardType"]},
+                    {"key": "surface", "label": "Surface finishing", "addon": True, "depends": [],
+                     "options": ["None", "Gloss Lamination (Both)", "Matte Lamination (Both)",
+                                 "Soft Touch Lamination (Both)", "Spot UV (Front)", "Spot UV (Both)"]},
+                    {"key": "round_corner", "label": "Round corner (R6mm)", "addon": True, "depends": [],
+                     "options": ["No", "Yes"]},
+                    {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [],
+                     "options": ["No", "3mm", "5mm"]},
+                    {"key": "hot_stamping", "label": "Hot stamping (block quoted separately)", "addon": True, "depends": [],
+                     "options": ["No Hot Stamping", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]},
+                    {"key": "embossing", "label": "Embossing (block quoted separately)", "addon": True, "depends": [],
+                     "options": ["Not Required", "Embossing Front", "Embossing Back"]},
                 ]},
     "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
                 "fields": [
@@ -506,18 +517,31 @@ def bizcard_options(product: int = Query(1), cardType: str | None = None):
 def bizcard_quote(product: int = Query(1), cardType: str = Query(...),
                   size: str = Query(...), paper: str = Query(...),
                   colour: str = Query(...), qty: int = Query(...),
-                  package: str = Query("Normal")):
+                  package: str = Query("Normal"), surface: str = Query("None"),
+                  round_corner: str = Query("No"), hole_punch: str = Query("No"),
+                  hot_stamping: str = Query("No Hot Stamping"),
+                  embossing: str = Query("Not Required")):
     from . import bizcard_engine as BE
+    from . import bizcard_finishing as BF
     key = _BC_LABELS.get(cardType, cardType)
     mult = package_multiplier(package)
     try:
-        cash = BE.cash_price(key, size, paper, colour, qty) * mult
+        base = BE.cash_price(key, size, paper, colour, qty)
+        fin = BF.finishing_cost({"surface": surface, "round_corner": round_corner,
+                                 "hole_punch": hole_punch}, qty)
+        cash = (base + fin) * mult
         wt = BE.weight_kg(size, paper, qty) * mult
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
+    note = None
+    if hot_stamping not in ("", "No Hot Stamping") or embossing not in ("", "Not Required"):
+        note = "Hot stamping / embossing block charge is quoted separately by Excard."
     return {"config": {"product": product, "cardType": cardType, "size": size,
-                       "paper": paper, "colour": colour, "qty": qty, "package": package},
-            "printoka_cash": round(cash, 2), "method": "formula",
+                       "paper": paper, "colour": colour, "qty": qty, "package": package,
+                       "surface": surface, "round_corner": round_corner, "hole_punch": hole_punch,
+                       "hot_stamping": hot_stamping, "embossing": embossing},
+            "printoka_cash": round(cash, 2), "finishing_cost": round(fin * mult, 2),
+            "method": "formula", "note": note,
             "tiers": BE.tiers(cash), "weight_kg": round(wt, 3)}
 
 

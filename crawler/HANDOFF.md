@@ -4,6 +4,25 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **FINISHING + DELIVERY for Business Card = DONE (exact via v4 API).**
+  - Finishing deltas are per-unit, scale with qty, independent of size/paper. Modelled
+    as delta-vs-qty curves in `app/bizcard_finishing.py` (`output/bizcard_finishing.json`),
+    added to the quote (`finishing_cost`). Verified exact: e.g. q1000 Gloss250 4C(Both)
+    + Gloss Lamination + Round Corner = RM113.20 (47.35 base + 50.85 lam + 15 RC).
+  - Priceable via API (exact): **Surface finishing** = Gloss/Matte/Soft-Touch lamination
+    + Spot UV (Front/Both) [Spot UV is encoded in the API `Lamination` field as
+    "Matte Lamination (Both) + Spot UV (...)"], **Round Corner** (+per-unit, code RC0601),
+    **Hole Punch** (3mm/5mm, +per-unit).
+  - **Hot Stamping & Embossing**: the CheckPrice API only adds process-DAYS, not cost
+    (block/mould charge isn't exposed). UI offers them but labels them "block quoted
+    separately"; finishing_cost excludes them + returns a `note`.
+  - UI: finishing fields are schema **add-on fields** (`addon:true`, inline `options`,
+    `depends:[]`) — the generic renderer fills them inline + defaults, independent of the
+    cascade. Both server calculator and standalone updated (JS finishing == Python).
+  - Rebuild after re-sampling: `python -m app.bizcard_finishing` then `app.build_standalone`.
+  - **REMAINING:** finishing for Loose Sheet (21/50) + Booklets (19/37) is NOT done —
+    those products live on the old www site (no API), so finishing must be sampled via
+    the browser crawler (slow). Base + delivery are done for them.
 - **ACCURACY (measured, honest — `app/audit.py`, ≥60% vs Excard ground truth):**
   All products use **per-config Excard price CURVES** (exact at Excard's order
   quantities) with the smooth formula as fallback for unsampled combos:

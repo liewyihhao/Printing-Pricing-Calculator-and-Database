@@ -180,9 +180,9 @@ async function selectProduct(pid){
 }
 function markChips(){ const v=$("qty").value; $("qchips").querySelectorAll(".qchip").forEach(b=>b.classList.toggle("active",b.dataset.q===v)); }
 
-function fillSelect(sel, opts){
+function fillSelect(sel, opts, noPlaceholder){
   const cur=sel.value;
-  sel.innerHTML = `<option value="">Select…</option>` + opts.map(o=>`<option>${o}</option>`).join("");
+  sel.innerHTML = (noPlaceholder?"":`<option value="">Select…</option>`) + opts.map(o=>`<option>${o}</option>`).join("");
   if(cur && opts.includes(cur)) sel.value=cur;
 }
 
@@ -190,13 +190,19 @@ async function onChange(idx){
   const f = S.fields[idx];
   const v = $(`f_${f.key}`).value;
   if(v) S.values[f.key]=v; else delete S.values[f.key];
-  for(let j=idx+1;j<S.fields.length;j++) delete S.values[S.fields[j].key];
+  if(f.addon){ quote(); return; }   // add-ons are independent; don't reset others
+  for(let j=idx+1;j<S.fields.length;j++) if(!S.fields[j].addon) delete S.values[S.fields[j].key];
   await populateFrom(idx+1);
 }
 
 async function populateFrom(startIdx){
   for(let i=startIdx;i<S.fields.length;i++){
     const f=S.fields[i], sel=$(`f_${f.key}`);
+    if(f.options){ // inline add-on options (e.g. finishing) — no fetch, default to first
+      fillSelect(sel, f.options, true); sel.disabled=false;
+      if(!f.options.includes(S.values[f.key])) S.values[f.key]=f.options[0];
+      sel.value=S.values[f.key]; continue;
+    }
     const ready=f.depends.every(d=>S.values[d]);
     if(!ready){ sel.disabled=true; sel.innerHTML='<option value="">—</option>'; delete S.values[f.key]; continue; }
     const params = f.depends.map(d=>`${d}=${enc(S.values[d])}`).join("&");

@@ -191,7 +191,18 @@ function cashBizcard(P,ct,size,paper,colour,qty){
 }
 
 // ---------- option cascades (local) ----------
+function finishingCost(opts, qty){
+  const F=DATA.finishing||{}; let t=0;
+  const interp=(c)=>{ if(!c||!Object.keys(c).length)return 0; const qs=Object.keys(c).map(Number).sort((a,b)=>a-b),x=+qty;
+    if(x<=qs[0])return c[String(qs[0])]; if(x>=qs[qs.length-1])return c[String(qs[qs.length-1])];
+    for(let i=1;i<qs.length;i++) if(x<=qs[i]){const a=qs[i-1],b=qs[i];return c[String(a)]+(x-a)/(b-a)*(c[String(b)]-c[String(a)]);} return 0; };
+  if(opts.surface && opts.surface!=="None") t+=interp((F.surface||{})[opts.surface]);
+  if(opts.round_corner==="Yes") t+=interp(F.round_corner);
+  if(opts.hole_punch==="3mm"||opts.hole_punch==="5mm") t+=interp(F.hole_punch);
+  return Math.round(t*100)/100;
+}
 function localOptions(prod, fieldKey, V){
+  const fdef=prod.fields.find(f=>f.key===fieldKey); if(fdef&&fdef.options) return fdef.options; // inline add-on
   const src=prod.optsrc, O=DATA.options;
   if(src==="loose21"){ const C=O.loose21;
     if(fieldKey==="size") return Object.keys(C).sort();
@@ -244,8 +255,10 @@ function localQuote(prod, V, qty){
     cash=curveLookup(C[pk], ck, qty) ?? cashBooklet(P,V.size,V.page,V.ordertype,V.binding,V.cover,V.content,V.colour,qty);
     wt=weightBooklet(V.size,V.page,V.ordertype,V.binding,V.cover,V.content,qty); }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
-    cash=cashBizcard(P,ct,V.size,V.paper,V.colour,qty);
-    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*1000)/1000; }
+    const fin=finishingCost(V,qty); cash=cashBizcard(P,ct,V.size,V.paper,V.colour,qty)+fin;
+    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*1000)/1000;
+    const note=((V.hot_stamping&&V.hot_stamping!=="No Hot Stamping")||(V.embossing&&V.embossing!=="Not Required"))?"Hot stamping / embossing block charge quoted separately.":null;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost: fin, tiers: tiers(cash), weight_kg: wt, method:"formula", note }; }
   return { printoka_cash: Math.round(cash*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula" };
 }
 
@@ -279,15 +292,18 @@ function selectProduct(id){
   markChips(); populateFrom(0);
 }
 function markChips(){ const v=$("qty").value; $("qchips").querySelectorAll(".qchip").forEach(b=>b.classList.toggle("active",b.dataset.q===v)); }
-function fillSelect(sel,opts){ const cur=sel.value;
-  sel.innerHTML=`<option value="">Select…</option>`+opts.map(o=>`<option>${o}</option>`).join("");
+function fillSelect(sel,opts,noPlaceholder){ const cur=sel.value;
+  sel.innerHTML=(noPlaceholder?"":`<option value="">Select…</option>`)+opts.map(o=>`<option>${o}</option>`).join("");
   if(cur&&opts.includes(cur)) sel.value=cur; }
 function onChange(idx){ const f=S.fields[idx], v=$(`f_${f.key}`).value;
   if(v)S.values[f.key]=v; else delete S.values[f.key];
-  for(let j=idx+1;j<S.fields.length;j++) delete S.values[S.fields[j].key];
+  if(f.addon){ quote(); return; }
+  for(let j=idx+1;j<S.fields.length;j++) if(!S.fields[j].addon) delete S.values[S.fields[j].key];
   populateFrom(idx+1); }
 function populateFrom(start){
   for(let i=start;i<S.fields.length;i++){ const f=S.fields[i], sel=$(`f_${f.key}`);
+    if(f.options){ fillSelect(sel,f.options,true); sel.disabled=false;
+      if(!f.options.includes(S.values[f.key])) S.values[f.key]=f.options[0]; sel.value=S.values[f.key]; continue; }
     const ready=f.depends.every(d=>S.values[d]);
     if(!ready){ sel.disabled=true; sel.innerHTML='<option value="">—</option>'; delete S.values[f.key]; continue; }
     const opts=localOptions(S.prod,f.key,S.values); fillSelect(sel,opts); sel.disabled=false;
@@ -308,9 +324,9 @@ function quote(){
     $("deliv_fee").textContent=RM(dv.fee);
     $("deliv_total").textContent=RM(q.printoka_cash+dv.fee);
     $("meta").classList.remove("hidden"); $("m_wt").textContent=q.weight_kg+" kg"; $("m_cw").textContent=dv.kg+" kg"; $("m_pu").textContent=RM(q.printoka_cash/qty); $("m_method").textContent=q.method;
-    const PAPER_RM=8.0, material=Math.min(q.printoka_cash,(q.weight_kg||0)/1.2065*PAPER_RM), printing=Math.max(0,q.printoka_cash-material);
+    const PAPER_RM=8.0, fin=q.finishing_cost||0, material=Math.min(q.printoka_cash-fin,(q.weight_kg||0)/1.2065*PAPER_RM), printing=Math.max(0,q.printoka_cash-material-fin);
     $("bd").classList.remove("hidden");
-    $("bd_mat").textContent=RM(material); $("bd_print").textContent=RM(printing); $("bd_fin").textContent=RM(0); $("bd_del").textContent=RM(dv.fee);
+    $("bd_mat").textContent=RM(material); $("bd_print").textContent=RM(printing); $("bd_fin").textContent=RM(fin); $("bd_del").textContent=RM(dv.fee);
     $("bd_total").textContent=RM(q.printoka_cash+dv.fee);
     $("fb").classList.remove("hidden"); window._lastQuote={product:prod.name,values:S.values,qty,dest:$("dest").value,cash:q.printoka_cash};
     $("status").textContent="";

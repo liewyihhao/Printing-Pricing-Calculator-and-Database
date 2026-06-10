@@ -75,6 +75,15 @@ def build_data():
         {"key": "size", "label": "Size", "depends": ["cardType"]},
         {"key": "paper", "label": "Paper", "depends": ["cardType"]},
         {"key": "colour", "label": "Print colour", "depends": ["cardType"]},
+        {"key": "surface", "label": "Surface finishing", "addon": True, "depends": [],
+         "options": ["None", "Gloss Lamination (Both)", "Matte Lamination (Both)",
+                     "Soft Touch Lamination (Both)", "Spot UV (Front)", "Spot UV (Both)"]},
+        {"key": "round_corner", "label": "Round corner (R6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+        {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["No", "3mm", "5mm"]},
+        {"key": "hot_stamping", "label": "Hot stamping (block quoted separately)", "addon": True, "depends": [],
+         "options": ["No Hot Stamping", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]},
+        {"key": "embossing", "label": "Embossing (block quoted separately)", "addon": True, "depends": [],
+         "options": ["Not Required", "Embossing Front", "Embossing Back"]},
     ]
     products = [
         {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",
@@ -102,6 +111,7 @@ def build_data():
             "booklet37": _load("booklet_curve_37.json", {}),
             "loose21": _load("loose_curve_21.json", {}),
         },
+        "finishing": _load("bizcard_finishing.json", {"surface": {}, "round_corner": {}, "hole_punch": {}}),
         "options": {
             "loose21": loose_cascade(),
             "digital50": {"sizes": digital["sizes"], "papers_by_size": digital["papers_by_size"]},
