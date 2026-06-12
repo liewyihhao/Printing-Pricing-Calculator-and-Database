@@ -38,7 +38,7 @@ def loose_cascade():
 def accuracy():
     # MEASURED median % vs Excard (output/audit_report.json). Curve products are
     # exact at Excard's order quantities; this is the custom-quantity interp error.
-    return {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6}
+    return {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 6.3, 61: 10.5}
 
 
 def build_data():
@@ -85,9 +85,31 @@ def build_data():
         {"key": "embossing", "label": "Embossing (block quoted separately)", "addon": True, "depends": [],
          "options": ["Not Required", "Embossing Front", "Embossing Back"]},
     ]
+    STICKER_MATS = ["Mirror Kote", "Mirror Kote (Strong Glue)", "Transparent OPP",
+                    "White PP (Polypropylene)", "White PE (Polyethylene)", "Synthetic Paper",
+                    "Printing Paper", "Brown Craft Paper", "Matte Silver Polyester",
+                    "Bright Silver Polyester", "Removable Transparent OPP",
+                    "Removable White PP", "Warranty Sticker"]
+    STICKER_D_FIELDS = [
+        {"key": "category", "label": "Cut type", "addon": True, "depends": [], "options": ["Rectangle/Square", "Custom Die-Cut"]},
+        {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": STICKER_MATS},
+        {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C", "1C"]},
+        {"key": "height", "label": "Height (mm)", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
+        {"key": "width", "label": "Width (mm)", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+    ]
+    STICKER_L_FIELDS = [
+        {"key": "category", "label": "Shape", "addon": True, "depends": [], "options": ["Standard Shape", "Round"]},
+        {"key": "colour", "label": "Hot stamping colour", "addon": True, "depends": [], "options": ["Gold", "Silver"]},
+        {"key": "height", "label": "Height (mm)", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
+        {"key": "width", "label": "Width (mm)", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+    ]
     products = [
         {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",
          "accuracy": acc.get(1), "fields": BIZCARD_FIELDS},
+        {"id": 60, "name": "Label Sticker — Digital", "engine": "sticker", "optsrc": "none",
+         "accuracy": acc.get(60), "fields": STICKER_D_FIELDS, "stickerMethod": "digital"},
+        {"id": 61, "name": "Label Sticker — Letterpress (Hot Stamping)", "engine": "sticker", "optsrc": "none",
+         "accuracy": acc.get(61), "fields": STICKER_L_FIELDS, "stickerMethod": "letterpress"},
         {"id": 21, "name": "Loose Sheet — Litho (Offset)", "engine": "litho",
          "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
         {"id": 50, "name": "Loose Sheet — Digital", "engine": "digital",
@@ -105,6 +127,8 @@ def build_data():
             "booklet19": _load("booklet_params_19.json")["params"],
             "booklet37": _load("booklet_params_37.json")["params"],
             "bizcard": _load("bizcard_params.json"),
+            "sticker_digital": _load("sticker_params_digital.json"),
+            "sticker_letterpress": _load("sticker_params_letterpress.json"),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -119,7 +143,8 @@ def build_data():
             "booklet37": _load("booklet_options_37.json")["combos"],
             "bizcard": bizcard_ct,
         },
-        "engineByProduct": {1: "bizcard", 21: "litho", 50: "digital", 19: "booklet19", 37: "booklet37"},
+        "engineByProduct": {1: "bizcard", 21: "litho", 50: "digital", 19: "booklet19",
+                            37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress"},
     }
 
 

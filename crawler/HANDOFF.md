@@ -4,6 +4,30 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **LABEL STICKER (products 60 Digital / 61 Letterpress-Hot-Stamping) = BUILT & LIVE.**
+  Custom-size product (no standard sizes): customer types W×H mm (1mm steps). On the
+  OLD www site — `/spec/Digital/Label_Sticker` + `/spec/Letterpress/Label_Sticker_with_Hot_Stamping`.
+  - **Options:** Digital — rdType(Sticker/CD), rdCategory(Rectangle/Round/Custom Die-Cut/
+    Kiss Cut/No Cut/…), 13 materials (Mirror Kote…Warranty Sticker), 4C/1C, txtHeight/
+    txtWidth, qty 10–8000, Nin1. Letterpress — Standard/Round shape, Gold/Silver hot
+    stamping, qty 500–1,000,000.
+  - **Price↔size = IMPOSITION BANDS** (stepped, symmetric in W×H, non-monotonic:
+    50×48=RM59.90 but 50×60=RM47.90) — how many nest per press sheet. So the engine is
+    an **imposition formula** (`app/sticker_engine.py`): `sheets=ceil(qty/ups(W,H))`,
+    `cash=margin*(setup+rate*mat[m]*colour*sheets^gamma)`, picking the best of TWO
+    calibrated press sheets. Capture+sampler: `app/sticker_capture.py`,
+    `app/sticker_sampler.py` (resumable, stale-guarded). Samples
+    `output/sticker_samples_{digital,letterpress}.json`; params `sticker_params_*.json`.
+  - **Accuracy (held-out sizes/configs):** Digital median ~6%, ~68% within 10% (TRAIN
+    4.4%); a tail (~30% of awkward custom sizes) reaches ~36% from imposition-band
+    misalignment — a smooth formula can't perfectly track Excard's nesting. Letterpress
+    median ~10.5% (sparser: 13 sizes, Standard Shape only — Round didn't capture).
+  - **API/UI:** `/api/printoka/sticker/options|quote`; schema family `sticker_digital`/
+    `sticker_letterpress` with **number fields** (height/width, type:"number") — the
+    generic UI renderer (both server + standalone) now supports numeric inputs.
+  - **REMAINING:** denser size sampling would tighten the band tails to ≤10%; Letterpress
+    Round shape + Warranty-Sticker material need re-sampling; other cut categories
+    (Kiss Cut/No Cut) not yet sampled. Delivery applies (per-kg).
 - **FINISHING + DELIVERY for Business Card = DONE (exact via v4 API).**
   - Finishing deltas are per-unit, scale with qty, independent of size/paper. Modelled
     as delta-vs-qty curves in `app/bizcard_finishing.py` (`output/bizcard_finishing.json`),

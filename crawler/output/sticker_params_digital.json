@@ -1,0 +1,42 @@
+{
+ "params": [
+  1.6276040915011325,
+  16.26056002377313,
+  0.6187706325690192,
+  0.8193020789828561,
+  369.0838724831371,
+  454.1000477501893,
+  432.41638469832327,
+  339.68883128966957,
+  11.51195386653175,
+  2.85664021540464,
+  5.162502756007816,
+  3.4765213560614203,
+  5.583760327978628,
+  6.690819353033303,
+  6.917680933581872,
+  3.4900528530158157,
+  5.328997645360004,
+  5.908501746230598,
+  6.64634338912622,
+  4.36327241453733,
+  5.571044217597302,
+  2.0234466148457493,
+  0.7957249209464448
+ ],
+ "materials": [
+  "Mirror Kote",
+  "Mirror Kote (Strong Glue)",
+  "Transparent OPP",
+  "White PP (Polypropylene)",
+  "White PE (Polyethylene)",
+  "Synthetic Paper",
+  "Printing Paper",
+  "Brown Craft Paper",
+  "Matte Silver Polyester",
+  "Bright Silver Polyester",
+  "Removable Transparent OPP",
+  "Removable White PP",
+  "Warranty Sticker"
+ ]
+}

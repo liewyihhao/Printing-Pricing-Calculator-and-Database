@@ -300,7 +300,9 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 21, "name": "Loose Sheet — Litho (Offset)"},
                {"id": 50, "name": "Loose Sheet — Digital"},
                {"id": 19, "name": "Booklet — Litho (Offset)"},
-               {"id": 37, "name": "Booklet — Digital"}]
+               {"id": 37, "name": "Booklet — Digital"},
+               {"id": 60, "name": "Label Sticker — Digital"},
+               {"id": 61, "name": "Label Sticker — Letterpress (Hot Stamping)"}]
 BOOKLET_IDS = (19, 37)
 
 
@@ -312,7 +314,7 @@ def printoka_products():
 # accuracy = MEASURED median % vs Excard (output/audit_report.json). Curve-based
 # products are exact at Excard's order quantities; this median is the held-out /
 # custom-quantity interpolation error.
-FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6}
+FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5}
 
 
 def _accuracy(product_id: int):
@@ -457,6 +459,27 @@ FIELD_SCHEMAS = {
                     {"key": "embossing", "label": "Embossing (block quoted separately)", "addon": True, "depends": [],
                      "options": ["Not Required", "Embossing Front", "Embossing Back"]},
                 ]},
+    "sticker_digital": {"options": "/api/printoka/sticker/options", "quote": "/api/printoka/sticker/quote",
+                "fields": [
+                    {"key": "category", "label": "Cut type", "addon": True, "depends": [],
+                     "options": ["Rectangle/Square", "Custom Die-Cut"]},
+                    {"key": "paper", "label": "Material", "addon": True, "depends": [],
+                     "options": ["Mirror Kote", "Mirror Kote (Strong Glue)", "Transparent OPP",
+                                 "White PP (Polypropylene)", "White PE (Polyethylene)", "Synthetic Paper",
+                                 "Printing Paper", "Brown Craft Paper", "Matte Silver Polyester",
+                                 "Bright Silver Polyester", "Removable Transparent OPP",
+                                 "Removable White PP", "Warranty Sticker"]},
+                    {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C", "1C"]},
+                    {"key": "height", "label": "Height (mm)", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
+                    {"key": "width", "label": "Width (mm)", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+                ]},
+    "sticker_letterpress": {"options": "/api/printoka/sticker/options", "quote": "/api/printoka/sticker/quote",
+                "fields": [
+                    {"key": "category", "label": "Shape", "addon": True, "depends": [], "options": ["Standard Shape", "Round"]},
+                    {"key": "colour", "label": "Hot stamping colour", "addon": True, "depends": [], "options": ["Gold", "Silver"]},
+                    {"key": "height", "label": "Height (mm)", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
+                    {"key": "width", "label": "Width (mm)", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+                ]},
     "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
                 "fields": [
                     {"key": "orientation", "label": "Orientation", "optionsKey": "orientations", "depends": []},
@@ -476,6 +499,10 @@ def _family(product_id: int) -> str:
         return "booklet"
     if product_id in (1,):  # business card (added when calibrated)
         return "bizcard"
+    if product_id == 60:
+        return "sticker_digital"
+    if product_id == 61:
+        return "sticker_letterpress"
     return "loose"
 
 
@@ -543,6 +570,30 @@ def bizcard_quote(product: int = Query(1), cardType: str = Query(...),
             "printoka_cash": round(cash, 2), "finishing_cost": round(fin * mult, 2),
             "method": "formula", "note": note,
             "tiers": BE.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Label Sticker (products 60 Digital / 61 Letterpress) ----------
+@app.get("/api/printoka/sticker/options")
+def sticker_options(product: int = Query(60)):
+    return {}  # all sticker fields are inline add-on / number fields in the schema
+
+
+@app.get("/api/printoka/sticker/quote")
+def sticker_quote(product: int = Query(60), height: float = Query(...),
+                  width: float = Query(...), qty: int = Query(...),
+                  category: str = Query("Rectangle/Square"), paper: str = Query("Mirror Kote"),
+                  colour: str = Query("4C")):
+    from . import sticker_engine as SE
+    method = "letterpress" if product == 61 else "digital"
+    try:
+        cash = SE.cash_price(method, float(height), float(width), paper, colour, qty)
+        wt = SE.weight_kg(float(height), float(width), qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    return {"config": {"product": product, "method": method, "category": category,
+                       "paper": paper, "colour": colour, "height": height, "width": width, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (imposition)",
+            "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 def _digital_options(size=None, paper=None, colour=None):

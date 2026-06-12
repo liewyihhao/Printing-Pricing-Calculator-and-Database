@@ -190,6 +190,19 @@ function cashBizcard(P,ct,size,paper,colour,qty){
   return Math.exp(interpLog(qs,ys,+qty)+areaAdj);
 }
 
+// ---------- LABEL STICKER (60 digital / 61 letterpress) — imposition formula ----------
+const STICKER_MATS=["Mirror Kote","Mirror Kote (Strong Glue)","Transparent OPP","White PP (Polypropylene)","White PE (Polyethylene)","Synthetic Paper","Printing Paper","Brown Craft Paper","Matte Silver Polyester","Bright Silver Polyester","Removable Transparent OPP","Removable White PP","Warranty Sticker"];
+function matIdx(m){ const i=STICKER_MATS.findIndex(x=>x.toLowerCase()===(m||"").toLowerCase()); return i<0?0:i; }
+function upsSheet(w,h,SW,SH,bleed){ const pw=w+bleed,ph=h+bleed; if(pw<=0||ph<=0)return 1;
+  const a=Math.floor(SW/pw)*Math.floor(SH/ph), b=Math.floor(SW/ph)*Math.floor(SH/pw); return Math.max(1,a,b); }
+function cashSticker(P,h,w,paper,colour,qty){
+  const margin=P[0],setup=P[1],rate=P[2],gamma=P[3], SW1=P[4],SH1=P[5],SW2=P[6],SH2=P[7],bleed=P[8];
+  const mats=P.slice(9,9+STICKER_MATS.length), colf=P[9+STICKER_MATS.length];
+  const u=Math.max(upsSheet(w,h,SW1,SH1,bleed),upsSheet(w,h,SW2,SH2,bleed));
+  const sheets=Math.ceil(qty/u), col=/1C/.test(colour||"")?colf:1.0;
+  return margin*(setup+rate*mats[matIdx(paper)]*col*Math.pow(sheets,gamma));
+}
+
 // ---------- option cascades (local) ----------
 function finishingCost(opts, qty){
   const F=DATA.finishing||{}; let t=0;
@@ -254,6 +267,10 @@ function localQuote(prod, V, qty){
     const ck=`${V.size}|${V.page}|${V.ordertype}|${V.binding}|${V.cover}|${V.content}|${V.colour}`;
     cash=curveLookup(C[pk], ck, qty) ?? cashBooklet(P,V.size,V.page,V.ordertype,V.binding,V.cover,V.content,V.colour,qty);
     wt=weightBooklet(V.size,V.page,V.ordertype,V.binding,V.cover,V.content,qty); }
+  else if(prod.engine==="sticker"){
+    const cash2=cashSticker(P.params||P,+V.height,+V.width,V.paper,V.colour,qty);
+    wt=Math.round((+V.height)*(+V.width)/1e6*150*qty/1000*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash2*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (imposition)" }; }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
     const fin=finishingCost(V,qty); cash=cashBizcard(P,ct,V.size,V.paper,V.colour,qty)+fin;
     const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*1000)/1000;
@@ -283,9 +300,14 @@ function selectProduct(id){
   $("calc").classList.remove("hidden"); $("calc").classList.add("fade");
   $("cfgtitle").textContent=prod.name;
   $("acc").innerHTML = prod.accuracy!=null?`<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">±${prod.accuracy}% vs Excard</span>`:"";
-  $("fields").innerHTML = S.fields.map(f=>`<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
-    <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"><option value="">—</option></select></div>`).join("");
-  S.fields.forEach((f,i)=>$(`f_${f.key}`).onchange=()=>onChange(i));
+  $("fields").innerHTML = S.fields.map(f=> f.type==="number"
+    ? `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
+        <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></div>`
+    : `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
+        <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"><option value="">—</option></select></div>`).join("");
+  S.fields.forEach((f,i)=>{ const el=$(`f_${f.key}`);
+    if(f.type==="number") el.oninput=()=>{ clearTimeout(S.t2); S.t2=setTimeout(()=>onChange(i),350); };
+    else el.onchange=()=>onChange(i); });
   $("qchips").innerHTML = QCHIPS.map(q=>`<button class="qchip rounded-md border hairline px-2.5 py-1 text-[12px] text-slate-600" data-q="${q}">${q.toLocaleString()}</button>`).join("");
   $("qchips").querySelectorAll(".qchip").forEach(b=>b.onclick=()=>{ $("qty").value=b.dataset.q; markChips(); quote(); });
   $("qty").oninput=()=>{ markChips(); clearTimeout(S.t); S.t=setTimeout(quote,250); };
@@ -297,11 +319,12 @@ function fillSelect(sel,opts,noPlaceholder){ const cur=sel.value;
   if(cur&&opts.includes(cur)) sel.value=cur; }
 function onChange(idx){ const f=S.fields[idx], v=$(`f_${f.key}`).value;
   if(v)S.values[f.key]=v; else delete S.values[f.key];
-  if(f.addon){ quote(); return; }
+  if(f.addon||f.type==="number"){ quote(); return; }
   for(let j=idx+1;j<S.fields.length;j++) if(!S.fields[j].addon) delete S.values[S.fields[j].key];
   populateFrom(idx+1); }
 function populateFrom(start){
   for(let i=start;i<S.fields.length;i++){ const f=S.fields[i], sel=$(`f_${f.key}`);
+    if(f.type==="number"){ if(!S.values[f.key]) S.values[f.key]=sel.value||f.default; if(!sel.value) sel.value=S.values[f.key]; continue; }
     if(f.options){ fillSelect(sel,f.options,true); sel.disabled=false;
       if(!f.options.includes(S.values[f.key])) S.values[f.key]=f.options[0]; sel.value=S.values[f.key]; continue; }
     const ready=f.depends.every(d=>S.values[d]);

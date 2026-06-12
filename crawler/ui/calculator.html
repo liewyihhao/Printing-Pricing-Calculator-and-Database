@@ -167,11 +167,15 @@ async function selectProduct(pid){
   $("cfgtitle").textContent = sch.name;
   $("acc").innerHTML = sch.accuracy!=null
     ? `<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">±${sch.accuracy}% vs Excard</span>` : "";
-  $("fields").innerHTML = S.fields.map(f=>`
-    <div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
-      <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">
+  $("fields").innerHTML = S.fields.map(f=> f.type==="number"
+    ? `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
+        <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></div>`
+    : `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
+        <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">
         <option value="">—</option></select></div>`).join("");
-  S.fields.forEach((f,i)=>{ $(`f_${f.key}`).onchange = ()=>onChange(i); });
+  S.fields.forEach((f,i)=>{ const el=$(`f_${f.key}`);
+    if(f.type==="number") el.oninput=()=>{ clearTimeout(S.t2); S.t2=setTimeout(()=>onChange(i),350); };
+    else el.onchange=()=>onChange(i); });
   $("qchips").innerHTML = QCHIPS.map(q=>`<button class="qchip rounded-md border hairline px-2.5 py-1 text-[12px] text-slate-600" data-q="${q}">${q.toLocaleString()}</button>`).join("");
   $("qchips").querySelectorAll(".qchip").forEach(b=>b.onclick=()=>{ $("qty").value=b.dataset.q; markChips(); quote(); });
   $("qty").oninput = ()=>{ markChips(); clearTimeout(S.t); S.t=setTimeout(quote,300); };
@@ -190,7 +194,7 @@ async function onChange(idx){
   const f = S.fields[idx];
   const v = $(`f_${f.key}`).value;
   if(v) S.values[f.key]=v; else delete S.values[f.key];
-  if(f.addon){ quote(); return; }   // add-ons are independent; don't reset others
+  if(f.addon || f.type==="number"){ quote(); return; }   // independent; don't reset others
   for(let j=idx+1;j<S.fields.length;j++) if(!S.fields[j].addon) delete S.values[S.fields[j].key];
   await populateFrom(idx+1);
 }
@@ -198,6 +202,11 @@ async function onChange(idx){
 async function populateFrom(startIdx){
   for(let i=startIdx;i<S.fields.length;i++){
     const f=S.fields[i], sel=$(`f_${f.key}`);
+    if(f.type==="number"){ // custom numeric input (e.g. sticker size in mm)
+      if(!S.values[f.key]) S.values[f.key] = sel.value || f.default;
+      if(!sel.value) sel.value = S.values[f.key];
+      continue;
+    }
     if(f.options){ // inline add-on options (e.g. finishing) — no fetch, default to first
       fillSelect(sel, f.options, true); sel.disabled=false;
       if(!f.options.includes(S.values[f.key])) S.values[f.key]=f.options[0];
