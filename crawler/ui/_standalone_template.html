@@ -287,8 +287,11 @@ function localQuote(prod, V, qty){
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost: Math.round(lf*pkgMult*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula" }; }
   else if(prod.engine==="booklet"){
     const ck=`${V.size}|${V.page}|${V.ordertype}|${V.binding}|${V.cover}|${V.content}|${V.colour}`;
-    cash=curveLookup(C[pk], ck, qty) ?? cashBooklet(P,V.size,V.page,V.ordertype,V.binding,V.cover,V.content,V.colour,qty);
-    wt=weightBooklet(V.size,V.page,V.ordertype,V.binding,V.cover,V.content,qty); }
+    const extra=(V.extra_books==="Yes")?30:0;
+    cash=(curveLookup(C[pk], ck, qty) ?? cashBooklet(P,V.size,V.page,V.ordertype,V.binding,V.cover,V.content,V.colour,qty))+extra;
+    wt=weightBooklet(V.size,V.page,V.ordertype,V.binding,V.cover,V.content,qty);
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost: extra, tiers: tiers(cash), weight_kg: wt, method:"formula",
+      note:(V.hot_stamping&&V.hot_stamping!=="Not Required")?"Hot stamping block charge quoted separately.":null }; }
   else if(prod.engine==="sticker"){
     const cash2=cashSticker(P.params||P,+V.height,+V.width,V.paper,V.colour,qty);
     wt=Math.round((+V.height)*(+V.width)/1e6*150*qty/1000*WF*1000)/1000;

@@ -78,6 +78,11 @@ def build_data():
         {"key": "cover", "label": "Cover paper", "depends": ["orientation", "size", "ordertype", "binding"]},
         {"key": "content", "label": "Content paper", "depends": ["orientation", "size", "ordertype", "binding", "cover"]},
         {"key": "colour", "label": "Content print colour", "depends": ["orientation", "size", "ordertype", "binding"]},
+        {"key": "outer_inner", "label": "Cover colour sides", "addon": True, "depends": [],
+         "options": ["4C: 4 Colour Outer Only", "4C: 4 Colour Outer & 4 Colour Inner"]},
+        {"key": "hot_stamping", "label": "Cover hot stamping (block quoted separately)", "addon": True, "depends": [],
+         "options": ["Not Required", "1C (Front)", "2C (Front)"]},
+        {"key": "extra_books", "label": "Add 3 extra books (+RM30)", "addon": True, "depends": [], "options": ["No", "Yes"]},
     ]
     BIZCARD_FIELDS = [
         {"key": "cardType", "label": "Card type", "depends": []},

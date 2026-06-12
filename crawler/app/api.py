@@ -412,19 +412,30 @@ def booklet_quote(product: int = Query(...), orientation: str = Query(...),
                   binding: str = Query(...), page: str = Query(...),
                   cover: str = Query(...), content: str = Query(...),
                   colour: str = Query("4C (Both)"), qty: int = Query(...),
-                  outer_inner: str = Query("4C: 4 Colour Outer Only")):
+                  outer_inner: str = Query("4C: 4 Colour Outer Only"),
+                  hot_stamping: str = Query("Not Required"),
+                  extra_books: str = Query("No")):
     from . import booklet_engine as be
     try:
         cash = be.cash_price(size, page, ordertype, binding, cover, content,
-                             colour, qty, product_id=product)
+                             colour, qty, outer_inner=outer_inner, product_id=product)
+        # Extra books = flat +RM30 (Excard "add 3 extra books"). Hot stamping is a
+        # block/mould charge Excard quotes separately (0 to the online price), and
+        # outer/inner is already included in the cover colour (Excard charges the same).
+        extra = 30.0 if extra_books in ("Yes", "yes", "true", True) else 0.0
+        cash += extra
         wt = be.weight_kg(size, page, ordertype, binding, cover, content, qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
+    note = "Hot stamping block/mould charge is quoted separately by Excard." \
+        if hot_stamping not in ("Not Required", "") else None
     return {"config": {"product": product, "orientation": orientation, "size": size,
                        "ordertype": ordertype, "binding": binding, "page": page,
                        "cover": cover, "content": content, "colour": colour,
-                       "qty": qty, "outer_inner": outer_inner},
-            "printoka_cash": round(cash, 2), "method": "formula",
+                       "qty": qty, "outer_inner": outer_inner, "hot_stamping": hot_stamping,
+                       "extra_books": extra_books},
+            "printoka_cash": round(cash, 2), "finishing_cost": round(extra, 2),
+            "method": "formula", "note": note,
             "tiers": be.tiers(cash), "weight_kg": wt}
 
 
@@ -511,6 +522,11 @@ FIELD_SCHEMAS = {
                     {"key": "cover", "label": "Cover paper", "optionsKey": "covers", "depends": ["orientation", "size", "ordertype", "binding"]},
                     {"key": "content", "label": "Content paper", "optionsKey": "contents", "depends": ["orientation", "size", "ordertype", "binding", "cover"]},
                     {"key": "colour", "label": "Content print colour", "optionsKey": "colours", "depends": ["orientation", "size", "ordertype", "binding"]},
+                    {"key": "outer_inner", "label": "Cover colour sides", "addon": True, "depends": [],
+                     "options": ["4C: 4 Colour Outer Only", "4C: 4 Colour Outer & 4 Colour Inner"]},
+                    {"key": "hot_stamping", "label": "Cover hot stamping (block quoted separately)", "addon": True, "depends": [],
+                     "options": ["Not Required", "1C (Front)", "2C (Front)"]},
+                    {"key": "extra_books", "label": "Add 3 extra books (+RM30)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
 }
 
