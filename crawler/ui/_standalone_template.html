@@ -190,6 +190,23 @@ function cashBizcard(P,ct,size,paper,colour,qty){
   return Math.exp(interpLog(qs,ys,+qty)+areaAdj);
 }
 
+// ---------- Digital Loose Sheet finishing add-ons ----------
+function looseFinishingCost(V, qty, sizeLabel){
+  const d=DATA.loose_finishing||{}; let t=0;
+  const interp=(c)=>{ if(!c||!Object.keys(c).length)return 0; const qs=Object.keys(c).map(Number).sort((a,b)=>a-b),x=+qty;
+    if(x<=qs[0])return c[String(qs[0])]; if(x>=qs[qs.length-1])return c[String(qs[qs.length-1])];
+    for(let i=1;i<qs.length;i++) if(x<=qs[i]){const a=qs[i-1],b=qs[i];return c[String(a)]+(x-a)/(b-a)*(c[String(b)]-c[String(a)]);} return 0; };
+  if(V.hot_stamping && V.hot_stamping!=="Not Required") t+=interp((d.hot_stamping||{})[V.hot_stamping]);
+  if(V.punch==="3mm"||V.punch==="6mm") t+=interp((d.punch||{})[V.punch]);
+  if(V.fold && V.fold!=="None" && (d.fold||{})[V.fold]){
+    const bs=d.fold[V.fold]; const m=/(\d+)\s*mm\s*x\s*(\d+)\s*mm/.exec(sizeLabel||""); const w=m?+m[1]:210,h=m?+m[2]:297;
+    let curve=bs[`${w}x${h}`];
+    if(!curve){ const ka=k=>{const[a,b]=k.split("x");return a*b;}; curve=bs[Object.keys(bs).reduce((p,k)=>Math.abs(ka(k)-w*h)<Math.abs(ka(p)-w*h)?k:p,Object.keys(bs)[0])]; }
+    t+=interp(curve||{});
+  }
+  return Math.round(t*100)/100;
+}
+
 // ---------- LABEL STICKER (60 digital / 61 letterpress) — imposition formula ----------
 const STICKER_MATS=["Mirror Kote","Mirror Kote (Strong Glue)","Transparent OPP","White PP (Polypropylene)","White PE (Polyethylene)","Synthetic Paper","Printing Paper","Brown Craft Paper","Matte Silver Polyester","Bright Silver Polyester","Removable Transparent OPP","Removable White PP","Warranty Sticker"];
 function matIdx(m){ const i=STICKER_MATS.findIndex(x=>x.toLowerCase()===(m||"").toLowerCase()); return i<0?0:i; }
@@ -264,8 +281,10 @@ function localQuote(prod, V, qty){
   if(prod.engine==="litho"){
     cash=(curveLookup(C.loose21, `${V.size}|${V.paper}|${V.colour}`, qty) ?? cashLitho(P,V.size,V.paper,V.colour,qty))*pkgMult;
     const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,128)*qty/1000*WF*pkgMult*100)/100; }
-  else if(prod.engine==="digital"){ cash=cashDigital(P,V.size,V.paper,V.colour,qty)*pkgMult;
-    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*pkgMult*100)/100; }
+  else if(prod.engine==="digital"){ const lf=looseFinishingCost(V,qty,V.size);
+    cash=(cashDigital(P,V.size,V.paper,V.colour,qty)+lf)*pkgMult;
+    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*pkgMult*100)/100;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost: Math.round(lf*pkgMult*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula" }; }
   else if(prod.engine==="booklet"){
     const ck=`${V.size}|${V.page}|${V.ordertype}|${V.binding}|${V.cover}|${V.content}|${V.colour}`;
     cash=curveLookup(C[pk], ck, qty) ?? cashBooklet(P,V.size,V.page,V.ordertype,V.binding,V.cover,V.content,V.colour,qty);

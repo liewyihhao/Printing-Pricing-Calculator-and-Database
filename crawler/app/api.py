@@ -443,6 +443,21 @@ FIELD_SCHEMAS = {
                   {"key": "custom_w", "label": "Custom width (mm) — optional, overrides Size", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
                   {"key": "custom_h", "label": "Custom height (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
               ]},
+    "loose_digital": {"options": "/api/printoka/options", "quote": "/api/printoka/quote",
+              "fields": [
+                  {"key": "size", "label": "Size", "optionsKey": "sizes", "depends": []},
+                  {"key": "paper", "label": "Paper", "optionsKey": "papers", "depends": ["size"]},
+                  {"key": "colour", "label": "Print colour", "optionsKey": "colours", "depends": ["size", "paper"]},
+                  {"key": "package", "label": "Package (ganging)", "optionsKey": "packages", "depends": ["size", "paper", "colour"]},
+                  {"key": "custom_w", "label": "Custom width (mm) — optional, overrides Size", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
+                  {"key": "custom_h", "label": "Custom height (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
+                  {"key": "hot_stamping", "label": "Hot stamping", "addon": True, "depends": [],
+                   "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]},
+                  {"key": "fold", "label": "Folding", "addon": True, "depends": [],
+                   "options": ["None", "1Fa", "2Fa", "2Fb", "2Fc", "3Fa", "3Fb", "4Fa", "4Fb"]},
+                  {"key": "punch", "label": "Hole punching", "addon": True, "depends": [],
+                   "options": ["No", "3mm", "6mm"]},
+              ]},
     "bizcard": {"options": "/api/printoka/bizcard/options", "quote": "/api/printoka/bizcard/quote",
                 "fields": [
                     {"key": "cardType", "label": "Card type", "optionsKey": "cardTypes", "depends": []},
@@ -509,6 +524,8 @@ def _family(product_id: int) -> str:
         return "sticker_digital"
     if product_id == 61:
         return "sticker_letterpress"
+    if product_id == 50:
+        return "loose_digital"   # has finishing add-ons (hot stamp / fold / punch)
     return "loose"
 
 
@@ -630,7 +647,9 @@ def printoka_options(product: int = Query(21), size: str | None = None,
 def printoka_quote(size: str = Query(...), paper: str = Query(...),
                    colour: str = Query(...), qty: int = Query(...),
                    package: str = Query("Normal"), product: int = Query(21),
-                   custom_h: float = Query(0), custom_w: float = Query(0)):
+                   custom_h: float = Query(0), custom_w: float = Query(0),
+                   hot_stamping: str = Query("Not Required"), fold: str = Query("None"),
+                   punch: str = Query("No")):
     """Pure-formula price (per-product engine) + physics weight. No stored prices.
     custom_h/custom_w (mm) override the standard size for a custom dimension — priced
     by the engine's area formula (the curve only covers the standard sizes)."""
@@ -639,9 +658,13 @@ def printoka_quote(size: str = Query(...), paper: str = Query(...),
     if custom:
         size = f"{int(custom_w)}mm x {int(custom_h)}mm"
     mult = package_multiplier(package)
+    fin = 0.0
     try:
         if product == 50:
-            cash = digital_engine.cash_price(size, paper, colour, qty) * mult
+            from . import loose_finishing as LF
+            base = digital_engine.cash_price(size, paper, colour, qty)
+            fin = LF.finishing_cost({"hot_stamping": hot_stamping, "fold": fold, "punch": punch}, qty, size)
+            cash = (base + fin) * mult
             tiers = digital_engine.tiers(cash); wt = digital_engine.weight_kg(size, paper, qty) * mult
         else:
             cash = cost_engine.cash_price(size, paper, colour, qty) * mult
@@ -650,7 +673,8 @@ def printoka_quote(size: str = Query(...), paper: str = Query(...),
         return JSONResponse({"error": str(e)}, status_code=400)
     return {"config": {"size": size, "paper": paper, "colour": colour,
                        "package": package, "qty": qty, "product": product, "custom": custom},
-            "printoka_cash": round(cash, 2), "method": "formula" + (" · custom size" if custom else ""),
+            "printoka_cash": round(cash, 2), "finishing_cost": round(fin * mult, 2),
+            "method": "formula" + (" · custom size" if custom else ""),
             "tiers": tiers, "weight_kg": round(wt, 2), "excard_cash": None, "delta_pct": None}
 
 

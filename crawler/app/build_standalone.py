@@ -59,6 +59,15 @@ def build_data():
         {"key": "paper", "label": "Paper", "depends": ["size"]},
         {"key": "colour", "label": "Print colour", "depends": ["size", "paper"]},
         {"key": "package", "label": "Package (ganging)", "depends": ["size", "paper", "colour"]},
+        {"key": "custom_w", "label": "Custom width (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
+        {"key": "custom_h", "label": "Custom height (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
+    ]
+    LOOSE_DIGITAL_FIELDS = LOOSE_FIELDS + [
+        {"key": "hot_stamping", "label": "Hot stamping", "addon": True, "depends": [],
+         "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]},
+        {"key": "fold", "label": "Folding", "addon": True, "depends": [],
+         "options": ["None", "1Fa", "2Fa", "2Fb", "2Fc", "3Fa", "3Fb", "4Fa", "4Fb"]},
+        {"key": "punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["No", "3mm", "6mm"]},
     ]
     BOOKLET_FIELDS = [
         {"key": "orientation", "label": "Orientation", "depends": []},
@@ -113,7 +122,7 @@ def build_data():
         {"id": 21, "name": "Loose Sheet — Litho (Offset)", "engine": "litho",
          "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
         {"id": 50, "name": "Loose Sheet — Digital", "engine": "digital",
-         "optsrc": "digital50", "accuracy": acc.get(50), "fields": LOOSE_FIELDS},
+         "optsrc": "digital50", "accuracy": acc.get(50), "fields": LOOSE_DIGITAL_FIELDS},
         {"id": 19, "name": "Booklet — Litho (Offset)", "engine": "booklet",
          "optsrc": "booklet19", "accuracy": acc.get(19), "fields": BOOKLET_FIELDS},
         {"id": 37, "name": "Booklet — Digital", "engine": "booklet",
@@ -136,6 +145,7 @@ def build_data():
             "loose21": _load("loose_curve_21.json", {}),
         },
         "finishing": _load("bizcard_finishing.json", {"surface": {}, "round_corner": {}, "hole_punch": {}}),
+        "loose_finishing": _load("loose_finishing_50.json", {"hot_stamping": {}, "punch": {}, "fold": {}}),
         "options": {
             "loose21": loose_cascade(),
             "digital50": {"sizes": digital["sizes"], "papers_by_size": digital["papers_by_size"]},
