@@ -4,6 +4,21 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **EXCARD-PARITY PASS (custom size + package).** Audited each product's live Excard
+  ordering form vs our UI and closed the input gaps:
+  - **Custom size**: Loose Sheet (21/50) + Business Card (1) now have optional
+    **Custom width/height (mm)** fields that override the standard size — priced via the
+    engine's area formula (litho/digital) or nearest-area fallback (bizcard). Schema
+    supports `type:"number"` + `optional:true` fields; generic UI renders numeric inputs.
+    e.g. litho 120×80 q1000 = RM174.86 (server == standalone). Label Sticker already had W×H.
+  - **Package (Nin1)**: now a ×N multiplier applied to Loose Sheet + Business Card quotes
+    (was previously ignored) — matches Excard's per-design ganging.
+  - Fixed an async race in the server calculator (`S.seq` guard) so rapid input can't
+    render a stale price.
+  - **STILL MISSING vs Excard (need a finishing price-sampling pass on www):**
+    Digital Loose Sheet finishing (hot stamping / fold formula / punch hole) and Booklet
+    cover finishing (lamination / Spot UV / hot stamping). Litho Loose Sheet has NO
+    finishing controls on Excard (confirmed). Business Card finishing is done.
 - **LABEL STICKER (products 60 Digital / 61 Letterpress-Hot-Stamping) = BUILT & LIVE.**
   Custom-size product (no standard sizes): customer types W×H mm (1mm steps). On the
   OLD www site — `/spec/Digital/Label_Sticker` + `/spec/Letterpress/Label_Sticker_with_Hot_Stamping`.

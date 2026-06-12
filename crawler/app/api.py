@@ -440,6 +440,8 @@ FIELD_SCHEMAS = {
                   {"key": "paper", "label": "Paper", "optionsKey": "papers", "depends": ["size"]},
                   {"key": "colour", "label": "Print colour", "optionsKey": "colours", "depends": ["size", "paper"]},
                   {"key": "package", "label": "Package (ganging)", "optionsKey": "packages", "depends": ["size", "paper", "colour"]},
+                  {"key": "custom_w", "label": "Custom width (mm) — optional, overrides Size", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
+                  {"key": "custom_h", "label": "Custom height (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
               ]},
     "bizcard": {"options": "/api/printoka/bizcard/options", "quote": "/api/printoka/bizcard/quote",
                 "fields": [
@@ -447,6 +449,10 @@ FIELD_SCHEMAS = {
                     {"key": "size", "label": "Size", "optionsKey": "sizes", "depends": ["cardType"]},
                     {"key": "paper", "label": "Paper", "optionsKey": "papers", "depends": ["cardType"]},
                     {"key": "colour", "label": "Print colour", "optionsKey": "colours", "depends": ["cardType"]},
+                    {"key": "package", "label": "Package (designs)", "addon": True, "depends": [],
+                     "options": ["Normal", "2in1", "3in1", "4in1", "5in1", "6in1", "7in1", "8in1", "9in1", "10in1"]},
+                    {"key": "custom_w", "label": "Custom width (mm) — optional", "type": "number", "optional": True, "min": 20, "max": 200, "depends": []},
+                    {"key": "custom_h", "label": "Custom height (mm) — optional", "type": "number", "optional": True, "min": 20, "max": 200, "depends": []},
                     {"key": "surface", "label": "Surface finishing", "addon": True, "depends": [],
                      "options": ["None", "Gloss Lamination (Both)", "Matte Lamination (Both)",
                                  "Soft Touch Lamination (Both)", "Spot UV (Front)", "Spot UV (Both)"]},
@@ -547,11 +553,14 @@ def bizcard_quote(product: int = Query(1), cardType: str = Query(...),
                   package: str = Query("Normal"), surface: str = Query("None"),
                   round_corner: str = Query("No"), hole_punch: str = Query("No"),
                   hot_stamping: str = Query("No Hot Stamping"),
-                  embossing: str = Query("Not Required")):
+                  embossing: str = Query("Not Required"),
+                  custom_h: float = Query(0), custom_w: float = Query(0)):
     from . import bizcard_engine as BE
     from . import bizcard_finishing as BF
     key = _BC_LABELS.get(cardType, cardType)
     mult = package_multiplier(package)
+    if custom_h and custom_w:
+        size = f"{int(custom_w)}mm x {int(custom_h)}mm"
     try:
         base = BE.cash_price(key, size, paper, colour, qty)
         fin = BF.finishing_cost({"surface": surface, "round_corner": round_corner,
@@ -620,22 +629,29 @@ def printoka_options(product: int = Query(21), size: str | None = None,
 @app.get("/api/printoka/quote")
 def printoka_quote(size: str = Query(...), paper: str = Query(...),
                    colour: str = Query(...), qty: int = Query(...),
-                   package: str = Query("Normal"), product: int = Query(21)):
-    """Pure-formula price (per-product engine) + physics weight. No stored prices."""
+                   package: str = Query("Normal"), product: int = Query(21),
+                   custom_h: float = Query(0), custom_w: float = Query(0)):
+    """Pure-formula price (per-product engine) + physics weight. No stored prices.
+    custom_h/custom_w (mm) override the standard size for a custom dimension — priced
+    by the engine's area formula (the curve only covers the standard sizes)."""
     from . import cost_engine, digital_engine, formulation
+    custom = bool(custom_h and custom_w)
+    if custom:
+        size = f"{int(custom_w)}mm x {int(custom_h)}mm"
+    mult = package_multiplier(package)
     try:
         if product == 50:
-            cash = digital_engine.cash_price(size, paper, colour, qty)
-            tiers = digital_engine.tiers(cash); wt = digital_engine.weight_kg(size, paper, qty)
+            cash = digital_engine.cash_price(size, paper, colour, qty) * mult
+            tiers = digital_engine.tiers(cash); wt = digital_engine.weight_kg(size, paper, qty) * mult
         else:
-            cash = cost_engine.cash_price(size, paper, colour, qty)
-            tiers = formulation.tiers(cash); wt = formulation.weight_kg(size, paper, qty)
+            cash = cost_engine.cash_price(size, paper, colour, qty) * mult
+            tiers = formulation.tiers(cash); wt = formulation.weight_kg(size, paper, qty) * mult
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
     return {"config": {"size": size, "paper": paper, "colour": colour,
-                       "package": package, "qty": qty, "product": product},
-            "printoka_cash": round(cash, 2), "method": "formula",
-            "tiers": tiers, "weight_kg": wt, "excard_cash": None, "delta_pct": None}
+                       "package": package, "qty": qty, "product": product, "custom": custom},
+            "printoka_cash": round(cash, 2), "method": "formula" + (" · custom size" if custom else ""),
+            "tiers": tiers, "weight_kg": round(wt, 2), "excard_cash": None, "delta_pct": None}
 
 
 @app.get("/api/printoka/kpi")

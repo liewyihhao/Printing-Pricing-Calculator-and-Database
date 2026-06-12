@@ -258,11 +258,14 @@ function curveLookup(curveset, key, qty){
 }
 function localQuote(prod, V, qty){
   const pk=DATA.engineByProduct[prod.id], P=DATA.params[pk], C=DATA.curves||{}; let cash, wt;
+  // custom size override (loose / bizcard): use typed W×H mm via the area formula
+  if(V.custom_w && V.custom_h) V = {...V, size:`${parseInt(V.custom_w)}mm x ${parseInt(V.custom_h)}mm`};
+  const pkgMult = (m=>{const x=/^(\d+)\s*in\s*1/i.exec(m||"");return x?+x[1]:1;})(V.package);
   if(prod.engine==="litho"){
-    cash=curveLookup(C.loose21, `${V.size}|${V.paper}|${V.colour}`, qty) ?? cashLitho(P,V.size,V.paper,V.colour,qty);
-    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,128)*qty/1000*WF*100)/100; }
-  else if(prod.engine==="digital"){ cash=cashDigital(P,V.size,V.paper,V.colour,qty);
-    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*100)/100; }
+    cash=(curveLookup(C.loose21, `${V.size}|${V.paper}|${V.colour}`, qty) ?? cashLitho(P,V.size,V.paper,V.colour,qty))*pkgMult;
+    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,128)*qty/1000*WF*pkgMult*100)/100; }
+  else if(prod.engine==="digital"){ cash=cashDigital(P,V.size,V.paper,V.colour,qty)*pkgMult;
+    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*pkgMult*100)/100; }
   else if(prod.engine==="booklet"){
     const ck=`${V.size}|${V.page}|${V.ordertype}|${V.binding}|${V.cover}|${V.content}|${V.colour}`;
     cash=curveLookup(C[pk], ck, qty) ?? cashBooklet(P,V.size,V.page,V.ordertype,V.binding,V.cover,V.content,V.colour,qty);
@@ -272,10 +275,10 @@ function localQuote(prod, V, qty){
     wt=Math.round((+V.height)*(+V.width)/1e6*150*qty/1000*WF*1000)/1000;
     return { printoka_cash: Math.round(cash2*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (imposition)" }; }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
-    const fin=finishingCost(V,qty); cash=cashBizcard(P,ct,V.size,V.paper,V.colour,qty)+fin;
-    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*1000)/1000;
+    const fin=finishingCost(V,qty); cash=(cashBizcard(P,ct,V.size,V.paper,V.colour,qty)+fin)*pkgMult;
+    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*pkgMult*1000)/1000;
     const note=((V.hot_stamping&&V.hot_stamping!=="No Hot Stamping")||(V.embossing&&V.embossing!=="Not Required"))?"Hot stamping / embossing block charge quoted separately.":null;
-    return { printoka_cash: Math.round(cash*100)/100, finishing_cost: fin, tiers: tiers(cash), weight_kg: wt, method:"formula", note }; }
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost: Math.round(fin*pkgMult*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula", note }; }
   return { printoka_cash: Math.round(cash*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula" };
 }
 
@@ -306,7 +309,7 @@ function selectProduct(id){
     : `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
         <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"><option value="">—</option></select></div>`).join("");
   S.fields.forEach((f,i)=>{ const el=$(`f_${f.key}`);
-    if(f.type==="number") el.oninput=()=>{ clearTimeout(S.t2); S.t2=setTimeout(()=>onChange(i),350); };
+    if(f.type==="number") el.oninput=()=>{ const v=el.value; if(v)S.values[f.key]=v; else delete S.values[f.key]; clearTimeout(S.t2); S.t2=setTimeout(quote,350); };
     else el.onchange=()=>onChange(i); });
   $("qchips").innerHTML = QCHIPS.map(q=>`<button class="qchip rounded-md border hairline px-2.5 py-1 text-[12px] text-slate-600" data-q="${q}">${q.toLocaleString()}</button>`).join("");
   $("qchips").querySelectorAll(".qchip").forEach(b=>b.onclick=()=>{ $("qty").value=b.dataset.q; markChips(); quote(); });
@@ -335,7 +338,7 @@ function populateFrom(start){
   quote();
 }
 function quote(){
-  const qty=parseInt($("qty").value||"0"), complete=S.fields.every(f=>S.values[f.key]);
+  const qty=parseInt($("qty").value||"0"), complete=S.fields.every(f=>f.optional||S.values[f.key]);
   if(!complete||!qty){ $("status").textContent=""; clearPrice("Configure a job…"); return; }
   try{ const q=localQuote(S.prod,S.values,qty);
     $("bigprice").textContent=RM(q.printoka_cash); $("bigprice").classList.remove("pricepulse"); void $("bigprice").offsetWidth; $("bigprice").classList.add("pricepulse");

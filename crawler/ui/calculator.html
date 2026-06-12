@@ -135,7 +135,7 @@ function deliveryFee(weightKg, code){ const d=DELIVERY.find(x=>x.code===code)||D
   const kg=Math.max(1, Math.ceil(weightKg||0)); return {fee:d.rate*kg, kg, rate:d.rate, label:d.label}; }
 async function api(p){ const r=await fetch(p); if(!r.ok) throw new Error(r.status); return r.json(); }
 
-let S = { pid:null, schema:null, values:{}, fields:[], t:null };
+let S = { pid:null, schema:null, values:{}, fields:[], t:null, t2:null, seq:0 };
 
 async function loadProducts(){
   const ps = await api("/api/printoka/product-status");
@@ -174,7 +174,7 @@ async function selectProduct(pid){
         <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">
         <option value="">—</option></select></div>`).join("");
   S.fields.forEach((f,i)=>{ const el=$(`f_${f.key}`);
-    if(f.type==="number") el.oninput=()=>{ clearTimeout(S.t2); S.t2=setTimeout(()=>onChange(i),350); };
+    if(f.type==="number") el.oninput=()=>{ const v=el.value; if(v)S.values[f.key]=v; else delete S.values[f.key]; clearTimeout(S.t2); S.t2=setTimeout(quote,350); };
     else el.onchange=()=>onChange(i); });
   $("qchips").innerHTML = QCHIPS.map(q=>`<button class="qchip rounded-md border hairline px-2.5 py-1 text-[12px] text-slate-600" data-q="${q}">${q.toLocaleString()}</button>`).join("");
   $("qchips").querySelectorAll(".qchip").forEach(b=>b.onclick=()=>{ $("qty").value=b.dataset.q; markChips(); quote(); });
@@ -226,13 +226,16 @@ async function populateFrom(startIdx){
 }
 
 async function quote(){
+  const seq = ++S.seq;   // guard against out-of-order async responses
   const qty=parseInt($("qty").value||"0");
-  const complete = S.fields.every(f=>S.values[f.key]);
+  const complete = S.fields.every(f=>f.optional || S.values[f.key]);
   if(!complete || !qty){ $("status").textContent=""; clearPrice("Configure a job…"); return; }
   $("status").textContent="Calculating…";
-  const params = S.fields.map(f=>`${f.key}=${enc(S.values[f.key])}`).join("&");
+  const params = S.fields.filter(f=>S.values[f.key]!=null && S.values[f.key]!=="")
+    .map(f=>`${f.key}=${enc(S.values[f.key])}`).join("&");
   try{
     const q=await api(`${S.schema.quote_endpoint}?product=${S.pid}&${params}&qty=${qty}`);
+    if(seq!==S.seq) return;   // a newer quote superseded this response
     $("status").textContent="";
     if(q.printoka_cash==null){ clearPrice("No basis to price this combo."); return; }
     const t=q.tiers||{};
