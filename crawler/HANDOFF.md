@@ -4,6 +4,28 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **EXCARD ORDERING-PAGE PARITY (single ongoing task #18 — NOT complete).** Goal: every
+  product's calculator UI mirrors its Excard order page. Progress:
+  - ✅ **Digital Loose Sheet** finishing: hot stamping, folding (8 types, size-dep),
+    hole punch — sampled (`loose_finishing_50.json`, `app/loose_finishing.py`) + wired
+    (product 50 = `loose_digital` schema family). Hidden radios set via JS click.
+  - ✅ **Booklet** (19/37) add-ons: cover hot stamping (block charge, 0 online — note),
+    outer/inner (included in cover colour, 0 — curve already matches), **+RM30 extra
+    books** (real). `booklet_finishing_sampler.py`.
+  - ✅ **Loose Sheet Litho** custom W×H size; **Business Card** finishing+custom size+package.
+  - ◑ **Label Sticker** Digital: Rectangle/Square + Custom Die-Cut + 13 materials incl
+    Warranty (re-sampled, genuine ~5.5×). Calibration = imposition + blended loss +
+    selective material re-centering; TRAIN ~6%, held-out ~11%. Warranty/synthetic
+    premium materials remain APPROXIMATE (imposition model can't fully capture them).
+  - ⛔ **REMAINING for full parity (do under task #18, don't close until done):**
+    1. Sticker **Round** category — uses `txtDiameter` (not H×W); sample by diameter
+       (30/40/50/60/80mm), model as W=H=d in the imposition engine + add UI category.
+    2. Sticker **Standard Shape** — uses H×W (engine already covers it); just expose as a
+       category option (it carries a small shape premium vs Rectangle, sample to confirm).
+    3. Sticker **No Cut / Kiss Cut / Multiple Dieline** — NO size input on selection
+       (sheet-based / different sub-form); need deeper discovery before sampling.
+    4. **Letterpress** sticker **Round** shape (only Standard Shape captured).
+    5. Tighten Warranty/synthetic premium-material pricing (separate cost structure).
 - **EXCARD-PARITY PASS (custom size + package).** Audited each product's live Excard
   ordering form vs our UI and closed the input gaps:
   - **Custom size**: Loose Sheet (21/50) + Business Card (1) now have optional
