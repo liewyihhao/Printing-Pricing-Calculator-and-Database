@@ -102,7 +102,10 @@ def calibrate_and_report(method="digital"):
 
     def loss(p):
         pred = predict(p, tr)
-        return float(np.median(np.abs(pred - cash[tr]) / cash[tr]))
+        ape = np.abs(pred - cash[tr]) / cash[tr]
+        # blend median (robust) + mean (so premium materials like Warranty, which are
+        # a minority of points, aren't ignored by a pure-median objective)
+        return float(0.5 * np.median(ape) + 0.5 * np.mean(ape))
 
     nmat = len(MATERIALS)
     bounds = [(1.0, 3.0), (0, 40), (0.01, 30), (0.5, 1.05),      # margin, setup, rate, gamma
@@ -111,6 +114,20 @@ def calibrate_and_report(method="digital"):
     res = differential_evolution(loss, bounds, maxiter=400, popsize=30, seed=7,
                                  tol=1e-7, workers=1, polish=True)
     p = list(res.x)
+    # Two-stage: re-center a MATERIAL multiplier to its empirical median ratio ONLY
+    # when the global fit leaves it badly off (>15% median), so premium materials
+    # (e.g. Warranty ~5.5x) get corrected without disturbing the well-fit majority.
+    allidx = list(range(len(cash)))
+    for mi in range(nmat):
+        sub = [i for i in allidx if m[i] == mi]
+        if len(sub) < 3:
+            continue
+        cur = predict(p, sub)
+        if float(np.median(np.abs(cur - cash[sub]) / cash[sub])) <= 0.15:
+            continue
+        p_unit = list(p); p_unit[9 + mi] = 1.0
+        pred1 = predict(p_unit, sub)
+        p[9 + mi] = max(0.05, float(np.median(cash[sub] / pred1)))
     (OUT / f"sticker_params_{method}.json").write_text(
         json.dumps({"params": p, "materials": MATERIALS}, indent=1))
 
