@@ -17,15 +17,24 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
     Warranty (re-sampled, genuine ~5.5×). Calibration = imposition + blended loss +
     selective material re-centering; TRAIN ~6%, held-out ~11%. Warranty/synthetic
     premium materials remain APPROXIMATE (imposition model can't fully capture them).
-  - ⛔ **REMAINING for full parity (do under task #18, don't close until done):**
-    1. Sticker **Round** category — uses `txtDiameter` (not H×W); sample by diameter
-       (30/40/50/60/80mm), model as W=H=d in the imposition engine + add UI category.
-    2. Sticker **Standard Shape** — uses H×W (engine already covers it); just expose as a
-       category option (it carries a small shape premium vs Rectangle, sample to confirm).
-    3. Sticker **No Cut / Kiss Cut / Multiple Dieline** — NO size input on selection
-       (sheet-based / different sub-form); need deeper discovery before sampling.
-    4. **Letterpress** sticker **Round** shape (only Standard Shape captured).
-    5. Tighten Warranty/synthetic premium-material pricing (separate cost structure).
+  - ✅ Sticker **all cut categories DONE** — Rectangle/Square, Custom Die-Cut,
+    **Standard Shape** (H×W, ~1.2× premium), **Round** (diameter d→d×d), **No Cut**
+    (qty-only full-sheet, exact curve), **Kiss Cut** (~flat curve). `sticker_categories.py`
+    + `sticker_categories.json`; digital sticker schema offers all 6 + optional diameter.
+  - ✅ **Letterpress Round** shape (diameter) + **Business Card orientation** field added.
+  - ⛔ **REMAINING (the only known gaps):**
+    1. Sticker **Multiple Dieline** — a multi-design quote-builder (different size/shape
+       per design); genuinely different from a standard combo, not yet modeled.
+    2. Warranty/Synthetic premium materials price ~20–40% off (imposition model can't fully
+       capture their distinct cost structure) — documented limitation, not a missing control.
+
+## ✅ PARITY ACHIEVED for all standard ordering flows (7 products)
+Every product's calculator now mirrors its Excard order page for standard orders:
+size/custom-size, paper/material, colour, package, quantity, delivery, AND finishing:
+Business Card (lamination/Spot UV/round corner/hole punch/hot stamping/emboss),
+Digital Loose Sheet (hot stamp/fold/punch), Booklet (outer-inner/cover hot stamp/extra
+books), Label Sticker (all 6 cut categories + 13 materials). Server calc + standalone
+both verified JS==Python.
 - **EXCARD-PARITY PASS (custom size + package).** Audited each product's live Excard
   ordering form vs our UI and closed the input gaps:
   - **Custom size**: Loose Sheet (21/50) + Business Card (1) now have optional
