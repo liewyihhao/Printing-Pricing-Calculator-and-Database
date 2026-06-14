@@ -20,6 +20,21 @@ def _load(p, default=None):
     return json.loads(f.read_text()) if f.exists() else default
 
 
+def _multidieline_data(mats):
+    """Precompute Multiple Dieline pricing inputs for the standalone:
+    base Mirror-Kote-4C sheet curve per sheet size, 1C colour multiplier, and a
+    per-material multiplier (so the JS port needs no fit)."""
+    from . import sticker_categories as SC
+    base = {}
+    for ss in SC.MD_SHEET_SIZES:
+        pts = SC._md_base_pts(ss)
+        if pts:
+            base[ss] = {str(q): c for q, c in sorted(pts)}
+    return {"base": base,
+            "colourMult": round(SC._md_colour_mult(), 6),
+            "matMult": {m: round(SC._md_mat_mult(m), 6) for m in mats}}
+
+
 def loose_cascade():
     """size -> paper -> colour -> [packages] for product 21 (status='done')."""
     from .db import session_scope
@@ -106,12 +121,14 @@ def build_data():
                     "Bright Silver Polyester", "Removable Transparent OPP",
                     "Removable White PP", "Warranty Sticker"]
     STICKER_D_FIELDS = [
-        {"key": "category", "label": "Cut type", "addon": True, "depends": [], "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut"]},
+        {"key": "category", "label": "Cut type", "addon": True, "depends": [], "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut", "Multiple Dieline"]},
         {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": STICKER_MATS},
         {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C", "1C"]},
         {"key": "finishing", "label": "Lamination", "addon": True, "depends": [],
          "options": ["Not Required", "Matte Laminate (Front)", "Gloss Laminate (Front)",
                      "Gloss Water Based Varnish", "UV Varnish", "Soft Touch Laminate (Front)"]},
+        {"key": "sheet_size", "label": "Sheet size — Multiple Dieline only", "addon": True, "depends": [], "options": ["A3+", "A4", "A5"]},
+        {"key": "dielines", "label": "Die lines per sheet — Multiple Dieline (no price effect)", "type": "number", "optional": True, "min": 1, "max": 100, "depends": []},
         {"key": "height", "label": "Height (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
         {"key": "width", "label": "Width (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
         {"key": "diameter", "label": "Diameter (mm) — Round only", "type": "number", "optional": True, "min": 10, "max": 300, "depends": []},
@@ -159,6 +176,7 @@ def build_data():
         "loose_finishing": _load("loose_finishing_50.json", {"hot_stamping": {}, "punch": {}, "fold": {}}),
         "sticker_categories": _load("sticker_categories.json", {"round": [], "standard_shape": [], "no_cut": [], "kiss_cut": []}),
         "stickerStdMult": (lambda: __import__("app.sticker_categories", fromlist=["_std_mult"])._std_mult())(),
+        "multidieline": _multidieline_data(STICKER_MATS),
         "sticker_finishing": _load("sticker_finishing.json", {}),
         "options": {
             "loose21": loose_cascade(),

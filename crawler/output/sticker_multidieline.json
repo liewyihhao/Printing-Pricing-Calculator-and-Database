@@ -1,0 +1,258 @@
+{
+"sheets": [
+{
+"sheet_size": "A3+",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 10,
+"cash": 59.9
+},
+{
+"sheet_size": "A3+",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 20,
+"cash": 79.45
+},
+{
+"sheet_size": "A3+",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 30,
+"cash": 100.2
+},
+{
+"sheet_size": "A3+",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 50,
+"cash": 142.65
+},
+{
+"sheet_size": "A3+",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 100,
+"cash": 202.05
+},
+{
+"sheet_size": "A3+",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 200,
+"cash": 330.35
+},
+{
+"sheet_size": "A3+",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 500,
+"cash": 624.35
+},
+{
+"sheet_size": "A4",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 10,
+"cash": 61.0
+},
+{
+"sheet_size": "A4",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 20,
+"cash": 70.8
+},
+{
+"sheet_size": "A4",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 100,
+"cash": 152.45
+},
+{
+"sheet_size": "A4",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 200,
+"cash": 206.9
+},
+{
+"sheet_size": "A4",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 1000,
+"cash": 617.1
+},
+{
+"sheet_size": "A5",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 20,
+"cash": 66.45
+},
+{
+"sheet_size": "A5",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 200,
+"cash": 157.9
+},
+{
+"sheet_size": "A5",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 2000,
+"cash": 614.7
+},
+{
+"sheet_size": "A4",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 40,
+"cash": 90.35
+},
+{
+"sheet_size": "A5",
+"dielines": 10,
+"paper": "Mirror Kote",
+"colour": "4C",
+"sheet_qty": 40,
+"cash": 76.25
+}
+],
+"dieline_sens": [
+{
+"sheet_size": "A3+",
+"dielines": 1,
+"sheet_qty": 50,
+"cash": 142.65
+},
+{
+"sheet_size": "A3+",
+"dielines": 1,
+"sheet_qty": 100,
+"cash": 202.05
+},
+{
+"sheet_size": "A3+",
+"dielines": 1,
+"sheet_qty": 500,
+"cash": 624.35
+},
+{
+"sheet_size": "A3+",
+"dielines": 5,
+"sheet_qty": 50,
+"cash": 142.65
+},
+{
+"sheet_size": "A3+",
+"dielines": 5,
+"sheet_qty": 100,
+"cash": 202.05
+},
+{
+"sheet_size": "A3+",
+"dielines": 5,
+"sheet_qty": 500,
+"cash": 624.35
+},
+{
+"sheet_size": "A3+",
+"dielines": 20,
+"sheet_qty": 50,
+"cash": 142.65
+},
+{
+"sheet_size": "A3+",
+"dielines": 20,
+"sheet_qty": 100,
+"cash": 202.05
+},
+{
+"sheet_size": "A3+",
+"dielines": 20,
+"sheet_qty": 500,
+"cash": 624.35
+},
+{
+"sheet_size": "A3+",
+"dielines": 40,
+"sheet_qty": 50,
+"cash": 142.65
+},
+{
+"sheet_size": "A3+",
+"dielines": 40,
+"sheet_qty": 100,
+"cash": 202.05
+},
+{
+"sheet_size": "A3+",
+"dielines": 40,
+"sheet_qty": 500,
+"cash": 624.35
+}
+],
+"mat_sens": [
+{
+"paper": "White PP (Polypropylene)",
+"colour": "4C",
+"sheet_size": "A3+",
+"sheet_qty": 100,
+"cash": 289.2
+},
+{
+"paper": "White PP (Polypropylene)",
+"colour": "4C",
+"sheet_size": "A3+",
+"sheet_qty": 500,
+"cash": 886.95
+},
+{
+"paper": "Synthetic Paper",
+"colour": "4C",
+"sheet_size": "A3+",
+"sheet_qty": 100,
+"cash": 346.05
+},
+{
+"paper": "Synthetic Paper",
+"colour": "4C",
+"sheet_size": "A3+",
+"sheet_qty": 500,
+"cash": 1075.7
+},
+{
+"paper": "Mirror Kote",
+"colour": "1C",
+"sheet_size": "A3+",
+"sheet_qty": 100,
+"cash": 174.25
+},
+{
+"paper": "Mirror Kote",
+"colour": "1C",
+"sheet_size": "A3+",
+"sheet_qty": 500,
+"cash": 525.15
+}
+]
+}

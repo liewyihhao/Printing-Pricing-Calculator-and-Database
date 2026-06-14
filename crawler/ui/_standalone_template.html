@@ -226,6 +226,16 @@ function stickerLaminationCost(opt,h,w,qty){
   if(x<=qs[0])return curve[String(qs[0])]; if(x>=qs[qs.length-1])return curve[String(qs[qs.length-1])];
   for(let i=1;i<qs.length;i++) if(x<=qs[i]){const t=(x-qs[i-1])/(qs[i]-qs[i-1]);return curve[String(qs[i-1])]+t*(curve[String(qs[i])]-curve[String(qs[i-1])]);} return 0;
 }
+function multidielinePrice(sheetSize, sheetQty, paper, colour){
+  const MD=DATA.multidieline||{}; const base=(MD.base||{});
+  const curve=base[sheetSize]||base["A3+"]||{};
+  const pts=Object.keys(curve).map(k=>[+k,curve[k]]);
+  if(!pts.length) return 0;
+  let cash=interpLogPts(pts, sheetQty);
+  cash *= (MD.matMult&&MD.matMult[paper]!=null)?MD.matMult[paper]:1.0;
+  if((colour||"").startsWith("1C")) cash *= (MD.colourMult||0.85);
+  return cash;
+}
 function stickerCategoryPrice(P,cat,h,w,paper,colour,qty,diameter){
   const SC=DATA.sticker_categories||{}, mult=DATA.stickerStdMult||1.2;
   const cash=(hh,ww)=>cashSticker(P,hh,ww,paper,colour,qty);
@@ -321,6 +331,13 @@ function localQuote(prod, V, qty){
       note:(V.hot_stamping&&V.hot_stamping!=="Not Required")?"Hot stamping block charge quoted separately.":null }; }
   else if(prod.engine==="sticker"){
     const pp=P.params||P;
+    if(prod.stickerMethod==="digital" && V.category==="Multiple Dieline"){
+      const ss=V.sheet_size||"A3+"; const cash2=multidielinePrice(ss, qty, V.paper, V.colour);
+      const SMM={"A3+":[317,425],"A4":[210,297],"A5":[148,210]}, [sh,sw]=SMM[ss]||SMM["A3+"];
+      const wt2=Math.round(sh*sw/1e6*150*qty/1000*WF*1000)/1000;
+      return { printoka_cash: Math.round(cash2*100)/100, finishing_cost:0, tiers: tiers(cash2),
+        weight_kg: wt2, method:"formula (sheet curve)",
+        note:"Multiple Dieline is priced per press sheet (A3+/A4/A5). Die lines per sheet do not affect price; lamination quoted separately." }; }
     let cash2 = prod.stickerMethod==="digital"
       ? stickerCategoryPrice(pp, V.category, +V.height, +V.width, V.paper, V.colour, qty, V.diameter)
       : (V.category==="Round"&&V.diameter ? cashSticker(pp,+V.diameter,+V.diameter,V.paper,V.colour,qty)

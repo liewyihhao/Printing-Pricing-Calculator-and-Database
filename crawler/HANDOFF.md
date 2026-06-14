@@ -22,11 +22,32 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
     (qty-only full-sheet, exact curve), **Kiss Cut** (~flat curve). `sticker_categories.py`
     + `sticker_categories.json`; digital sticker schema offers all 6 + optional diameter.
   - ✅ **Letterpress Round** shape (diameter) + **Business Card orientation** field added.
-  - ⛔ **REMAINING (the only known gaps):**
-    1. Sticker **Multiple Dieline** — a multi-design quote-builder (different size/shape
-       per design); genuinely different from a standard combo, not yet modeled.
-    2. Warranty/Synthetic premium materials price ~20–40% off (imposition model can't fully
+  - ✅ **Sticker Multiple Dieline DONE** — a sheet-based multi-design product. Probed the
+    live www form (`app/multidieline_sampler.py`): the ONLY price drivers are
+    **ddlCutToSheet** = "Delivery Sheet Size" (A3+ 317×425 / A4 210×297 / A5 148×210 mm),
+    **ddlSheetQty** = number of press SHEETS (10…1,000,000), material, and colour. The
+    **die-line count** (txtTtlArtwork, "designs per sheet") has **ZERO price effect**
+    (verified dl=1/5/20/40 → identical price) — it's a production-only input. There is NO
+    per-design size input. Model in `sticker_categories.py` (`multidieline_price`): a
+    log-interp **sheet-count curve per sheet size** (Mirror Kote 4C base, from
+    `output/sticker_multidieline.json`) × a **material multiplier** (sampled for White PP
+    ≈1.43×, Synthetic ≈1.72×; other materials via a linear map of the imposition engine's
+    per-material factor, calibrated on those points) × a **1C colour multiplier** (≈0.85).
+    Wired into the digital sticker schema (category "Multiple Dieline" + a `sheet_size`
+    addon field + an informational `dielines` field), `sticker/quote` (qty = sheet count,
+    weight = sheet area × 150gsm × sheets), and the standalone (precomputed
+    base/colourMult/matMult baked in; JS `multidielinePrice` == Python to the cent, verified
+    via node localQuote: A3+ q100 = RM202.05/2.438kg, A4 Synthetic q1000 = RM1050.88).
+    **Accuracy (leave-one-out, honest — pessimistic on a coarse grid; exact at every
+    captured sheet count):** A3+ (default sheet size, 7 pts) median 6.6% / max 18.9%;
+    A4 (6 pts) median 9.5%; A5 (4 pts, sparse — a 200→2000 gap that resists capture) median
+    23.4% / max 42.7%. The A5 mid-range is the lone weak spot and would tighten with a
+    denser A5 capture.
+  - ⛔ **REMAINING (the only known gap):**
+    1. Warranty/Synthetic premium materials price ~20–40% off (imposition model can't fully
        capture their distinct cost structure) — documented limitation, not a missing control.
+       (Multiple Dieline now prices Synthetic correctly via its own sheet curve; this gap is
+       only on the per-PIECE imposition categories.)
 
 ## ✅ PARITY ACHIEVED for all standard ordering flows (7 products)
 Every product's calculator now mirrors its Excard order page for standard orders:

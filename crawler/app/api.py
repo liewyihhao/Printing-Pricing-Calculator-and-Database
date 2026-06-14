@@ -495,7 +495,7 @@ FIELD_SCHEMAS = {
     "sticker_digital": {"options": "/api/printoka/sticker/options", "quote": "/api/printoka/sticker/quote",
                 "fields": [
                     {"key": "category", "label": "Cut type", "addon": True, "depends": [],
-                     "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut"]},
+                     "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut", "Multiple Dieline"]},
                     {"key": "paper", "label": "Material", "addon": True, "depends": [],
                      "options": ["Mirror Kote", "Mirror Kote (Strong Glue)", "Transparent OPP",
                                  "White PP (Polypropylene)", "White PE (Polyethylene)", "Synthetic Paper",
@@ -506,6 +506,9 @@ FIELD_SCHEMAS = {
                     {"key": "finishing", "label": "Lamination", "addon": True, "depends": [],
                      "options": ["Not Required", "Matte Laminate (Front)", "Gloss Laminate (Front)",
                                  "Gloss Water Based Varnish", "UV Varnish", "Soft Touch Laminate (Front)"]},
+                    {"key": "sheet_size", "label": "Sheet size — Multiple Dieline only", "addon": True, "depends": [],
+                     "options": ["A3+", "A4", "A5"]},
+                    {"key": "dielines", "label": "Die lines per sheet — Multiple Dieline (no price effect)", "type": "number", "optional": True, "min": 1, "max": 100, "depends": []},
                     {"key": "height", "label": "Height (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
                     {"key": "width", "label": "Width (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
                     {"key": "diameter", "label": "Diameter (mm) — Round only", "type": "number", "optional": True, "min": 10, "max": 300, "depends": []},
@@ -631,11 +634,25 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
                   width: float = Query(0), qty: int = Query(...),
                   category: str = Query("Rectangle/Square"), paper: str = Query("Mirror Kote"),
                   colour: str = Query("4C"), diameter: float = Query(0),
-                  finishing: str = Query("Not Required")):
+                  finishing: str = Query("Not Required"), sheet_size: str = Query("A3+")):
     from . import sticker_engine as SE
+    # Multiple Dieline is sheet-based: qty = number of press sheets, sized A3+/A4/A5.
+    MD_SHEET_MM = {"A3+": (317, 425), "A4": (210, 297), "A5": (148, 210)}
     method = "letterpress" if product == 61 else "digital"
     fin = 0.0
     try:
+        if method == "digital" and category == "Multiple Dieline":
+            from . import sticker_categories as SC
+            cash = SC.category_price(category, 0, 0, paper, colour, qty, sheet_size=sheet_size)
+            sh, sw = MD_SHEET_MM.get(sheet_size, (317, 425))
+            wt = SE.weight_kg(sh, sw, qty)  # each sheet weighed as one "piece"
+            note = "Multiple Dieline is priced per press sheet (A3+/A4/A5). Die lines per sheet do not affect price; lamination quoted separately."
+            return {"config": {"product": product, "method": method, "category": category,
+                               "paper": paper, "colour": colour, "sheet_size": sheet_size,
+                               "qty": qty, "finishing": finishing}, "note": note,
+                    "printoka_cash": round(cash, 2), "finishing_cost": 0.0,
+                    "method": "formula (sheet curve)",
+                    "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
         if method == "digital":
             from . import sticker_categories as SC
             from . import sticker_finishing as SF
