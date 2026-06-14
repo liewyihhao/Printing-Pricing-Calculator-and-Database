@@ -503,6 +503,9 @@ FIELD_SCHEMAS = {
                                  "Bright Silver Polyester", "Removable Transparent OPP",
                                  "Removable White PP", "Warranty Sticker"]},
                     {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C", "1C"]},
+                    {"key": "finishing", "label": "Lamination", "addon": True, "depends": [],
+                     "options": ["Not Required", "Matte Laminate (Front)", "Gloss Laminate (Front)",
+                                 "Gloss Water Based Varnish", "UV Varnish", "Soft Touch Laminate (Front)"]},
                     {"key": "height", "label": "Height (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
                     {"key": "width", "label": "Width (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
                     {"key": "diameter", "label": "Diameter (mm) — Round only", "type": "number", "optional": True, "min": 10, "max": 300, "depends": []},
@@ -627,14 +630,21 @@ def sticker_options(product: int = Query(60)):
 def sticker_quote(product: int = Query(60), height: float = Query(0),
                   width: float = Query(0), qty: int = Query(...),
                   category: str = Query("Rectangle/Square"), paper: str = Query("Mirror Kote"),
-                  colour: str = Query("4C"), diameter: float = Query(0)):
+                  colour: str = Query("4C"), diameter: float = Query(0),
+                  finishing: str = Query("Not Required")):
     from . import sticker_engine as SE
     method = "letterpress" if product == 61 else "digital"
+    fin = 0.0
     try:
         if method == "digital":
             from . import sticker_categories as SC
+            from . import sticker_finishing as SF
             cash = SC.category_price(category, float(height), float(width), paper,
                                      colour, qty, diameter=float(diameter))
+            fh = float(diameter) if (category == "Round" and diameter) else (float(height) or 50)
+            fw = float(diameter) if (category == "Round" and diameter) else (float(width) or 50)
+            fin = SF.finishing_cost(finishing, fh, fw, qty)
+            cash += fin
         else:  # letterpress: Round uses diameter as W=H
             if category == "Round" and diameter:
                 cash = SE.cash_price(method, float(diameter), float(diameter), paper, colour, qty)
@@ -648,8 +658,9 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
         return JSONResponse({"error": str(e)}, status_code=400)
     return {"config": {"product": product, "method": method, "category": category,
                        "paper": paper, "colour": colour, "height": height, "width": width,
-                       "diameter": diameter, "qty": qty},
-            "printoka_cash": round(cash, 2), "method": "formula (imposition)",
+                       "diameter": diameter, "qty": qty, "finishing": finishing},
+            "printoka_cash": round(cash, 2), "finishing_cost": round(fin, 2),
+            "method": "formula (imposition)",
             "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
 
 

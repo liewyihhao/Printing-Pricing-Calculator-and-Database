@@ -109,6 +109,9 @@ def build_data():
         {"key": "category", "label": "Cut type", "addon": True, "depends": [], "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut"]},
         {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": STICKER_MATS},
         {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C", "1C"]},
+        {"key": "finishing", "label": "Lamination", "addon": True, "depends": [],
+         "options": ["Not Required", "Matte Laminate (Front)", "Gloss Laminate (Front)",
+                     "Gloss Water Based Varnish", "UV Varnish", "Soft Touch Laminate (Front)"]},
         {"key": "height", "label": "Height (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
         {"key": "width", "label": "Width (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
         {"key": "diameter", "label": "Diameter (mm) — Round only", "type": "number", "optional": True, "min": 10, "max": 300, "depends": []},
@@ -156,6 +159,7 @@ def build_data():
         "loose_finishing": _load("loose_finishing_50.json", {"hot_stamping": {}, "punch": {}, "fold": {}}),
         "sticker_categories": _load("sticker_categories.json", {"round": [], "standard_shape": [], "no_cut": [], "kiss_cut": []}),
         "stickerStdMult": (lambda: __import__("app.sticker_categories", fromlist=["_std_mult"])._std_mult())(),
+        "sticker_finishing": _load("sticker_finishing.json", {}),
         "options": {
             "loose21": loose_cascade(),
             "digital50": {"sizes": digital["sizes"], "papers_by_size": digital["papers_by_size"]},

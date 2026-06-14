@@ -216,6 +216,16 @@ function interpLogPts(pts,qty){ if(!pts||!pts.length)return 0; pts=pts.slice().s
   const xs=pts.map(p=>p[0]),ys=pts.map(p=>Math.log(p[1])),x=+qty;
   if(x<=xs[0])return Math.exp(ys[0]); if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);
   for(let i=1;i<xs.length;i++) if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));} return Math.exp(ys[ys.length-1]); }
+function stickerLaminationCost(opt,h,w,qty){
+  if(!opt||opt==="Not Required")return 0;
+  const by=(DATA.sticker_finishing||{})[opt]; if(!by)return 0;
+  let curve=by[`${parseInt(h)}x${parseInt(w)}`];
+  if(!curve){ const ka=k=>{const[a,b]=k.split("x");return a*b;}; const ks=Object.keys(by); if(!ks.length)return 0;
+    curve=by[ks.reduce((p,k)=>Math.abs(ka(k)-h*w)<Math.abs(ka(p)-h*w)?k:p,ks[0])]; }
+  const qs=Object.keys(curve).map(Number).sort((a,b)=>a-b),x=+qty;
+  if(x<=qs[0])return curve[String(qs[0])]; if(x>=qs[qs.length-1])return curve[String(qs[qs.length-1])];
+  for(let i=1;i<qs.length;i++) if(x<=qs[i]){const t=(x-qs[i-1])/(qs[i]-qs[i-1]);return curve[String(qs[i-1])]+t*(curve[String(qs[i])]-curve[String(qs[i-1])]);} return 0;
+}
 function stickerCategoryPrice(P,cat,h,w,paper,colour,qty,diameter){
   const SC=DATA.sticker_categories||{}, mult=DATA.stickerStdMult||1.2;
   const cash=(hh,ww)=>cashSticker(P,hh,ww,paper,colour,qty);
@@ -311,10 +321,15 @@ function localQuote(prod, V, qty){
       note:(V.hot_stamping&&V.hot_stamping!=="Not Required")?"Hot stamping block charge quoted separately.":null }; }
   else if(prod.engine==="sticker"){
     const pp=P.params||P;
-    const cash2 = prod.stickerMethod==="digital"
+    let cash2 = prod.stickerMethod==="digital"
       ? stickerCategoryPrice(pp, V.category, +V.height, +V.width, V.paper, V.colour, qty, V.diameter)
       : (V.category==="Round"&&V.diameter ? cashSticker(pp,+V.diameter,+V.diameter,V.paper,V.colour,qty)
                                           : cashSticker(pp,(+V.height)||50,(+V.width)||50,V.paper,V.colour,qty));
+    if(prod.stickerMethod==="digital"){
+      const fh=(V.category==="Round"&&V.diameter)?+V.diameter:((+V.height)||50);
+      const fw=(V.category==="Round"&&V.diameter)?+V.diameter:((+V.width)||50);
+      cash2 += stickerLaminationCost(V.finishing, fh, fw, qty);
+    }
     const dd=(V.category==="Round"&&V.diameter)?+V.diameter:0;
     const wh=dd||+V.height||50, ww=dd||+V.width||50;
     wt=Math.round(wh*ww/1e6*150*qty/1000*WF*1000)/1000;
