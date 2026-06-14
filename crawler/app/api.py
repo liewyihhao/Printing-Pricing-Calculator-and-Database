@@ -473,6 +473,7 @@ FIELD_SCHEMAS = {
                 "fields": [
                     {"key": "cardType", "label": "Card type", "optionsKey": "cardTypes", "depends": []},
                     {"key": "size", "label": "Size", "optionsKey": "sizes", "depends": ["cardType"]},
+                    {"key": "orientation", "label": "Orientation", "addon": True, "depends": [], "options": ["Landscape", "Portrait"]},
                     {"key": "paper", "label": "Paper", "optionsKey": "papers", "depends": ["cardType"]},
                     {"key": "colour", "label": "Print colour", "optionsKey": "colours", "depends": ["cardType"]},
                     {"key": "package", "label": "Package (designs)", "addon": True, "depends": [],
@@ -510,8 +511,9 @@ FIELD_SCHEMAS = {
                 "fields": [
                     {"key": "category", "label": "Shape", "addon": True, "depends": [], "options": ["Standard Shape", "Round"]},
                     {"key": "colour", "label": "Hot stamping colour", "addon": True, "depends": [], "options": ["Gold", "Silver"]},
-                    {"key": "height", "label": "Height (mm)", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
-                    {"key": "width", "label": "Width (mm)", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+                    {"key": "height", "label": "Height (mm) — Standard Shape", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
+                    {"key": "width", "label": "Width (mm) — Standard Shape", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+                    {"key": "diameter", "label": "Diameter (mm) — Round only", "type": "number", "optional": True, "min": 10, "max": 300, "depends": []},
                 ]},
     "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
                 "fields": [
@@ -633,8 +635,11 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
             from . import sticker_categories as SC
             cash = SC.category_price(category, float(height), float(width), paper,
                                      colour, qty, diameter=float(diameter))
-        else:
-            cash = SE.cash_price(method, float(height), float(width), paper, colour, qty)
+        else:  # letterpress: Round uses diameter as W=H
+            if category == "Round" and diameter:
+                cash = SE.cash_price(method, float(diameter), float(diameter), paper, colour, qty)
+            else:
+                cash = SE.cash_price(method, float(height) or 50, float(width) or 50, paper, colour, qty)
         # weight uses the bounding box (diameter for round, else h×w)
         wh = float(diameter) if (category == "Round" and diameter) else float(height)
         ww = float(diameter) if (category == "Round" and diameter) else float(width)

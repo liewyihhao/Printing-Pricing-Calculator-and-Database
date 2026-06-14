@@ -87,6 +87,7 @@ def build_data():
     BIZCARD_FIELDS = [
         {"key": "cardType", "label": "Card type", "depends": []},
         {"key": "size", "label": "Size", "depends": ["cardType"]},
+        {"key": "orientation", "label": "Orientation", "addon": True, "depends": [], "options": ["Landscape", "Portrait"]},
         {"key": "paper", "label": "Paper", "depends": ["cardType"]},
         {"key": "colour", "label": "Print colour", "depends": ["cardType"]},
         {"key": "surface", "label": "Surface finishing", "addon": True, "depends": [],
@@ -115,8 +116,9 @@ def build_data():
     STICKER_L_FIELDS = [
         {"key": "category", "label": "Shape", "addon": True, "depends": [], "options": ["Standard Shape", "Round"]},
         {"key": "colour", "label": "Hot stamping colour", "addon": True, "depends": [], "options": ["Gold", "Silver"]},
-        {"key": "height", "label": "Height (mm)", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
-        {"key": "width", "label": "Width (mm)", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+        {"key": "height", "label": "Height (mm) — Standard Shape", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
+        {"key": "width", "label": "Width (mm) — Standard Shape", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+        {"key": "diameter", "label": "Diameter (mm) — Round only", "type": "number", "optional": True, "min": 10, "max": 300, "depends": []},
     ]
     products = [
         {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",

@@ -313,7 +313,8 @@ function localQuote(prod, V, qty){
     const pp=P.params||P;
     const cash2 = prod.stickerMethod==="digital"
       ? stickerCategoryPrice(pp, V.category, +V.height, +V.width, V.paper, V.colour, qty, V.diameter)
-      : cashSticker(pp, +V.height, +V.width, V.paper, V.colour, qty);
+      : (V.category==="Round"&&V.diameter ? cashSticker(pp,+V.diameter,+V.diameter,V.paper,V.colour,qty)
+                                          : cashSticker(pp,(+V.height)||50,(+V.width)||50,V.paper,V.colour,qty));
     const dd=(V.category==="Round"&&V.diameter)?+V.diameter:0;
     const wh=dd||+V.height||50, ww=dd||+V.width||50;
     wt=Math.round(wh*ww/1e6*150*qty/1000*WF*1000)/1000;
