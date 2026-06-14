@@ -16,6 +16,7 @@ from . import sticker_engine as SE
 OUT = Path(__file__).resolve().parent.parent / "output"
 FILE = OUT / "sticker_categories.json"
 MD_FILE = OUT / "sticker_multidieline.json"
+WARRANTY_FILE = OUT / "sticker_warranty.json"
 CATEGORIES = ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round",
               "No Cut", "Kiss Cut", "Multiple Dieline"]
 MD_SHEET_SIZES = ["A3+", "A4", "A5"]   # Delivery Sheet Size (317x425 / 210x297 / 148x210 mm)
@@ -166,9 +167,59 @@ def multidieline_price(sheet_size, sheet_qty, paper, colour):
     return base * mult
 
 
+# ---------------- Warranty Sticker (per-piece curve, replaces the imposition formula) ----------------
+# The imposition model can't track Warranty Sticker (its cost scales far more steeply
+# with sticker area than nesting predicts: ratio ~2.6x at 20mm -> ~12.7x at 100mm, so a
+# single material multiplier is off ~35%). Instead price it from a 2D (area x qty) curve
+# built from real samples (output/sticker_warranty.json).
+
+def _warranty():
+    if "warr" not in _CACHE:
+        _CACHE["warr"] = json.loads(WARRANTY_FILE.read_text()) if WARRANTY_FILE.exists() else None
+    return _CACHE["warr"]
+
+
+def warranty_price(h, w, qty, colour):
+    d = _warranty()
+    if not d or not d.get("sizes"):
+        return 0.0
+    sizes = d["sizes"]
+    area = max(1.0, float(h) * float(w))
+    # price at this qty for every sampled size (log-interp over qty)
+    pts = [(s["area"], _interp([(int(q), c) for q, c in s["curve"].items()], qty)) for s in sizes]
+    pts = [p for p in pts if p[1] > 0]
+    if not pts:
+        return 0.0
+    pts.sort()
+    # log-log interpolate in area (price grows ~ power law with area)
+    import math
+    if area <= pts[0][0]:
+        base = pts[0][1] * (area / pts[0][0])      # gentle linear extrapolation below
+    elif area >= pts[-1][0]:
+        base = pts[-1][1] * (area / pts[-1][0])     # linear extrapolation above
+    else:
+        for i in range(1, len(pts)):
+            if area <= pts[i][0]:
+                la = math.log(area); x0 = math.log(pts[i-1][0]); x1 = math.log(pts[i][0])
+                y0 = math.log(pts[i-1][1]); y1 = math.log(pts[i][1])
+                base = math.exp(y0 + (la - x0) / (x1 - x0) * (y1 - y0)); break
+    if (colour or "").startswith("1C"):
+        base *= float(d.get("colour1C", 0.87))
+    return base
+
+
 def category_price(category, h, w, paper, colour, qty, diameter=0, sheet_size="A3+"):
     if category == "Multiple Dieline":
         return multidieline_price(sheet_size, qty, paper, colour)
+    # Warranty Sticker: use its own area x qty curve for the per-piece cut categories
+    if paper == "Warranty Sticker" and category in (
+            "Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round"):
+        if category == "Round":
+            dd = int(diameter or h or w or 50)
+            return warranty_price(dd, dd, qty, colour) * _std_mult()
+        if category == "Standard Shape":
+            return warranty_price(h, w, qty, colour) * _std_mult()
+        return warranty_price(h, w, qty, colour)
     cat = category or "Rectangle/Square"
     if cat in ("Rectangle/Square", "Custom Die-Cut"):
         return SE.cash_price("digital", h, w, paper, colour, qty)

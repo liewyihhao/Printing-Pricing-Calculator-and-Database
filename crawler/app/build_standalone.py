@@ -177,6 +177,7 @@ def build_data():
         "sticker_categories": _load("sticker_categories.json", {"round": [], "standard_shape": [], "no_cut": [], "kiss_cut": []}),
         "stickerStdMult": (lambda: __import__("app.sticker_categories", fromlist=["_std_mult"])._std_mult())(),
         "multidieline": _multidieline_data(STICKER_MATS),
+        "warranty": _load("sticker_warranty.json", {"sizes": [], "colour1C": 0.87}),
         "sticker_finishing": _load("sticker_finishing.json", {}),
         "options": {
             "loose21": loose_cascade(),

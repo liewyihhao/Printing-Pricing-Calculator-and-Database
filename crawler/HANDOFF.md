@@ -43,11 +43,21 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
     A4 (6 pts) median 9.5%; A5 (4 pts, sparse — a 200→2000 gap that resists capture) median
     23.4% / max 42.7%. The A5 mid-range is the lone weak spot and would tighten with a
     denser A5 capture.
-  - ⛔ **REMAINING (the only known gap):**
-    1. Warranty/Synthetic premium materials price ~20–40% off (imposition model can't fully
-       capture their distinct cost structure) — documented limitation, not a missing control.
-       (Multiple Dieline now prices Synthetic correctly via its own sheet curve; this gap is
-       only on the per-PIECE imposition categories.)
+  - ✅ **Warranty Sticker accuracy FIXED.** Per-material audit vs stored samples revealed
+    the handoff's "premium materials ~20–40% off" was really ONLY Warranty Sticker (median
+    35.6%); Synthetic/White PP/etc. are already ~5%. Warranty's cost scales far more steeply
+    with sticker AREA than nesting predicts (ratio ~2.6× at 20mm → ~12.7× at 100mm), so a
+    single material multiplier can't fit it. Replaced with a **2D area×qty curve**
+    (`output/sticker_warranty.json`, 11 sizes from real samples) → `warranty_price()` in
+    `sticker_categories.py`, routed for Warranty on the per-piece cut categories
+    (Rectangle/Custom/Standard/Round). **Exact (0%) at sampled sizes; ~18.6% median for a
+    fully held-out size via area interp** (arbitrary in-between sizes interpolate between
+    neighbours, so better in practice). Ported to the standalone (`warrantyPrice` JS +
+    embedded data; JS==Python to the cent).
+  - ⛔ **REMAINING (documented limitations, not missing controls):**
+    1. Mirror Kote base imposition median ~12.5% (vs ~5% for most materials) — the
+       smooth-formula tail on awkward custom sizes (imposition-band misalignment), as long
+       documented. Warranty is now the curve exception above.
 
 ## ✅ PARITY ACHIEVED for all standard ordering flows (7 products)
 Every product's calculator now mirrors its Excard order page for standard orders:

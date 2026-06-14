@@ -236,9 +236,30 @@ function multidielinePrice(sheetSize, sheetQty, paper, colour){
   if((colour||"").startsWith("1C")) cash *= (MD.colourMult||0.85);
   return cash;
 }
+function warrantyPrice(h,w,qty,colour){
+  const W=DATA.warranty||{}; const sizes=W.sizes||[]; if(!sizes.length) return 0;
+  const area=Math.max(1, (+h)*(+w));
+  let pts=sizes.map(s=>{ const cv=Object.keys(s.curve).map(k=>[+k,s.curve[k]]);
+    return [s.area, interpLogPts(cv, qty)]; }).filter(p=>p[1]>0).sort((a,b)=>a[0]-b[0]);
+  if(!pts.length) return 0;
+  let base;
+  if(area<=pts[0][0]) base=pts[0][1]*(area/pts[0][0]);
+  else if(area>=pts[pts.length-1][0]) base=pts[pts.length-1][1]*(area/pts[pts.length-1][0]);
+  else { for(let i=1;i<pts.length;i++){ if(area<=pts[i][0]){
+    const la=Math.log(area),x0=Math.log(pts[i-1][0]),x1=Math.log(pts[i][0]),
+      y0=Math.log(pts[i-1][1]),y1=Math.log(pts[i][1]);
+    base=Math.exp(y0+(la-x0)/(x1-x0)*(y1-y0)); break; } } }
+  if((colour||"").startsWith("1C")) base*=(W.colour1C||0.87);
+  return base;
+}
 function stickerCategoryPrice(P,cat,h,w,paper,colour,qty,diameter){
   const SC=DATA.sticker_categories||{}, mult=DATA.stickerStdMult||1.2;
   const cash=(hh,ww)=>cashSticker(P,hh,ww,paper,colour,qty);
+  if(paper==="Warranty Sticker" && (cat==="Rectangle/Square"||cat==="Custom Die-Cut"||cat==="Standard Shape"||cat==="Round")){
+    if(cat==="Round"){const d=parseInt(diameter||h||w||50); return warrantyPrice(d,d,qty,colour)*mult;}
+    if(cat==="Standard Shape") return warrantyPrice(h,w,qty,colour)*mult;
+    return warrantyPrice(h,w,qty,colour);
+  }
   if(cat==="Round"){const d=parseInt(diameter||h||w||50); return cash(d,d)*mult;}
   if(cat==="Standard Shape") return cash(h,w)*mult;
   if(cat==="No Cut"){ let pts=(SC.no_cut||[]).filter(r=>r.paper===paper).map(r=>[r.qty,r.cash]);
