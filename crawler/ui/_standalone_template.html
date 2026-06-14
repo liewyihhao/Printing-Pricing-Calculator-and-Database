@@ -212,6 +212,23 @@ const STICKER_MATS=["Mirror Kote","Mirror Kote (Strong Glue)","Transparent OPP",
 function matIdx(m){ const i=STICKER_MATS.findIndex(x=>x.toLowerCase()===(m||"").toLowerCase()); return i<0?0:i; }
 function upsSheet(w,h,SW,SH,bleed){ const pw=w+bleed,ph=h+bleed; if(pw<=0||ph<=0)return 1;
   const a=Math.floor(SW/pw)*Math.floor(SH/ph), b=Math.floor(SW/ph)*Math.floor(SH/pw); return Math.max(1,a,b); }
+function interpLogPts(pts,qty){ if(!pts||!pts.length)return 0; pts=pts.slice().sort((a,b)=>a[0]-b[0]);
+  const xs=pts.map(p=>p[0]),ys=pts.map(p=>Math.log(p[1])),x=+qty;
+  if(x<=xs[0])return Math.exp(ys[0]); if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);
+  for(let i=1;i<xs.length;i++) if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));} return Math.exp(ys[ys.length-1]); }
+function stickerCategoryPrice(P,cat,h,w,paper,colour,qty,diameter){
+  const SC=DATA.sticker_categories||{}, mult=DATA.stickerStdMult||1.2;
+  const cash=(hh,ww)=>cashSticker(P,hh,ww,paper,colour,qty);
+  if(cat==="Round"){const d=parseInt(diameter||h||w||50); return cash(d,d)*mult;}
+  if(cat==="Standard Shape") return cash(h,w)*mult;
+  if(cat==="No Cut"){ let pts=(SC.no_cut||[]).filter(r=>r.paper===paper).map(r=>[r.qty,r.cash]);
+    if(!pts.length){ const base=(SC.no_cut||[]).filter(r=>/Mirror/.test(r.paper)).map(r=>[r.qty,r.cash]);
+      const prem=cashSticker(P,50,50,paper,colour,500)/Math.max(cashSticker(P,50,50,"Mirror Kote",colour,500),1e-6);
+      pts=base.map(p=>[p[0],p[1]*prem]); }
+    return interpLogPts(pts,qty); }
+  if(cat==="Kiss Cut") return interpLogPts((SC.kiss_cut||[]).map(r=>[r.qty,r.cash]),qty);
+  return cash(h,w);  // Rectangle/Square, Custom Die-Cut
+}
 function cashSticker(P,h,w,paper,colour,qty){
   const margin=P[0],setup=P[1],rate=P[2],gamma=P[3], SW1=P[4],SH1=P[5],SW2=P[6],SH2=P[7],bleed=P[8];
   const mats=P.slice(9,9+STICKER_MATS.length), colf=P[9+STICKER_MATS.length];
@@ -293,8 +310,13 @@ function localQuote(prod, V, qty){
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost: extra, tiers: tiers(cash), weight_kg: wt, method:"formula",
       note:(V.hot_stamping&&V.hot_stamping!=="Not Required")?"Hot stamping block charge quoted separately.":null }; }
   else if(prod.engine==="sticker"){
-    const cash2=cashSticker(P.params||P,+V.height,+V.width,V.paper,V.colour,qty);
-    wt=Math.round((+V.height)*(+V.width)/1e6*150*qty/1000*WF*1000)/1000;
+    const pp=P.params||P;
+    const cash2 = prod.stickerMethod==="digital"
+      ? stickerCategoryPrice(pp, V.category, +V.height, +V.width, V.paper, V.colour, qty, V.diameter)
+      : cashSticker(pp, +V.height, +V.width, V.paper, V.colour, qty);
+    const dd=(V.category==="Round"&&V.diameter)?+V.diameter:0;
+    const wh=dd||+V.height||50, ww=dd||+V.width||50;
+    wt=Math.round(wh*ww/1e6*150*qty/1000*WF*1000)/1000;
     return { printoka_cash: Math.round(cash2*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (imposition)" }; }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
     const fin=finishingCost(V,qty); cash=(cashBizcard(P,ct,V.size,V.paper,V.colour,qty)+fin)*pkgMult;

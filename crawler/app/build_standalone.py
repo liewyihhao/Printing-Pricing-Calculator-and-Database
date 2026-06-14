@@ -105,11 +105,12 @@ def build_data():
                     "Bright Silver Polyester", "Removable Transparent OPP",
                     "Removable White PP", "Warranty Sticker"]
     STICKER_D_FIELDS = [
-        {"key": "category", "label": "Cut type", "addon": True, "depends": [], "options": ["Rectangle/Square", "Custom Die-Cut"]},
+        {"key": "category", "label": "Cut type", "addon": True, "depends": [], "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut"]},
         {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": STICKER_MATS},
         {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C", "1C"]},
-        {"key": "height", "label": "Height (mm)", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
-        {"key": "width", "label": "Width (mm)", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+        {"key": "height", "label": "Height (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
+        {"key": "width", "label": "Width (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+        {"key": "diameter", "label": "Diameter (mm) — Round only", "type": "number", "optional": True, "min": 10, "max": 300, "depends": []},
     ]
     STICKER_L_FIELDS = [
         {"key": "category", "label": "Shape", "addon": True, "depends": [], "options": ["Standard Shape", "Round"]},
@@ -151,6 +152,8 @@ def build_data():
         },
         "finishing": _load("bizcard_finishing.json", {"surface": {}, "round_corner": {}, "hole_punch": {}}),
         "loose_finishing": _load("loose_finishing_50.json", {"hot_stamping": {}, "punch": {}, "fold": {}}),
+        "sticker_categories": _load("sticker_categories.json", {"round": [], "standard_shape": [], "no_cut": [], "kiss_cut": []}),
+        "stickerStdMult": (lambda: __import__("app.sticker_categories", fromlist=["_std_mult"])._std_mult())(),
         "options": {
             "loose21": loose_cascade(),
             "digital50": {"sizes": digital["sizes"], "papers_by_size": digital["papers_by_size"]},

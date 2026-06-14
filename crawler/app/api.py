@@ -494,7 +494,7 @@ FIELD_SCHEMAS = {
     "sticker_digital": {"options": "/api/printoka/sticker/options", "quote": "/api/printoka/sticker/quote",
                 "fields": [
                     {"key": "category", "label": "Cut type", "addon": True, "depends": [],
-                     "options": ["Rectangle/Square", "Custom Die-Cut"]},
+                     "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut"]},
                     {"key": "paper", "label": "Material", "addon": True, "depends": [],
                      "options": ["Mirror Kote", "Mirror Kote (Strong Glue)", "Transparent OPP",
                                  "White PP (Polypropylene)", "White PE (Polyethylene)", "Synthetic Paper",
@@ -502,8 +502,9 @@ FIELD_SCHEMAS = {
                                  "Bright Silver Polyester", "Removable Transparent OPP",
                                  "Removable White PP", "Warranty Sticker"]},
                     {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C", "1C"]},
-                    {"key": "height", "label": "Height (mm)", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
-                    {"key": "width", "label": "Width (mm)", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+                    {"key": "height", "label": "Height (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},
+                    {"key": "width", "label": "Width (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
+                    {"key": "diameter", "label": "Diameter (mm) — Round only", "type": "number", "optional": True, "min": 10, "max": 300, "depends": []},
                 ]},
     "sticker_letterpress": {"options": "/api/printoka/sticker/options", "quote": "/api/printoka/sticker/quote",
                 "fields": [
@@ -621,19 +622,28 @@ def sticker_options(product: int = Query(60)):
 
 
 @app.get("/api/printoka/sticker/quote")
-def sticker_quote(product: int = Query(60), height: float = Query(...),
-                  width: float = Query(...), qty: int = Query(...),
+def sticker_quote(product: int = Query(60), height: float = Query(0),
+                  width: float = Query(0), qty: int = Query(...),
                   category: str = Query("Rectangle/Square"), paper: str = Query("Mirror Kote"),
-                  colour: str = Query("4C")):
+                  colour: str = Query("4C"), diameter: float = Query(0)):
     from . import sticker_engine as SE
     method = "letterpress" if product == 61 else "digital"
     try:
-        cash = SE.cash_price(method, float(height), float(width), paper, colour, qty)
-        wt = SE.weight_kg(float(height), float(width), qty)
+        if method == "digital":
+            from . import sticker_categories as SC
+            cash = SC.category_price(category, float(height), float(width), paper,
+                                     colour, qty, diameter=float(diameter))
+        else:
+            cash = SE.cash_price(method, float(height), float(width), paper, colour, qty)
+        # weight uses the bounding box (diameter for round, else h×w)
+        wh = float(diameter) if (category == "Round" and diameter) else float(height)
+        ww = float(diameter) if (category == "Round" and diameter) else float(width)
+        wt = SE.weight_kg(wh or 50, ww or 50, qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     return {"config": {"product": product, "method": method, "category": category,
-                       "paper": paper, "colour": colour, "height": height, "width": width, "qty": qty},
+                       "paper": paper, "colour": colour, "height": height, "width": width,
+                       "diameter": diameter, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "formula (imposition)",
             "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
 
