@@ -114,6 +114,96 @@ async def densify(account_id=1):
     print(f"densified: total base={len(data['sheets'])}")
 
 
+async def fill(account_id=1):
+    """Robust gap fill: FRESH page navigation + reconfigure for EACH (sheet_size, qty),
+    so no postback-chain staleness. Slow but bulletproof. Merges into the file."""
+    a = accounts.get(account_id)
+    out = OUT / "sticker_multidieline.json"
+    data = json.loads(out.read_text())
+    want = {"A4": [30, 50, 70, 150, 300, 500, 700],
+            "A5": [10, 30, 50, 70, 100, 150, 300, 500, 700, 1000]}
+    label = {"A4": "210mm x 297mm (A4)", "A5": "148mm x 210mm (A5)"}
+    async with async_playwright() as pw:
+        b = await launch(pw); ctx = await b.new_context(viewport={"width": 1440, "height": 1300})
+        page = await ctx.new_page(); await login(page, username=a.username, password=a.password)
+        for ss_key, qtys in want.items():
+            have = {r["sheet_qty"] for r in data["sheets"] if r["sheet_size"] == ss_key}
+            for q in qtys:
+                if q in have:
+                    continue
+                await _setup(page); await _config(page, label[ss_key], 10)
+                if not await _sel_qty(page, q):
+                    log.info("md.fill_miss", ss=ss_key, q=q); continue
+                await asyncio.sleep(1.5)
+                c = (await _read_price(page)).get("before_discount")
+                if c:
+                    data["sheets"].append({"sheet_size": ss_key, "dielines": 10,
+                                           "paper": "Mirror Kote", "colour": "4C", "sheet_qty": q, "cash": c})
+                    out.write_text(json.dumps(data, indent=0))
+                    log.info("md.fill", ss=ss_key, q=q, cash=c)
+                else:
+                    log.info("md.fill_none", ss=ss_key, q=q)
+        try: await b.close()
+        except Exception: pass
+    print(f"filled: base={len([r for r in data['sheets'] if r['paper']=='Mirror Kote' and r['colour']=='4C'])}")
+
+
+# exact per-sheet-size sheet-qty ladders (from the live ddlSheetQty option dump)
+FULL_LADDER = {
+    "A3+": [1, 2, 3, 5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 200, 300, 400, 500],
+    "A4":  [2, 4, 6, 10, 20, 40, 60, 80, 100, 120, 140, 160, 180, 200, 400, 600, 800, 1000],
+    "A5":  [4, 8, 12, 20, 40, 80, 120, 160, 200, 240, 280, 320, 360, 400, 800, 1200, 1600, 2000],
+}
+
+
+async def full(account_id=1):
+    """Capture the COMPLETE ddlSheetQty ladder for every sheet size (Mirror Kote 4C),
+    fresh-nav per point for robustness. Overwrites the base 'sheets' set so the curve is
+    exact at every orderable sheet quantity. Preserves dieline_sens / mat_sens."""
+    a = accounts.get(account_id)
+    out = OUT / "sticker_multidieline.json"
+    data = json.loads(out.read_text()) if out.exists() else {"sheets": [], "dieline_sens": [], "mat_sens": []}
+    label = {"A3+": SHEET_SIZES[0], "A4": SHEET_SIZES[1], "A5": SHEET_SIZES[2]}
+    fresh = []
+    async with async_playwright() as pw:
+        b = await launch(pw); ctx = await b.new_context(viewport={"width": 1440, "height": 1300})
+        page = await ctx.new_page(); await login(page, username=a.username, password=a.password)
+        for ss_key, qtys in FULL_LADDER.items():
+            for q in qtys:
+                await _setup(page); await _config(page, label[ss_key], 10)
+                if not await _sel_qty(page, q):
+                    log.info("md.full_miss", ss=ss_key, q=q); continue
+                await asyncio.sleep(1.3)
+                c = (await _read_price(page)).get("before_discount")
+                if c:
+                    fresh.append({"sheet_size": ss_key, "dielines": 10, "paper": "Mirror Kote",
+                                  "colour": "4C", "sheet_qty": q, "cash": c})
+                    log.info("md.full", ss=ss_key, q=q, cash=c)
+                # persist progress (replace base sheets with fresh-so-far + keep other papers)
+                others = [r for r in data["sheets"] if not (r["paper"] == "Mirror Kote" and r["colour"] == "4C")]
+                data["sheets"] = others + fresh
+                out.write_text(json.dumps(data, indent=0))
+        try: await b.close()
+        except Exception: pass
+    print(f"full capture: {len(fresh)} Mirror Kote 4C points across {len(FULL_LADDER)} sheet sizes")
+
+
+async def dumpopts(account_id=1):
+    """Print the actual ddlSheetQty option list for each sheet size (completeness check)."""
+    a = accounts.get(account_id)
+    async with async_playwright() as pw:
+        b = await launch(pw); ctx = await b.new_context(viewport={"width": 1440, "height": 1300})
+        page = await ctx.new_page(); await login(page, username=a.username, password=a.password)
+        for ss in SHEET_SIZES:
+            await _setup(page); await _config(page, ss, 10)
+            await asyncio.sleep(1.0)
+            opts = await page.locator("select[name$='ddlSheetQty']").first.evaluate(
+                "el=>[...el.options].map(o=>o.text.trim()).filter(t=>t && !t.startsWith('-'))")
+            print(f"{SS_KEY[ss]:4} ddlSheetQty options ({len(opts)}): {opts}")
+        try: await b.close()
+        except Exception: pass
+
+
 async def run(account_id=1):
     a = accounts.get(account_id)
     out = OUT / "sticker_multidieline.json"
@@ -162,5 +252,11 @@ if __name__ == "__main__":
     acct = int(sys.argv[1]) if len(sys.argv) > 1 else 1
     if len(sys.argv) > 2 and sys.argv[2] == "densify":
         asyncio.run(densify(acct))
+    elif len(sys.argv) > 2 and sys.argv[2] == "fill":
+        asyncio.run(fill(acct))
+    elif len(sys.argv) > 2 and sys.argv[2] == "dumpopts":
+        asyncio.run(dumpopts(acct))
+    elif len(sys.argv) > 2 and sys.argv[2] == "full":
+        asyncio.run(full(acct))
     else:
         asyncio.run(run(acct))

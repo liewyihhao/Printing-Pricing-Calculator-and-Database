@@ -38,11 +38,13 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
     weight = sheet area × 150gsm × sheets), and the standalone (precomputed
     base/colourMult/matMult baked in; JS `multidielinePrice` == Python to the cent, verified
     via node localQuote: A3+ q100 = RM202.05/2.438kg, A4 Synthetic q1000 = RM1050.88).
-    **Accuracy (leave-one-out, honest — pessimistic on a coarse grid; exact at every
-    captured sheet count):** A3+ (default sheet size, 7 pts) median 6.6% / max 18.9%;
-    A4 (6 pts) median 9.5%; A5 (4 pts, sparse — a 200→2000 gap that resists capture) median
-    23.4% / max 42.7%. The A5 mid-range is the lone weak spot and would tighten with a
-    denser A5 capture.
+    **Accuracy: EXACT at every orderable sheet quantity.** The ddlSheetQty ladder differs
+    per sheet size (A4 ≈ 2× A3+, A5 ≈ 4×, since smaller sheets need more sheets for the same
+    piece count). `dumpopts` mode captured the real per-size option lists, then `full` mode
+    captured **all 18 orderable quantities × 3 sheet sizes = 54 points** (Mirror Kote 4C);
+    the curve log-interpolates so it's exact at each dropdown value. Material/colour layer
+    median 1.2% (held-out). Sampler modes: `multidieline_sampler.py {run|densify|fill|
+    dumpopts|full}` (resumable). Earlier coarse-grid LOO numbers are obsolete.
   - ✅ **Warranty Sticker accuracy FIXED.** Per-material audit vs stored samples revealed
     the handoff's "premium materials ~20–40% off" was really ONLY Warranty Sticker (median
     35.6%); Synthetic/White PP/etc. are already ~5%. Warranty's cost scales far more steeply
