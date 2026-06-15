@@ -4,6 +4,26 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **#18 PARITY MATRIX (side-by-side vs each Excard order page).** Verified each product's
+  UI fields against its live Excard order-page controls:
+  - **Business Card (1)** — cardType(Std/Thin Fold/Fat Fold/Custom Die-Cut/Plastic), size
+    (+custom), orientation, paper, colour, package(×N), qty, surface lam/SpotUV, round
+    corner, hole punch, hot stamping, embossing, delivery. ✅ complete.
+  - **Loose Sheet Litho (21)** — size(+custom), paper, colour, package(×N), qty, delivery.
+    Litho has NO finishing on Excard. ✅ complete.
+  - **Loose Sheet Digital (50)** — + hot stamping / fold / punch finishing. ✅ complete.
+  - **Booklet Litho/Digital (19/37)** — orientation, size, cover type, binding, page, cover
+    paper/colour, content paper/colour, outer-inner, cover hot stamping, extra books, qty,
+    delivery. ✅ complete.
+  - **Label Sticker Digital (60)** — rdType **Sticker**, all 7 cut categories (incl Multiple
+    Dieline), 13 materials, colour, lamination/finishing, size/diameter, sheet_size+dielines,
+    **package(×N, NEW — verified 2in1=2.0× / 4in1=4.0×)**, qty, delivery. ✅ complete for the
+    **Sticker** type. ⛔ the form's **rdType "CD"** option (round CD/disc labels — its own
+    sizes) is NOT modeled — a separate niche variant, the lone remaining follow-up.
+  - **Label Sticker Letterpress (61)** — shape(Standard/Round), hot-stamp colour, size/
+    diameter, qty, delivery. ✅ complete.
+  ⇒ Every standard ordering flow is at parity. The single open item is the **CD sticker
+  sub-type** on product 60's page (needs its own option+price sampling, like a new product).
 - **EXCARD ORDERING-PAGE PARITY (single ongoing task #18 — NOT complete).** Goal: every
   product's calculator UI mirrors its Excard order page. Progress:
   - ✅ **Digital Loose Sheet** finishing: hot stamping, folding (8 types, size-dep),

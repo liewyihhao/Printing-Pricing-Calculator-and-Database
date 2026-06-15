@@ -352,10 +352,11 @@ function localQuote(prod, V, qty){
       note:(V.hot_stamping&&V.hot_stamping!=="Not Required")?"Hot stamping block charge quoted separately.":null }; }
   else if(prod.engine==="sticker"){
     const pp=P.params||P;
+    const sMult = prod.stickerMethod==="digital" ? pkgMult : 1;  // N-in-1 = xN (digital, verified)
     if(prod.stickerMethod==="digital" && V.category==="Multiple Dieline"){
-      const ss=V.sheet_size||"A3+"; const cash2=multidielinePrice(ss, qty, V.paper, V.colour);
+      const ss=V.sheet_size||"A3+"; const cash2=multidielinePrice(ss, qty, V.paper, V.colour)*sMult;
       const SMM={"A3+":[317,425],"A4":[210,297],"A5":[148,210]}, [sh,sw]=SMM[ss]||SMM["A3+"];
-      const wt2=Math.round(sh*sw/1e6*150*qty/1000*WF*1000)/1000;
+      const wt2=Math.round(sh*sw/1e6*150*qty/1000*WF*sMult*1000)/1000;
       return { printoka_cash: Math.round(cash2*100)/100, finishing_cost:0, tiers: tiers(cash2),
         weight_kg: wt2, method:"formula (sheet curve)",
         note:"Multiple Dieline is priced per press sheet (A3+/A4/A5). Die lines per sheet do not affect price; lamination quoted separately." }; }
@@ -368,9 +369,10 @@ function localQuote(prod, V, qty){
       const fw=(V.category==="Round"&&V.diameter)?+V.diameter:((+V.width)||50);
       cash2 += stickerLaminationCost(V.finishing, fh, fw, qty);
     }
+    cash2 *= sMult;
     const dd=(V.category==="Round"&&V.diameter)?+V.diameter:0;
     const wh=dd||+V.height||50, ww=dd||+V.width||50;
-    wt=Math.round(wh*ww/1e6*150*qty/1000*WF*1000)/1000;
+    wt=Math.round(wh*ww/1e6*150*qty/1000*WF*sMult*1000)/1000;
     return { printoka_cash: Math.round(cash2*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (imposition)" }; }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
     const fin=finishingCost(V,qty); cash=(cashBizcard(P,ct,V.size,V.paper,V.colour,qty)+fin)*pkgMult;

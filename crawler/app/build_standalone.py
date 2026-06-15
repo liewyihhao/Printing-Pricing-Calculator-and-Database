@@ -127,6 +127,7 @@ def build_data():
         {"key": "finishing", "label": "Lamination", "addon": True, "depends": [],
          "options": ["Not Required", "Matte Laminate (Front)", "Gloss Laminate (Front)",
                      "Gloss Water Based Varnish", "UV Varnish", "Soft Touch Laminate (Front)"]},
+        {"key": "package", "label": "Package (N-in-1, ×N)", "addon": True, "depends": [], "options": ["Normal", "2in1", "3in1", "4in1", "5in1", "6in1", "7in1", "8in1", "9in1", "10in1"]},
         {"key": "sheet_size", "label": "Sheet size — Multiple Dieline only", "addon": True, "depends": [], "options": ["A3+", "A4", "A5"]},
         {"key": "dielines", "label": "Die lines per sheet — Multiple Dieline (no price effect)", "type": "number", "optional": True, "min": 1, "max": 100, "depends": []},
         {"key": "height", "label": "Height (mm) — Rectangle/Standard/Custom", "type": "number", "min": 10, "max": 300, "default": 50, "depends": []},

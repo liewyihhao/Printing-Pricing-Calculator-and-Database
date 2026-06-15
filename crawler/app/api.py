@@ -506,6 +506,8 @@ FIELD_SCHEMAS = {
                     {"key": "finishing", "label": "Lamination", "addon": True, "depends": [],
                      "options": ["Not Required", "Matte Laminate (Front)", "Gloss Laminate (Front)",
                                  "Gloss Water Based Varnish", "UV Varnish", "Soft Touch Laminate (Front)"]},
+                    {"key": "package", "label": "Package (N-in-1, ×N)", "addon": True, "depends": [],
+                     "options": ["Normal", "2in1", "3in1", "4in1", "5in1", "6in1", "7in1", "8in1", "9in1", "10in1"]},
                     {"key": "sheet_size", "label": "Sheet size — Multiple Dieline only", "addon": True, "depends": [],
                      "options": ["A3+", "A4", "A5"]},
                     {"key": "dielines", "label": "Die lines per sheet — Multiple Dieline (no price effect)", "type": "number", "optional": True, "min": 1, "max": 100, "depends": []},
@@ -634,22 +636,24 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
                   width: float = Query(0), qty: int = Query(...),
                   category: str = Query("Rectangle/Square"), paper: str = Query("Mirror Kote"),
                   colour: str = Query("4C"), diameter: float = Query(0),
-                  finishing: str = Query("Not Required"), sheet_size: str = Query("A3+")):
+                  finishing: str = Query("Not Required"), sheet_size: str = Query("A3+"),
+                  package: str = Query("Normal")):
     from . import sticker_engine as SE
     # Multiple Dieline is sheet-based: qty = number of press sheets, sized A3+/A4/A5.
     MD_SHEET_MM = {"A3+": (317, 425), "A4": (210, 297), "A5": (148, 210)}
     method = "letterpress" if product == 61 else "digital"
+    mult = package_multiplier(package)  # N-in-1 = pure xN gang (verified)
     fin = 0.0
     try:
         if method == "digital" and category == "Multiple Dieline":
             from . import sticker_categories as SC
-            cash = SC.category_price(category, 0, 0, paper, colour, qty, sheet_size=sheet_size)
+            cash = SC.category_price(category, 0, 0, paper, colour, qty, sheet_size=sheet_size) * mult
             sh, sw = MD_SHEET_MM.get(sheet_size, (317, 425))
-            wt = SE.weight_kg(sh, sw, qty)  # each sheet weighed as one "piece"
+            wt = SE.weight_kg(sh, sw, qty) * mult  # each sheet weighed as one "piece"
             note = "Multiple Dieline is priced per press sheet (A3+/A4/A5). Die lines per sheet do not affect price; lamination quoted separately."
             return {"config": {"product": product, "method": method, "category": category,
                                "paper": paper, "colour": colour, "sheet_size": sheet_size,
-                               "qty": qty, "finishing": finishing}, "note": note,
+                               "qty": qty, "package": package, "finishing": finishing}, "note": note,
                     "printoka_cash": round(cash, 2), "finishing_cost": 0.0,
                     "method": "formula (sheet curve)",
                     "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
@@ -661,8 +665,9 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
             fh = float(diameter) if (category == "Round" and diameter) else (float(height) or 50)
             fw = float(diameter) if (category == "Round" and diameter) else (float(width) or 50)
             fin = SF.finishing_cost(finishing, fh, fw, qty)
-            cash += fin
-        else:  # letterpress: Round uses diameter as W=H
+            cash = (cash + fin) * mult       # N-in-1 = pure xN gang (digital, verified)
+            fin = fin * mult
+        else:  # letterpress: Round uses diameter as W=H (package not offered)
             if category == "Round" and diameter:
                 cash = SE.cash_price(method, float(diameter), float(diameter), paper, colour, qty)
             else:
@@ -670,12 +675,12 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
         # weight uses the bounding box (diameter for round, else h×w)
         wh = float(diameter) if (category == "Round" and diameter) else float(height)
         ww = float(diameter) if (category == "Round" and diameter) else float(width)
-        wt = SE.weight_kg(wh or 50, ww or 50, qty)
+        wt = SE.weight_kg(wh or 50, ww or 50, qty) * (mult if method == "digital" else 1)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     return {"config": {"product": product, "method": method, "category": category,
                        "paper": paper, "colour": colour, "height": height, "width": width,
-                       "diameter": diameter, "qty": qty, "finishing": finishing},
+                       "diameter": diameter, "qty": qty, "package": package, "finishing": finishing},
             "printoka_cash": round(cash, 2), "finishing_cost": round(fin, 2),
             "method": "formula (imposition)",
             "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
