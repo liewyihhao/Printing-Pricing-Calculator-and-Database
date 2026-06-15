@@ -17,6 +17,8 @@ OUT = Path(__file__).resolve().parent.parent / "output"
 FILE = OUT / "sticker_categories.json"
 MD_FILE = OUT / "sticker_multidieline.json"
 WARRANTY_FILE = OUT / "sticker_warranty.json"
+CD_FILE = OUT / "sticker_cd.json"
+CD_PAPERS = ["Mirror Kote", "Printing Paper"]
 CATEGORIES = ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round",
               "No Cut", "Kiss Cut", "Multiple Dieline"]
 MD_SHEET_SIZES = ["A3+", "A4", "A5"]   # Delivery Sheet Size (317x425 / 210x297 / 148x210 mm)
@@ -206,6 +208,26 @@ def warranty_price(h, w, qty, colour):
     if (colour or "").startswith("1C"):
         base *= float(d.get("colour1C", 0.87))
     return base
+
+
+# ---------------- CD label (fixed-shape disc; rdType=CD) ----------------
+# CD is a fixed disc label: no cut category, no size. Price = per-(material,colour)
+# quantity curve (output/sticker_cd.json). Only Mirror Kote / Printing Paper offered;
+# any other material falls back to Mirror Kote.
+
+def _cd():
+    if "cd" not in _CACHE:
+        _CACHE["cd"] = json.loads(CD_FILE.read_text()) if CD_FILE.exists() else {"curves": {}}
+    return _CACHE["cd"]
+
+
+def cd_price(paper, colour, qty):
+    d = _cd().get("curves", {})
+    pap = paper if paper in CD_PAPERS else "Mirror Kote"
+    col = "1C" if (colour or "").startswith("1C") else "4C"
+    cv = d.get(f"{pap}|{col}") or d.get(f"Mirror Kote|{col}") or {}
+    pts = [(int(q), c) for q, c in cv.items()]
+    return _interp(pts, qty)
 
 
 def category_price(category, h, w, paper, colour, qty, diameter=0, sheet_size="A3+"):

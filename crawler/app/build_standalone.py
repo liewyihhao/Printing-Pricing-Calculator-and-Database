@@ -121,7 +121,8 @@ def build_data():
                     "Bright Silver Polyester", "Removable Transparent OPP",
                     "Removable White PP", "Warranty Sticker"]
     STICKER_D_FIELDS = [
-        {"key": "category", "label": "Cut type", "addon": True, "depends": [], "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut", "Multiple Dieline"]},
+        {"key": "type", "label": "Product type", "addon": True, "depends": [], "options": ["Sticker", "CD"]},
+        {"key": "category", "label": "Cut type (Sticker only)", "addon": True, "depends": [], "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut", "Multiple Dieline"]},
         {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": STICKER_MATS},
         {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C", "1C"]},
         {"key": "finishing", "label": "Lamination", "addon": True, "depends": [],
@@ -179,6 +180,7 @@ def build_data():
         "stickerStdMult": (lambda: __import__("app.sticker_categories", fromlist=["_std_mult"])._std_mult())(),
         "multidieline": _multidieline_data(STICKER_MATS),
         "warranty": _load("sticker_warranty.json", {"sizes": [], "colour1C": 0.87}),
+        "sticker_cd": _load("sticker_cd.json", {"curves": {}}),
         "sticker_finishing": _load("sticker_finishing.json", {}),
         "options": {
             "loose21": loose_cascade(),

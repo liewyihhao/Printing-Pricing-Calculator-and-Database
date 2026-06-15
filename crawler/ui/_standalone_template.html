@@ -353,6 +353,16 @@ function localQuote(prod, V, qty){
   else if(prod.engine==="sticker"){
     const pp=P.params||P;
     const sMult = prod.stickerMethod==="digital" ? pkgMult : 1;  // N-in-1 = xN (digital, verified)
+    if(prod.stickerMethod==="digital" && V.type==="CD"){
+      const cv=(DATA.sticker_cd||{}).curves||{};
+      const pap=["Mirror Kote","Printing Paper"].includes(V.paper)?V.paper:"Mirror Kote";
+      const col=(V.colour||"").startsWith("1C")?"1C":"4C";
+      const c=cv[pap+"|"+col]||cv["Mirror Kote|"+col]||{};
+      const cash2=interpLogPts(Object.keys(c).map(k=>[+k,c[k]]),qty)*sMult;
+      const wt2=Math.round(117*117/1e6*150*qty/1000*WF*sMult*1000)/1000;
+      return { printoka_cash: Math.round(cash2*100)/100, finishing_cost:0, tiers: tiers(cash2),
+        weight_kg: wt2, method:"formula (CD curve)",
+        note:"CD disc label (fixed shape); Mirror Kote / Printing Paper only." }; }
     if(prod.stickerMethod==="digital" && V.category==="Multiple Dieline"){
       const ss=V.sheet_size||"A3+"; const cash2=multidielinePrice(ss, qty, V.paper, V.colour)*sMult;
       const SMM={"A3+":[317,425],"A4":[210,297],"A5":[148,210]}, [sh,sw]=SMM[ss]||SMM["A3+"];

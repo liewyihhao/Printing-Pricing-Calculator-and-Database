@@ -494,7 +494,9 @@ FIELD_SCHEMAS = {
                 ]},
     "sticker_digital": {"options": "/api/printoka/sticker/options", "quote": "/api/printoka/sticker/quote",
                 "fields": [
-                    {"key": "category", "label": "Cut type", "addon": True, "depends": [],
+                    {"key": "type", "label": "Product type", "addon": True, "depends": [],
+                     "options": ["Sticker", "CD"]},
+                    {"key": "category", "label": "Cut type (Sticker only)", "addon": True, "depends": [],
                      "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut", "Multiple Dieline"]},
                     {"key": "paper", "label": "Material", "addon": True, "depends": [],
                      "options": ["Mirror Kote", "Mirror Kote (Strong Glue)", "Transparent OPP",
@@ -637,7 +639,7 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
                   category: str = Query("Rectangle/Square"), paper: str = Query("Mirror Kote"),
                   colour: str = Query("4C"), diameter: float = Query(0),
                   finishing: str = Query("Not Required"), sheet_size: str = Query("A3+"),
-                  package: str = Query("Normal")):
+                  package: str = Query("Normal"), type: str = Query("Sticker")):
     from . import sticker_engine as SE
     # Multiple Dieline is sheet-based: qty = number of press sheets, sized A3+/A4/A5.
     MD_SHEET_MM = {"A3+": (317, 425), "A4": (210, 297), "A5": (148, 210)}
@@ -645,6 +647,16 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
     mult = package_multiplier(package)  # N-in-1 = pure xN gang (verified)
     fin = 0.0
     try:
+        if method == "digital" and type == "CD":
+            from . import sticker_categories as SC
+            cash = SC.cd_price(paper, colour, qty) * mult
+            wt = SE.weight_kg(117, 117, qty) * mult  # standard CD label ~117mm disc
+            return {"config": {"product": product, "method": method, "type": "CD",
+                               "paper": paper, "colour": colour, "qty": qty, "package": package},
+                    "note": "CD disc label (fixed shape); Mirror Kote / Printing Paper only.",
+                    "printoka_cash": round(cash, 2), "finishing_cost": 0.0,
+                    "method": "formula (CD curve)",
+                    "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
         if method == "digital" and category == "Multiple Dieline":
             from . import sticker_categories as SC
             cash = SC.category_price(category, 0, 0, paper, colour, qty, sheet_size=sheet_size) * mult

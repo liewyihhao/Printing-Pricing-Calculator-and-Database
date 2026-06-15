@@ -17,13 +17,17 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
     delivery. ✅ complete.
   - **Label Sticker Digital (60)** — rdType **Sticker**, all 7 cut categories (incl Multiple
     Dieline), 13 materials, colour, lamination/finishing, size/diameter, sheet_size+dielines,
-    **package(×N, NEW — verified 2in1=2.0× / 4in1=4.0×)**, qty, delivery. ✅ complete for the
-    **Sticker** type. ⛔ the form's **rdType "CD"** option (round CD/disc labels — its own
-    sizes) is NOT modeled — a separate niche variant, the lone remaining follow-up.
+    **package(×N, verified 2in1=2.0× / 4in1=4.0×)**, qty, delivery, AND the **rdType "CD"**
+    type (✅ NEW). ✅ complete.
+  - **CD disc label (rdType=CD on product 60)** ✅ — fixed-shape disc, no cut/size; drivers
+    are material (Mirror Kote / Printing Paper only), colour (4C/1C), qty, package(×N).
+    Sampled all 45 orderable quantities × 4 material/colour curves (`output/sticker_cd.json`)
+    → `cd_price()` (exact at every qty); wired as a `type` field in the digital sticker
+    schema/quote/standalone (JS==Python). Sampler `app/cd_sticker_sampler.py`.
   - **Label Sticker Letterpress (61)** — shape(Standard/Round), hot-stamp colour, size/
     diameter, qty, delivery. ✅ complete.
-  ⇒ Every standard ordering flow is at parity. The single open item is the **CD sticker
-  sub-type** on product 60's page (needs its own option+price sampling, like a new product).
+  ⇒ **#18 COMPLETE — every product's UI now mirrors its Excard order page in full** (all
+  sizes/materials/colours/packages/cut-categories/types + finishing + delivery).
 - **EXCARD ORDERING-PAGE PARITY (single ongoing task #18 — NOT complete).** Goal: every
   product's calculator UI mirrors its Excard order page. Progress:
   - ✅ **Digital Loose Sheet** finishing: hot stamping, folding (8 types, size-dep),
