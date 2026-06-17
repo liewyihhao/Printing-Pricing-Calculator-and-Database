@@ -4,6 +4,28 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **PACKAGING BOX — new section (P0–P2 done; P3 + full-fidelity folding remain).**
+  Served at **`/packaging`** (`ui/packaging.html`). Excard's packmage engine reverse-
+  engineered (see PACKAGING_BOX_FINDINGS.md): pricing `POST /uc/GetPriceFactor2` (public
+  JSON, exact total/unit price + weight), 3D dieline `POST /uc/LinTest3D` (LineExp cut/
+  crease segments), delivery `GetTranFeeByAreaID`. Token bootstrapped via ONE Playwright
+  login then threaded `requests` (`app/packaging_api.py bootstrap_session`).
+  - **Sampled** all 67 boxes × dims grid × full qty ladder (2656 pts) + a dieline each
+    (`app/packaging_sampler.py`; raw `output/packaging_samples.json` 492KB gitignored).
+  - **Engine** `app/packaging_engine.py` (our own): per-box regression `total = a0 +
+    a1·netarea + b0·qty + b1·(netarea·qty)`, netarea predicted from L/W/D. **In-sample
+    MAPE median 4.9%** (NOT yet a held-out audit — P3). Params `output/packaging_params.json`.
+  - **API:** `/api/printoka/packaging/{catalogue,quote,dieline}`. Catalogue (67 boxes, 11
+    categories, names/images/limits) `output/packaging_catalogue_ui.json`
+    (`app/packaging_catalogue.py`).
+  - **3D (P2):** three.js viewer with Folded-3D / Flat-dieline toggle. Flat dieline =
+    EXACT from LinTest3D LineExp (all boxes). Folded 3D = parametric tube (walls+bottom+
+    tuck flap) for RTE/STE/Lock-Bottom archetypes; size-accurate solid for others.
+  - **REMAINING:** (1) exact per-style folding for non-tube archetypes (trays, hinged-lid,
+    gable, cone, sleeve, divider, inner-holding); (2) P3 — print colour/material/finishing
+    options (engine currently models the default 4C chain only), offline standalone
+    bundling (three.js + catalogue + params + dielines), real held-out accuracy audit, and
+    side-by-side parity vs each Excard DIY page. Recon/build scripts: `app/packaging_*.py`.
 - **NEW PRODUCT: Bill-Book — Litho (NCR carbonless), id 24.** Order page
   `www.excard.com.my/spec/Litho/Bill-Book`. Cascade learned: PackForm(Book/Pad) ×
   Paper(NCR) × Size(~37) × PaperMaterial(NCR 2–6 Layers/plies) × per-ply tint dropdowns
