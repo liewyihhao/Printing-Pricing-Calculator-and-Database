@@ -29,10 +29,16 @@ def _dims(lim):
     Dmax = Darr[2] if len(Darr) > 2 and Darr[2] else D0 * 4
     def cD(d): return int(max(D0, min(d, Dmax)))
     cand = [(L0, W0, D0),
-            (L0 + 30, W0 + 20, cD(D0 + 30)),
-            (max(L0, 100), max(W0, 80), cD(max(D0, 50))),
-            (max(L0, 150), max(W0, 100), cD(max(D0, 80))),
-            (L0 * 2, W0 * 2, cD(min(D0 * 2, Dmax)))]
+            (L0 + 20, W0 + 15, cD(D0 + 20)),
+            (L0 + 40, W0 + 30, cD(D0 + 40)),
+            (max(L0, 90), max(W0, 70), cD(max(D0, 45))),
+            (max(L0, 120), max(W0, 90), cD(max(D0, 60))),
+            (max(L0, 160), max(W0, 110), cD(max(D0, 80))),
+            (max(L0, 200), max(W0, 140), cD(max(D0, 100))),
+            (int(L0 * 1.5), int(W0 * 1.5), cD(int(D0 * 1.5))),
+            (L0 * 2, W0 * 2, cD(min(D0 * 2, Dmax))),
+            (int(L0 * 2.5), max(W0, 80), cD(max(D0, 70))),
+            (max(L0, 140), int(W0 * 2), cD(min(int(D0 * 1.8), Dmax)))]
     seen, out = set(), []
     for t in cand:
         t = (int(t[0]), int(t[1]), int(t[2]))

@@ -13,8 +13,10 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Sampled** all 67 boxes × dims grid × full qty ladder (2656 pts) + a dieline each
     (`app/packaging_sampler.py`; raw `output/packaging_samples.json` 492KB gitignored).
   - **Engine** `app/packaging_engine.py` (our own): per-box regression `total = a0 +
-    a1·netarea + b0·qty + b1·(netarea·qty)`, netarea predicted from L/W/D. **In-sample
-    MAPE median 4.9%** (NOT yet a held-out audit — P3). Params `output/packaging_params.json`.
+    a1·netarea + b0·qty + b1·(netarea·qty)`, netarea predicted from L/W/D. Sampled 11
+    sizes/box (5760 pts). **Held-out (leave-one-dimension-out) median 6.5%, 70% within 10%,
+    p90 16.8%** — tail on odd shapes (dividers/cones/sleeves). Params
+    `output/packaging_params.json`.
   - **API:** `/api/printoka/packaging/{catalogue,quote,dieline}`. Catalogue (67 boxes, 11
     categories, names/images/limits) `output/packaging_catalogue_ui.json`
     (`app/packaging_catalogue.py`).
