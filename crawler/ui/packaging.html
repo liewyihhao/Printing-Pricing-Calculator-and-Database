@@ -40,7 +40,11 @@
       <div id="config" class="hidden">
         <div class="grid grid-cols-2 gap-5">
           <div class="card p-3"><div id="viewer" style="width:100%;height:360px;border-radius:10px;overflow:hidden;background:#0b1020"></div>
-            <div class="text-[11px] text-slate-400 mt-2 text-center">Drag to rotate · scroll to zoom · dimensions to scale</div></div>
+            <div class="flex items-center justify-center gap-2 mt-2">
+              <button id="modeBox" class="chip" style="cursor:pointer">Folded 3D</button>
+              <button id="modeNet" class="chip" style="cursor:pointer;background:#f1f5f9;color:#64748b">Flat dieline</button>
+            </div>
+            <div class="text-[11px] text-slate-400 mt-1 text-center">Drag to rotate · scroll to zoom · true to dimensions</div></div>
           <div class="card p-4">
             <div class="flex items-center gap-2 mb-1"><span id="cName" class="font-semibold text-[15px]"></span><span id="cCat" class="chip"></span></div>
             <div id="cCode" class="text-[12px] text-slate-400 mb-4"></div>
@@ -101,7 +105,11 @@ function renderGallery(q){
 }
 $("search").oninput = e => renderGallery(e.target.value);
 
-function select(code){
+let MODE = "box", DIELINE = null;
+const TUBE_CATS = ["Reverse Tuck (RTE)","Straight Tuck (STE)","Lock Bottom"];
+function isTube(){ return sel && TUBE_CATS.includes(sel.category); }
+
+async function select(code){
   sel = CAT.find(b=>b.code===code); if(!sel) return;
   document.querySelectorAll(".boxcard").forEach(e=>e.classList.toggle("sel", e.dataset.code===code));
   $("empty").classList.add("hidden"); $("config").classList.remove("hidden");
@@ -117,10 +125,18 @@ function select(code){
       <input type="range" id="r${k}" min="${mn}" max="${mx}" value="${v}" class="w-full"/></div>`).join("");
   ["L","W","D"].forEach(k=>$("r"+k).oninput=()=>{ $("v"+k).textContent=$("r"+k).value; updateBox(); quote(); });
   $("qty").onchange = quote;
+  DIELINE = null;
+  fetch(`/api/printoka/packaging/dieline?box=${sel.code}`).then(r=>r.ok?r.json():null).then(d=>{ DIELINE=d; if(MODE==="net") updateBox(); }).catch(()=>{});
   initThree(); updateBox(); quote();
 }
+$("modeBox").onclick=()=>{ MODE="box"; setModeBtns(); updateBox(); };
+$("modeNet").onclick=()=>{ MODE="net"; setModeBtns(); updateBox(); };
+function setModeBtns(){
+  $("modeBox").style.cssText = "cursor:pointer"+(MODE==="box"?"":";background:#f1f5f9;color:#64748b");
+  $("modeNet").style.cssText = "cursor:pointer"+(MODE==="net"?"":";background:#f1f5f9;color:#64748b");
+}
 
-// ---- 3D (P1: size-accurate carton; P2 folds the real dieline) ----
+// ---- 3D : folded carton (tube archetypes) / size-accurate solid / flat dieline net ----
 function initThree(){
   if(three){ three.dispose(); }
   const el=$("viewer"); el.innerHTML="";
@@ -142,13 +158,44 @@ function initThree(){
 function updateBox(){
   if(!three) return;
   const L=+$("rL").value, W=+$("rW").value, D=+$("rD").value;
-  three.group.clear();
-  const g=new THREE.BoxGeometry(L,D,W);  // L×W footprint, D height
-  const mesh=new THREE.Mesh(g,three.mat); three.group.add(mesh);
-  three.group.add(new THREE.LineSegments(new THREE.EdgesGeometry(g),three.edge));
-  // recentre camera distance to box size
-  const r=Math.max(L,W,D); three.cam.position.setLength(r*2.1+200);
-  three.group.position.y = D/2;
+  three.group.clear(); three.group.rotation.set(0,0,0); three.group.position.set(0,0,0);
+  if(MODE==="net"){ buildNet(); }
+  else if(isTube()){ buildTube(L,W,D); three.group.position.y=D/2; }
+  else { const g=new THREE.BoxGeometry(L,D,W); three.group.add(new THREE.Mesh(g,three.mat));
+         three.group.add(new THREE.LineSegments(new THREE.EdgesGeometry(g),three.edge)); three.group.position.y=D/2; }
+  const r=Math.max(L,W,D); three.cam.position.setLength(r*2.2+220);
+}
+
+// A folded rectangular tuck/lock tube: 4 walls + bottom + half-open top tuck flap.
+function buildTube(L,W,D){
+  const t=2;
+  const panel=(geo,x,y,z,rx,ry)=>{ const m=new THREE.Mesh(geo,three.mat);
+    m.position.set(x,y,z); if(rx)m.rotation.x=rx; if(ry)m.rotation.y=ry; three.group.add(m);
+    const e=new THREE.LineSegments(new THREE.EdgesGeometry(geo),three.edge);
+    e.position.copy(m.position); e.rotation.copy(m.rotation); three.group.add(e); };
+  panel(new THREE.BoxGeometry(L,D,t), 0,0, W/2);          // front
+  panel(new THREE.BoxGeometry(L,D,t), 0,0,-W/2);          // back
+  panel(new THREE.BoxGeometry(W,D,t), -L/2,0,0, 0, Math.PI/2);  // left
+  panel(new THREE.BoxGeometry(W,D,t),  L/2,0,0, 0, Math.PI/2);  // right
+  panel(new THREE.BoxGeometry(L,t,W), 0,-D/2,0);          // bottom
+  panel(new THREE.BoxGeometry(L,t,W*0.55), 0, D/2, -W*0.1, -0.5); // top tuck flap (ajar)
+}
+
+// Flat dieline net from LinTest3D LineExp: solid=cut, dash=crease, plus arcs.
+function buildNet(){
+  if(!DIELINE||!DIELINE.LineExp){ const g=new THREE.PlaneGeometry(120,80);
+    three.group.add(new THREE.Mesh(g,new THREE.MeshBasicMaterial({color:0x1e293b}))); return; }
+  const bj=DIELINE.BoxJson||{}, ox=bj.OffsetX||0, oy=bj.OffsetY||0;
+  const cut=new THREE.LineBasicMaterial({color:0xffd27f}), crease=new THREE.LineDashedMaterial({color:0x6ee7ff,dashSize:4,gapSize:3});
+  const pts2=(x,y)=>new THREE.Vector3(x+ox, 0, -(y+oy));
+  for(const s of DIELINE.LineExp){
+    if(s[0]===0){ const g=new THREE.BufferGeometry().setFromPoints([pts2(s[2],s[3]),pts2(s[4],s[5])]);
+      const ln=new THREE.Line(g, s[1]===1?crease:cut); ln.computeLineDistances(); three.group.add(ln); }
+    else if(s[0]===1){ const [,,cx,cy,r,a0,a1]=s; const pts=[]; const steps=10;
+      for(let i=0;i<=steps;i++){ const a=(a0+(a1-a0)*i/steps)*Math.PI/180; pts.push(pts2(cx+r*Math.cos(a), cy+r*Math.sin(a))); }
+      const ln=new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), s[1]===1?crease:cut); ln.computeLineDistances(); three.group.add(ln); }
+  }
+  three.group.rotation.x=-Math.PI/2.2;  // lay the net facing the camera
 }
 
 let seq=0;
