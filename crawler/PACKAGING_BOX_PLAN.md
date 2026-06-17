@@ -111,9 +111,25 @@ data model and the sampling grid below.
 
 ---
 
-## 4. Phased delivery (proposed)
-- **P0 — Recon crawl** (after Bill-Book): map catalogue, per-style options, pricing API, 3D
-  source, auth. Produce findings + finalise data model. _(study; low risk)_
+## 3b. POST-RECON UPDATE (P0 done — see PACKAGING_BOX_FINDINGS.md)
+Recon (commit 7c453d6) confirmed the build is **much lower-risk** than assumed:
+- **Pricing is a public JSON API** (`POST /uc/GetPriceFactor2`, no login) returning exact
+  total/unit price + weight. ⇒ P1 sampling is a **direct threaded API call (bizcard-style),
+  NO browser** — fast. Engine = per-box curve / area-law fit of `TotalFee` vs
+  (netarea, color, ups `no`, qty) × `ProfitRate`.
+- **3D is given to us**: `POST /uc/LinTest3D` returns each box's **parametric dieline**
+  (`LineExp` cut/fold segments + panel dims) as f(L,W,D,CAL). ⇒ P2 = a three.js renderer
+  that folds the supplied dieline, instead of hand-modeling 43 shapes. Dimensionally exact.
+- **Catalogue/options/limits** already extracted from JS globals
+  (`output/packaging_globals/*`, `packaging_catalogue.json`): 67 box defs (43 enabled), 39
+  categories, per-box L/W/D/G limits, process IDs (P001 print, P0xx finishing) + material
+  IDs (M00xx via `Mid4DiyAndOrder`).
+- Both APIs need a page `__RequestVerificationToken`; pricing appears not to need login
+  (confirm under load in P1).
+
+## 4. Phased delivery (updated post-recon)
+- **P0 — Recon crawl** ✅ DONE (commit 7c453d6): catalogue, APIs, 3D source, limits mapped;
+  findings in PACKAGING_BOX_FINDINGS.md.
 - **P1 — Pricing spine, no 3D:** catalogue + options + sampler + engine + API + a basic
   (non-3D) configurator with a size-accurate placeholder preview. Ships real prices for all
   styles. _(reuses the proven product pattern)_
