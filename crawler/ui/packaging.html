@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Printoka — Packaging Boxes</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }</script>
+<style>
+  body{font-family:Inter,system-ui,sans-serif;background:#f6f8fc;color:#0f172a}
+  .card{background:#fff;border:1px solid #e8edf5;border-radius:14px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+  .boxcard{cursor:pointer;transition:.15s}.boxcard:hover{border-color:#6366f1;transform:translateY(-1px)}
+  .boxcard.sel{border-color:#6366f1;box-shadow:0 0 0 2px #6366f133}
+  .tier{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed #eef2f7;font-size:13px}
+  input[type=range]{accent-color:#6366f1}
+  .chip{font-size:11px;padding:2px 8px;border-radius:999px;background:#eef2ff;color:#4338ca}
+</style>
+</head>
+<body class="min-h-screen">
+<div class="max-w-[1240px] mx-auto px-5 py-6">
+  <div class="flex items-center gap-3 mb-5">
+    <div class="h-9 w-9 rounded-lg grid place-items-center text-white font-bold"
+         style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">P</div>
+    <div><div class="font-semibold text-[15px]">Printoka — Packaging Boxes</div>
+      <div class="text-[12px] text-slate-500">Custom folding-carton boxes · 3D preview · instant price</div></div>
+    <a href="/" class="ml-auto text-[13px] text-indigo-600 hover:underline">← Other products</a>
+  </div>
+
+  <div class="grid grid-cols-12 gap-5">
+    <!-- gallery -->
+    <div class="col-span-4">
+      <input id="search" placeholder="Search box styles…" class="w-full card px-3 py-2 text-[13px] mb-3 outline-none" />
+      <div id="gallery" class="space-y-4 max-h-[78vh] overflow-auto pr-1"></div>
+    </div>
+
+    <!-- configurator -->
+    <div class="col-span-8">
+      <div id="empty" class="card p-10 text-center text-slate-400 text-[14px]">Select a box style to customize →</div>
+      <div id="config" class="hidden">
+        <div class="grid grid-cols-2 gap-5">
+          <div class="card p-3"><div id="viewer" style="width:100%;height:360px;border-radius:10px;overflow:hidden;background:#0b1020"></div>
+            <div class="text-[11px] text-slate-400 mt-2 text-center">Drag to rotate · scroll to zoom · dimensions to scale</div></div>
+          <div class="card p-4">
+            <div class="flex items-center gap-2 mb-1"><span id="cName" class="font-semibold text-[15px]"></span><span id="cCat" class="chip"></span></div>
+            <div id="cCode" class="text-[12px] text-slate-400 mb-4"></div>
+            <div class="space-y-4" id="dims"></div>
+            <div class="mt-4">
+              <label class="text-[12px] text-slate-500">Quantity</label>
+              <select id="qty" class="w-full card px-3 py-2 text-[13px] mt-1 outline-none">
+                <option>100</option><option>200</option><option selected>300</option><option>500</option>
+                <option>1000</option><option>2000</option><option>3000</option><option>5000</option></select>
+            </div>
+          </div>
+        </div>
+        <div class="card p-5 mt-5">
+          <div class="flex items-end justify-between mb-3">
+            <div><div class="text-[12px] text-slate-500">Printoka price (Cash)</div>
+              <div id="cash" class="text-[30px] font-bold text-slate-800">—</div>
+              <div id="unit" class="text-[12px] text-slate-500"></div></div>
+            <div class="text-right"><div class="text-[12px] text-slate-500">Est. weight</div>
+              <div id="weight" class="text-[15px] font-medium"></div>
+              <div id="method" class="text-[11px] text-slate-400 mt-1"></div></div>
+          </div>
+          <div id="tiers"></div>
+          <div id="note" class="text-[11px] text-slate-400 mt-3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+const $ = id => document.getElementById(id);
+let CAT = [], sel = null, three = null;
+
+async function load(){
+  CAT = await (await fetch("/api/printoka/packaging/catalogue")).json();
+  renderGallery("");
+}
+function renderGallery(q){
+  q = (q||"").toLowerCase();
+  const groups = {};
+  for(const b of CAT){
+    if(q && !(b.name.toLowerCase().includes(q)||b.code.toLowerCase().includes(q)||b.category.toLowerCase().includes(q))) continue;
+    (groups[b.category]=groups[b.category]||[]).push(b);
+  }
+  $("gallery").innerHTML = Object.entries(groups).map(([cat,boxes])=>`
+    <div><div class="text-[12px] font-semibold text-slate-500 mb-2">${cat} <span class="text-slate-400">(${boxes.length})</span></div>
+      <div class="grid grid-cols-2 gap-2">${boxes.map(b=>`
+        <div class="boxcard card p-2 ${sel&&sel.code===b.code?'sel':''}" data-code="${b.code}">
+          <div class="h-20 grid place-items-center bg-slate-50 rounded mb-1 overflow-hidden">
+            ${b.image?`<img src="${b.image}" class="max-h-20 object-contain" onerror="this.style.display='none'"/>`:''}</div>
+          <div class="text-[11px] font-medium leading-tight truncate" title="${b.name}">${b.name}</div>
+          <div class="text-[10px] text-slate-400">${b.code}</div>
+        </div>`).join("")}</div></div>`).join("");
+  document.querySelectorAll(".boxcard").forEach(el=>el.onclick=()=>select(el.dataset.code));
+}
+$("search").oninput = e => renderGallery(e.target.value);
+
+function select(code){
+  sel = CAT.find(b=>b.code===code); if(!sel) return;
+  document.querySelectorAll(".boxcard").forEach(e=>e.classList.toggle("sel", e.dataset.code===code));
+  $("empty").classList.add("hidden"); $("config").classList.remove("hidden");
+  $("cName").textContent = sel.name; $("cCat").textContent = sel.category; $("cCode").textContent = "Style "+sel.code;
+  const L0=Math.max(sel.limits.L,80), W0=Math.max(sel.limits.W,60), D0=Math.max(sel.limits.Dmin,40);
+  const lims = sel.limits;
+  $("dims").innerHTML = [
+    ["L","Length", lims.L, 400, L0],["W","Width", lims.W, 400, W0],
+    ["D","Depth/Height", lims.Dmin, lims.Dmax||400, D0]
+  ].map(([k,lab,mn,mx,v])=>`
+    <div><div class="flex justify-between text-[12px] text-slate-500"><span>${lab}</span>
+      <span><b id="v${k}">${v}</b> mm</span></div>
+      <input type="range" id="r${k}" min="${mn}" max="${mx}" value="${v}" class="w-full"/></div>`).join("");
+  ["L","W","D"].forEach(k=>$("r"+k).oninput=()=>{ $("v"+k).textContent=$("r"+k).value; updateBox(); quote(); });
+  $("qty").onchange = quote;
+  initThree(); updateBox(); quote();
+}
+
+// ---- 3D (P1: size-accurate carton; P2 folds the real dieline) ----
+function initThree(){
+  if(three){ three.dispose(); }
+  const el=$("viewer"); el.innerHTML="";
+  const w=el.clientWidth,h=el.clientHeight;
+  const scene=new THREE.Scene(); scene.background=new THREE.Color(0x0b1020);
+  const cam=new THREE.PerspectiveCamera(40,w/h,1,5000); cam.position.set(320,260,360);
+  const rnd=new THREE.WebGLRenderer({antialias:true}); rnd.setSize(w,h); rnd.setPixelRatio(devicePixelRatio); el.appendChild(rnd.domElement);
+  scene.add(new THREE.AmbientLight(0xffffff,.75));
+  const dl=new THREE.DirectionalLight(0xffffff,.9); dl.position.set(1,2,1.5); scene.add(dl);
+  const grid=new THREE.GridHelper(800,16,0x334155,0x1e293b); grid.position.y=-1; scene.add(grid);
+  const ctrl=new OrbitControls(cam,rnd.domElement); ctrl.enableDamping=true;
+  const mat=new THREE.MeshLambertMaterial({color:0xc9a66b});
+  const edge=new THREE.LineBasicMaterial({color:0x6b4f2a});
+  const group=new THREE.Group(); scene.add(group);
+  three={scene,cam,rnd,ctrl,group,mat,edge,
+    dispose(){ rnd.dispose(); el.innerHTML=""; }};
+  (function loop(){ if(three){ three.ctrl.update(); three.rnd.render(three.scene,three.cam); requestAnimationFrame(loop);} })();
+}
+function updateBox(){
+  if(!three) return;
+  const L=+$("rL").value, W=+$("rW").value, D=+$("rD").value;
+  three.group.clear();
+  const g=new THREE.BoxGeometry(L,D,W);  // L×W footprint, D height
+  const mesh=new THREE.Mesh(g,three.mat); three.group.add(mesh);
+  three.group.add(new THREE.LineSegments(new THREE.EdgesGeometry(g),three.edge));
+  // recentre camera distance to box size
+  const r=Math.max(L,W,D); three.cam.position.setLength(r*2.1+200);
+  three.group.position.y = D/2;
+}
+
+let seq=0;
+async function quote(){
+  if(!sel) return; const my=++seq;
+  const L=+$("rL").value,W=+$("rW").value,D=+$("rD").value,qty=+$("qty").value;
+  $("cash").textContent="…";
+  const q=await (await fetch(`/api/printoka/packaging/quote?box=${sel.code}&L=${L}&W=${W}&D=${D}&qty=${qty}`)).json();
+  if(my!==seq) return;
+  if(q.error){ $("cash").textContent="—"; $("note").textContent=q.error; return; }
+  $("cash").textContent="RM "+q.printoka_cash.toFixed(2);
+  $("unit").textContent="RM "+(q.printoka_cash/qty).toFixed(3)+" / box · "+qty+" pcs";
+  $("weight").textContent=q.weight_kg+" kg";
+  $("method").textContent=q.method;
+  $("note").textContent=q.note||"";
+  $("tiers").innerHTML=Object.entries(q.tiers).map(([t,v])=>
+    `<div class="tier"><span class="text-slate-500">${t}</span><span class="font-medium">RM ${v.toFixed(2)}</span></div>`).join("");
+}
+load();
+</script>
+</body>
+</html>

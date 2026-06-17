@@ -724,6 +724,48 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
             "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
 
 
+# ---------- Packaging Box (packmage, own section) ----------
+_PKG_CACHE: dict = {}
+
+
+def _pkg_load(name):
+    if name not in _PKG_CACHE:
+        f = UI_DIR.parent / "output" / name
+        _PKG_CACHE[name] = _json.loads(f.read_text()) if f.exists() else {}
+    return _PKG_CACHE[name]
+
+
+@app.get("/api/printoka/packaging/catalogue")
+def packaging_catalogue():
+    return _pkg_load("packaging_catalogue_ui.json") or []
+
+
+@app.get("/api/printoka/packaging/quote")
+def packaging_quote(box: str = Query(...), L: float = Query(...), W: float = Query(...),
+                    D: float = Query(...), qty: int = Query(...)):
+    from . import packaging_engine as PE
+    try:
+        cash = PE.cash_price(box, float(L), float(W), float(D), int(qty))
+        wt = PE.weight_kg(box, float(L), float(W), float(D), int(qty))
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": f"no price model for box {box}"}, status_code=404)
+    return {"config": {"box": box, "L": L, "W": W, "D": D, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (area-law fit)",
+            "note": "Folding-carton box; price scales with dieline board area and quantity.",
+            "tiers": PE.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+@app.get("/api/printoka/packaging/dieline")
+def packaging_dieline(box: str = Query(...)):
+    """Dieline geometry (LineExp segments + panel dims) for the 3D preview."""
+    dl = _pkg_load("packaging_dielines.json").get(box)
+    if not dl:
+        return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
+    return dl
+
+
 # ---------- Bill-Book (Litho NCR, id 24) ----------
 @app.get("/api/printoka/billbook/options")
 def billbook_options(product: int = Query(24)):
@@ -867,3 +909,8 @@ def standalone():
 @app.get("/dashboard")
 def dashboard():
     return FileResponse(UI_DIR / "dashboard.html")
+
+
+@app.get("/packaging")
+def packaging_page():
+    return FileResponse(UI_DIR / "packaging.html")

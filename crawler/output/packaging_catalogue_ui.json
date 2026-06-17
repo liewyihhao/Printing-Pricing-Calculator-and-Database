@@ -1,0 +1,806 @@
+[
+{
+"code": "0930",
+"name": "Divider Boxes",
+"category": "Divider",
+"image": "https://packaging.excard.com.my/Content/boximg/0930-M.png",
+"limits": {
+"L": 50,
+"W": 1,
+"Dmin": 10,
+"Dmax": null
+}
+},
+{
+"code": "M013",
+"name": "Divider Box",
+"category": "Divider",
+"image": "https://packaging.excard.com.my/Content/boximg/M013-M.png",
+"limits": {
+"L": 50,
+"W": 20,
+"Dmin": 1,
+"Dmax": null
+}
+},
+{
+"code": "M014",
+"name": "Divider Box",
+"category": "Divider",
+"image": "https://packaging.excard.com.my/Content/boximg/M014-M.png",
+"limits": {
+"L": 50,
+"W": 20,
+"Dmin": 1,
+"Dmax": null
+}
+},
+{
+"code": "M015",
+"name": "Divider Box",
+"category": "Divider",
+"image": "https://packaging.excard.com.my/Content/boximg/M015-M.png",
+"limits": {
+"L": 50,
+"W": 20,
+"Dmin": 1,
+"Dmax": null
+}
+},
+{
+"code": "M016",
+"name": "Divider Boxes",
+"category": "Divider",
+"image": "https://packaging.excard.com.my/Content/boximg/M016-M.png",
+"limits": {
+"L": 50,
+"W": 20,
+"Dmin": 1,
+"Dmax": null
+}
+},
+{
+"code": "G012",
+"name": "Gift Card Envelope",
+"category": "Folder & Envelope",
+"image": "https://packaging.excard.com.my/Content/boximg/G012-M.png",
+"limits": {
+"L": 100,
+"W": 50,
+"Dmin": 1,
+"Dmax": null
+}
+},
+{
+"code": "K003",
+"name": "Tongue Lock",
+"category": "Gift / Display",
+"image": "https://packaging.excard.com.my/Content/boximg/K003-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "K006",
+"name": "Top with Dual Lock",
+"category": "Gift / Display",
+"image": "https://packaging.excard.com.my/Content/boximg/K006-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "K016",
+"name": "K016",
+"category": "Gift / Display",
+"image": "https://packaging.excard.com.my/Content/boximg/K016-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "K016X",
+"name": "Gable with Handle",
+"category": "Gift / Display",
+"image": "https://packaging.excard.com.my/Content/boximg/K016X-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "L021",
+"name": "L021",
+"category": "Gift / Display",
+"image": "https://packaging.excard.com.my/Content/boximg/L021-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "L044",
+"name": "Triangular Cone Box",
+"category": "Gift / Display",
+"image": "https://packaging.excard.com.my/Content/boximg/L044-M.png",
+"limits": {
+"L": 50,
+"W": 1,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "L069",
+"name": "L069",
+"category": "Gift / Display",
+"image": "https://packaging.excard.com.my/Content/boximg/L069-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "L069A",
+"name": "Self Lock Box",
+"category": "Gift / Display",
+"image": "https://packaging.excard.com.my/Content/boximg/L069A-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "L082",
+"name": "Triangle Box",
+"category": "Gift / Display",
+"image": "https://packaging.excard.com.my/Content/boximg/L082-M.png",
+"limits": {
+"L": 50,
+"W": 1,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "E005X",
+"name": "Roll End Tuck Front (RETF) Box",
+"category": "Hinged Lid / RETF",
+"image": "https://packaging.excard.com.my/Content/boximg/E005X-M.png",
+"limits": {
+"L": 60,
+"W": 60,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "E005Y",
+"name": "E005Y",
+"category": "Hinged Lid / RETF",
+"image": "https://packaging.excard.com.my/Content/boximg/E005Y-M.png",
+"limits": {
+"L": 60,
+"W": 60,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "E013X",
+"name": "E013X",
+"category": "Hinged Lid / RETF",
+"image": "https://packaging.excard.com.my/Content/boximg/E013X-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "E028A",
+"name": "Roll End Tuck Front (RETF) Box",
+"category": "Hinged Lid / RETF",
+"image": "https://packaging.excard.com.my/Content/boximg/E028A-M.png",
+"limits": {
+"L": 60,
+"W": 60,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "E043A",
+"name": "E043A",
+"category": "Hinged Lid / RETF",
+"image": "https://packaging.excard.com.my/Content/boximg/E043A-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "E049",
+"name": "Roll End Tuck Front (RETF) Box",
+"category": "Hinged Lid / RETF",
+"image": "https://packaging.excard.com.my/Content/boximg/E049-M.png",
+"limits": {
+"L": 60,
+"W": 60,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "Z039A",
+"name": "Roll End Tuck Front (RETF) Box",
+"category": "Hinged Lid / RETF",
+"image": "https://packaging.excard.com.my/Content/boximg/Z039A-M.png",
+"limits": {
+"L": 60,
+"W": 60,
+"Dmin": 60,
+"Dmax": null
+}
+},
+{
+"code": "M061",
+"name": "Inner Holding Box",
+"category": "Inner Holding",
+"image": "https://packaging.excard.com.my/Content/boximg/M061-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 10,
+"Dmax": null
+}
+},
+{
+"code": "M062",
+"name": "Inner Holding Box",
+"category": "Inner Holding",
+"image": "https://packaging.excard.com.my/Content/boximg/M062-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 10,
+"Dmax": null
+}
+},
+{
+"code": "M063",
+"name": "Inner Holding Box",
+"category": "Inner Holding",
+"image": "https://packaging.excard.com.my/Content/boximg/M063-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 10,
+"Dmax": null
+}
+},
+{
+"code": "M064",
+"name": "Inner Holding Box",
+"category": "Inner Holding",
+"image": "https://packaging.excard.com.my/Content/boximg/M064-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 10,
+"Dmax": null
+}
+},
+{
+"code": "B044X",
+"name": "Semi Auto Bottom Lock, Tongue Lock",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/B044X-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "B048A",
+"name": "Auto Bottom Lock, Tongue Lock",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/B048A-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "C001A",
+"name": "Semi Auto Bottom Lock Box",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001A-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "C001AA",
+"name": "Semi Auto Bottom Lock",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001AA-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "C001AB",
+"name": "Semi Auto Bottom Lock",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001AB-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "C001AC",
+"name": "Semi Auto Bottom Lock (Window)",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001AC-M.png",
+"limits": {
+"L": 65,
+"W": 50,
+"Dmin": 100,
+"Dmax": null
+}
+},
+{
+"code": "C001AD",
+"name": "Auto Bottom Lock",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001AD-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "C001AE",
+"name": "Auto Bottom Lock (Window)",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001AE-M.png",
+"limits": {
+"L": 65,
+"W": 50,
+"Dmin": 100,
+"Dmax": null
+}
+},
+{
+"code": "C001AX",
+"name": "C001AX",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001AX-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "C001AY",
+"name": "C001AY",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001AY-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "C001B",
+"name": "Semi Auto Bottom Lock, Window Patching",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001B-M.png",
+"limits": {
+"L": 65,
+"W": 50,
+"Dmin": 100,
+"Dmax": null
+}
+},
+{
+"code": "C001BX",
+"name": "C001BX",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001BX-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "C001EX",
+"name": "C001EX",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001EX-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "C001IX",
+"name": "Semi Auto Bottom Lock, Sombrero Hole",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001IX-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "C001JX",
+"name": "Semi Auto Bottom Lock, Window (Hanging)",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001JX-M.png",
+"limits": {
+"L": 65,
+"W": 50,
+"Dmin": 100,
+"Dmax": null
+}
+},
+{
+"code": "C001M",
+"name": "Auto Bottom Lock Box",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001M-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "C001N",
+"name": "Auto Bottom Lock, Window Patching",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001N-M.png",
+"limits": {
+"L": 65,
+"W": 50,
+"Dmin": 100,
+"Dmax": null
+}
+},
+{
+"code": "C001NX",
+"name": "C001NX",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001NX-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "C001QX",
+"name": "Auto Bottom Lock, Sombrero Hole",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001QX-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "C001RX",
+"name": "Auto Bottom Lock, Window (Hanging)",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/C001RX-M.png",
+"limits": {
+"L": 65,
+"W": 50,
+"Dmin": 100,
+"Dmax": null
+}
+},
+{
+"code": "K024",
+"name": "Semi Auto Bottom Lock Box",
+"category": "Lock Bottom",
+"image": "https://packaging.excard.com.my/Content/boximg/K024-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "B052A",
+"name": "Open Top Box with Hole Punch",
+"category": "Other",
+"image": "https://packaging.excard.com.my/Content/boximg/B052A-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "C017",
+"name": "C017",
+"category": "Other",
+"image": "https://packaging.excard.com.my/Content/boximg/C017-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "T001",
+"name": "T001",
+"category": "Other",
+"image": "https://packaging.excard.com.my/Content/boximg/T001-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "A001",
+"name": "Reverse Tuck End (RTE) Box",
+"category": "Reverse Tuck (RTE)",
+"image": "https://packaging.excard.com.my/Content/boximg/A001-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 50,
+"Dmax": 300
+}
+},
+{
+"code": "A001A",
+"name": "RTE Box, Window Patching",
+"category": "Reverse Tuck (RTE)",
+"image": "https://packaging.excard.com.my/Content/boximg/A001A-M.png",
+"limits": {
+"L": 65,
+"W": 20,
+"Dmin": 100,
+"Dmax": null
+}
+},
+{
+"code": "A001X",
+"name": "Reverse Tuck End (RTE) Box",
+"category": "Reverse Tuck (RTE)",
+"image": "https://packaging.excard.com.my/Content/boximg/A001X-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 50,
+"Dmax": 300
+}
+},
+{
+"code": "B038",
+"name": "RTE Box, Tongue Lock",
+"category": "Reverse Tuck (RTE)",
+"image": "https://packaging.excard.com.my/Content/boximg/B038-M.png",
+"limits": {
+"L": 50,
+"W": 20,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "B040A",
+"name": "RTE Box (Hanging)",
+"category": "Reverse Tuck (RTE)",
+"image": "https://packaging.excard.com.my/Content/boximg/B040A-M.png",
+"limits": {
+"L": 50,
+"W": 20,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "B042A",
+"name": "RTE Box, Tongue Lock (Hanging)",
+"category": "Reverse Tuck (RTE)",
+"image": "https://packaging.excard.com.my/Content/boximg/B042A-M.png",
+"limits": {
+"L": 50,
+"W": 20,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "J023A",
+"name": "Packaging Sleeve",
+"category": "Sleeve",
+"image": "https://packaging.excard.com.my/Content/boximg/J023A-M.png",
+"limits": {
+"L": 30,
+"W": 30,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "A002AX",
+"name": "STE Box, Window Patching",
+"category": "Straight Tuck (STE)",
+"image": "https://packaging.excard.com.my/Content/boximg/A002AX-M.png",
+"limits": {
+"L": 65,
+"W": 20,
+"Dmin": 100,
+"Dmax": null
+}
+},
+{
+"code": "A002BX",
+"name": "STE Box, Tongue Lock",
+"category": "Straight Tuck (STE)",
+"image": "https://packaging.excard.com.my/Content/boximg/A002BX-M.png",
+"limits": {
+"L": 50,
+"W": 20,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "A002CX",
+"name": "STE Box, Window Patching",
+"category": "Straight Tuck (STE)",
+"image": "https://packaging.excard.com.my/Content/boximg/A002CX-M.png",
+"limits": {
+"L": 65,
+"W": 20,
+"Dmin": 100,
+"Dmax": null
+}
+},
+{
+"code": "A002FX",
+"name": "STE Box, Tongue Lock (Hanging)",
+"category": "Straight Tuck (STE)",
+"image": "https://packaging.excard.com.my/Content/boximg/A002FX-M.png",
+"limits": {
+"L": 50,
+"W": 20,
+"Dmin": 50,
+"Dmax": null
+}
+},
+{
+"code": "A002X",
+"name": "Straight Tuck End (STE) Box",
+"category": "Straight Tuck (STE)",
+"image": "https://packaging.excard.com.my/Content/boximg/A002X-M.png",
+"limits": {
+"L": 20,
+"W": 20,
+"Dmin": 50,
+"Dmax": 300
+}
+},
+{
+"code": "B037",
+"name": "STE Box, Tongue Lock (Hanging + Window)",
+"category": "Straight Tuck (STE)",
+"image": "https://packaging.excard.com.my/Content/boximg/B037-M.png",
+"limits": {
+"L": 65,
+"W": 20,
+"Dmin": 100,
+"Dmax": null
+}
+},
+{
+"code": "D007A",
+"name": "Friction Box with Base Only",
+"category": "Trays & Top-Base",
+"image": "https://packaging.excard.com.my/Content/boximg/D007A-M.png",
+"limits": {
+"L": 60,
+"W": 60,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "D030",
+"name": "Friction Box with Lid Only",
+"category": "Trays & Top-Base",
+"image": "https://packaging.excard.com.my/Content/boximg/D030-M.png",
+"limits": {
+"L": 60,
+"W": 60,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "D040A",
+"name": "Friction Base and Lid Gift Box",
+"category": "Trays & Top-Base",
+"image": "https://packaging.excard.com.my/Content/boximg/D040A-M.png",
+"limits": {
+"L": 60,
+"W": 60,
+"Dmin": 20,
+"Dmax": null
+}
+},
+{
+"code": "D052A",
+"name": "Inner Holding Box",
+"category": "Trays & Top-Base",
+"image": "https://packaging.excard.com.my/Content/boximg/D052A-M.png",
+"limits": {
+"L": 50,
+"W": 50,
+"Dmin": 10,
+"Dmax": null
+}
+}
+]
