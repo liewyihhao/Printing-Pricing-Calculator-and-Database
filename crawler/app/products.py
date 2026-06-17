@@ -31,6 +31,8 @@ PRODUCTS: dict[int, ProductTarget] = {
                       "https://www.excard.com.my/spec/Litho/Booklet"),
     37: ProductTarget(37, "Booklet", "Digital",
                       "https://www.excard.com.my/spec/Digital/Booklet"),
+    24: ProductTarget(24, "Bill-Book", "Litho",   # internal id (NCR carbonless book/pad)
+                      "https://www.excard.com.my/spec/Litho/Bill-Book"),
 }
 
 

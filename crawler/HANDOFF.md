@@ -4,6 +4,24 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **NEW PRODUCT: Bill-Book — Litho (NCR carbonless), id 24.** Order page
+  `www.excard.com.my/spec/Litho/Bill-Book`. Cascade learned: PackForm(Book/Pad) ×
+  Paper(NCR) × Size(~37) × PaperMaterial(NCR 2–6 Layers/plies) × per-ply tint dropdowns
+  (ddlLayer1..N — required for 3+ ply, price-neutral) × PrintColorSide(1C/2C/4C front,
+  both, .../back) × Sets-per-book(ddlSets 50/100 — **2-ply only**; 3+ ply count sets
+  directly via comboQty) × comboQty(books) + Numbering(free) + Hole-punch(+~RM0.36/book) +
+  Binding orientation (price-neutral). KEY GOTCHAS: ddlSets only exists for 2-ply; 3+ ply
+  needs ddlLayer1..N set before pricing; an ASP.NET "Loading In Progress" overlay must
+  clear before reading price (sampler `_safe_read` waits it out). Engine
+  `app/billbook_engine.py`: per-config **quantity curve keyed (layers|colour|sets)** at A4
+  (log-interp over books) × **size factor** (per-size vs A4 from a size scan, area-interp
+  for unsampled sizes) × Pad factor (0.988) + punch delta; numbering free. Price is ~linear
+  in plies (~+RM404/ply at A4 q100). Sampler `app/billbook_sampler.py` (modes: run; full
+  comboQty ladder; resumable, overlay-hardened). Wired: products.py(24), PRODUCTS_UI,
+  FIELD_SCHEMAS["billbook"], _family, `/api/printoka/billbook/{options,quote}`, standalone
+  (billbookPrice JS == Python verified). **Full comboQty ladder captured for ALL plies
+  (2–6) — exact at every orderable quantity; held-out custom-qty LOO median 2.5%.** Samples
+  `output/billbook_samples.json` (360 pts, 24 configs), params `output/billbook_params.json`.
 - **#18 PARITY MATRIX (side-by-side vs each Excard order page).** Verified each product's
   UI fields against its live Excard order-page controls:
   - **Business Card (1)** — cardType(Std/Thin Fold/Fat Fold/Custom Die-Cut/Plastic), size

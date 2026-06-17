@@ -226,6 +226,38 @@ function stickerLaminationCost(opt,h,w,qty){
   if(x<=qs[0])return curve[String(qs[0])]; if(x>=qs[qs.length-1])return curve[String(qs[qs.length-1])];
   for(let i=1;i<qs.length;i++) if(x<=qs[i]){const t=(x-qs[i-1])/(qs[i]-qs[i-1]);return curve[String(qs[i-1])]+t*(curve[String(qs[i])]-curve[String(qs[i-1])]);} return 0;
 }
+function billbookArea(size, sizeMm){
+  if(sizeMm[size]) return sizeMm[size][0]*sizeMm[size][1];
+  const m=(size||"").match(/(\d+)\s*mm\s*x\s*(\d+)\s*mm/i) || (size||"").match(/(\d+)\D+(\d+)/);
+  return m ? (+m[1])*(+m[2]) : 0;
+}
+function billbookSizeFactor(size, P){
+  const sf=P.size_factors||{}; if(sf[size]!=null) return sf[size];
+  const area=billbookArea(size,P.size_mm||{});
+  const pts=Object.keys(sf).map(s=>[billbookArea(s,P.size_mm||{}),sf[s]]).filter(p=>p[0]).sort((a,b)=>a[0]-b[0]);
+  if(!pts.length||!area) return 1.0;
+  if(area<=pts[0][0]) return pts[0][1];
+  if(area>=pts[pts.length-1][0]) return pts[pts.length-1][1];
+  for(let i=1;i<pts.length;i++){ if(area<=pts[i][0]){
+    const t=(area-pts[i-1][0])/(pts[i][0]-pts[i-1][0]); return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]); } }
+  return 1.0;
+}
+function billbookPrice(P, V, qty){
+  const cv=P.curves||{}; const nLayers=parseInt((V.layers||"").match(/\d+/)||"2");
+  const setsEff = nLayers===2 ? (V.sets||"50") : "-";
+  let key=`${V.layers}|${V.colour}|${setsEff}`;
+  if(!cv[key]){ const alt=`${V.layers}|${V.colour}|${nLayers>=3?"-":"50"}`;
+    key = cv[alt]?alt : Object.keys(cv).find(k=>k.startsWith(`${V.layers}|${V.colour}|`)); }
+  if(!key||!cv[key]) return {cash:0,wt:0};
+  let base=interpLogPts(Object.keys(cv[key]).map(k=>[+k,cv[key][k]]),qty)*billbookSizeFactor(V.size,P);
+  if(V.packform==="Pad") base*=(P.pad_factor||0.988);
+  if(V.punch==="Yes") base += (P.punch_per_book||0.358)*qty;
+  const mm=(P.size_mm||{})[V.size]||[210,297];
+  const setsN = setsEff==="-" ? 50 : parseInt(setsEff);
+  const sheets=qty*setsN*nLayers;
+  const wt=Math.round(mm[0]*mm[1]/1e6*(P.ncr_gsm||55)*sheets/1000*(P.weight_factor||WF)*1000)/1000;
+  return {cash:base, wt};
+}
 function multidielinePrice(sheetSize, sheetQty, paper, colour){
   const MD=DATA.multidieline||{}; const base=(MD.base||{});
   const curve=base[sheetSize]||base["A3+"]||{};
@@ -350,6 +382,11 @@ function localQuote(prod, V, qty){
     wt=weightBooklet(V.size,V.page,V.ordertype,V.binding,V.cover,V.content,qty);
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost: extra, tiers: tiers(cash), weight_kg: wt, method:"formula",
       note:(V.hot_stamping&&V.hot_stamping!=="Not Required")?"Hot stamping block charge quoted separately.":null }; }
+  else if(prod.engine==="billbook"){
+    const r=billbookPrice(P, V, qty);
+    return { printoka_cash: Math.round(r.cash*100)/100, finishing_cost:0, tiers: tiers(r.cash),
+      weight_kg: r.wt, method:"formula (per-config curve)",
+      note:"Numbering is free; binding orientation is price-neutral. Quantity = number of books/pads." }; }
   else if(prod.engine==="sticker"){
     const pp=P.params||P;
     const sMult = prod.stickerMethod==="digital" ? pkgMult : 1;  // N-in-1 = xN (digital, verified)

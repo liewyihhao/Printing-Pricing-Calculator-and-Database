@@ -53,7 +53,7 @@ def loose_cascade():
 def accuracy():
     # MEASURED median % vs Excard (output/audit_report.json). Curve products are
     # exact at Excard's order quantities; this is the custom-quantity interp error.
-    return {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 6.3, 61: 10.5}
+    return {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 6.3, 61: 10.5, 24: 2.5}
 
 
 def build_data():
@@ -142,9 +142,33 @@ def build_data():
         {"key": "width", "label": "Width (mm) — Standard Shape", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
         {"key": "diameter", "label": "Diameter (mm) — Round only", "type": "number", "optional": True, "min": 10, "max": 300, "depends": []},
     ]
+    BILLBOOK_SIZES = ["145mm x 210mm", "A4 (210mm x 297mm)", "B5 (176mm x 250mm)", "90mm x 140mm",
+                  "90mm x 177mm", "95mm x 210mm", "95mm x 225mm", "105mm x 145mm", "105mm x 175mm",
+                  "107mm x 190mm", "110mm x 210mm", "120mm x 210mm", "120mm x 230mm", "125mm x 175mm",
+                  "135mm x 210mm", "145mm x 148mm", "145mm x 190mm", "148mm x 190mm", "148mm x 291mm",
+                  "160mm x 240mm", "165mm x 210mm", "170mm x 190mm", "173mm x 206mm", "180mm x 280mm",
+                  "190mm x 210mm", "190mm x 270mm", "190mm x 290mm", "190mm x 297mm", "192mm x 268mm",
+                  "194mm x 205mm", "206mm x 240mm", "206mm x 330mm", "210mm x 270mm", "210mm x 291mm",
+                  "B4 (250mm x 353mm)", "291mm x 420mm", "F3 (330mm x 420mm)"]
+    BILLBOOK_FIELDS = [
+        {"key": "packform", "label": "Form", "addon": True, "depends": [], "options": ["Book", "Pad"]},
+        {"key": "size", "label": "Size", "addon": True, "depends": [], "options": BILLBOOK_SIZES},
+        {"key": "layers", "label": "Plies (NCR layers)", "addon": True, "depends": [],
+         "options": ["NCR - 2 Layers", "NCR - 3 Layers", "NCR - 4 Layers", "NCR - 5 Layers", "NCR - 6 Layer"]},
+        {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [],
+         "options": ["1C (Front)", "2C (Front)", "4C (Front)", "1C (Both)", "2C (Front) / 1C (Back)", "4C (Front) / 1C (Back)"]},
+        {"key": "sets", "label": "Sets per book (2-ply only)", "addon": True, "depends": [], "options": ["50", "100"]},
+        {"key": "binding", "label": "Binding location", "addon": True, "depends": [],
+         "options": ["Portrait - Left side binding", "Portrait - Top side binding",
+                     "Landscape - Left side binding", "Landscape - Top side binding"]},
+        {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+        {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+    ]
     products = [
         {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",
          "accuracy": acc.get(1), "fields": BIZCARD_FIELDS},
+        {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)", "engine": "billbook",
+         "optsrc": "none", "accuracy": acc.get(24), "fields": BILLBOOK_FIELDS},
         {"id": 60, "name": "Label Sticker — Digital", "engine": "sticker", "optsrc": "none",
          "accuracy": acc.get(60), "fields": STICKER_D_FIELDS, "stickerMethod": "digital"},
         {"id": 61, "name": "Label Sticker — Letterpress (Hot Stamping)", "engine": "sticker", "optsrc": "none",
@@ -168,6 +192,7 @@ def build_data():
             "bizcard": _load("bizcard_params.json"),
             "sticker_digital": _load("sticker_params_digital.json"),
             "sticker_letterpress": _load("sticker_params_letterpress.json"),
+            "billbook": _load("billbook_params.json", {"curves": {}, "size_factors": {}, "size_mm": {}}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -190,7 +215,8 @@ def build_data():
             "bizcard": bizcard_ct,
         },
         "engineByProduct": {1: "bizcard", 21: "litho", 50: "digital", 19: "booklet19",
-                            37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress"},
+                            37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
+                            24: "billbook"},
     }
 
 

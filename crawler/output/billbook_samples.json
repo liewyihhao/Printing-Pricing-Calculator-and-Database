@@ -1,0 +1,2995 @@
+{
+"core": [
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 10,
+"cash": 157.08
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 20,
+"cash": 220.61
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 50,
+"cash": 430.82
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 100,
+"cash": 778.47
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 200,
+"cash": 1488.8
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 500,
+"cash": 3572.42
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 1000,
+"cash": 7040.88
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 10,
+"cash": 215.99
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 20,
+"cash": 345.35
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 50,
+"cash": 759.99
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 100,
+"cash": 1452.99
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 200,
+"cash": 2842.46
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 500,
+"cash": 6954.26
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 1000,
+"cash": 13805.72
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 10,
+"cash": 492.03
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 20,
+"cash": 554.4
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 50,
+"cash": 779.63
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 100,
+"cash": 1248.56
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 200,
+"cash": 2203.74
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 500,
+"cash": 4840.61
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 1000,
+"cash": 9243.47
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 10,
+"cash": 550.94
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 20,
+"cash": 688.38
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 50,
+"cash": 1228.92
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 100,
+"cash": 2169.09
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 200,
+"cash": 3928.16
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 500,
+"cash": 9154.53
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 1000,
+"cash": 17866.7
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 10,
+"cash": 234.47
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 20,
+"cash": 297.99
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 50,
+"cash": 515.13
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 100,
+"cash": 861.63
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 200,
+"cash": 1571.96
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 500,
+"cash": 3656.73
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 1000,
+"cash": 7126.35
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 10,
+"cash": 292.22
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 20,
+"cash": 428.51
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 50,
+"cash": 844.31
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 100,
+"cash": 1536.15
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 200,
+"cash": 2926.77
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 500,
+"cash": 7038.57
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 1000,
+"cash": 13891.19
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 10,
+"cash": 231.0
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 20,
+"cash": 292.22
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 50,
+"cash": 520.91
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 100,
+"cash": 893.97
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 200,
+"cash": 1674.75
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 500,
+"cash": 3962.81
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 1000,
+"cash": 7774.31
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 10,
+"cash": 289.91
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 20,
+"cash": 418.11
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 50,
+"cash": 876.65
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 100,
+"cash": 1641.26
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 200,
+"cash": 3167.01
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 500,
+"cash": 7686.53
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 1000,
+"cash": 15225.21
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 195.2
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 300.3
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 628.32
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 1191.96
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 2298.45
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 5601.75
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 11083.38
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 528.99
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 642.18
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 1040.66
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 1820.28
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 3198.2
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 7359.66
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 14213.43
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 10,
+"cash": 272.58
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 20,
+"cash": 384.62
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 50,
+"cash": 711.48
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 100,
+"cash": 1276.28
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 200,
+"cash": 2382.77
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 500,
+"cash": 5686.07
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 1000,
+"cash": 11170.01
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 270.27
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 375.38
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 732.27
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 1351.35
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 2552.55
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 6171.17
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 12158.69
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 231.0
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 373.07
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 828.14
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 1585.82
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 3108.11
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 7616.07
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 15128.19
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 564.8
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 716.1
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 1298.22
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 2303.07
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 4196.12
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 9817.5
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 19189.17
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 10,
+"cash": 307.23
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 20,
+"cash": 456.23
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 50,
+"cash": 912.45
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 100,
+"cash": 1670.13
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 200,
+"cash": 3192.42
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 500,
+"cash": 7701.54
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 1000,
+"cash": 15214.82
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 303.77
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 446.99
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 945.95
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 1772.93
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 3432.66
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 8350.65
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 16546.53
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 272.58
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 460.85
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 1040.66
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 2001.62
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 3913.14
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 9643.1
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 19166.07
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 617.93
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 813.12
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 1619.31
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 2827.44
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 5188.26
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 12330.78
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 24157.98
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 10,
+"cash": 359.21
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 20,
+"cash": 544.01
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 50,
+"cash": 1127.28
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 100,
+"cash": 2085.93
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 200,
+"cash": 4000.92
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 500,
+"cash": 9729.72
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 1000,
+"cash": 19252.7
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 348.81
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 550.94
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 1187.34
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 2226.84
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 4307.0
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 10556.7
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 20928.6
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 310.7
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 533.61
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 1240.47
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 2395.47
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 4723.95
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 11653.95
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 23207.42
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 30,
+"cash": 289.91
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 40,
+"cash": 352.28
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 60,
+"cash": 493.19
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 70,
+"cash": 576.35
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 80,
+"cash": 635.25
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 90,
+"cash": 717.26
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 150,
+"cash": 1142.3
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "50",
+"qty": 300,
+"cash": 2184.11
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 30,
+"cash": 481.64
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 40,
+"cash": 621.39
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 60,
+"cash": 899.75
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 70,
+"cash": 1054.52
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 80,
+"cash": 1176.95
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 90,
+"cash": 1316.7
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 150,
+"cash": 2149.46
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 300,
+"cash": 4214.6
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 30,
+"cash": 631.79
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 40,
+"cash": 694.16
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 60,
+"cash": 843.15
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 70,
+"cash": 985.22
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 80,
+"cash": 1047.59
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 90,
+"cash": 1185.03
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 150,
+"cash": 1768.31
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "50",
+"qty": 300,
+"cash": 3083.85
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 30,
+"cash": 831.6
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 40,
+"cash": 1033.73
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 60,
+"cash": 1425.27
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 70,
+"cash": 1682.84
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 80,
+"cash": 1801.8
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 90,
+"cash": 1988.91
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 150,
+"cash": 3049.2
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "4C (Front)",
+"sets": "100",
+"qty": 300,
+"cash": 5669.9
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 30,
+"cash": 374.22
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 40,
+"cash": 436.59
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 60,
+"cash": 577.5
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 70,
+"cash": 659.51
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 80,
+"cash": 719.57
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 90,
+"cash": 800.42
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 150,
+"cash": 1226.61
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "50",
+"qty": 300,
+"cash": 2268.42
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 30,
+"cash": 565.95
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 40,
+"cash": 705.71
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 60,
+"cash": 984.06
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 70,
+"cash": 1138.83
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 80,
+"cash": 1261.26
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 90,
+"cash": 1401.02
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 150,
+"cash": 2232.62
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Both)",
+"sets": "100",
+"qty": 300,
+"cash": 4298.91
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 30,
+"cash": 366.14
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 40,
+"cash": 426.2
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 60,
+"cash": 582.12
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 70,
+"cash": 677.99
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 80,
+"cash": 739.2
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 90,
+"cash": 833.91
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 150,
+"cash": 1302.84
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "50",
+"qty": 300,
+"cash": 2437.05
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 30,
+"cash": 570.57
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 40,
+"cash": 724.19
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 60,
+"cash": 1031.42
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 70,
+"cash": 1213.91
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 80,
+"cash": 1334.03
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 90,
+"cash": 1488.8
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 150,
+"cash": 2401.25
+},
+{
+"size": "A4",
+"layers": "NCR - 2 Layers",
+"colour": "2C (Front)",
+"sets": "100",
+"qty": 300,
+"cash": 4673.13
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 415.8
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 513.98
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 746.13
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 861.63
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 960.96
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 1075.31
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 1752.14
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 3404.94
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 765.77
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 862.79
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 1215.06
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 1389.47
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 1486.49
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 1655.12
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 2543.31
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 4603.83
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 30,
+"cash": 500.12
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 40,
+"cash": 597.14
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 60,
+"cash": 830.45
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 70,
+"cash": 945.95
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 80,
+"cash": 1045.28
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 90,
+"cash": 1159.62
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 150,
+"cash": 1837.61
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 300,
+"cash": 3489.26
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 505.89
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 604.07
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 862.79
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 990.99
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 1092.63
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 1221.99
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 1966.97
+},
+{
+"size": "A4",
+"layers": "NCR - 3 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 3769.92
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 523.22
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 676.83
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 981.75
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 1150.38
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 1282.05
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 1435.67
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 2346.96
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 4609.61
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 873.18
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 1089.17
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 1507.28
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 1777.55
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 1911.53
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 2107.88
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 3250.17
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 6069.53
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 30,
+"cash": 607.53
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 40,
+"cash": 759.99
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 60,
+"cash": 1064.91
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 70,
+"cash": 1234.7
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 80,
+"cash": 1366.37
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 90,
+"cash": 1519.98
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 150,
+"cash": 2431.28
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 300,
+"cash": 4693.92
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 613.31
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 779.63
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 1111.11
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 1308.62
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 1442.6
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 1610.07
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 2602.22
+},
+{
+"size": "A4",
+"layers": "NCR - 4 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 5069.3
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 647.96
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 836.22
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 1228.92
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 1418.34
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 1605.45
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 1812.2
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 2957.96
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 5831.6
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 1061.45
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 1308.62
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 1858.4
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 2091.71
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 2322.71
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 2602.22
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 4007.85
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 7588.35
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 30,
+"cash": 733.43
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 40,
+"cash": 920.54
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 60,
+"cash": 1313.24
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 70,
+"cash": 1502.66
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 80,
+"cash": 1688.61
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 90,
+"cash": 1897.67
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 150,
+"cash": 3042.27
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 300,
+"cash": 5915.91
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 753.06
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 955.19
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 1389.47
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 1591.59
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 1793.72
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 2025.87
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 3267.5
+},
+{
+"size": "A4",
+"layers": "NCR - 5 Layers",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 6399.86
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 773.85
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 999.08
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 1464.54
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 1704.78
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 1927.7
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 2171.4
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 3567.8
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 7033.95
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 653.73
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 884.73
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 1248.56
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 1528.07
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 1869.95
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 2137.91
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 2457.84
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 2721.18
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 3036.5
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 3296.37
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 4769.0
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 6183.87
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 9051.74
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 14785.16
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "4C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 29129.1
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 10,
+"cash": 396.17
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 20,
+"cash": 617.93
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 30,
+"cash": 859.32
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 40,
+"cash": 1083.39
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 50,
+"cash": 1324.79
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 60,
+"cash": 1547.7
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 70,
+"cash": 1791.41
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 80,
+"cash": 2016.63
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 90,
+"cash": 2255.72
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 100,
+"cash": 2480.94
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 150,
+"cash": 3652.11
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 200,
+"cash": 4808.27
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 300,
+"cash": 7120.58
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 500,
+"cash": 11739.42
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "1C (Both)",
+"sets": "-",
+"qty": 1000,
+"cash": 23292.89
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 10,
+"cash": 386.93
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 20,
+"cash": 621.39
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 30,
+"cash": 892.82
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 40,
+"cash": 1129.59
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 50,
+"cash": 1401.02
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 60,
+"cash": 1637.79
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 70,
+"cash": 1905.75
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 80,
+"cash": 2144.84
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 90,
+"cash": 2410.49
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 100,
+"cash": 2650.73
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 150,
+"cash": 3932.78
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 200,
+"cash": 5182.49
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 300,
+"cash": 7701.54
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 500,
+"cash": 12730.41
+},
+{
+"size": "A4",
+"layers": "NCR - 6 Layer",
+"colour": "2C (Front)",
+"sets": "-",
+"qty": 1000,
+"cash": 25310.67
+}
+],
+"size_scan": [
+{
+"size": "A4 (210mm x 297mm)",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 50,
+"cash": 759.99
+},
+{
+"size": "A4 (210mm x 297mm)",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 200,
+"cash": 2842.46
+},
+{
+"size": "B5 (176mm x 250mm)",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 50,
+"cash": 565.95
+},
+{
+"size": "B5 (176mm x 250mm)",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 200,
+"cash": 2070.92
+},
+{
+"size": "145mm x 210mm",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 50,
+"cash": 472.4
+},
+{
+"size": "145mm x 210mm",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 200,
+"cash": 1695.54
+},
+{
+"size": "90mm x 140mm",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 50,
+"cash": 277.2
+},
+{
+"size": "90mm x 140mm",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 200,
+"cash": 866.25
+},
+{
+"size": "105mm x 145mm",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 50,
+"cash": 302.61
+},
+{
+"size": "105mm x 145mm",
+"layers": "NCR - 2 Layers",
+"colour": "1C (Front)",
+"sets": "100",
+"qty": 200,
+"cash": 921.69
+}
+],
+"finishing": [
+{
+"kind": "base",
+"qty": 100,
+"cash": 1452.99
+},
+{
+"kind": "numbering",
+"qty": 100,
+"cash": 1452.99
+},
+{
+"kind": "punch",
+"qty": 100,
+"cash": 1488.8
+}
+],
+"packform": [
+{
+"packform": "Book",
+"qty": 100,
+"cash": 1452.99
+},
+{
+"packform": "Pad",
+"qty": 100,
+"cash": 1435.67
+}
+]
+}

@@ -302,8 +302,17 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 19, "name": "Booklet — Litho (Offset)"},
                {"id": 37, "name": "Booklet — Digital"},
                {"id": 60, "name": "Label Sticker — Digital"},
-               {"id": 61, "name": "Label Sticker — Letterpress (Hot Stamping)"}]
+               {"id": 61, "name": "Label Sticker — Letterpress (Hot Stamping)"},
+               {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)"}]
 BOOKLET_IDS = (19, 37)
+BILLBOOK_SIZES = ["145mm x 210mm", "A4 (210mm x 297mm)", "B5 (176mm x 250mm)", "90mm x 140mm",
+                  "90mm x 177mm", "95mm x 210mm", "95mm x 225mm", "105mm x 145mm", "105mm x 175mm",
+                  "107mm x 190mm", "110mm x 210mm", "120mm x 210mm", "120mm x 230mm", "125mm x 175mm",
+                  "135mm x 210mm", "145mm x 148mm", "145mm x 190mm", "148mm x 190mm", "148mm x 291mm",
+                  "160mm x 240mm", "165mm x 210mm", "170mm x 190mm", "173mm x 206mm", "180mm x 280mm",
+                  "190mm x 210mm", "190mm x 270mm", "190mm x 290mm", "190mm x 297mm", "192mm x 268mm",
+                  "194mm x 205mm", "206mm x 240mm", "206mm x 330mm", "210mm x 270mm", "210mm x 291mm",
+                  "B4 (250mm x 353mm)", "291mm x 420mm", "F3 (330mm x 420mm)"]
 
 
 @app.get("/api/printoka/products")
@@ -314,7 +323,7 @@ def printoka_products():
 # accuracy = MEASURED median % vs Excard (output/audit_report.json). Curve-based
 # products are exact at Excard's order quantities; this median is the held-out /
 # custom-quantity interpolation error.
-FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5}
+FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24: 2.5}
 
 
 def _accuracy(product_id: int):
@@ -525,6 +534,21 @@ FIELD_SCHEMAS = {
                     {"key": "width", "label": "Width (mm) — Standard Shape", "type": "number", "min": 10, "max": 300, "default": 90, "depends": []},
                     {"key": "diameter", "label": "Diameter (mm) — Round only", "type": "number", "optional": True, "min": 10, "max": 300, "depends": []},
                 ]},
+    "billbook": {"options": "/api/printoka/billbook/options", "quote": "/api/printoka/billbook/quote",
+                "fields": [
+                    {"key": "packform", "label": "Form", "addon": True, "depends": [], "options": ["Book", "Pad"]},
+                    {"key": "size", "label": "Size", "addon": True, "depends": [], "options": BILLBOOK_SIZES},
+                    {"key": "layers", "label": "Plies (NCR layers)", "addon": True, "depends": [],
+                     "options": ["NCR - 2 Layers", "NCR - 3 Layers", "NCR - 4 Layers", "NCR - 5 Layers", "NCR - 6 Layer"]},
+                    {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [],
+                     "options": ["1C (Front)", "2C (Front)", "4C (Front)", "1C (Both)", "2C (Front) / 1C (Back)", "4C (Front) / 1C (Back)"]},
+                    {"key": "sets", "label": "Sets per book (2-ply only; else fixed)", "addon": True, "depends": [], "options": ["50", "100"]},
+                    {"key": "binding", "label": "Binding location", "addon": True, "depends": [],
+                     "options": ["Portrait - Left side binding", "Portrait - Top side binding",
+                                 "Landscape - Left side binding", "Landscape - Top side binding"]},
+                    {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                    {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                ]},
     "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
                 "fields": [
                     {"key": "orientation", "label": "Orientation", "optionsKey": "orientations", "depends": []},
@@ -555,6 +579,8 @@ def _family(product_id: int) -> str:
         return "sticker_letterpress"
     if product_id == 50:
         return "loose_digital"   # has finishing add-ons (hot stamp / fold / punch)
+    if product_id == 24:
+        return "billbook"
     return "loose"
 
 
@@ -696,6 +722,38 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
             "printoka_cash": round(cash, 2), "finishing_cost": round(fin, 2),
             "method": "formula (imposition)",
             "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Bill-Book (Litho NCR, id 24) ----------
+@app.get("/api/printoka/billbook/options")
+def billbook_options(product: int = Query(24)):
+    return {}  # all bill-book fields are inline addon fields in the schema
+
+
+@app.get("/api/printoka/billbook/quote")
+def billbook_quote(product: int = Query(24), size: str = Query("A4 (210mm x 297mm)"),
+                   layers: str = Query("NCR - 2 Layers"), colour: str = Query("1C (Front)"),
+                   sets: str = Query("50"), qty: int = Query(...), packform: str = Query("Book"),
+                   binding: str = Query("Portrait - Left side binding"),
+                   numbering: str = Query("No"), punch: str = Query("No")):
+    from . import billbook_engine as BB
+    import re
+    n_layers = int(re.search(r"(\d+)", layers).group(1)) if re.search(r"(\d+)", layers) else 2
+    sets_eff = sets if n_layers == 2 else "-"   # 3+ ply: sets fixed (no dropdown on Excard)
+    try:
+        cash = BB.cash_price(size, layers, colour, sets_eff, qty, packform=packform,
+                             numbering=(numbering == "Yes"), punch=(punch == "Yes"))
+        wt = BB.weight_kg(size, layers, sets_eff, qty, packform=packform)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": f"no price for {layers}/{colour}"}, status_code=400)
+    return {"config": {"product": product, "size": size, "layers": layers, "colour": colour,
+                       "sets": sets_eff, "qty": qty, "packform": packform, "binding": binding,
+                       "numbering": numbering, "punch": punch},
+            "printoka_cash": round(cash, 2), "method": "formula (per-config curve)",
+            "note": "Numbering is free; binding orientation is price-neutral. qty = number of books/pads.",
+            "tiers": BB.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 def _digital_options(size=None, paper=None, colour=None):
