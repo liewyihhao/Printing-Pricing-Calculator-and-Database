@@ -923,3 +923,8 @@ def dashboard():
 @app.get("/packaging")
 def packaging_page():
     return FileResponse(UI_DIR / "packaging.html")
+
+
+@app.get("/packaging-standalone")
+def packaging_standalone():
+    return FileResponse(UI_DIR / "packaging_standalone.html")

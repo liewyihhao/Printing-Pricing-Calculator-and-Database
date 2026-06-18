@@ -86,11 +86,27 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 const $ = id => document.getElementById(id);
 let CAT = [], sel = null, three = null;
+const BAKED = window.PKG_DATA || null;   // present in the offline standalone build
+
+// JS port of packaging_engine.cash_price (used in offline mode)
+function pkgPrice(box, L, W, D, qty, material, finishing){
+  const P = BAKED && BAKED.params; const p = P && P.boxes[box]; if(!p) return null;
+  const na = Math.max(1, p.n[0]+p.n[1]*(L*W)+p.n[2]*((L+W)*D));
+  const setup = p.t[0]+p.t[1]*na; let perpiece = p.t[2]+p.t[3]*na;
+  perpiece *= (P.options.material[material] || 1);
+  let cash = setup + perpiece*qty;
+  const fd = P.options.finishing, fin = fd[finishing] || fd["+"+(finishing||"")];
+  if(fin && finishing!=="P021" && finishing) cash += fin.setup + fin.perpiece*(na/(P.options.ref_na||1200))*qty;
+  const uw = Math.max(0, p.w[0]+p.w[1]*na);
+  const tiers={}; [["Cash",0],["Silver",.04],["Gold",.08],["Platinum",.14]].forEach(([t,d])=>tiers[t]=+(cash*(1-d)).toFixed(2));
+  return { printoka_cash:+Math.max(0,cash).toFixed(2), tiers, weight_kg:+(uw*qty).toFixed(3),
+    method:"formula (area-law + options)", note:"Folding-carton box; print colour does not affect price." };
+}
 
 let OPTS = {materials:[],colours:[],finishing:[]};
 async function load(){
-  CAT = await (await fetch("/api/printoka/packaging/catalogue")).json();
-  try{ OPTS = await (await fetch("/api/printoka/packaging/options")).json(); }catch(e){}
+  CAT = BAKED ? BAKED.catalogue : await (await fetch("/api/printoka/packaging/catalogue")).json();
+  try{ OPTS = BAKED ? BAKED.options : await (await fetch("/api/printoka/packaging/options")).json(); }catch(e){}
   $("material").innerHTML = (OPTS.materials||[]).map(m=>`<option value="${m.id}">${m.name}</option>`).join("");
   $("colour").innerHTML   = (OPTS.colours||[]).map(c=>`<option value="${c.id}" ${c.id===4?'selected':''}>${c.name}</option>`).join("");
   $("finishing").innerHTML= `<option value="P021" selected>Gloss Lamination (default)</option><option value="none">None</option>`
@@ -139,7 +155,8 @@ async function select(code){
   ["L","W","D"].forEach(k=>$("r"+k).oninput=()=>{ $("v"+k).textContent=$("r"+k).value; updateBox(); quote(); });
   $("qty").onchange = quote;
   DIELINE = null;
-  fetch(`/api/printoka/packaging/dieline?box=${sel.code}`).then(r=>r.ok?r.json():null).then(d=>{ DIELINE=d; if(MODE==="net") updateBox(); }).catch(()=>{});
+  if(BAKED){ DIELINE = BAKED.dielines[sel.code]||null; }
+  else fetch(`/api/printoka/packaging/dieline?box=${sel.code}`).then(r=>r.ok?r.json():null).then(d=>{ DIELINE=d; if(MODE==="net") updateBox(); }).catch(()=>{});
   initThree(); updateBox(); quote();
 }
 $("modeBox").onclick=()=>{ MODE="box"; setModeBtns(); updateBox(); };
@@ -217,7 +234,8 @@ async function quote(){
   const L=+$("rL").value,W=+$("rW").value,D=+$("rD").value,qty=+$("qty").value;
   const mat=$("material").value, col=$("colour").value, fin=$("finishing").value;
   $("cash").textContent="…";
-  const q=await (await fetch(`/api/printoka/packaging/quote?box=${sel.code}&L=${L}&W=${W}&D=${D}&qty=${qty}&material=${mat}&colour=${col}&finishing=${fin}`)).json();
+  const q = BAKED ? pkgPrice(sel.code,L,W,D,qty,mat,fin)
+                  : await (await fetch(`/api/printoka/packaging/quote?box=${sel.code}&L=${L}&W=${W}&D=${D}&qty=${qty}&material=${mat}&colour=${col}&finishing=${fin}`)).json();
   if(my!==seq) return;
   if(q.error){ $("cash").textContent="—"; $("note").textContent=q.error; return; }
   $("cash").textContent="RM "+q.printoka_cash.toFixed(2);
