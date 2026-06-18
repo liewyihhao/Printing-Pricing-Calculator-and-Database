@@ -1,0 +1,116 @@
+{
+ "materials": [
+  {
+   "id": "M0024",
+   "name": "Gloss Art Card 1 Side Coated"
+  },
+  {
+   "id": "M0001",
+   "name": "SBS Paperboard"
+  },
+  {
+   "id": "M0003",
+   "name": "Boxboard Grey Back"
+  },
+  {
+   "id": "M0006",
+   "name": "Coated Art Paper"
+  },
+  {
+   "id": "M0007",
+   "name": "Brown Paper"
+  },
+  {
+   "id": "M0011",
+   "name": "F-Flute Single Wall Corrugated Board"
+  },
+  {
+   "id": "M0012",
+   "name": "E-Flute Single Wall Corrugated Board"
+  },
+  {
+   "id": "M0013",
+   "name": "B-Flute Single Wall Corrugated Board"
+  },
+  {
+   "id": "M0014",
+   "name": "BE-Flute Two Wall Corrugated Board"
+  },
+  {
+   "id": "M0015",
+   "name": "BC-Flute Two Wall Corrugated Board"
+  },
+  {
+   "id": "M0103",
+   "name": "Silver Foil Board"
+  },
+  {
+   "id": "M0106",
+   "name": "Gold Gloss Paperboard (SBS Paperboard Back)"
+  },
+  {
+   "id": "M0109",
+   "name": "Gold Gloss Paperboard (Greyback Paperboard Back)"
+  },
+  {
+   "id": "M0021",
+   "name": "PVC"
+  }
+ ],
+ "colours": [
+  {
+   "id": 1,
+   "name": "1 Colour"
+  },
+  {
+   "id": 2,
+   "name": "2 Colour"
+  },
+  {
+   "id": 4,
+   "name": "4 Colour (CMYK)"
+  }
+ ],
+ "finishing": [
+  {
+   "id": "P021",
+   "name": "Gloss Lamination (Front)"
+  },
+  {
+   "id": "P022",
+   "name": "Matte Lamination (Front)"
+  },
+  {
+   "id": "P023",
+   "name": "Gloss Water Based Varnish (Front)"
+  },
+  {
+   "id": "P024",
+   "name": "Matte Water Based Varnish (Front)"
+  },
+  {
+   "id": "P036",
+   "name": "UV Varnish (Front)"
+  },
+  {
+   "id": "P033",
+   "name": "Spot UV"
+  },
+  {
+   "id": "P031",
+   "name": "Hot Stamping"
+  },
+  {
+   "id": "P032",
+   "name": "Embossing"
+  },
+  {
+   "id": "P035",
+   "name": "Calendaring Varnish"
+  },
+  {
+   "id": "P034",
+   "name": "Textured"
+  }
+ ]
+}

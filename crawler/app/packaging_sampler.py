@@ -56,6 +56,7 @@ def run(account_id=1):
     samples = json.loads(samples_f.read_text()) if samples_f.exists() else {}
     dielines = json.loads(diel_f.read_text()) if diel_f.exists() else {}
 
+    defaults = json.loads((OUT / "packaging_defaults.json").read_text()) if (OUT / "packaging_defaults.json").exists() else {}
     pk = bootstrap_session(account_id)
     if not pk.token:
         raise SystemExit("no token — login/bootstrap failed")
@@ -66,9 +67,10 @@ def run(account_id=1):
         if box in samples and len(samples[box]) >= len(_dims(lim.get(box, {}))) * len(QTYS) - 2:
             return box, "skip"
         rows = []
+        chain = (defaults.get(box) or {}).get("ProcessJson")  # box's real default chain
         for (L, W, D) in _dims(lim.get(box, {})):
             try:
-                for r in pk.price(box, L, W, D, QTYS):
+                for r in pk.price(box, L, W, D, QTYS, process=chain):
                     dic = r.get("dic", {})
                     rows.append({"L": L, "W": W, "D": D, "qty": r["qty"], "total": r["total"],
                                  "unit": r["unit"], "unit_weight": r["unit_weight"],

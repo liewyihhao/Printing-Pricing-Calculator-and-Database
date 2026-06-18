@@ -49,11 +49,17 @@
             <div class="flex items-center gap-2 mb-1"><span id="cName" class="font-semibold text-[15px]"></span><span id="cCat" class="chip"></span></div>
             <div id="cCode" class="text-[12px] text-slate-400 mb-4"></div>
             <div class="space-y-4" id="dims"></div>
-            <div class="mt-4">
-              <label class="text-[12px] text-slate-500">Quantity</label>
-              <select id="qty" class="w-full card px-3 py-2 text-[13px] mt-1 outline-none">
-                <option>100</option><option>200</option><option selected>300</option><option>500</option>
-                <option>1000</option><option>2000</option><option>3000</option><option>5000</option></select>
+            <div class="grid grid-cols-2 gap-3 mt-4">
+              <div><label class="text-[12px] text-slate-500">Material</label>
+                <select id="material" class="w-full card px-2 py-2 text-[12px] mt-1 outline-none"></select></div>
+              <div><label class="text-[12px] text-slate-500">Print colour</label>
+                <select id="colour" class="w-full card px-2 py-2 text-[12px] mt-1 outline-none"></select></div>
+              <div><label class="text-[12px] text-slate-500">Finishing</label>
+                <select id="finishing" class="w-full card px-2 py-2 text-[12px] mt-1 outline-none"></select></div>
+              <div><label class="text-[12px] text-slate-500">Quantity</label>
+                <select id="qty" class="w-full card px-2 py-2 text-[12px] mt-1 outline-none">
+                  <option>100</option><option>200</option><option selected>300</option><option>500</option>
+                  <option>1000</option><option>2000</option><option>3000</option><option>5000</option></select></div>
             </div>
           </div>
         </div>
@@ -81,8 +87,15 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 const $ = id => document.getElementById(id);
 let CAT = [], sel = null, three = null;
 
+let OPTS = {materials:[],colours:[],finishing:[]};
 async function load(){
   CAT = await (await fetch("/api/printoka/packaging/catalogue")).json();
+  try{ OPTS = await (await fetch("/api/printoka/packaging/options")).json(); }catch(e){}
+  $("material").innerHTML = (OPTS.materials||[]).map(m=>`<option value="${m.id}">${m.name}</option>`).join("");
+  $("colour").innerHTML   = (OPTS.colours||[]).map(c=>`<option value="${c.id}" ${c.id===4?'selected':''}>${c.name}</option>`).join("");
+  $("finishing").innerHTML= `<option value="P021" selected>Gloss Lamination (default)</option><option value="none">None</option>`
+    + (OPTS.finishing||[]).filter(f=>f.id!=="P021").map(f=>`<option value="${f.id}">${f.name}</option>`).join("");
+  ["material","colour","finishing"].forEach(id=>$(id).onchange=quote);
   renderGallery("");
 }
 function renderGallery(q){
@@ -202,8 +215,9 @@ let seq=0;
 async function quote(){
   if(!sel) return; const my=++seq;
   const L=+$("rL").value,W=+$("rW").value,D=+$("rD").value,qty=+$("qty").value;
+  const mat=$("material").value, col=$("colour").value, fin=$("finishing").value;
   $("cash").textContent="…";
-  const q=await (await fetch(`/api/printoka/packaging/quote?box=${sel.code}&L=${L}&W=${W}&D=${D}&qty=${qty}`)).json();
+  const q=await (await fetch(`/api/printoka/packaging/quote?box=${sel.code}&L=${L}&W=${W}&D=${D}&qty=${qty}&material=${mat}&colour=${col}&finishing=${fin}`)).json();
   if(my!==seq) return;
   if(q.error){ $("cash").textContent="—"; $("note").textContent=q.error; return; }
   $("cash").textContent="RM "+q.printoka_cash.toFixed(2);

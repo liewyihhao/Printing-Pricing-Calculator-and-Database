@@ -20,8 +20,15 @@ import numpy as np
 
 OUT = Path(__file__).resolve().parent.parent / "output"
 SAMPLES = OUT / "packaging_samples.json"
+OPT_SAMPLES = OUT / "packaging_option_samples.json"
 PARAMS = OUT / "packaging_params.json"
 TIER_DISCOUNTS = {"Cash": 0.0, "Silver": 0.04, "Gold": 0.08, "Platinum": 0.14}
+REF_NA = 1200.0   # reference netarea of the option-sample boxes (~120×100×80) for scaling finishing
+# material per-piece multipliers vs the default Gloss Art Card (M0024). Sampled where
+# available; family-based estimates for materials the API rejected on the sampled boxes.
+MAT_MULT_FALLBACK = {"M0024": 1.0, "M0001": 1.275, "M0003": 0.725, "M0006": 1.0, "M0007": 0.9,
+                     "M0011": 1.232, "M0012": 1.15, "M0013": 1.063, "M0014": 1.35, "M0015": 1.4,
+                     "M0103": 3.016, "M0106": 3.0, "M0109": 3.0, "M0021": 2.5}
 _CACHE: dict = {}
 
 
@@ -55,8 +62,44 @@ def build_params():
         w_coef, *_ = np.linalg.lstsq(np.column_stack([np.ones_like(na), na]), uw, rcond=None)
         params[box] = {"n": n_coef.tolist(), "t": t_coef.tolist(), "w": w_coef.tolist(),
                        "na_min": float(na.min()), "na_max": float(na.max())}
-    PARAMS.write_text(json.dumps(params, indent=0))
-    return params
+    out = {"boxes": params, "options": _calibrate_options()}
+    PARAMS.write_text(json.dumps(out, indent=0))
+    return out
+
+
+def _calibrate_options():
+    """Material per-piece multipliers + finishing additive deltas (setup + per-piece, the
+    per-piece scaled by netarea/REF_NA). Print colour has no price effect (verified)."""
+    opt = {"material": dict(MAT_MULT_FALLBACK), "finishing": {}, "ref_na": REF_NA}
+    if not OPT_SAMPLES.exists():
+        return opt
+    o = json.loads(OPT_SAMPLES.read_text())
+
+    def slope(key):
+        by = {}
+        for r in o.get(key, []):
+            by.setdefault(r["box"], []).append((r["qty"], r["total"]))
+        res = {}
+        for box, pts in by.items():
+            q = np.array([p[0] for p in pts], float); t = np.array([p[1] for p in pts], float)
+            c, *_ = np.linalg.lstsq(np.column_stack([np.ones_like(q), q]), t, rcond=None)
+            res[box] = (float(c[0]), float(c[1]))
+        return res
+    import statistics
+    base = slope("base")
+    for k in o:
+        if k.startswith("mat:"):
+            rs = slope(k); rats = [rs[b][1] / base[b][1] for b in rs if base.get(b) and base[b][1] > 0]
+            if rats:
+                opt["material"][k[4:]] = round(statistics.median(rats), 4)
+        elif k.startswith("fin:"):
+            rs = slope(k)
+            ds = [rs[b][0] - base[b][0] for b in rs if base.get(b)]
+            dp = [rs[b][1] - base[b][1] for b in rs if base.get(b)]
+            if ds:
+                opt["finishing"][k[4:]] = {"setup": round(statistics.median(ds), 2),
+                                           "perpiece": round(statistics.median(dp), 5)}
+    return opt
 
 
 def _netarea(box, L, W, D, p):
@@ -64,13 +107,26 @@ def _netarea(box, L, W, D, p):
     return max(1.0, n[0] + n[1] * (L * W) + n[2] * ((L + W) * D))
 
 
-def cash_price(box, L, W, D, qty):
-    p = _fit().get(box)
+def cash_price(box, L, W, D, qty, material="M0024", colour=4, finishing="P021"):
+    fit = _fit(); p = fit["boxes"].get(box) if "boxes" in fit else fit.get(box)
     if not p:
         return 0.0
     na = _netarea(box, L, W, D, p)
     t = p["t"]
-    return max(0.0, t[0] + t[1] * na + t[2] * qty + t[3] * (na * qty))
+    setup = t[0] + t[1] * na
+    perpiece = (t[2] + t[3] * na)
+    opt = fit.get("options", {}) if "boxes" in fit else {}
+    # material multiplies the per-piece (board) term; print colour has no effect
+    perpiece *= opt.get("material", {}).get(material, 1.0)
+    cash = setup + perpiece * qty
+    # finishing additive delta vs the default gloss lamination (P021 = no delta).
+    # swap coatings keyed by ID (P022…); add-ons (spot UV/hot stamp/emboss) keyed "+ID".
+    fdict = opt.get("finishing", {})
+    fin = fdict.get(finishing) or fdict.get("+" + (finishing or ""))
+    if fin and finishing not in ("P021", "", None):
+        scale = na / opt.get("ref_na", 1200.0)
+        cash += fin.get("setup", 0) + fin.get("perpiece", 0) * scale * qty
+    return max(0.0, cash)
 
 
 def tiers(cash):
@@ -78,7 +134,7 @@ def tiers(cash):
 
 
 def weight_kg(box, L, W, D, qty):
-    p = _fit().get(box)
+    fit = _fit(); p = fit["boxes"].get(box) if "boxes" in fit else fit.get(box)
     if not p:
         return 0.0
     na = _netarea(box, L, W, D, p)

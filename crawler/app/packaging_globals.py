@@ -11,7 +11,8 @@ from .browser import launch, login
 
 OUTD = Path(__file__).resolve().parent.parent / "output" / "packaging_globals"
 DIY = "https://packaging.excard.com.my/uc/diy/A001X"
-GLOBALS = ["boxTree", "restBoxes", "BOXLIB", "bootPms4DIY", "boxPmsLimit", "Mid4DiyAndOrder", "__boxPmsLimit"]
+GLOBALS = ["boxTree", "restBoxes", "BOXLIB", "bootPms4DIY", "boxPmsLimit", "Mid4DiyAndOrder", "__boxPmsLimit",
+           "PM", "_apnPms", "BoxLib", "BoxDiy2", "BoxDiyDBStore", "BoxDiyComponents", "BOX2"]
 
 
 async def run(account_id=1):
