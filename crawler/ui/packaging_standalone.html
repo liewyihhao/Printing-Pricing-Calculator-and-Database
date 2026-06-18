@@ -193,10 +193,17 @@ function updateBox(){
   if(MODE==="net"){ buildNet(); }
   else {
     const c = sel ? sel.category : "";
-    if(TUBE_CATS.includes(c)) buildCarton(L,W,D,{bottom:true,tuck:true});
-    else if(c==="Trays & Top-Base") buildCarton(L,W,D,{bottom:true,tuck:false});
+    const code = sel ? sel.code : "";
+    if(code==="L044") buildCone(L,W,D);
+    else if(code==="L082") buildTriangle(L,W,D);
+    else if(code==="K016"||code==="K016X") buildGable(L,W,D);
+    else if(c==="Folder & Envelope") buildEnvelope(L,W,D);
+    else if(c==="Divider") buildDivider(L,W,D);
+    else if(TUBE_CATS.includes(c)) buildCarton(L,W,D,{bottom:true,tuck:true});
+    else if(c==="Trays & Top-Base"||c==="Inner Holding") buildCarton(L,W,D,{bottom:true,tuck:false});
     else if(c==="Sleeve") buildCarton(L,W,D,{bottom:false,tuck:false});
     else if(c==="Hinged Lid / RETF") buildCarton(L,W,D,{bottom:true,lid:true});
+    else if(c==="Gift / Display") buildCarton(L,W,D,{bottom:true,tuck:true});
     else { const g=new THREE.BoxGeometry(L,D,W); three.group.add(new THREE.Mesh(g,three.mat));
            three.group.add(new THREE.LineSegments(new THREE.EdgesGeometry(g),three.edge)); }
     three.group.position.y=D/2;
@@ -220,6 +227,26 @@ function buildCarton(L,W,D,opts){
   if(opts.tuck) panel(new THREE.BoxGeometry(L,t,W*0.55), 0, D/2, -W*0.1, -0.5);
   if(opts.lid)  // full lid hinged on the back edge, ajar
     panel(new THREE.BoxGeometry(L,t,W), 0, D/2 + W*0.28, -W*0.18, -1.05);
+}
+function _mesh(geo,pos,rot){ const m=new THREE.Mesh(geo,three.mat);
+  if(pos)m.position.set(pos[0]||0,pos[1]||0,pos[2]||0); if(rot)m.rotation.set(rot[0]||0,rot[1]||0,rot[2]||0);
+  three.group.add(m);
+  const e=new THREE.LineSegments(new THREE.EdgesGeometry(geo),three.edge); e.position.copy(m.position); e.rotation.copy(m.rotation); three.group.add(e); return m; }
+function buildCone(L,W,D){ _mesh(new THREE.ConeGeometry(Math.min(L,W)/2, D, 36)); }              // triangular cone box
+function buildTriangle(L,W,D){ _mesh(new THREE.CylinderGeometry(Math.min(L,W)/1.7, Math.min(L,W)/1.7, D, 3)); } // triangular prism
+function buildGable(L,W,D){    // body + peaked gable roof
+  _mesh(new THREE.BoxGeometry(L, D*0.6, W), [0,-D*0.2,0]);
+  _mesh(new THREE.CylinderGeometry(W/2, W/2, L, 3), [0,D*0.35,0], [0,0,Math.PI/2]);
+}
+function buildEnvelope(L,W,D){ // flat envelope lying down + a triangular flap
+  _mesh(new THREE.BoxGeometry(L, 3, W));
+  const flap=_mesh(new THREE.CylinderGeometry(W/2, W/2, L, 3), [0,2,0], [0,0,Math.PI/2]); flap.scale.y=0.06;
+  three.group.position.y=2;
+}
+function buildDivider(L,W,D){ // intersecting slotted panels (a cross) + base
+  _mesh(new THREE.BoxGeometry(L, D, 2));
+  _mesh(new THREE.BoxGeometry(W, D, 2), [0,0,0], [0,Math.PI/2,0]);
+  _mesh(new THREE.BoxGeometry(L, 2, W), [0,-D/2,0]);
 }
 
 // Flat dieline net from LinTest3D LineExp: solid=cut, dash=crease, plus arcs.

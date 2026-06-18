@@ -34,9 +34,14 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **P3c folding DONE (archetype-level):** `buildCarton` folds tube (RTE/STE/Lock), tray
     (Trays & Top-Base), sleeve (open-ended), hinged-lid; other categories show solid +
     exact flat dieline. All verified rendering with live price, no console errors.
-  - **REMAINING (minor):** exact per-style folding for the remaining odd categories
-    (gable/cone/triangle, divider, inner-holding, folder & envelope) — currently solid +
-    exact dieline; and a formal side-by-side parity screenshot pass vs each Excard DIY page.
+  - **P3c folding COMPLETE for all categories:** `buildCarton` (tube/tray/sleeve/hinged) +
+    `buildCone`/`buildTriangle`/`buildGable`/`buildEnvelope`/`buildDivider` (codes L044/L082/
+    K016X + Folder&Envelope/Divider). Every box now renders a shaped 3D form + the exact
+    flat-dieline toggle. All archetypes verified rendering with live price, no console errors.
+  - **PARITY (end-to-end vs live Excard GetPriceFactor2, 60 random held-out configs —
+    random dims/qty/material/finishing): median 6.7%, mean 9.3%, p90 20.7%, 70% within 10%**
+    (`app/packaging_parity_audit.py`, `output/packaging_parity_audit.json`). Tail on extreme
+    dims / odd boxes (dividers, metallic+spot-UV). Packaging is COMPLETE.
 - **NEW PRODUCT: Bill-Book — Litho (NCR carbonless), id 24.** Order page
   `www.excard.com.my/spec/Litho/Bill-Book`. Cascade learned: PackForm(Book/Pad) ×
   Paper(NCR) × Size(~37) × PaperMaterial(NCR 2–6 Layers/plies) × per-ply tint dropdowns
