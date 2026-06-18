@@ -107,7 +107,13 @@ def _netarea(box, L, W, D, p):
     return max(1.0, n[0] + n[1] * (L * W) + n[2] * ((L + W) * D))
 
 
-def cash_price(box, L, W, D, qty, material="M0024", colour=4, finishing="P021"):
+def cash_price(box, L, W, D, qty, material="M0024", colour=4,
+               coating="P021", addons=None, finishing=None):
+    """Price a folding-carton box. coating = one mutually-exclusive surface coating
+    (P021 gloss lam = the calibration baseline / no delta; or none/P022/P023/P024/P036).
+    addons = a stackable list of add-on finishings (P033 spot UV / P031 hot stamp /
+    P032 emboss) — their deltas SUM (verified additive vs the live API). `finishing` is a
+    deprecated single-value alias."""
     fit = _fit(); p = fit["boxes"].get(box) if "boxes" in fit else fit.get(box)
     if not p:
         return 0.0
@@ -116,16 +122,27 @@ def cash_price(box, L, W, D, qty, material="M0024", colour=4, finishing="P021"):
     setup = t[0] + t[1] * na
     perpiece = (t[2] + t[3] * na)
     opt = fit.get("options", {}) if "boxes" in fit else {}
-    # material multiplies the per-piece (board) term; print colour has no effect
-    perpiece *= opt.get("material", {}).get(material, 1.0)
+    perpiece *= opt.get("material", {}).get(material, 1.0)   # board cost; colour has no effect
     cash = setup + perpiece * qty
-    # finishing additive delta vs the default gloss lamination (P021 = no delta).
-    # swap coatings keyed by ID (P022…); add-ons (spot UV/hot stamp/emboss) keyed "+ID".
-    fdict = opt.get("finishing", {})
-    fin = fdict.get(finishing) or fdict.get("+" + (finishing or ""))
-    if fin and finishing not in ("P021", "", None):
-        scale = na / opt.get("ref_na", 1200.0)
-        cash += fin.get("setup", 0) + fin.get("perpiece", 0) * scale * qty
+    fdict = opt.get("finishing", {}); ref = opt.get("ref_na", 1200.0); scale = na / ref
+
+    def _delta(key):
+        f = fdict.get(key)
+        return (f.get("setup", 0) + f.get("perpiece", 0) * scale * qty) if f else 0.0
+
+    # back-compat: a single `finishing` maps to coating (if a swap) or an add-on
+    al = list(addons or [])
+    if finishing is not None:
+        if finishing in fdict and finishing != "P021":
+            coating = finishing
+        elif finishing not in ("P021", "", None):
+            al.append(finishing)
+    # coating delta (P021 baseline = 0; none/P022/P023/P024/P036 are swap keys)
+    if coating and coating != "P021":
+        cash += _delta(coating)
+    # stacked add-on deltas
+    for a in al:
+        cash += _delta("+" + a)
     return max(0.0, cash)
 
 

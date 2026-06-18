@@ -23,6 +23,12 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **3D (P2):** three.js viewer with Folded-3D / Flat-dieline toggle. Flat dieline =
     EXACT from LinTest3D LineExp (all boxes). Folded 3D = parametric tube (walls+bottom+
     tuck flap) for RTE/STE/Lock-Bottom archetypes; size-accurate solid for others.
+  - **STACKABLE FINISHING (matches Excard):** finishing deltas verified **perfectly additive**
+    (0.0% vs live API, `app/packaging_finishing_study.py`). UI now = a **surface-coating**
+    dropdown (None/Gloss/Matte/Gloss-Varnish/Matte-Varnish/UV, mutually exclusive) + **stackable
+    add-on checkboxes** (Spot UV / Hot Stamping / Embossing). Engine `cash_price(... coating=,
+    addons=[])` sums the coating-swap delta + each add-on delta; API `coating` + `addons` (CSV);
+    standalone JS port == Python to the cent. `optioncat` split into `coatings`/`addons`.
   - **P3a options DONE:** decoded `_apnPms.info4MaterialsProcesses`; per-box real default
     chains captured (`packaging_defaults.json`, fixes P062 underprice); engine option layer
     = material per-piece multipliers (14 mats) + finishing additive deltas (10) + print

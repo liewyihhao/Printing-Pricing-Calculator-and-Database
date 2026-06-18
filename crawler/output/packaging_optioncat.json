@@ -71,7 +71,11 @@
    "name": "4 Colour (CMYK)"
   }
  ],
- "finishing": [
+ "coatings": [
+  {
+   "id": "none",
+   "name": "None"
+  },
   {
    "id": "P021",
    "name": "Gloss Lamination (Front)"
@@ -91,7 +95,9 @@
   {
    "id": "P036",
    "name": "UV Varnish (Front)"
-  },
+  }
+ ],
+ "addons": [
   {
    "id": "P033",
    "name": "Spot UV"
@@ -103,14 +109,6 @@
   {
    "id": "P032",
    "name": "Embossing"
-  },
-  {
-   "id": "P035",
-   "name": "Calendaring Varnish"
-  },
-  {
-   "id": "P034",
-   "name": "Textured"
   }
  ]
 }

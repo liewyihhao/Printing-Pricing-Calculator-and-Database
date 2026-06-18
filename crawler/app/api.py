@@ -749,20 +749,22 @@ def packaging_options():
 def packaging_quote(box: str = Query(...), L: float = Query(...), W: float = Query(...),
                     D: float = Query(...), qty: int = Query(...),
                     material: str = Query("M0024"), colour: int = Query(4),
-                    finishing: str = Query("P021")):
+                    coating: str = Query("P021"), addons: str = Query(""),
+                    finishing: str = Query(None)):
     from . import packaging_engine as PE
+    addon_list = [a for a in (addons or "").split(",") if a]
     try:
-        cash = PE.cash_price(box, float(L), float(W), float(D), int(qty),
-                             material=material, colour=colour, finishing=finishing)
+        cash = PE.cash_price(box, float(L), float(W), float(D), int(qty), material=material,
+                             colour=colour, coating=coating, addons=addon_list, finishing=finishing)
         wt = PE.weight_kg(box, float(L), float(W), float(D), int(qty))
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": f"no price model for box {box}"}, status_code=404)
-    return {"config": {"box": box, "L": L, "W": W, "D": D, "qty": qty,
-                       "material": material, "colour": colour, "finishing": finishing},
-            "printoka_cash": round(cash, 2), "method": "formula (area-law + option deltas)",
-            "note": "Folding-carton box; price scales with board area × qty; print colour does not affect price.",
+    return {"config": {"box": box, "L": L, "W": W, "D": D, "qty": qty, "material": material,
+                       "colour": colour, "coating": coating, "addons": addon_list},
+            "printoka_cash": round(cash, 2), "method": "formula (area-law + stacked option deltas)",
+            "note": "Folding-carton box; coating + add-ons stack; print colour does not affect price.",
             "tiers": PE.tiers(cash), "weight_kg": round(wt, 3)}
 
 

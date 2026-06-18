@@ -54,13 +54,15 @@
                 <select id="material" class="w-full card px-2 py-2 text-[12px] mt-1 outline-none"></select></div>
               <div><label class="text-[12px] text-slate-500">Print colour</label>
                 <select id="colour" class="w-full card px-2 py-2 text-[12px] mt-1 outline-none"></select></div>
-              <div><label class="text-[12px] text-slate-500">Finishing</label>
-                <select id="finishing" class="w-full card px-2 py-2 text-[12px] mt-1 outline-none"></select></div>
+              <div><label class="text-[12px] text-slate-500">Surface coating</label>
+                <select id="coating" class="w-full card px-2 py-2 text-[12px] mt-1 outline-none"></select></div>
               <div><label class="text-[12px] text-slate-500">Quantity</label>
                 <select id="qty" class="w-full card px-2 py-2 text-[12px] mt-1 outline-none">
                   <option>100</option><option>200</option><option selected>300</option><option>500</option>
                   <option>1000</option><option>2000</option><option>3000</option><option>5000</option></select></div>
             </div>
+            <div class="mt-3"><label class="text-[12px] text-slate-500">Add-on finishing (stackable)</label>
+              <div id="addons" class="flex flex-wrap gap-3 mt-1"></div></div>
           </div>
         </div>
         <div class="card p-5 mt-5">
@@ -89,14 +91,16 @@ let CAT = [], sel = null, three = null;
 const BAKED = window.PKG_DATA || null;   // present in the offline standalone build
 
 // JS port of packaging_engine.cash_price (used in offline mode)
-function pkgPrice(box, L, W, D, qty, material, finishing){
+function pkgPrice(box, L, W, D, qty, material, coating, addons){
   const P = BAKED && BAKED.params; const p = P && P.boxes[box]; if(!p) return null;
   const na = Math.max(1, p.n[0]+p.n[1]*(L*W)+p.n[2]*((L+W)*D));
   const setup = p.t[0]+p.t[1]*na; let perpiece = p.t[2]+p.t[3]*na;
   perpiece *= (P.options.material[material] || 1);
   let cash = setup + perpiece*qty;
-  const fd = P.options.finishing, fin = fd[finishing] || fd["+"+(finishing||"")];
-  if(fin && finishing!=="P021" && finishing) cash += fin.setup + fin.perpiece*(na/(P.options.ref_na||1200))*qty;
+  const fd = P.options.finishing||{}, scale = na/(P.options.ref_na||1200);
+  const delta = k => { const f=fd[k]; return f ? f.setup + f.perpiece*scale*qty : 0; };
+  if(coating && coating!=="P021") cash += delta(coating);          // coating swap
+  (addons||[]).forEach(a => cash += delta("+"+a));                  // stacked add-ons
   const uw = Math.max(0, p.w[0]+p.w[1]*na);
   const tiers={}; [["Cash",0],["Silver",.04],["Gold",.08],["Platinum",.14]].forEach(([t,d])=>tiers[t]=+(cash*(1-d)).toFixed(2));
   return { printoka_cash:+Math.max(0,cash).toFixed(2), tiers, weight_kg:+(uw*qty).toFixed(3),
@@ -109,9 +113,12 @@ async function load(){
   try{ OPTS = BAKED ? BAKED.options : await (await fetch("/api/printoka/packaging/options")).json(); }catch(e){}
   $("material").innerHTML = (OPTS.materials||[]).map(m=>`<option value="${m.id}">${m.name}</option>`).join("");
   $("colour").innerHTML   = (OPTS.colours||[]).map(c=>`<option value="${c.id}" ${c.id===4?'selected':''}>${c.name}</option>`).join("");
-  $("finishing").innerHTML= `<option value="P021" selected>Gloss Lamination (default)</option><option value="none">None</option>`
-    + (OPTS.finishing||[]).filter(f=>f.id!=="P021").map(f=>`<option value="${f.id}">${f.name}</option>`).join("");
-  ["material","colour","finishing"].forEach(id=>$(id).onchange=quote);
+  $("coating").innerHTML  = (OPTS.coatings||[{id:'P021',name:'Gloss Lamination'},{id:'none',name:'None'}])
+    .map(c=>`<option value="${c.id}" ${c.id==='P021'?'selected':''}>${c.name}</option>`).join("");
+  $("addons").innerHTML   = (OPTS.addons||[]).map(a=>
+    `<label class="text-[12px] inline-flex items-center gap-1.5"><input type="checkbox" class="addonchk" value="${a.id}"/> ${a.name}</label>`).join("");
+  ["material","colour","coating"].forEach(id=>$(id).onchange=quote);
+  document.querySelectorAll(".addonchk").forEach(c=>c.onchange=quote);
   renderGallery("");
 }
 function renderGallery(q){
@@ -269,10 +276,11 @@ let seq=0;
 async function quote(){
   if(!sel) return; const my=++seq;
   const L=+$("rL").value,W=+$("rW").value,D=+$("rD").value,qty=+$("qty").value;
-  const mat=$("material").value, col=$("colour").value, fin=$("finishing").value;
+  const mat=$("material").value, col=$("colour").value, coat=$("coating").value;
+  const adds=[...document.querySelectorAll(".addonchk:checked")].map(c=>c.value);
   $("cash").textContent="…";
-  const q = BAKED ? pkgPrice(sel.code,L,W,D,qty,mat,fin)
-                  : await (await fetch(`/api/printoka/packaging/quote?box=${sel.code}&L=${L}&W=${W}&D=${D}&qty=${qty}&material=${mat}&colour=${col}&finishing=${fin}`)).json();
+  const q = BAKED ? pkgPrice(sel.code,L,W,D,qty,mat,coat,adds)
+                  : await (await fetch(`/api/printoka/packaging/quote?box=${sel.code}&L=${L}&W=${W}&D=${D}&qty=${qty}&material=${mat}&colour=${col}&coating=${coat}&addons=${adds.join(",")}`)).json();
   if(my!==seq) return;
   if(q.error){ $("cash").textContent="—"; $("note").textContent=q.error; return; }
   $("cash").textContent="RM "+q.printoka_cash.toFixed(2);
