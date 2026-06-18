@@ -191,25 +191,35 @@ function updateBox(){
   const L=+$("rL").value, W=+$("rW").value, D=+$("rD").value;
   three.group.clear(); three.group.rotation.set(0,0,0); three.group.position.set(0,0,0);
   if(MODE==="net"){ buildNet(); }
-  else if(isTube()){ buildTube(L,W,D); three.group.position.y=D/2; }
-  else { const g=new THREE.BoxGeometry(L,D,W); three.group.add(new THREE.Mesh(g,three.mat));
-         three.group.add(new THREE.LineSegments(new THREE.EdgesGeometry(g),three.edge)); three.group.position.y=D/2; }
+  else {
+    const c = sel ? sel.category : "";
+    if(TUBE_CATS.includes(c)) buildCarton(L,W,D,{bottom:true,tuck:true});
+    else if(c==="Trays & Top-Base") buildCarton(L,W,D,{bottom:true,tuck:false});
+    else if(c==="Sleeve") buildCarton(L,W,D,{bottom:false,tuck:false});
+    else if(c==="Hinged Lid / RETF") buildCarton(L,W,D,{bottom:true,lid:true});
+    else { const g=new THREE.BoxGeometry(L,D,W); three.group.add(new THREE.Mesh(g,three.mat));
+           three.group.add(new THREE.LineSegments(new THREE.EdgesGeometry(g),three.edge)); }
+    three.group.position.y=D/2;
+  }
   const r=Math.max(L,W,D); three.cam.position.setLength(r*2.2+220);
 }
 
-// A folded rectangular tuck/lock tube: 4 walls + bottom + half-open top tuck flap.
-function buildTube(L,W,D){
+// Generic folded carton: 4 walls + optional bottom / tuck flap / hinged lid.
+// opts: {bottom, tuck (ajar tuck flap), lid (full hinged lid, ajar)}
+function buildCarton(L,W,D,opts){
   const t=2;
   const panel=(geo,x,y,z,rx,ry)=>{ const m=new THREE.Mesh(geo,three.mat);
     m.position.set(x,y,z); if(rx)m.rotation.x=rx; if(ry)m.rotation.y=ry; three.group.add(m);
     const e=new THREE.LineSegments(new THREE.EdgesGeometry(geo),three.edge);
     e.position.copy(m.position); e.rotation.copy(m.rotation); three.group.add(e); };
-  panel(new THREE.BoxGeometry(L,D,t), 0,0, W/2);          // front
-  panel(new THREE.BoxGeometry(L,D,t), 0,0,-W/2);          // back
-  panel(new THREE.BoxGeometry(W,D,t), -L/2,0,0, 0, Math.PI/2);  // left
-  panel(new THREE.BoxGeometry(W,D,t),  L/2,0,0, 0, Math.PI/2);  // right
-  panel(new THREE.BoxGeometry(L,t,W), 0,-D/2,0);          // bottom
-  panel(new THREE.BoxGeometry(L,t,W*0.55), 0, D/2, -W*0.1, -0.5); // top tuck flap (ajar)
+  panel(new THREE.BoxGeometry(L,D,t), 0,0, W/2);
+  panel(new THREE.BoxGeometry(L,D,t), 0,0,-W/2);
+  panel(new THREE.BoxGeometry(W,D,t), -L/2,0,0, 0, Math.PI/2);
+  panel(new THREE.BoxGeometry(W,D,t),  L/2,0,0, 0, Math.PI/2);
+  if(opts.bottom!==false) panel(new THREE.BoxGeometry(L,t,W), 0,-D/2,0);
+  if(opts.tuck) panel(new THREE.BoxGeometry(L,t,W*0.55), 0, D/2, -W*0.1, -0.5);
+  if(opts.lid)  // full lid hinged on the back edge, ajar
+    panel(new THREE.BoxGeometry(L,t,W), 0, D/2 + W*0.28, -W*0.18, -1.05);
 }
 
 // Flat dieline net from LinTest3D LineExp: solid=cut, dash=crease, plus arcs.

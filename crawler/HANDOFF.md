@@ -23,11 +23,20 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **3D (P2):** three.js viewer with Folded-3D / Flat-dieline toggle. Flat dieline =
     EXACT from LinTest3D LineExp (all boxes). Folded 3D = parametric tube (walls+bottom+
     tuck flap) for RTE/STE/Lock-Bottom archetypes; size-accurate solid for others.
-  - **REMAINING:** (1) exact per-style folding for non-tube archetypes (trays, hinged-lid,
-    gable, cone, sleeve, divider, inner-holding); (2) P3 — print colour/material/finishing
-    options (engine currently models the default 4C chain only), offline standalone
-    bundling (three.js + catalogue + params + dielines), real held-out accuracy audit, and
-    side-by-side parity vs each Excard DIY page. Recon/build scripts: `app/packaging_*.py`.
+  - **P3a options DONE:** decoded `_apnPms.info4MaterialsProcesses`; per-box real default
+    chains captured (`packaging_defaults.json`, fixes P062 underprice); engine option layer
+    = material per-piece multipliers (14 mats) + finishing additive deltas (10) + print
+    colour = no price effect (verified). Option-layer accuracy vs API median 5.3%. Wired:
+    `/packaging/options` + material/colour/finishing on `/packaging/quote` + UI dropdowns.
+  - **P3b standalone DONE:** `ui/packaging_standalone.html` (212KB, baked catalogue/options/
+    params/67 dielines + JS engine port == Python to the cent). `app/build_packaging_standalone.py`;
+    served `/packaging-standalone`.
+  - **P3c folding DONE (archetype-level):** `buildCarton` folds tube (RTE/STE/Lock), tray
+    (Trays & Top-Base), sleeve (open-ended), hinged-lid; other categories show solid +
+    exact flat dieline. All verified rendering with live price, no console errors.
+  - **REMAINING (minor):** exact per-style folding for the remaining odd categories
+    (gable/cone/triangle, divider, inner-holding, folder & envelope) — currently solid +
+    exact dieline; and a formal side-by-side parity screenshot pass vs each Excard DIY page.
 - **NEW PRODUCT: Bill-Book — Litho (NCR carbonless), id 24.** Order page
   `www.excard.com.my/spec/Litho/Bill-Book`. Cascade learned: PackForm(Book/Pad) ×
   Paper(NCR) × Size(~37) × PaperMaterial(NCR 2–6 Layers/plies) × per-ply tint dropdowns
