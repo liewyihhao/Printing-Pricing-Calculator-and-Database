@@ -221,6 +221,10 @@ async function populateFrom(startIdx){
     catch(e){ opts=[]; }
     fillSelect(sel,opts); sel.disabled=false;
     if(S.values[f.key] && !opts.includes(S.values[f.key])) delete S.values[f.key];
+    // auto-default a required cascade field to its first option (prefer "Normal") so the
+    // price computes immediately instead of waiting on every manual pick.
+    if(!S.values[f.key] && !f.optional && opts.length)
+      S.values[f.key] = opts.includes("Normal") ? "Normal" : opts[0];
     if(S.values[f.key]) sel.value=S.values[f.key];
   }
   quote();
