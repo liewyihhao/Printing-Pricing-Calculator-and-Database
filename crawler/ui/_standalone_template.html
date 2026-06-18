@@ -481,6 +481,7 @@ function populateFrom(start){
     if(!ready){ sel.disabled=true; sel.innerHTML='<option value="">—</option>'; delete S.values[f.key]; continue; }
     const opts=localOptions(S.prod,f.key,S.values); fillSelect(sel,opts); sel.disabled=false;
     if(S.values[f.key]&&!opts.includes(S.values[f.key])) delete S.values[f.key];
+    if(!S.values[f.key]&&!f.optional&&opts.length) S.values[f.key]=opts.includes("Normal")?"Normal":opts[0];
     if(S.values[f.key]) sel.value=S.values[f.key]; }
   quote();
 }
