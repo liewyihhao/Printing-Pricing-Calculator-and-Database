@@ -159,15 +159,29 @@ async function select(code){
     <div><div class="flex justify-between text-[12px] text-slate-500"><span>${lab}</span>
       <span><b id="v${k}">${v}</b> mm</span></div>
       <input type="range" id="r${k}" min="${mn}" max="${mx}" value="${v}" class="w-full"/></div>`).join("");
-  ["L","W","D"].forEach(k=>$("r"+k).oninput=()=>{ $("v"+k).textContent=$("r"+k).value; updateBox(); quote(); });
+  ["L","W","D"].forEach(k=>$("r"+k).oninput=()=>{ $("v"+k).textContent=$("r"+k).value; updateBox(); quote(); scheduleDieline(); });
   $("qty").onchange = quote;
   DIELINE = null;
-  if(BAKED){ DIELINE = BAKED.dielines[sel.code]||null; }
-  else fetch(`/api/printoka/packaging/dieline?box=${sel.code}`).then(r=>r.ok?r.json():null).then(d=>{ DIELINE=d; if(MODE==="net") updateBox(); }).catch(()=>{});
-  initThree(); updateBox(); quote();
+  initThree(); fetchDieline(); updateBox(); quote();
+}
+let _dieT=null;
+function scheduleDieline(){ if(BAKED || MODE!=="net" || !sel) return;
+  clearTimeout(_dieT); _dieT=setTimeout(fetchDieline, 350); }   // debounce live dieline per dims
+async function fetchDieline(){
+  if(!sel) return;
+  const L=+$("rL").value,W=+$("rW").value,D=+$("rD").value;
+  if(BAKED){ // pick the baked dieline nearest to the chosen dimensions
+    const vs=(BAKED.dielines_multi||{})[sel.code];
+    if(vs && vs.length){ let best=vs[0],bd=1e18;
+      for(const v of vs){ const d=(v.dims[0]-L)**2+(v.dims[1]-W)**2+(v.dims[2]-D)**2; if(d<bd){bd=d;best=v;} }
+      DIELINE={BoxJson:best.BoxJson,LineExp:best.LineExp}; }
+    else DIELINE = BAKED.dielines[sel.code]||null;
+    if(MODE==="net") updateBox(); return; }
+  try{ const d=await (await fetch(`/api/printoka/packaging/dieline?box=${sel.code}&L=${L}&W=${W}&D=${D}`)).json();
+    if(d && d.LineExp){ DIELINE=d; if(MODE==="net") updateBox(); } }catch(e){}
 }
 $("modeBox").onclick=()=>{ MODE="box"; setModeBtns(); updateBox(); };
-$("modeNet").onclick=()=>{ MODE="net"; setModeBtns(); updateBox(); };
+$("modeNet").onclick=()=>{ MODE="net"; setModeBtns(); if(!DIELINE) fetchDieline(); else updateBox(); };
 function setModeBtns(){
   $("modeBox").style.cssText = "cursor:pointer"+(MODE==="box"?"":";background:#f1f5f9;color:#64748b");
   $("modeNet").style.cssText = "cursor:pointer"+(MODE==="net"?"":";background:#f1f5f9;color:#64748b");
@@ -192,10 +206,20 @@ function initThree(){
     dispose(){ rnd.dispose(); el.innerHTML=""; }};
   (function loop(){ if(three){ three.ctrl.update(); three.rnd.render(three.scene,three.cam); requestAnimationFrame(loop);} })();
 }
+const MAT_COLOR={M0007:0x9c7a4d,M0008:0x9c7a4d,M0003:0xb9b2a4,M0004:0xb9b2a4,
+  M0001:0xf2eee3,M0002:0xf2eee3,M0006:0xf2efe6,M0005:0xf2efe6,M0024:0xf6f1e7,M0025:0xf6f1e7,
+  M0103:0xc9ced4,M0105:0xc9ced4,M0107:0xc9ced4,M0108:0xc9ced4,M0106:0xd4af37,M0109:0xd4af37,
+  M0021:0xd8eef7,M0009:0xd8eef7,M0011:0xcaa06a,M0012:0xcaa06a,M0013:0xcaa06a,M0014:0xc49a5e,M0015:0xc49a5e};
+function matColor(){ const m=$("material")?$("material").value:"M0024"; return MAT_COLOR[m]||0xc9a66b; }
+function isWindow(){ return sel && /window/i.test(sel.name); }
+function isHang(){ return sel && /hang|sombrero|hole punch/i.test(sel.name); }
 function updateBox(){
   if(!three) return;
   const L=+$("rL").value, W=+$("rW").value, D=+$("rD").value;
   three.group.clear(); three.group.rotation.set(0,0,0); three.group.position.set(0,0,0);
+  three.mat.color.setHex(matColor());
+  three.mat.transparent = ($("material") && ($("material").value==="M0021"||$("material").value==="M0009"));
+  three.mat.opacity = three.mat.transparent ? 0.55 : 1;
   if(MODE==="net"){ buildNet(); }
   else {
     const c = sel ? sel.category : "";
@@ -212,11 +236,26 @@ function updateBox(){
     else if(c==="Gift / Display") buildCarton(L,W,D,{bottom:true,tuck:true});
     else { const g=new THREE.BoxGeometry(L,D,W); three.group.add(new THREE.Mesh(g,three.mat));
            three.group.add(new THREE.LineSegments(new THREE.EdgesGeometry(g),three.edge)); }
+    addFeatures(L,W,D);
     three.group.position.y=D/2;
   }
   const r=Math.max(L,W,D); three.cam.position.setLength(r*2.2+220);
 }
 
+// Box-type features: a translucent window panel + a hang-hole, per box style.
+function addFeatures(L,W,D){
+  if(isWindow()){
+    const wm=new THREE.MeshLambertMaterial({color:0x9fd4ff,transparent:true,opacity:0.32,side:THREE.DoubleSide});
+    const win=new THREE.Mesh(new THREE.PlaneGeometry(L*0.62, D*0.6), wm);
+    win.position.set(0,0,W/2+0.6); three.group.add(win);
+    three.group.add(new THREE.LineSegments(new THREE.EdgesGeometry(win.geometry),three.edge).translateZ(W/2+0.6));
+  }
+  if(isHang()){
+    const hole=new THREE.Mesh(new THREE.TorusGeometry(Math.min(L,W)*0.06, 1.4, 8, 20),
+      new THREE.MeshBasicMaterial({color:0x3b2f17}));
+    hole.position.set(0, D/2-Math.min(L,W)*0.10, -W/2-0.5); three.group.add(hole);
+  }
+}
 // Generic folded carton: 4 walls + optional bottom / tuck flap / hinged lid.
 // opts: {bottom, tuck (ajar tuck flap), lid (full hinged lid, ajar)}
 function buildCarton(L,W,D,opts){

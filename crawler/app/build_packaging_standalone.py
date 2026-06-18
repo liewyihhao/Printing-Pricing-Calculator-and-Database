@@ -26,6 +26,7 @@ def main():
         "options": _load("packaging_optioncat.json", {}),
         "params": _load("packaging_params.json", {}),
         "dielines": _load("packaging_dielines.json", {}),
+        "dielines_multi": _load("packaging_dielines_multi.json", {}),
     }
     html = (UI / "packaging.html").read_text(encoding="utf-8")
     inject = "<script>window.PKG_DATA=" + json.dumps(data, separators=(",", ":")) + ";</script>\n"

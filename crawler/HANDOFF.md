@@ -23,6 +23,16 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **3D (P2):** three.js viewer with Folded-3D / Flat-dieline toggle. Flat dieline =
     EXACT from LinTest3D LineExp (all boxes). Folded 3D = parametric tube (walls+bottom+
     tuck flap) for RTE/STE/Lock-Bottom archetypes; size-accurate solid for others.
+  - **3D + 2D ACCURACY IMPROVED:** (a) 3D mesh now coloured by selected **material** (kraft/
+    white/grey/gold/silver/translucent PVC) + **window-patch** boxes show a translucent window
+    panel and **hanging** boxes a hang-hole (`addFeatures`, MAT_COLOR in packaging.html).
+    (b) **2D dieline now matches the chosen dimensions** — `/packaging/dieline?box&L&W&D`
+    serves the EXACT dieline live from LinTest3D when possible (works in a normally-run
+    server; auto-disabled inside the Windows dev preview where Playwright can't spawn in a
+    worker thread), otherwise the **nearest of 4 pre-captured sizes/box**
+    (`packaging_dielines_multi.json`, `app/packaging_dielines_multi.py`, 268 dielines). The
+    standalone bakes the multi set and picks nearest client-side. Verified: small vs large
+    L give different dielines (Width 173 vs 544); material/window/hang render, no errors.
   - **STACKABLE FINISHING (matches Excard):** finishing deltas verified **perfectly additive**
     (0.0% vs live API, `app/packaging_finishing_study.py`). UI now = a **surface-coating**
     dropdown (None/Gloss/Matte/Gloss-Varnish/Matte-Varnish/UV, mutually exclusive) + **stackable

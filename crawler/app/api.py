@@ -768,9 +768,54 @@ def packaging_quote(box: str = Query(...), L: float = Query(...), W: float = Que
             "tiers": PE.tiers(cash), "weight_kg": round(wt, 3)}
 
 
+_PKG_SESSION: dict = {}
+
+
+def _pkg_session():
+    """Lazily bootstrap (Playwright login) one packaging API session, reused across calls.
+    The async Playwright bootstrap runs in a dedicated thread+loop (so it works regardless
+    of the request's threadpool context); afterwards the requests-based client is reused."""
+    if "pk" not in _PKG_SESSION:
+        import asyncio, threading
+        from . import packaging_api as PA
+        box = {}
+
+        def _worker():
+            loop = asyncio.new_event_loop(); asyncio.set_event_loop(loop)
+            try:
+                token, cookies = loop.run_until_complete(PA._bootstrap_async(1))
+                box["pk"] = PA.Packaging(token=token, cookies=cookies)
+            except Exception as e:  # noqa: BLE001
+                box["err"] = repr(e)
+            finally:
+                loop.close()
+        t = threading.Thread(target=_worker, daemon=True); t.start(); t.join(timeout=40)
+        if "pk" not in box:
+            raise RuntimeError(f"packaging bootstrap failed: {box.get('err','timeout')}")
+        _PKG_SESSION["pk"] = box["pk"]
+    return _PKG_SESSION["pk"]
+
+
 @app.get("/api/printoka/packaging/dieline")
-def packaging_dieline(box: str = Query(...)):
-    """Dieline geometry (LineExp segments + panel dims) for the 3D preview."""
+def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Query(0), D: float = Query(0)):
+    """Dieline geometry (LineExp segments + panel dims). If L/W/D given, fetch the EXACT
+    dieline for those dimensions live from Excard's LinTest3D; else the stored reference."""
+    if L and W and D and not _PKG_SESSION.get("off"):
+        try:
+            dl = _pkg_session().dieline(box, float(L), float(W), float(D))
+            if dl and dl.get("LineExp"):
+                return dl
+        except Exception:  # noqa: BLE001
+            # live LinTest3D unavailable here (e.g. Playwright can't launch inside the dev
+            # server on Windows) — disable further live attempts; use nearest pre-captured.
+            _PKG_SESSION["off"] = True; _PKG_SESSION.pop("pk", None)
+    # offline fallback: nearest pre-captured size (works in preview + standalone)
+    if L and W and D:
+        variants = _pkg_load("packaging_dielines_multi.json").get(box)
+        if variants:
+            tgt = (float(L), float(W), float(D))
+            best = min(variants, key=lambda v: sum((a - b) ** 2 for a, b in zip(v["dims"], tgt)))
+            return {"BoxJson": best["BoxJson"], "LineExp": best["LineExp"]}
     dl = _pkg_load("packaging_dielines.json").get(box)
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
