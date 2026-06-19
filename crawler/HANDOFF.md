@@ -18,8 +18,13 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Sticker 60:** added **Hot Stamping** (Gold/Silver) — block charge, quoted separately.
   - Business Card, Letterpress sticker, Packaging already at full option parity.
   - Quote `note` now rendered in both UIs (server `#status` + standalone) so compulsory
-    finishing + block charges are visible. REMAINING: sample real price deltas for the
-    newly-added finishing (booklet cover lamination; envelope) instead of "quoted separately".
+    finishing + block charges are visible.
+  - **Envelope (21+50) now PRICED** (per-piece estimate ~RM0.043–0.049/pc × qty × package;
+    `envelope_cost()` in api.py + `envCost()` in standalone; JS==Python). Sampled
+    `finishing_envelope.json` — Digital linear, Litho band-priced (low-qty estimate differs).
+  - **Booklet cover lamination still 'quoted separately'** — its delta sample was unusable
+    (booklet form cover-colour cascade hidden in headless → stale RM130 read); needs a
+    booklet-config fix to sample. Embossing/hot-stamp remain block charges (parity-correct).
 - **PACKAGING BOX — new section (P0–P2 done; P3 + full-fidelity folding remain).**
   Served at **`/packaging`** (`ui/packaging.html`). Excard's packmage engine reverse-
   engineered (see PACKAGING_BOX_FINDINGS.md): pricing `POST /uc/GetPriceFactor2` (public

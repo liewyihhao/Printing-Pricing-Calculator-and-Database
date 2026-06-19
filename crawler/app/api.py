@@ -305,6 +305,16 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 61, "name": "Label Sticker — Letterpress (Hot Stamping)"},
                {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)"}]
 BOOKLET_IDS = (19, 37)
+ENVELOPE_RATE = {"108mm x 159mm - Pink A6": 0.043, "110mm x 220mm - White DL": 0.049}  # RM/piece (sampled)
+
+
+def envelope_cost(env: str | None, qty: int) -> float:
+    """Per-piece envelope add-on cost (sampled ~RM0.043–0.049/pc; default 0.046)."""
+    if not env or env.startswith("Not"):
+        return 0.0
+    return ENVELOPE_RATE.get(env, 0.046) * int(qty)
+
+
 ENVELOPE_OPTS = ["Not Required", "108mm x 159mm - Pink A6", "110mm x 220mm - White DL",
                  "133mm x 102mm - Cream A7", "162mm x 114mm - White A6",
                  "162mm x 229mm - Pink A5", "162mm x 229mm - White A5", "215mm x 114mm - Pink DL"]
@@ -939,21 +949,23 @@ def printoka_quote(size: str = Query(...), paper: str = Query(...),
     if custom:
         size = f"{int(custom_w)}mm x {int(custom_h)}mm"
     mult = package_multiplier(package)
+    env_add = envelope_cost(envelope, qty)   # priced per-piece (sampled), scales with package
     fin = 0.0
     try:
         if product == 50:
             from . import loose_finishing as LF
             base = digital_engine.cash_price(size, paper, colour, qty)
-            fin = LF.finishing_cost({"hot_stamping": hot_stamping, "fold": fold, "punch": punch}, qty, size)
+            fin = LF.finishing_cost({"hot_stamping": hot_stamping, "fold": fold, "punch": punch}, qty, size) + env_add
             cash = (base + fin) * mult
             tiers = digital_engine.tiers(cash); wt = digital_engine.weight_kg(size, paper, qty) * mult
         else:
-            cash = cost_engine.cash_price(size, paper, colour, qty) * mult
+            fin = env_add
+            cash = (cost_engine.cash_price(size, paper, colour, qty) + fin) * mult
             tiers = formulation.tiers(cash); wt = formulation.weight_kg(size, paper, qty) * mult
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
-    note = "Envelope is quoted separately by Excard (not in the online price)." \
-        if envelope not in ("Not Required", "") else None
+    note = "Envelope priced as a per-piece estimate (~RM0.04/pc); Excard band-prices at low quantities." \
+        if env_add else None
     return {"config": {"size": size, "paper": paper, "colour": colour,
                        "package": package, "qty": qty, "product": product, "custom": custom,
                        "envelope": envelope},

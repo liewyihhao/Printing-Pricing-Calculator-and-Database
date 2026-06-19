@@ -1,0 +1,174 @@
+{
+ "37": [
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 100,
+   "lam": "Matte Lamination (Both)",
+   "base_noLamSelected": 233.0,
+   "with": 130.0
+  },
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 100,
+   "lam": "Gloss Lamination (Both)",
+   "base_noLamSelected": 233.0,
+   "with": 130.0
+  },
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 100,
+   "lam": "Matte Lamination (Front)",
+   "base_noLamSelected": 233.0,
+   "with": 130.0
+  },
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 300,
+   "lam": "Matte Lamination (Both)",
+   "base_noLamSelected": 503.0,
+   "with": 130.0
+  },
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 300,
+   "lam": "Gloss Lamination (Both)",
+   "base_noLamSelected": 503.0,
+   "with": 130.0
+  },
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 300,
+   "lam": "Matte Lamination (Front)",
+   "base_noLamSelected": 503.0,
+   "with": 130.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 100,
+   "lam": "Matte Lamination (Both)",
+   "base_noLamSelected": 181.0,
+   "with": 130.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 100,
+   "lam": "Gloss Lamination (Both)",
+   "base_noLamSelected": 181.0,
+   "with": 130.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 100,
+   "lam": "Matte Lamination (Front)",
+   "base_noLamSelected": 181.0,
+   "with": 130.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 300,
+   "lam": "Matte Lamination (Both)",
+   "base_noLamSelected": 324.0,
+   "with": 130.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 300,
+   "lam": "Gloss Lamination (Both)",
+   "base_noLamSelected": 324.0,
+   "with": 130.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 300,
+   "lam": "Matte Lamination (Front)",
+   "base_noLamSelected": 324.0,
+   "with": 130.0
+  }
+ ],
+ "19": [
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 100,
+   "lam": "Matte Lamination (Both)",
+   "base_noLamSelected": 362.0,
+   "with": 363.0
+  },
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 100,
+   "lam": "Gloss Lamination (Both)",
+   "base_noLamSelected": 362.0,
+   "with": 363.0
+  },
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 100,
+   "lam": "Matte Lamination (Front)",
+   "base_noLamSelected": 362.0,
+   "with": 363.0
+  },
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 300,
+   "lam": "Matte Lamination (Both)",
+   "base_noLamSelected": 477.0,
+   "with": 363.0
+  },
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 300,
+   "lam": "Gloss Lamination (Both)",
+   "base_noLamSelected": 477.0,
+   "with": 363.0
+  },
+  {
+   "size": "A4 (210mm x 297mm)",
+   "qty": 300,
+   "lam": "Matte Lamination (Front)",
+   "base_noLamSelected": 477.0,
+   "with": 363.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 100,
+   "lam": "Matte Lamination (Both)",
+   "base_noLamSelected": 350.0,
+   "with": 363.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 100,
+   "lam": "Gloss Lamination (Both)",
+   "base_noLamSelected": 350.0,
+   "with": 363.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 100,
+   "lam": "Matte Lamination (Front)",
+   "base_noLamSelected": 350.0,
+   "with": 363.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 300,
+   "lam": "Matte Lamination (Both)",
+   "base_noLamSelected": 438.0,
+   "with": 363.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 300,
+   "lam": "Gloss Lamination (Both)",
+   "base_noLamSelected": 438.0,
+   "with": 363.0
+  },
+  {
+   "size": "A5 (148mm x 210mm)",
+   "qty": 300,
+   "lam": "Matte Lamination (Front)",
+   "base_noLamSelected": 438.0,
+   "with": 363.0
+  }
+ ]
+}

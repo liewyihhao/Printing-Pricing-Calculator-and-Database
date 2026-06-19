@@ -39,6 +39,17 @@ Gaps + fix status below. Pricing tiers everywhere: Cash → Silver −4 → Gold
 ### Sticker Letterpress (61)
 - Standard Shape/Round, H×W, Hot Stamping colour (Gold/Silver), Quantity. ✅ matches.
 
+## Pricing of added finishing (update)
+- **Loose Envelope (21+50): PRICED.** Sampled deltas (`finishing_envelope.json`): Digital is
+  linear ~RM0.044/pc; Litho is band-priced (q500 ≈ RM0.029/pc → q1000 ≈ RM0.049/pc). Modelled
+  as a per-piece estimate (Pink A6 0.043, White DL 0.049, default 0.046) × qty × package, added
+  to the quote + finishing_cost; labelled an estimate (Litho low-qty bands differ). JS==Python.
+- **Booklet Cover Lamination (19+37): still 'quoted separately'.** The delta sample
+  (`finishing_booklet_lam.json`) was UNUSABLE — the booklet form's cover-print-colour cascade
+  is hidden in headless config, so the with-lamination price reads a stale RM130 placeholder.
+  Option remains selectable + visible with a separate-quote note; needs a booklet-form config
+  fix (set cover colour via the OuterInner radio / JS) before its delta can be sampled.
+
 ## Fix plan / status
 1. **Loose Envelope** (21+50) — add `envelope` option field; price = additive delta
    (sample) or block note. _(in progress)_
