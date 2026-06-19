@@ -194,6 +194,13 @@ def build_data():
          "optsrc": "booklet19", "accuracy": acc.get(19), "fields": BOOKLET_FIELDS},
         {"id": 37, "name": "Booklet — Digital", "engine": "booklet",
          "optsrc": "booklet37", "accuracy": acc.get(37), "fields": BOOKLET_FIELDS},
+        # Aliases of Loose Sheet Litho (same Excard order form) — reuse litho engine+options.
+        {"id": 101, "name": "Brochure (= Loose Sheet Litho)", "engine": "litho",
+         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
+        {"id": 102, "name": "Flyer (= Loose Sheet Litho)", "engine": "litho",
+         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
+        {"id": 103, "name": "Customprint (= Loose Sheet Litho)", "engine": "litho",
+         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
     ]
     return {
         "products": products,
@@ -229,7 +236,7 @@ def build_data():
         },
         "engineByProduct": {1: "bizcard", 21: "litho", 50: "digital", 19: "booklet19",
                             37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
-                            24: "billbook"},
+                            24: "billbook", 101: "litho", 102: "litho", 103: "litho"},
     }
 
 

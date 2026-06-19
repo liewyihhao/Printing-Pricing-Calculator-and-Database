@@ -303,7 +303,13 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 37, "name": "Booklet — Digital"},
                {"id": 60, "name": "Label Sticker — Digital"},
                {"id": 61, "name": "Label Sticker — Letterpress (Hot Stamping)"},
-               {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)"}]
+               {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)"},
+               {"id": 101, "name": "Brochure (= Loose Sheet Litho)"},
+               {"id": 102, "name": "Flyer (= Loose Sheet Litho)"},
+               {"id": 103, "name": "Customprint (= Loose Sheet Litho)"}]
+# Catalogue products whose Excard order page IS the Loose Sheet Litho form (aliases) —
+# they reuse the litho engine/options exactly (see output/spec_link_map.json).
+LOOSE_LITHO_ALIASES = (101, 102, 103)
 BOOKLET_IDS = (19, 37)
 ENVELOPE_RATE = {"108mm x 159mm - Pink A6": 0.043, "110mm x 220mm - White DL": 0.049}  # RM/piece (sampled)
 
@@ -342,7 +348,8 @@ def printoka_products():
 # accuracy = MEASURED median % vs Excard (output/audit_report.json). Curve-based
 # products are exact at Excard's order quantities; this median is the held-out /
 # custom-quantity interpolation error.
-FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24: 2.5}
+FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24: 2.5,
+              101: 1.7, 102: 1.7, 103: 1.7}  # aliases reuse loose-litho accuracy
 
 
 def _accuracy(product_id: int):

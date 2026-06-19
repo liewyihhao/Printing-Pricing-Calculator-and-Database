@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-19T19:41:45",
+ "scanned_at": "2026-06-19T23:08:04",
  "total": 52,
- "built": 8,
+ "built": 10,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -150,8 +150,10 @@
    "name": "Brochure",
    "url": "https://www.excard.com.my/product/brochure",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Loose Sheet Litho (alias, id 101)"
+   ],
    "is_new": false
   },
   {
@@ -373,8 +375,10 @@
    "name": "Customprint",
    "url": "https://www.excard.com.my/product/customprint",
    "category": "Misc",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Loose Sheet Litho (alias, id 103)"
+   ],
    "is_new": false
   },
   {

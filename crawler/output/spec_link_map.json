@@ -1,0 +1,137 @@
+{
+ "brochure": [
+  "/spec/Litho/Loose_Sheet"
+ ],
+ "flyer": [
+  "/spec/Litho/Loose_Sheet"
+ ],
+ "notepad": [
+  "/spec/Litho/Notepad"
+ ],
+ "letterhead": [
+  "/spec/Litho/Letterhead"
+ ],
+ "envelope": [
+  "/spec/Litho/Envelope"
+ ],
+ "folder": [
+  "/spec/Litho/Folder"
+ ],
+ "l-shape-folder": [
+  "/spec/Digital/L_Shape_Plastic_Folder"
+ ],
+ "bookmark": [
+  "/spec/Digital/Bookmark"
+ ],
+ "voucher": [
+  "/spec/Litho/voucher"
+ ],
+ "computer-form": [
+  "/spec/Litho/Computer_Form"
+ ],
+ "wire-o-notebook": [
+  "/spec/Litho/Wire"
+ ],
+ "pvc-card": [
+  "/spec/Digital/PVC_Card"
+ ],
+ "tent-card": [
+  "/spec/Litho/Tent_Card"
+ ],
+ "kad-kahwin": [
+  "/spec/Digital/Kad_Kahwin"
+ ],
+ "kad-terima-kasih": [
+  "/spec/Digital/kad_Terima_Kasih"
+ ],
+ "desk-calendar-hard-stand": [
+  "/spec/Litho/Desk_Calendar_"
+ ],
+ "desk-calendar-soft-stand": [
+  "/spec/Litho/Desk_Calendar_"
+ ],
+ "wall-calendar": [
+  "/spec/Litho/Wall_Calendar"
+ ],
+ "wire-o-wall-calendar": [
+  "/spec/Litho/Wire"
+ ],
+ "car-sticker": [
+  "/spec/Digital/Static_Cling_Window_Sticker"
+ ],
+ "static-cling-window-sticker": [
+  "/spec/Digital/Static_Cling_Window_Sticker"
+ ],
+ "paper-bag": [
+  "/spec/Litho/Paper_Bag"
+ ],
+ "non-woven-bag": [
+  "/spec/Litho/Non"
+ ],
+ "canvas-tote-bag": [
+  "/spec/Litho/Canvas_Tote_Bag"
+ ],
+ "standing-pouch": [
+  "/spec/Litho/Standing_Pouch"
+ ],
+ "sachet-board": [
+  "/spec/Litho/Papan_Kopi"
+ ],
+ "money-packet": [
+  "/spec/Litho/Money_Packet"
+ ],
+ "banner": [
+  "/spec/Litho/Banner"
+ ],
+ "bunting": [
+  "/spec/Litho/Bunting"
+ ],
+ "roll-up-stand": [
+  "/spec/Litho/Roll_Up_Stand"
+ ],
+ "wobbler": [
+  "/spec/Digital/Wobbler"
+ ],
+ "mug": [
+  "/spec/Litho/Mug"
+ ],
+ "magnet": [
+  "/spec/Digital/Magnet"
+ ],
+ "button-badge": [
+  "/spec/Digital/button_badge"
+ ],
+ "sublimation-shirt": [
+  "/spec/Digital/Shirt"
+ ],
+ "hand-fan": [
+  "/spec/Digital/Hand_Fan"
+ ],
+ "hanger": [
+  "/spec/Digital/Hanger"
+ ],
+ "hard-cover-menu": [
+  "/spec/Digital/Hard_Cover_Menu"
+ ],
+ "mask-keeper": [
+  "/spec/Digital/Mask_Keeper"
+ ],
+ "pillow": [
+  "/spec/Litho/Pillow"
+ ],
+ "pre-inked-stamp": [
+  "/spec/Litho/Stamp_Chop"
+ ],
+ "stamp-chop": [
+  "/spec/Litho/Stamp_Chop"
+ ],
+ "arch-file": [
+  "/spec/Digital/Arch_File"
+ ],
+ "papan-kopi": [
+  "/spec/Litho/Papan_Kopi"
+ ],
+ "customprint": [
+  "/spec/Litho/Loose_Sheet"
+ ]
+}
