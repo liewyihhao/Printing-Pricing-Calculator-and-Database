@@ -4,6 +4,22 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **BUILDING ALL 52 — batch in progress.** Map of every catalogue product → its `/spec`
+  order form saved at `output/spec_link_map.json` (most catalogue "products" are marketing
+  pages funnelling into a shared spec form). Reusable form dumper: `app/formdump_url.py`.
+  - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
+    (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
+    engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Notepad — Litho (id 104) BUILT.** Fixed-spec product: Size 80×106mm, Simili 80gsm
+    40-sheet content, 4C+4C cover / 1C content, Wire-O punch + Matte Lamination (Both)
+    compulsory. **VERIFIED on the live form: price depends ONLY on quantity** — cover paper
+    (260/310gsm) and Spot UV (Front Cover) do NOT change the online price (block/included);
+    paper only affects weight. Engine `app/notepad_engine.py` = single qty curve (log-interp,
+    exact at the 11 order quantities; held-out custom-qty LOO median 5.2%, max 14%). Sampler
+    `app/notepad_sampler.py`; samples `output/notepad_samples.json` (33 pts), params
+    `output/notepad_params.json`. Wired: PRODUCTS_UI(104), FIELD_SCHEMAS["notepad"], _family,
+    `/api/printoka/notepad/{options,quote}`, standalone (notepad JS == Python to the cent).
+
 - **CROSS-PRODUCT PARITY AUDIT vs Excard (options + prices) — see PARITY_AUDIT.md.** Dumped
   every live order page (`app/parity_formdump.py` → `output/parity_*.json`) and compared
   options field-by-field. Gaps found + FIXED (option/UI parity, both UIs + standalone):

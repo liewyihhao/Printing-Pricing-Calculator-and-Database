@@ -25,6 +25,7 @@ BUILT = {
     "flyer": ["Loose Sheet (flyer = loose sheet)"],
     "brochure": ["Loose Sheet Litho (alias, id 101)"],
     "customprint": ["Loose Sheet Litho (alias, id 103)"],
+    "notepad": ["Notepad Litho (104)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

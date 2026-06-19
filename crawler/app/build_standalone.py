@@ -177,9 +177,17 @@ def build_data():
         {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
         {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
     ]
+    NOTEPAD_FIELDS = [
+        {"key": "paper", "label": "Cover paper (weight only; no price change)", "addon": True, "depends": [],
+         "options": ["Gloss Art Card 260gsm (2 side coated)", "Gloss Art Card 310gsm (2 side coated)"]},
+        {"key": "lamination", "label": "Lamination (Matte Both compulsory; Spot UV quoted separately)", "addon": True, "depends": [],
+         "options": ["Matte Lamination (Both)", "Matte Lamination (Both) + Spot UV (Front Cover)"]},
+    ]
     products = [
         {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",
          "accuracy": acc.get(1), "fields": BIZCARD_FIELDS},
+        {"id": 104, "name": "Notepad — Litho", "engine": "notepad", "optsrc": "none",
+         "accuracy": acc.get(104), "fields": NOTEPAD_FIELDS},
         {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)", "engine": "billbook",
          "optsrc": "none", "accuracy": acc.get(24), "fields": BILLBOOK_FIELDS},
         {"id": 60, "name": "Label Sticker — Digital", "engine": "sticker", "optsrc": "none",
@@ -213,6 +221,7 @@ def build_data():
             "sticker_digital": _load("sticker_params_digital.json"),
             "sticker_letterpress": _load("sticker_params_letterpress.json"),
             "billbook": _load("billbook_params.json", {"curves": {}, "size_factors": {}, "size_mm": {}}),
+            "notepad": _load("notepad_params.json", {"curve": {}, "size_mm": [80, 106], "content_sheets": 40, "content_gsm": 80}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -236,7 +245,8 @@ def build_data():
         },
         "engineByProduct": {1: "bizcard", 21: "litho", 50: "digital", 19: "booklet19",
                             37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
-                            24: "billbook", 101: "litho", 102: "litho", 103: "litho"},
+                            24: "billbook", 101: "litho", 102: "litho", 103: "litho",
+                            104: "notepad"},
     }
 
 

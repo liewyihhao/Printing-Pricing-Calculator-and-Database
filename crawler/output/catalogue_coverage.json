@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-19T23:08:04",
+ "scanned_at": "2026-06-19T23:23:12",
  "total": 52,
- "built": 10,
+ "built": 11,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -229,8 +229,10 @@
    "name": "Notepad",
    "url": "https://www.excard.com.my/product/notepad",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Notepad Litho (104)"
+   ],
    "is_new": false
   },
   {

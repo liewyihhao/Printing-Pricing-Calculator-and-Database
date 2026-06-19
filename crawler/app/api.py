@@ -306,7 +306,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)"},
                {"id": 101, "name": "Brochure (= Loose Sheet Litho)"},
                {"id": 102, "name": "Flyer (= Loose Sheet Litho)"},
-               {"id": 103, "name": "Customprint (= Loose Sheet Litho)"}]
+               {"id": 103, "name": "Customprint (= Loose Sheet Litho)"},
+               {"id": 104, "name": "Notepad — Litho"}]
 # Catalogue products whose Excard order page IS the Loose Sheet Litho form (aliases) —
 # they reuse the litho engine/options exactly (see output/spec_link_map.json).
 LOOSE_LITHO_ALIASES = (101, 102, 103)
@@ -349,7 +350,8 @@ def printoka_products():
 # products are exact at Excard's order quantities; this median is the held-out /
 # custom-quantity interpolation error.
 FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24: 2.5,
-              101: 1.7, 102: 1.7, 103: 1.7}  # aliases reuse loose-litho accuracy
+              101: 1.7, 102: 1.7, 103: 1.7,  # aliases reuse loose-litho accuracy
+              104: 5.2}  # notepad: exact at order qtys; 5.2 = held-out interp median
 
 
 def _accuracy(product_id: int):
@@ -589,6 +591,13 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "notepad": {"options": "/api/printoka/notepad/options", "quote": "/api/printoka/notepad/quote",
+                "fields": [
+                    {"key": "paper", "label": "Cover paper (weight only; no price change)", "addon": True, "depends": [],
+                     "options": ["Gloss Art Card 260gsm (2 side coated)", "Gloss Art Card 310gsm (2 side coated)"]},
+                    {"key": "lamination", "label": "Lamination (Matte Both compulsory; Spot UV quoted separately)", "addon": True, "depends": [],
+                     "options": ["Matte Lamination (Both)", "Matte Lamination (Both) + Spot UV (Front Cover)"]},
+                ]},
     "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
                 "fields": [
                     {"key": "orientation", "label": "Orientation", "optionsKey": "orientations", "depends": []},
@@ -624,6 +633,8 @@ def _family(product_id: int) -> str:
         return "loose_digital"   # has finishing add-ons (hot stamp / fold / punch)
     if product_id == 24:
         return "billbook"
+    if product_id == 104:
+        return "notepad"
     return "loose"
 
 
@@ -886,6 +897,32 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Notepad (Litho, id 104) ----------
+@app.get("/api/printoka/notepad/options")
+def notepad_options(product: int = Query(104)):
+    return {}  # all notepad fields are inline addon fields in the schema
+
+
+@app.get("/api/printoka/notepad/quote")
+def notepad_quote(product: int = Query(104),
+                  paper: str = Query("Gloss Art Card 260gsm (2 side coated)"),
+                  lamination: str = Query("Matte Lamination (Both)"), qty: int = Query(...)):
+    from . import notepad_engine as NP
+    try:
+        cash = NP.cash_price(paper, qty, lamination)
+        wt = NP.weight_kg(paper, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("Notepad: fixed 80x106mm, Simili 80gsm 40-sheet content, 4C+4C cover / 1C content, "
+            "Wire-O hole punch + Matte Lamination (Both) compulsory (included). Cover paper "
+            "(260/310gsm) and Spot UV do not change the online price (block/included). qty = books.")
+    return {"config": {"product": product, "paper": paper, "lamination": lamination, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (qty curve)", "note": note,
+            "tiers": NP.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Bill-Book (Litho NCR, id 24) ----------
