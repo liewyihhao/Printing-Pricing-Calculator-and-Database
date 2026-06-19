@@ -305,6 +305,15 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 61, "name": "Label Sticker — Letterpress (Hot Stamping)"},
                {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)"}]
 BOOKLET_IDS = (19, 37)
+ENVELOPE_OPTS = ["Not Required", "108mm x 159mm - Pink A6", "110mm x 220mm - White DL",
+                 "133mm x 102mm - Cream A7", "162mm x 114mm - White A6",
+                 "162mm x 229mm - Pink A5", "162mm x 229mm - White A5", "215mm x 114mm - Pink DL"]
+BK_COVER_LAM = ["Not Required", "Matte Lamination (Front)", "Matte Lamination (Both)",
+                "Matte Lamination (Front) + Spot UV (Front)", "Matte Lamination (Both) + Spot UV (Front)",
+                "Gloss Lamination (Front)", "Gloss Lamination (Both)", "UV Varnish (Front)",
+                "UV Varnish (Both)", "Gloss Waterbase Varnish (Front)", "Gloss Waterbase Varnish (Both)"]
+BK_EMBOSS = ["Not Required", "90mm x 30mm", "90mm x 70mm", "95mm x 206mm", "101mm x 144mm",
+             "144mm x 206mm", "194mm x 206mm", "206mm x 294mm"]
 BILLBOOK_SIZES = ["145mm x 210mm", "A4 (210mm x 297mm)", "B5 (176mm x 250mm)", "90mm x 140mm",
                   "90mm x 177mm", "95mm x 210mm", "95mm x 225mm", "105mm x 145mm", "105mm x 175mm",
                   "107mm x 190mm", "110mm x 210mm", "120mm x 210mm", "120mm x 230mm", "125mm x 175mm",
@@ -423,25 +432,35 @@ def booklet_quote(product: int = Query(...), orientation: str = Query(...),
                   colour: str = Query("4C (Both)"), qty: int = Query(...),
                   outer_inner: str = Query("4C: 4 Colour Outer Only"),
                   hot_stamping: str = Query("Not Required"),
+                  cover_lamination: str = Query("Not Required"),
+                  cover_embossing: str = Query("Not Required"),
+                  jawi: str = Query("No"),
                   extra_books: str = Query("No")):
     from . import booklet_engine as be
     try:
         cash = be.cash_price(size, page, ordertype, binding, cover, content,
                              colour, qty, outer_inner=outer_inner, product_id=product)
-        # Extra books = flat +RM30 (Excard "add 3 extra books"). Hot stamping is a
-        # block/mould charge Excard quotes separately (0 to the online price), and
-        # outer/inner is already included in the cover colour (Excard charges the same).
         extra = 30.0 if extra_books in ("Yes", "yes", "true", True) else 0.0
         cash += extra
         wt = be.weight_kg(size, page, ordertype, binding, cover, content, qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
-    note = "Hot stamping block/mould charge is quoted separately by Excard." \
-        if hot_stamping not in ("Not Required", "") else None
+    # Compulsory finishing (always included, shown like Excard) depends on binding.
+    compulsory = "Creasing, Saddle Stitching + Folding" if "Saddle" in binding \
+        else ("Perfect Binding" if "Perfect" in binding else binding)
+    blocks = []
+    if hot_stamping not in ("Not Required", ""): blocks.append("hot stamping")
+    if cover_embossing not in ("Not Required", ""): blocks.append("embossing")
+    if cover_lamination not in ("Not Required", ""): blocks.append("cover lamination")
+    note = f"Compulsory finishing: {compulsory} (included)."
+    if blocks:
+        note += " " + ", ".join(blocks).capitalize() + " quoted separately by Excard (not in the online price)."
     return {"config": {"product": product, "orientation": orientation, "size": size,
                        "ordertype": ordertype, "binding": binding, "page": page,
                        "cover": cover, "content": content, "colour": colour,
                        "qty": qty, "outer_inner": outer_inner, "hot_stamping": hot_stamping,
+                       "cover_lamination": cover_lamination, "cover_embossing": cover_embossing,
+                       "jawi": jawi, "compulsory_finishing": compulsory,
                        "extra_books": extra_books},
             "printoka_cash": round(cash, 2), "finishing_cost": round(extra, 2),
             "method": "formula", "note": note,
@@ -460,6 +479,7 @@ FIELD_SCHEMAS = {
                   {"key": "paper", "label": "Paper", "optionsKey": "papers", "depends": ["size"]},
                   {"key": "colour", "label": "Print colour", "optionsKey": "colours", "depends": ["size", "paper"]},
                   {"key": "package", "label": "Package (ganging)", "optionsKey": "packages", "depends": ["size", "paper", "colour"]},
+                  {"key": "envelope", "label": "Envelope (add-on)", "addon": True, "depends": [], "options": ENVELOPE_OPTS},
                   {"key": "custom_w", "label": "Custom width (mm) — optional, overrides Size", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
                   {"key": "custom_h", "label": "Custom height (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
               ]},
@@ -477,6 +497,7 @@ FIELD_SCHEMAS = {
                    "options": ["None", "1Fa", "2Fa", "2Fb", "2Fc", "3Fa", "3Fb", "4Fa", "4Fb"]},
                   {"key": "punch", "label": "Hole punching", "addon": True, "depends": [],
                    "options": ["No", "3mm", "6mm"]},
+                  {"key": "envelope", "label": "Envelope (add-on)", "addon": True, "depends": [], "options": ENVELOPE_OPTS},
               ]},
     "bizcard": {"options": "/api/printoka/bizcard/options", "quote": "/api/printoka/bizcard/quote",
                 "fields": [
@@ -517,6 +538,8 @@ FIELD_SCHEMAS = {
                     {"key": "finishing", "label": "Lamination", "addon": True, "depends": [],
                      "options": ["Not Required", "Matte Laminate (Front)", "Gloss Laminate (Front)",
                                  "Gloss Water Based Varnish", "UV Varnish", "Soft Touch Laminate (Front)"]},
+                    {"key": "hot_stamping", "label": "Hot stamping (block quoted separately)", "addon": True, "depends": [],
+                     "options": ["Not Required", "Gold", "Silver"]},
                     {"key": "package", "label": "Package (N-in-1, ×N)", "addon": True, "depends": [],
                      "options": ["Normal", "2in1", "3in1", "4in1", "5in1", "6in1", "7in1", "8in1", "9in1", "10in1"]},
                     {"key": "sheet_size", "label": "Sheet size — Multiple Dieline only", "addon": True, "depends": [],
@@ -561,8 +584,11 @@ FIELD_SCHEMAS = {
                     {"key": "colour", "label": "Content print colour", "optionsKey": "colours", "depends": ["orientation", "size", "ordertype", "binding"]},
                     {"key": "outer_inner", "label": "Cover colour sides", "addon": True, "depends": [],
                      "options": ["4C: 4 Colour Outer Only", "4C: 4 Colour Outer & 4 Colour Inner"]},
+                    {"key": "cover_lamination", "label": "Cover lamination / finishing", "addon": True, "depends": [], "options": BK_COVER_LAM},
+                    {"key": "cover_embossing", "label": "Cover embossing — emboss size (block quoted separately)", "addon": True, "depends": [], "options": BK_EMBOSS},
                     {"key": "hot_stamping", "label": "Cover hot stamping (block quoted separately)", "addon": True, "depends": [],
                      "options": ["Not Required", "1C (Front)", "2C (Front)"]},
+                    {"key": "jawi", "label": "Jawi content", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "extra_books", "label": "Add 3 extra books (+RM30)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
 }
@@ -665,7 +691,8 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
                   category: str = Query("Rectangle/Square"), paper: str = Query("Mirror Kote"),
                   colour: str = Query("4C"), diameter: float = Query(0),
                   finishing: str = Query("Not Required"), sheet_size: str = Query("A3+"),
-                  package: str = Query("Normal"), type: str = Query("Sticker")):
+                  package: str = Query("Normal"), type: str = Query("Sticker"),
+                  hot_stamping: str = Query("Not Required")):
     from . import sticker_engine as SE
     # Multiple Dieline is sheet-based: qty = number of press sheets, sized A3+/A4/A5.
     MD_SHEET_MM = {"A3+": (317, 425), "A4": (210, 297), "A5": (148, 210)}
@@ -716,11 +743,14 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
         wt = SE.weight_kg(wh or 50, ww or 50, qty) * (mult if method == "digital" else 1)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
+    hs_note = ("Hot stamping (%s) block/foil charge is quoted separately by Excard." % hot_stamping) \
+        if hot_stamping not in ("Not Required", "") else None
     return {"config": {"product": product, "method": method, "category": category,
                        "paper": paper, "colour": colour, "height": height, "width": width,
-                       "diameter": diameter, "qty": qty, "package": package, "finishing": finishing},
+                       "diameter": diameter, "qty": qty, "package": package, "finishing": finishing,
+                       "hot_stamping": hot_stamping},
             "printoka_cash": round(cash, 2), "finishing_cost": round(fin, 2),
-            "method": "formula (imposition)",
+            "method": "formula (imposition)", "note": hs_note,
             "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
 
 
@@ -881,7 +911,7 @@ def printoka_quote(size: str = Query(...), paper: str = Query(...),
                    package: str = Query("Normal"), product: int = Query(21),
                    custom_h: float = Query(0), custom_w: float = Query(0),
                    hot_stamping: str = Query("Not Required"), fold: str = Query("None"),
-                   punch: str = Query("No")):
+                   punch: str = Query("No"), envelope: str = Query("Not Required")):
     """Pure-formula price (per-product engine) + physics weight. No stored prices.
     custom_h/custom_w (mm) override the standard size for a custom dimension — priced
     by the engine's area formula (the curve only covers the standard sizes)."""
@@ -903,10 +933,13 @@ def printoka_quote(size: str = Query(...), paper: str = Query(...),
             tiers = formulation.tiers(cash); wt = formulation.weight_kg(size, paper, qty) * mult
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
+    note = "Envelope is quoted separately by Excard (not in the online price)." \
+        if envelope not in ("Not Required", "") else None
     return {"config": {"size": size, "paper": paper, "colour": colour,
-                       "package": package, "qty": qty, "product": product, "custom": custom},
+                       "package": package, "qty": qty, "product": product, "custom": custom,
+                       "envelope": envelope},
             "printoka_cash": round(cash, 2), "finishing_cost": round(fin * mult, 2),
-            "method": "formula" + (" · custom size" if custom else ""),
+            "method": "formula" + (" · custom size" if custom else ""), "note": note,
             "tiers": tiers, "weight_kg": round(wt, 2), "excard_cash": None, "delta_pct": None}
 
 

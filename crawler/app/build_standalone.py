@@ -69,11 +69,15 @@ def build_data():
             "internal": key, "sizes": sizes, "colours": colours,
             "papers": [PLASTIC_PAPER] if key == "plastic_card" else PAPERS}
 
+    ENVELOPE_OPTS = ["Not Required", "108mm x 159mm - Pink A6", "110mm x 220mm - White DL",
+                     "133mm x 102mm - Cream A7", "162mm x 114mm - White A6",
+                     "162mm x 229mm - Pink A5", "162mm x 229mm - White A5", "215mm x 114mm - Pink DL"]
     LOOSE_FIELDS = [
         {"key": "size", "label": "Size", "depends": []},
         {"key": "paper", "label": "Paper", "depends": ["size"]},
         {"key": "colour", "label": "Print colour", "depends": ["size", "paper"]},
         {"key": "package", "label": "Package (ganging)", "depends": ["size", "paper", "colour"]},
+        {"key": "envelope", "label": "Envelope (add-on)", "addon": True, "depends": [], "options": ENVELOPE_OPTS},
         {"key": "custom_w", "label": "Custom width (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
         {"key": "custom_h", "label": "Custom height (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
     ]
@@ -95,8 +99,16 @@ def build_data():
         {"key": "colour", "label": "Content print colour", "depends": ["orientation", "size", "ordertype", "binding"]},
         {"key": "outer_inner", "label": "Cover colour sides", "addon": True, "depends": [],
          "options": ["4C: 4 Colour Outer Only", "4C: 4 Colour Outer & 4 Colour Inner"]},
+        {"key": "cover_lamination", "label": "Cover lamination / finishing", "addon": True, "depends": [],
+         "options": ["Not Required", "Matte Lamination (Front)", "Matte Lamination (Both)",
+                     "Matte Lamination (Front) + Spot UV (Front)", "Matte Lamination (Both) + Spot UV (Front)",
+                     "Gloss Lamination (Front)", "Gloss Lamination (Both)", "UV Varnish (Front)",
+                     "UV Varnish (Both)", "Gloss Waterbase Varnish (Front)", "Gloss Waterbase Varnish (Both)"]},
+        {"key": "cover_embossing", "label": "Cover embossing — emboss size (block quoted separately)", "addon": True, "depends": [],
+         "options": ["Not Required", "90mm x 30mm", "90mm x 70mm", "95mm x 206mm", "101mm x 144mm", "144mm x 206mm", "194mm x 206mm", "206mm x 294mm"]},
         {"key": "hot_stamping", "label": "Cover hot stamping (block quoted separately)", "addon": True, "depends": [],
          "options": ["Not Required", "1C (Front)", "2C (Front)"]},
+        {"key": "jawi", "label": "Jawi content", "addon": True, "depends": [], "options": ["No", "Yes"]},
         {"key": "extra_books", "label": "Add 3 extra books (+RM30)", "addon": True, "depends": [], "options": ["No", "Yes"]},
     ]
     BIZCARD_FIELDS = [
@@ -128,6 +140,7 @@ def build_data():
         {"key": "finishing", "label": "Lamination", "addon": True, "depends": [],
          "options": ["Not Required", "Matte Laminate (Front)", "Gloss Laminate (Front)",
                      "Gloss Water Based Varnish", "UV Varnish", "Soft Touch Laminate (Front)"]},
+        {"key": "hot_stamping", "label": "Hot stamping (block quoted separately)", "addon": True, "depends": [], "options": ["Not Required", "Gold", "Silver"]},
         {"key": "package", "label": "Package (N-in-1, ×N)", "addon": True, "depends": [], "options": ["Normal", "2in1", "3in1", "4in1", "5in1", "6in1", "7in1", "8in1", "9in1", "10in1"]},
         {"key": "sheet_size", "label": "Sheet size — Multiple Dieline only", "addon": True, "depends": [], "options": ["A3+", "A4", "A5"]},
         {"key": "dielines", "label": "Die lines per sheet — Multiple Dieline (no price effect)", "type": "number", "optional": True, "min": 1, "max": 100, "depends": []},

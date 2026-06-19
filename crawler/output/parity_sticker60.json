@@ -1,0 +1,205 @@
+{
+ "selects": [
+  {
+   "name": "",
+   "visible": true,
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "name": "ddlpaper",
+   "visible": true,
+   "options": [
+    "- Please Select -",
+    "Mirror Kote",
+    "Mirror Kote (Strong Glue)",
+    "Transparent OPP",
+    "White PP (Polypropylene)",
+    "White PE (Polyethylene) - 20% OFF",
+    "Synthetic Paper",
+    "Printing Paper",
+    "Brown Craft Paper",
+    "Matte Silver Polyester - 20% OFF",
+    "Bright Silver Polyester",
+    "Removable Transparent OPP - 20% OFF",
+    "Removable White PP",
+    "Warranty Sticker"
+   ]
+  },
+  {
+   "name": "ddlQty",
+   "visible": true,
+   "options": [
+    "- Please Select -",
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "150",
+    "200",
+    "250",
+    "300",
+    "350",
+    "400",
+    "450",
+    "500",
+    "550",
+    "600",
+    "650",
+    "700",
+    "750",
+    "800",
+    "850",
+    "900",
+    "950",
+    "1000",
+    "1500",
+    "2000",
+    "2500",
+    "3000",
+    "3500",
+    "4000",
+    "4500",
+    "5000",
+    "6000",
+    "7000",
+    "8000",
+    "9000",
+    "10000",
+    "15000",
+    "20000",
+    "25000",
+    "30000",
+    "35000",
+    "40000",
+    "45000",
+    "50000",
+    "60000",
+    "70000",
+    "80000",
+    "90000",
+    "100000",
+    "150000",
+    "200000",
+    "250000",
+    "300000",
+    "350000",
+    "400000",
+    "450000",
+    "500000",
+    "600000",
+    "700000",
+    "800000",
+    "900000",
+    "1000000",
+    "Others"
+   ]
+  },
+  {
+   "name": "rblPackage",
+   "visible": true,
+   "options": [
+    "Normal",
+    "2in1",
+    "3in1",
+    "4in1",
+    "5in1",
+    "6in1",
+    "7in1",
+    "8in1",
+    "9in1",
+    "10in1"
+   ]
+  },
+  {
+   "name": "ddlOtherCountryCode",
+   "visible": true,
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  }
+ ],
+ "radios": {
+  "rdType": [
+   "Sticker",
+   "CD"
+  ],
+  "rdCategory": [
+   "Rectangle/Square,1, 89mm x 54mm; 148mm x 210mm; 210mm x 297mm; 105mm x 148mm; 60mm x 100mm",
+   "Round,1,50mm x 50mm; 60mm x 60mm; 80mm x 80mm; 40mm x 40mm; 30mm x 30mm",
+   "Custom Die-Cut,3,",
+   "Standard Shape,1,",
+   "Multiple Dieline (color)(Available for different size and different shape)(colorend),3,",
+   "Kiss Cut (1up/sheet),3,",
+   "No Cut,1,"
+  ],
+  "rbprintcolour": [
+   "4C,1",
+   "1C,1"
+  ],
+  "rblOrderCountryCode": [
+   "99",
+   "98",
+   "96",
+   "100"
+  ],
+  "rblOtherOrderCountryCode": [
+   "other"
+  ],
+  "rblCourier": [
+   "28",
+   "1"
+  ]
+ },
+ "checkboxes": [
+  "chkSampleProof"
+ ],
+ "text_inputs": [
+  "",
+  "txtHeight",
+  "txtWidth"
+ ],
+ "sections": [
+  "HOT STAMPING NEW",
+  "FINISHING"
+ ]
+}

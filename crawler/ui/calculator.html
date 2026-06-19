@@ -241,7 +241,7 @@ async function quote(){
   try{
     const q=await api(`${S.schema.quote_endpoint}?product=${S.pid}&${params}&qty=${qty}`);
     if(seq!==S.seq) return;   // a newer quote superseded this response
-    $("status").textContent="";
+    $("status").textContent = q.note || "";   // compulsory finishing / block-charge notes
     if(q.printoka_cash==null){ clearPrice("No basis to price this combo."); return; }
     const t=q.tiers||{};
     $("bigprice").textContent=RM(q.printoka_cash); $("bigprice").classList.remove("pricepulse"); void $("bigprice").offsetWidth; $("bigprice").classList.add("pricepulse");

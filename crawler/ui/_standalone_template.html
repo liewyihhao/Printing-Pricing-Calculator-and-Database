@@ -374,14 +374,19 @@ function localQuote(prod, V, qty){
   else if(prod.engine==="digital"){ const lf=looseFinishingCost(V,qty,V.size);
     cash=(cashDigital(P,V.size,V.paper,V.colour,qty)+lf)*pkgMult;
     const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*pkgMult*100)/100;
-    return { printoka_cash: Math.round(cash*100)/100, finishing_cost: Math.round(lf*pkgMult*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula" }; }
+    const en=(V.envelope&&V.envelope!=="Not Required")?"Envelope quoted separately by Excard.":null;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost: Math.round(lf*pkgMult*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula", note:en }; }
   else if(prod.engine==="booklet"){
     const ck=`${V.size}|${V.page}|${V.ordertype}|${V.binding}|${V.cover}|${V.content}|${V.colour}`;
     const extra=(V.extra_books==="Yes")?30:0;
     cash=(curveLookup(C[pk], ck, qty) ?? cashBooklet(P,V.size,V.page,V.ordertype,V.binding,V.cover,V.content,V.colour,qty))+extra;
     wt=weightBooklet(V.size,V.page,V.ordertype,V.binding,V.cover,V.content,qty);
-    return { printoka_cash: Math.round(cash*100)/100, finishing_cost: extra, tiers: tiers(cash), weight_kg: wt, method:"formula",
-      note:(V.hot_stamping&&V.hot_stamping!=="Not Required")?"Hot stamping block charge quoted separately.":null }; }
+    const comp=/Saddle/.test(V.binding||"")?"Creasing, Saddle Stitching + Folding":(/Perfect/.test(V.binding||"")?"Perfect Binding":(V.binding||""));
+    const blk=[]; if(V.hot_stamping&&V.hot_stamping!=="Not Required")blk.push("hot stamping");
+    if(V.cover_embossing&&V.cover_embossing!=="Not Required")blk.push("embossing");
+    if(V.cover_lamination&&V.cover_lamination!=="Not Required")blk.push("cover lamination");
+    let bnote="Compulsory finishing: "+comp+" (included)."+(blk.length?(" "+blk.join(", ")+" quoted separately."):"");
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost: extra, tiers: tiers(cash), weight_kg: wt, method:"formula", note:bnote }; }
   else if(prod.engine==="billbook"){
     const r=billbookPrice(P, V, qty);
     return { printoka_cash: Math.round(r.cash*100)/100, finishing_cost:0, tiers: tiers(r.cash),
@@ -420,13 +425,15 @@ function localQuote(prod, V, qty){
     const dd=(V.category==="Round"&&V.diameter)?+V.diameter:0;
     const wh=dd||+V.height||50, ww=dd||+V.width||50;
     wt=Math.round(wh*ww/1e6*150*qty/1000*WF*sMult*1000)/1000;
-    return { printoka_cash: Math.round(cash2*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (imposition)" }; }
+    return { printoka_cash: Math.round(cash2*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (imposition)",
+      note:(V.hot_stamping&&V.hot_stamping!=="Not Required")?("Hot stamping ("+V.hot_stamping+") block/foil charge quoted separately."):null }; }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
     const fin=finishingCost(V,qty); cash=(cashBizcard(P,ct,V.size,V.paper,V.colour,qty)+fin)*pkgMult;
     const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*pkgMult*1000)/1000;
     const note=((V.hot_stamping&&V.hot_stamping!=="No Hot Stamping")||(V.embossing&&V.embossing!=="Not Required"))?"Hot stamping / embossing block charge quoted separately.":null;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost: Math.round(fin*pkgMult*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula", note }; }
-  return { printoka_cash: Math.round(cash*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula" };
+  return { printoka_cash: Math.round(cash*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula",
+    note:(V.envelope&&V.envelope!=="Not Required")?"Envelope quoted separately by Excard.":null };
 }
 
 // ---------- UI ----------
@@ -503,7 +510,7 @@ function quote(){
     $("bd_mat").textContent=RM(material); $("bd_print").textContent=RM(printing); $("bd_fin").textContent=RM(fin); $("bd_del").textContent=RM(dv.fee);
     $("bd_total").textContent=RM(q.printoka_cash+dv.fee);
     $("fb").classList.remove("hidden"); window._lastQuote={product:prod.name,values:S.values,qty,dest:$("dest").value,cash:q.printoka_cash};
-    $("status").textContent="";
+    $("status").textContent=q.note||"";
   }catch(e){ $("status").textContent="Could not price this combination."; clearPrice("—"); }
 }
 function clearPrice(msg){ $("bigprice").textContent="RM —"; $("perunit").textContent=""; $("tiers").innerHTML=`<div class="text-slate-400">${msg}</div>`; ["meta","deliv","bd","fb"].forEach(id=>{const e=$(id); if(e)e.classList.add("hidden");}); }

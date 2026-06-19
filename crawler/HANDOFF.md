@@ -4,6 +4,22 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **CROSS-PRODUCT PARITY AUDIT vs Excard (options + prices) — see PARITY_AUDIT.md.** Dumped
+  every live order page (`app/parity_formdump.py` → `output/parity_*.json`) and compared
+  options field-by-field. Gaps found + FIXED (option/UI parity, both UIs + standalone):
+  - **Booklet 19/37:** added **Cover Lamination** (11 opts), **Cover Embossing — emboss
+    size** (7), **Jawi content**, and a **Compulsory Finishing display** (binding-driven:
+    Saddle → "Creasing, Saddle Stitching + Folding"; shown in the quote note). Embossing +
+    hot-stamp (size/foil) are block charges → "quoted separately" (no online price delta,
+    like bizcard). **Cover-lamination price delta NOT yet sampled** — currently shown as a
+    selectable option + note; sample its delta to make it priced (TODO).
+  - **Loose 21 + 50:** added **Envelope** add-on (7 sizes) — quoted separately (note).
+    Confirmed Litho loose has NO lamination/hot-stamp/fold/punch (only Envelope).
+  - **Sticker 60:** added **Hot Stamping** (Gold/Silver) — block charge, quoted separately.
+  - Business Card, Letterpress sticker, Packaging already at full option parity.
+  - Quote `note` now rendered in both UIs (server `#status` + standalone) so compulsory
+    finishing + block charges are visible. REMAINING: sample real price deltas for the
+    newly-added finishing (booklet cover lamination; envelope) instead of "quoted separately".
 - **PACKAGING BOX — new section (P0–P2 done; P3 + full-fidelity folding remain).**
   Served at **`/packaging`** (`ui/packaging.html`). Excard's packmage engine reverse-
   engineered (see PACKAGING_BOX_FINDINGS.md): pricing `POST /uc/GetPriceFactor2` (public

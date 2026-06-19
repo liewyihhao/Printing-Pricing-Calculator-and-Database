@@ -1,0 +1,133 @@
+{
+ "selects": [
+  {
+   "name": "",
+   "visible": true,
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "name": "ddlQty",
+   "visible": true,
+   "options": [
+    "- Please Select -",
+    "500",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1000",
+    "2000",
+    "3000",
+    "4000",
+    "5000",
+    "6000",
+    "7000",
+    "8000",
+    "9000",
+    "10000",
+    "20000",
+    "30000",
+    "40000",
+    "50000",
+    "60000",
+    "70000",
+    "80000",
+    "90000",
+    "100000",
+    "200000",
+    "300000",
+    "400000",
+    "500000",
+    "600000",
+    "700000",
+    "800000",
+    "900000",
+    "1000000",
+    "Others"
+   ]
+  },
+  {
+   "name": "ddlHotStampingColour1",
+   "visible": true,
+   "options": [
+    "- Please Select -",
+    "Gold",
+    "Silver"
+   ]
+  },
+  {
+   "name": "ddlOtherCountryCode",
+   "visible": true,
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  }
+ ],
+ "radios": {
+  "rdCategory": [
+   "Standard Shape",
+   "Round"
+  ],
+  "rblOrderCountryCode": [
+   "99",
+   "98",
+   "96",
+   "100"
+  ],
+  "rblOtherOrderCountryCode": [
+   "other"
+  ],
+  "rblCourier": [
+   "28",
+   "1"
+  ]
+ },
+ "checkboxes": [],
+ "text_inputs": [
+  "",
+  "txtHeight",
+  "txtWidth"
+ ],
+ "sections": [
+  "Hot Stamping",
+  "HOT STAMPING NEW",
+  "Hot Stamping Colour \t",
+  "Hot Stamping Front Colour 1 ",
+  "HOT STAMPING",
+  "Hot Stamping\t1C (Front)"
+ ]
+}
