@@ -1,0 +1,495 @@
+{
+ "scanned_at": "2026-06-19T19:41:45",
+ "total": 52,
+ "built": 8,
+ "new_since_last": [],
+ "removed_since_last": [],
+ "products": [
+  {
+   "slug": "Stamp-chop",
+   "name": "Stamp Chop",
+   "url": "https://www.excard.com.my/product/Stamp-chop",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "button-badge",
+   "name": "Button Badge",
+   "url": "https://www.excard.com.my/product/button-badge",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "hand-fan",
+   "name": "Hand Fan",
+   "url": "https://www.excard.com.my/product/hand-fan",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "hanger",
+   "name": "Hanger",
+   "url": "https://www.excard.com.my/product/hanger",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "hard-cover-menu",
+   "name": "Hard Cover Menu",
+   "url": "https://www.excard.com.my/product/hard-cover-menu",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "magnet",
+   "name": "Magnet",
+   "url": "https://www.excard.com.my/product/magnet",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "mask-keeper",
+   "name": "Mask Keeper",
+   "url": "https://www.excard.com.my/product/mask-keeper",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "mug",
+   "name": "Mug",
+   "url": "https://www.excard.com.my/product/mug",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "pillow",
+   "name": "Pillow",
+   "url": "https://www.excard.com.my/product/pillow",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "pre-inked-stamp",
+   "name": "Pre Inked Stamp",
+   "url": "https://www.excard.com.my/product/pre-inked-stamp",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "sublimation-shirt",
+   "name": "Sublimation Shirt",
+   "url": "https://www.excard.com.my/product/sublimation-shirt",
+   "category": "Apparel & Gifts",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "Wire-O-Notebook",
+   "name": "Wire O Notebook",
+   "url": "https://www.excard.com.my/product/Wire-O-Notebook",
+   "category": "Books & Stationery",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "bill-book",
+   "name": "Bill Book",
+   "url": "https://www.excard.com.my/product/bill-book",
+   "category": "Books & Stationery",
+   "built": true,
+   "built_as": [
+    "Bill-Book Litho (24)"
+   ],
+   "is_new": false
+  },
+  {
+   "slug": "booklet",
+   "name": "Booklet",
+   "url": "https://www.excard.com.my/product/booklet",
+   "category": "Books & Stationery",
+   "built": true,
+   "built_as": [
+    "Booklet Litho (19)",
+    "Booklet Digital (37)"
+   ],
+   "is_new": false
+  },
+  {
+   "slug": "bookmark",
+   "name": "Bookmark",
+   "url": "https://www.excard.com.my/product/bookmark",
+   "category": "Books & Stationery",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "brochure",
+   "name": "Brochure",
+   "url": "https://www.excard.com.my/product/brochure",
+   "category": "Books & Stationery",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "computer-form",
+   "name": "Computer Form",
+   "url": "https://www.excard.com.my/product/computer-form",
+   "category": "Books & Stationery",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "envelope",
+   "name": "Envelope",
+   "url": "https://www.excard.com.my/product/envelope",
+   "category": "Books & Stationery",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "flyer",
+   "name": "Flyer",
+   "url": "https://www.excard.com.my/product/flyer",
+   "category": "Books & Stationery",
+   "built": true,
+   "built_as": [
+    "Loose Sheet (flyer = loose sheet)"
+   ],
+   "is_new": false
+  },
+  {
+   "slug": "folder",
+   "name": "Folder",
+   "url": "https://www.excard.com.my/product/folder",
+   "category": "Books & Stationery",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "l-shape-folder",
+   "name": "L Shape Folder",
+   "url": "https://www.excard.com.my/product/l-shape-folder",
+   "category": "Books & Stationery",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "letterhead",
+   "name": "Letterhead",
+   "url": "https://www.excard.com.my/product/letterhead",
+   "category": "Books & Stationery",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "loose-sheet",
+   "name": "Loose Sheet",
+   "url": "https://www.excard.com.my/product/loose-sheet",
+   "category": "Books & Stationery",
+   "built": true,
+   "built_as": [
+    "Loose Sheet Litho (21)",
+    "Loose Sheet Digital (50)"
+   ],
+   "is_new": false
+  },
+  {
+   "slug": "notepad",
+   "name": "Notepad",
+   "url": "https://www.excard.com.my/product/notepad",
+   "category": "Books & Stationery",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "voucher",
+   "name": "Voucher",
+   "url": "https://www.excard.com.my/product/voucher",
+   "category": "Books & Stationery",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "desk-calendar-hard-stand",
+   "name": "Desk Calendar Hard Stand",
+   "url": "https://www.excard.com.my/product/desk-calendar-hard-stand",
+   "category": "Calendars & Diary",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "desk-calendar-soft-stand",
+   "name": "Desk Calendar Soft Stand",
+   "url": "https://www.excard.com.my/product/desk-calendar-soft-stand",
+   "category": "Calendars & Diary",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "wall-calendar",
+   "name": "Wall Calendar",
+   "url": "https://www.excard.com.my/product/wall-calendar",
+   "category": "Calendars & Diary",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "wire-o-wall-calendar",
+   "name": "Wire O Wall Calendar",
+   "url": "https://www.excard.com.my/product/wire-o-wall-calendar",
+   "category": "Calendars & Diary",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "business-card",
+   "name": "Business Card",
+   "url": "https://www.excard.com.my/product/business-card",
+   "category": "Cards",
+   "built": true,
+   "built_as": [
+    "Business Card (id 1)"
+   ],
+   "is_new": false
+  },
+  {
+   "slug": "kad-kahwin",
+   "name": "Kad Kahwin",
+   "url": "https://www.excard.com.my/product/kad-kahwin",
+   "category": "Cards",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "kad-terima-kasih",
+   "name": "Kad Terima Kasih",
+   "url": "https://www.excard.com.my/product/kad-terima-kasih",
+   "category": "Cards",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "pvc-card",
+   "name": "Pvc Card",
+   "url": "https://www.excard.com.my/product/pvc-card",
+   "category": "Cards",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "tent-card",
+   "name": "Tent Card",
+   "url": "https://www.excard.com.my/product/tent-card",
+   "category": "Cards",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "banner",
+   "name": "Banner",
+   "url": "https://www.excard.com.my/product/banner",
+   "category": "Large Format",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "bunting",
+   "name": "Bunting",
+   "url": "https://www.excard.com.my/product/bunting",
+   "category": "Large Format",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "roll-up-stand",
+   "name": "Roll Up Stand",
+   "url": "https://www.excard.com.my/product/roll-up-stand",
+   "category": "Large Format",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "wobbler",
+   "name": "Wobbler",
+   "url": "https://www.excard.com.my/product/wobbler",
+   "category": "Large Format",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "arch-file",
+   "name": "Arch File",
+   "url": "https://www.excard.com.my/product/arch-file",
+   "category": "Misc",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "customprint",
+   "name": "Customprint",
+   "url": "https://www.excard.com.my/product/customprint",
+   "category": "Misc",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "papan-kopi",
+   "name": "Papan Kopi",
+   "url": "https://www.excard.com.my/product/papan-kopi",
+   "category": "Misc",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "money-packet",
+   "name": "Money Packet",
+   "url": "https://www.excard.com.my/product/money-packet",
+   "category": "Money Packet",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "canvas-tote-bag",
+   "name": "Canvas Tote Bag",
+   "url": "https://www.excard.com.my/product/canvas-tote-bag",
+   "category": "Packaging & Boxes",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "kotak-cenderahati",
+   "name": "Kotak Cenderahati",
+   "url": "https://www.excard.com.my/product/kotak-cenderahati",
+   "category": "Packaging & Boxes",
+   "built": true,
+   "built_as": [
+    "Packaging Boxes (67 styles)"
+   ],
+   "is_new": false
+  },
+  {
+   "slug": "non-woven-bag",
+   "name": "Non Woven Bag",
+   "url": "https://www.excard.com.my/product/non-woven-bag",
+   "category": "Packaging & Boxes",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "paper-bag",
+   "name": "Paper Bag",
+   "url": "https://www.excard.com.my/product/paper-bag",
+   "category": "Packaging & Boxes",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "sachet-board",
+   "name": "Sachet Board",
+   "url": "https://www.excard.com.my/product/sachet-board",
+   "category": "Packaging & Boxes",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "standing-pouch",
+   "name": "Standing Pouch",
+   "url": "https://www.excard.com.my/product/standing-pouch",
+   "category": "Packaging & Boxes",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "car-sticker",
+   "name": "Car Sticker",
+   "url": "https://www.excard.com.my/product/car-sticker",
+   "category": "Stickers & Labels",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  },
+  {
+   "slug": "label-sticker-with-hot-stamping",
+   "name": "Label Sticker With Hot Stamping",
+   "url": "https://www.excard.com.my/product/label-sticker-with-hot-stamping",
+   "category": "Stickers & Labels",
+   "built": true,
+   "built_as": [
+    "Label Sticker Letterpress (61)"
+   ],
+   "is_new": false
+  },
+  {
+   "slug": "roll-form-sticker",
+   "name": "Roll Form Sticker",
+   "url": "https://www.excard.com.my/product/roll-form-sticker",
+   "category": "Stickers & Labels",
+   "built": true,
+   "built_as": [
+    "Label Sticker Digital (60)"
+   ],
+   "is_new": false
+  },
+  {
+   "slug": "static-cling-window-sticker",
+   "name": "Static Cling Window Sticker",
+   "url": "https://www.excard.com.my/product/static-cling-window-sticker",
+   "category": "Stickers & Labels",
+   "built": false,
+   "built_as": [],
+   "is_new": false
+  }
+ ]
+}

@@ -754,6 +754,25 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
             "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
 
 
+# ---------- Catalogue auto check-up (scan Excard + coverage) ----------
+@app.get("/api/printoka/catalogue/coverage")
+def catalogue_coverage():
+    """Latest Excard catalogue + our coverage (built / new / not-built). Read-only;
+    refreshed by the scan endpoint or `python -m app.catalogue_scan`."""
+    f = UI_DIR.parent / "output" / "catalogue_coverage.json"
+    return _json.loads(f.read_text()) if f.exists() else {"total": 0, "built": 0, "products": []}
+
+
+@app.get("/api/printoka/catalogue/scan")
+def catalogue_scan_now():
+    """Run a live catalogue check-up (fetch Excard sitemap, diff vs last, recompute coverage)."""
+    try:
+        from . import catalogue_scan as CS
+        return CS.coverage()
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=502)
+
+
 # ---------- Packaging Box (packmage, own section) ----------
 _PKG_CACHE: dict = {}
 
@@ -1003,6 +1022,11 @@ def dashboard():
 @app.get("/packaging")
 def packaging_page():
     return FileResponse(UI_DIR / "packaging.html")
+
+
+@app.get("/coverage")
+def coverage_page():
+    return FileResponse(UI_DIR / "coverage.html")
 
 
 @app.get("/packaging-standalone")
