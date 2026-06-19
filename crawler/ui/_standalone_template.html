@@ -400,6 +400,15 @@ function localQuote(prod, V, qty){
     wt=Math.round(sm[0]*sm[1]/1e6*(cg+(P.content_sheets||40)*(P.content_gsm||80))*qty/1000*WF*1000)/1000;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
       note:"Notepad: fixed 80x106mm, 40-sheet Simili content, Wire-O punch + Matte Lam (Both) compulsory. Cover paper & Spot UV do not change the online price. qty = books." }; }
+  else if(prod.engine==="letterhead"){
+    const cv=P.curves||{}; const np=/Conqueror/.test(V.paper||"")?"Conqueror":V.paper;
+    let key=np+"|"+V.colour;
+    if(!cv[key]) key=Object.keys(cv).find(k=>k.startsWith(np+"|"))||Object.keys(cv)[0];
+    const c=cv[key]||{}; cash=interpLogPts(Object.keys(c).map(k=>[+k,c[k]]),qty);
+    const sm=P.size_mm||[210,297]; const g=(/(\d+)\s*gsm/.exec(V.paper||"")||[])[1]||100;
+    wt=Math.round(sm[0]*sm[1]/1e6*(+g)*qty/1000*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-config qty curve)",
+      note:"Letterhead: fixed A4 (210x297mm). The 4 Conqueror 100gsm finishes are price-identical. Exact at sampled order quantities (500/1000/1500). qty = sheets." }; }
   else if(prod.engine==="sticker"){
     const pp=P.params||P;
     const sMult = prod.stickerMethod==="digital" ? pkgMult : 1;  // N-in-1 = xN (digital, verified)

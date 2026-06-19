@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-19T23:23:12",
+ "scanned_at": "2026-06-20T07:40:05",
  "total": 52,
- "built": 11,
+ "built": 12,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -208,8 +208,10 @@
    "name": "Letterhead",
    "url": "https://www.excard.com.my/product/letterhead",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Letterhead Litho (105)"
+   ],
    "is_new": false
   },
   {

@@ -10,6 +10,17 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Letterhead — Litho (id 105) BUILT.** Fixed A4 (210×297mm). Drivers: paper × print
+    colour/side × qty. The **4 Conqueror 100gsm finishes are price-identical** (verified →
+    collapsed to one curve); Simili 80/100 differ. Engine `app/letterhead_engine.py` =
+    per-(paper|colour) qty curve (log-interp). Exact at sampled order quantities
+    (500/1000/1500); held-out custom-qty LOO median 8.2%, p90 13.7% (offset step-pricing
+    limit). **GAP: the live form is flaky headless (colour-select postback intermittently
+    drops comboQty), so low quantities (<500) are only sampled for Simili100 4C; other
+    configs extrapolate flat below 500 and above 1500.** Sampler `app/letterhead_sampler.py`
+    (resumable, `_avail` retry); samples `output/letterhead_samples.json` (63 pts/16 cfgs),
+    params `output/letterhead_params.json`. Wired: PRODUCTS_UI(105), FIELD_SCHEMAS,
+    _family, `/api/printoka/letterhead/{options,quote}`, standalone (JS==Python verified).
   - **Notepad — Litho (id 104) BUILT.** Fixed-spec product: Size 80×106mm, Simili 80gsm
     40-sheet content, 4C+4C cover / 1C content, Wire-O punch + Matte Lamination (Both)
     compulsory. **VERIFIED on the live form: price depends ONLY on quantity** — cover paper

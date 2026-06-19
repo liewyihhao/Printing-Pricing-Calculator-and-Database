@@ -307,7 +307,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 101, "name": "Brochure (= Loose Sheet Litho)"},
                {"id": 102, "name": "Flyer (= Loose Sheet Litho)"},
                {"id": 103, "name": "Customprint (= Loose Sheet Litho)"},
-               {"id": 104, "name": "Notepad — Litho"}]
+               {"id": 104, "name": "Notepad — Litho"},
+               {"id": 105, "name": "Letterhead — Litho"}]
 # Catalogue products whose Excard order page IS the Loose Sheet Litho form (aliases) —
 # they reuse the litho engine/options exactly (see output/spec_link_map.json).
 LOOSE_LITHO_ALIASES = (101, 102, 103)
@@ -351,7 +352,8 @@ def printoka_products():
 # custom-quantity interpolation error.
 FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24: 2.5,
               101: 1.7, 102: 1.7, 103: 1.7,  # aliases reuse loose-litho accuracy
-              104: 5.2}  # notepad: exact at order qtys; 5.2 = held-out interp median
+              104: 5.2,  # notepad: exact at order qtys; 5.2 = held-out interp median
+              105: 8.2}  # letterhead: exact at sampled order qtys; 8.2 = held-out interp median
 
 
 def _accuracy(product_id: int):
@@ -591,6 +593,15 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "letterhead": {"options": "/api/printoka/letterhead/options", "quote": "/api/printoka/letterhead/quote",
+                "fields": [
+                    {"key": "paper", "label": "Paper", "addon": True, "depends": [],
+                     "options": ["Simili 80gsm", "Simili 100gsm", "Conqueror 100gsm Brilliant White Laid",
+                                 "Conqueror 100gsm Diamond White Laid", "Conqueror 100gsm White Wove",
+                                 "Conqueror 100gsm Cream Laid"]},
+                    {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [],
+                     "options": ["1C (Front)", "2C (Front)", "4C (Front)", "4C (Both)"]},
+                ]},
     "notepad": {"options": "/api/printoka/notepad/options", "quote": "/api/printoka/notepad/quote",
                 "fields": [
                     {"key": "paper", "label": "Cover paper (weight only; no price change)", "addon": True, "depends": [],
@@ -635,6 +646,8 @@ def _family(product_id: int) -> str:
         return "billbook"
     if product_id == 104:
         return "notepad"
+    if product_id == 105:
+        return "letterhead"
     return "loose"
 
 
@@ -897,6 +910,31 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Letterhead (Litho, id 105) ----------
+@app.get("/api/printoka/letterhead/options")
+def letterhead_options(product: int = Query(105)):
+    return {}  # all letterhead fields are inline addon fields in the schema
+
+
+@app.get("/api/printoka/letterhead/quote")
+def letterhead_quote(product: int = Query(105), paper: str = Query("Simili 80gsm"),
+                     colour: str = Query("4C (Front)"), qty: int = Query(...)):
+    from . import letterhead_engine as LH
+    try:
+        cash = LH.cash_price(paper, colour, qty)
+        wt = LH.weight_kg(paper, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("Letterhead: fixed A4 (210x297mm). The 4 Conqueror 100gsm finishes are price-"
+            "identical. Exact at sampled order quantities (500/1000/1500); other quantities "
+            "interpolate. qty = sheets.")
+    return {"config": {"product": product, "paper": paper, "colour": colour, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per-config qty curve)", "note": note,
+            "tiers": LH.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Notepad (Litho, id 104) ----------

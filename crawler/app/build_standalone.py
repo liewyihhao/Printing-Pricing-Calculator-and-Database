@@ -183,11 +183,21 @@ def build_data():
         {"key": "lamination", "label": "Lamination (Matte Both compulsory; Spot UV quoted separately)", "addon": True, "depends": [],
          "options": ["Matte Lamination (Both)", "Matte Lamination (Both) + Spot UV (Front Cover)"]},
     ]
+    LETTERHEAD_FIELDS = [
+        {"key": "paper", "label": "Paper", "addon": True, "depends": [],
+         "options": ["Simili 80gsm", "Simili 100gsm", "Conqueror 100gsm Brilliant White Laid",
+                     "Conqueror 100gsm Diamond White Laid", "Conqueror 100gsm White Wove",
+                     "Conqueror 100gsm Cream Laid"]},
+        {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [],
+         "options": ["1C (Front)", "2C (Front)", "4C (Front)", "4C (Both)"]},
+    ]
     products = [
         {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",
          "accuracy": acc.get(1), "fields": BIZCARD_FIELDS},
         {"id": 104, "name": "Notepad — Litho", "engine": "notepad", "optsrc": "none",
          "accuracy": acc.get(104), "fields": NOTEPAD_FIELDS},
+        {"id": 105, "name": "Letterhead — Litho", "engine": "letterhead", "optsrc": "none",
+         "accuracy": acc.get(105), "fields": LETTERHEAD_FIELDS},
         {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)", "engine": "billbook",
          "optsrc": "none", "accuracy": acc.get(24), "fields": BILLBOOK_FIELDS},
         {"id": 60, "name": "Label Sticker — Digital", "engine": "sticker", "optsrc": "none",
@@ -222,6 +232,7 @@ def build_data():
             "sticker_letterpress": _load("sticker_params_letterpress.json"),
             "billbook": _load("billbook_params.json", {"curves": {}, "size_factors": {}, "size_mm": {}}),
             "notepad": _load("notepad_params.json", {"curve": {}, "size_mm": [80, 106], "content_sheets": 40, "content_gsm": 80}),
+            "letterhead": _load("letterhead_params.json", {"curves": {}, "size_mm": [210, 297]}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -246,7 +257,7 @@ def build_data():
         "engineByProduct": {1: "bizcard", 21: "litho", 50: "digital", 19: "booklet19",
                             37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
-                            104: "notepad"},
+                            104: "notepad", 105: "letterhead"},
     }
 
 
