@@ -10,6 +10,19 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Envelope — Litho (id 106) BUILT.** Standalone Envelope product (NOT the loose-sheet
+    add-on). Drivers: **mould/model** (17 image-radio moulds; code encodes size + window
+    NW/W) × **print colour/side** (12) × qty. Compulsory Die-Cutting + Folding + Gluing
+    (included). Engine `app/envelope_engine.py` = per-model base qty curve at 4C(Front)
+    (log-interp) + **additive colour plate-cost delta** vs 4C(Front) (the additive model
+    transfers across moulds far better than multiplicative — validated on a 2nd mould).
+    **Accuracy: base-curve held-out-qty LOO median 2.0% (p90 4.7%); held-out colour on a
+    2nd mould median 4.1%, max 9.7%.** GAP: the 3 OE 'Best Seller' moulds need an extra
+    paper select (cfg_fail headless) so they're unsampled — mapped to the same-size EV
+    mould (paper differs slightly). Sampler `app/envelope_sampler.py` (mould via JS-click;
+    core 84 / colour 24 / check 6 pts), params `output/envelope_params.json`. Wired:
+    PRODUCTS_UI(106), FIELD_SCHEMAS, _family, `/api/printoka/envelope/{options,quote}`,
+    standalone (JS==Python verified incl. OE→EV size fallback).
   - **Letterhead — Litho (id 105) BUILT.** Fixed A4 (210×297mm). Drivers: paper × print
     colour/side × qty. The **4 Conqueror 100gsm finishes are price-identical** (verified →
     collapsed to one curve); Simili 80/100 differ. Engine `app/letterhead_engine.py` =

@@ -308,7 +308,18 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 102, "name": "Flyer (= Loose Sheet Litho)"},
                {"id": 103, "name": "Customprint (= Loose Sheet Litho)"},
                {"id": 104, "name": "Notepad — Litho"},
-               {"id": 105, "name": "Letterhead — Litho"}]
+               {"id": 105, "name": "Letterhead — Litho"},
+               {"id": 106, "name": "Envelope — Litho"}]
+ENVELOPE_MODELS = [
+    "OE4496NW — 114x248mm (Best Seller)", "OE4496W — 114x248mm (window)",
+    "OE9013NW — 229x324mm", "EV4090NW — 102x229mm", "EV4090W — 102x229mm (window)",
+    "EV4286NW — 110x220mm", "EV4286W — 110x220mm (window)", "EV4496NW — 114x248mm",
+    "EV4496W — 114x248mm (window)", "EV6390NW — 162x229mm", "EV7010NW — 178x254mm",
+    "EV9013NW — 229x324mm", "EV1015NW — 254x381mm", "IS4286NW — 110x220mm",
+    "IS6390NW — 162x229mm", "OP8642NW — 220x110mm", "OP6344NW — 162x114mm"]
+ENVELOPE_COLOURS = ["1C (Front)", "1C (Both)", "1C (Front)/2C (Back)", "1C (Front)/4C (Back)",
+    "2C (Front)", "2C (Front)/1C (Back)", "2C (Both)", "2C (Front)/4C (Back)",
+    "4C (Front)", "4C (Front)/1C (Back)", "4C (Front)/2C (Back)", "4C (Both)"]
 # Catalogue products whose Excard order page IS the Loose Sheet Litho form (aliases) —
 # they reuse the litho engine/options exactly (see output/spec_link_map.json).
 LOOSE_LITHO_ALIASES = (101, 102, 103)
@@ -353,7 +364,8 @@ def printoka_products():
 FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24: 2.5,
               101: 1.7, 102: 1.7, 103: 1.7,  # aliases reuse loose-litho accuracy
               104: 5.2,  # notepad: exact at order qtys; 5.2 = held-out interp median
-              105: 8.2}  # letterhead: exact at sampled order qtys; 8.2 = held-out interp median
+              105: 8.2,  # letterhead: exact at sampled order qtys; 8.2 = held-out interp median
+              106: 4.1}  # envelope: base LOO ~2%; held-out colour (additive) median 4.1%
 
 
 def _accuracy(product_id: int):
@@ -593,6 +605,11 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "envelope": {"options": "/api/printoka/envelope/options", "quote": "/api/printoka/envelope/quote",
+                "fields": [
+                    {"key": "model", "label": "Envelope model (size / window)", "addon": True, "depends": [], "options": ENVELOPE_MODELS},
+                    {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ENVELOPE_COLOURS},
+                ]},
     "letterhead": {"options": "/api/printoka/letterhead/options", "quote": "/api/printoka/letterhead/quote",
                 "fields": [
                     {"key": "paper", "label": "Paper", "addon": True, "depends": [],
@@ -648,6 +665,8 @@ def _family(product_id: int) -> str:
         return "notepad"
     if product_id == 105:
         return "letterhead"
+    if product_id == 106:
+        return "envelope"
     return "loose"
 
 
@@ -910,6 +929,31 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Envelope (Litho, id 106) ----------
+@app.get("/api/printoka/envelope/options")
+def envelope_options(product: int = Query(106)):
+    return {}  # inline addon fields
+
+
+@app.get("/api/printoka/envelope/quote")
+def envelope_quote(product: int = Query(106), model: str = Query("EV4496NW — 114x248mm"),
+                   colour: str = Query("4C (Front)"), qty: int = Query(...)):
+    from . import envelope_engine as EV
+    try:
+        cash = EV.cash_price(model, colour, qty)
+        wt = EV.weight_kg(model, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("Envelope: Die-Cutting, Folding + Gluing compulsory (included). Print colour is "
+            "an additive plate cost vs 4C(Front). The 3 OE 'Best Seller' moulds map to the "
+            "same-size EV mould (their paper differs slightly). qty = pieces.")
+    return {"config": {"product": product, "model": model, "colour": colour, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per-model curve + colour plate delta)",
+            "note": note, "tiers": EV.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Letterhead (Litho, id 105) ----------

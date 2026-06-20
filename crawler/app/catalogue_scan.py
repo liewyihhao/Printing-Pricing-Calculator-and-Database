@@ -27,6 +27,7 @@ BUILT = {
     "customprint": ["Loose Sheet Litho (alias, id 103)"],
     "notepad": ["Notepad Litho (104)"],
     "letterhead": ["Letterhead Litho (105)"],
+    "envelope": ["Envelope Litho (106)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

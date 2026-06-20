@@ -191,11 +191,27 @@ def build_data():
         {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [],
          "options": ["1C (Front)", "2C (Front)", "4C (Front)", "4C (Both)"]},
     ]
+    ENVELOPE_MODELS = [
+        "OE4496NW — 114x248mm (Best Seller)", "OE4496W — 114x248mm (window)",
+        "OE9013NW — 229x324mm", "EV4090NW — 102x229mm", "EV4090W — 102x229mm (window)",
+        "EV4286NW — 110x220mm", "EV4286W — 110x220mm (window)", "EV4496NW — 114x248mm",
+        "EV4496W — 114x248mm (window)", "EV6390NW — 162x229mm", "EV7010NW — 178x254mm",
+        "EV9013NW — 229x324mm", "EV1015NW — 254x381mm", "IS4286NW — 110x220mm",
+        "IS6390NW — 162x229mm", "OP8642NW — 220x110mm", "OP6344NW — 162x114mm"]
+    ENVELOPE_COLOURS = ["1C (Front)", "1C (Both)", "1C (Front)/2C (Back)", "1C (Front)/4C (Back)",
+        "2C (Front)", "2C (Front)/1C (Back)", "2C (Both)", "2C (Front)/4C (Back)",
+        "4C (Front)", "4C (Front)/1C (Back)", "4C (Front)/2C (Back)", "4C (Both)"]
+    ENVELOPE_FIELDS = [
+        {"key": "model", "label": "Envelope model (size / window)", "addon": True, "depends": [], "options": ENVELOPE_MODELS},
+        {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ENVELOPE_COLOURS},
+    ]
     products = [
         {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",
          "accuracy": acc.get(1), "fields": BIZCARD_FIELDS},
         {"id": 104, "name": "Notepad — Litho", "engine": "notepad", "optsrc": "none",
          "accuracy": acc.get(104), "fields": NOTEPAD_FIELDS},
+        {"id": 106, "name": "Envelope — Litho", "engine": "envelope", "optsrc": "none",
+         "accuracy": acc.get(106), "fields": ENVELOPE_FIELDS},
         {"id": 105, "name": "Letterhead — Litho", "engine": "letterhead", "optsrc": "none",
          "accuracy": acc.get(105), "fields": LETTERHEAD_FIELDS},
         {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)", "engine": "billbook",
@@ -233,6 +249,7 @@ def build_data():
             "billbook": _load("billbook_params.json", {"curves": {}, "size_factors": {}, "size_mm": {}}),
             "notepad": _load("notepad_params.json", {"curve": {}, "size_mm": [80, 106], "content_sheets": 40, "content_gsm": 80}),
             "letterhead": _load("letterhead_params.json", {"curves": {}, "size_mm": [210, 297]}),
+            "envelope": _load("envelope_params.json", {"base_curves": {}, "sizes": {}, "colour_delta": {}, "env_gsm": 100}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -257,7 +274,7 @@ def build_data():
         "engineByProduct": {1: "bizcard", 21: "litho", 50: "digital", 19: "booklet19",
                             37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
-                            104: "notepad", 105: "letterhead"},
+                            104: "notepad", 105: "letterhead", 106: "envelope"},
     }
 
 

@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-20T07:40:05",
+ "scanned_at": "2026-06-20T08:23:56",
  "total": 52,
- "built": 12,
+ "built": 13,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -170,8 +170,10 @@
    "name": "Envelope",
    "url": "https://www.excard.com.my/product/envelope",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Envelope Litho (106)"
+   ],
    "is_new": false
   },
   {
