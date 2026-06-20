@@ -223,6 +223,10 @@ def build_data():
          "accuracy": acc.get(106), "fields": ENVELOPE_FIELDS},
         {"id": 107, "name": "Folder — Litho (Presentation Folder)", "engine": "folder", "optsrc": "none",
          "accuracy": acc.get(107), "fields": FOLDER_FIELDS},
+        {"id": 108, "name": "L-Shape Plastic Folder — Digital", "engine": "lshape", "optsrc": "none",
+         "accuracy": acc.get(108), "fields": [
+            {"key": "paper", "label": "Material", "addon": True, "depends": [],
+             "options": ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]}]},
         {"id": 105, "name": "Letterhead — Litho", "engine": "letterhead", "optsrc": "none",
          "accuracy": acc.get(105), "fields": LETTERHEAD_FIELDS},
         {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)", "engine": "billbook",
@@ -262,6 +266,7 @@ def build_data():
             "letterhead": _load("letterhead_params.json", {"curves": {}, "size_mm": [210, 297]}),
             "envelope": _load("envelope_params.json", {"base_curves": {}, "sizes": {}, "colour_delta": {}, "env_gsm": 100}),
             "folder": _load("folder_params.json", {"base_curves": {}, "sizes": {}, "paper_delta": {}, "ref_paper": ""}),
+            "lshape": _load("lshape_params.json", {"curves": {}, "size_mm": [310, 442]}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -286,7 +291,8 @@ def build_data():
         "engineByProduct": {1: "bizcard", 21: "litho", 50: "digital", 19: "booklet19",
                             37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
-                            104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder"},
+                            104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder",
+                            108: "lshape"},
     }
 
 

@@ -10,6 +10,10 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **L-Shape Plastic Folder — Digital (id 108) BUILT.** Fixed model LSF 001, 310×442mm, 4C.
+    Drivers: material (Synthetic Paper 180micron / Frosted Plastic 200micron) × qty. Engine
+    `app/lshape_engine.py` = per-paper qty curve (log-interp; exact at the 14 order qtys; LOO
+    median 2.2%). Sampler `app/lshape_sampler.py` (28 pts). Wired everywhere; JS==Python.
   - **Folder — Litho (id 107) BUILT (Presentation Folder group).** Drivers: mould group
     (PF/DF/KF/CF) → mould (image radios) × paper (5 Gloss Art Card weights) × qty; no
     print-colour; Die-cutting + creasing compulsory (included). Engine `app/folder_engine.py`

@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-20T21:02:47",
+ "scanned_at": "2026-06-20T21:11:05",
  "total": 52,
- "built": 14,
+ "built": 15,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -203,8 +203,10 @@
    "name": "L Shape Folder",
    "url": "https://www.excard.com.my/product/l-shape-folder",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "L-Shape Plastic Folder Digital (108)"
+   ],
    "is_new": false
   },
   {

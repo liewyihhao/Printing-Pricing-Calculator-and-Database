@@ -29,6 +29,7 @@ BUILT = {
     "letterhead": ["Letterhead Litho (105)"],
     "envelope": ["Envelope Litho (106)"],
     "folder": ["Folder Litho — Presentation Folder (107)"],
+    "l-shape-folder": ["L-Shape Plastic Folder Digital (108)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

@@ -400,6 +400,13 @@ function localQuote(prod, V, qty){
     wt=Math.round(sm[0]*sm[1]/1e6*(cg+(P.content_sheets||40)*(P.content_gsm||80))*qty/1000*WF*1000)/1000;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
       note:"Notepad: fixed 80x106mm, 40-sheet Simili content, Wire-O punch + Matte Lam (Both) compulsory. Cover paper & Spot UV do not change the online price. qty = books." }; }
+  else if(prod.engine==="lshape"){
+    const cv=P.curves||{}; let key=cv[V.paper]?V.paper:(Object.keys(cv).find(k=>V.paper&&k.startsWith(V.paper.slice(0,9)))||Object.keys(cv)[0]);
+    const c=cv[key]||{}; cash=interpLogPts(Object.keys(c).map(k=>[+k,c[k]]),qty);
+    const sm=P.size_mm||[310,442]; const micron=/200/.test(V.paper||"")?200:180;
+    wt=Math.round(sm[0]*sm[1]/1e6*micron*qty/1000*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-paper qty curve)",
+      note:"L-Shape Plastic Folder: fixed LSF 001, 310x442mm, 4C. Compulsory die-cut + fold included. qty = pieces." }; }
   else if(prod.engine==="folder"){
     const bc=P.base_curves||{}, sz=P.sizes||{}, pd=P.paper_delta||{}, ref=P.ref_paper;
     const code=(V.mould||"").trim().match(/^[A-Z]{3}\s*\d{3}/); let m=code?code[0]:V.mould;
