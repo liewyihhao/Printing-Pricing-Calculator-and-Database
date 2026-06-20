@@ -10,6 +10,13 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Bookmark — Digital (id 109) BUILT.** Drivers: paper (7; Vellum OOS skipped) × colour
+    (4C Front/Both) × qty, + Round Cornering (R6) / Hole Punching (6mm) additive add-ons.
+    Engine `app/bookmark_engine.py` = per-(paper|colour) **log-log** qty curve (price is
+    ~power-law in qty — log-log cut held-out LOO from 18.7% to **2.5%**) + finishing deltas.
+    NOTE: bookmark/standalone uses a log-log interpolator (`interpLogLog`), distinct from the
+    shared log-price/linear-qty `interpLogPts`. Sampler `app/bookmark_sampler.py` (112 core +
+    6 finishing). Wired everywhere; JS==Python.
   - **L-Shape Plastic Folder — Digital (id 108) BUILT.** Fixed model LSF 001, 310×442mm, 4C.
     Drivers: material (Synthetic Paper 180micron / Frosted Plastic 200micron) × qty. Engine
     `app/lshape_engine.py` = per-paper qty curve (log-interp; exact at the 14 order qtys; LOO

@@ -227,6 +227,15 @@ def build_data():
          "accuracy": acc.get(108), "fields": [
             {"key": "paper", "label": "Material", "addon": True, "depends": [],
              "options": ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]}]},
+        {"id": 109, "name": "Bookmark — Digital", "engine": "bookmark", "optsrc": "none",
+         "accuracy": acc.get(109), "fields": [
+            {"key": "paper", "label": "Paper", "addon": True, "depends": [],
+             "options": ["Gloss Art Card 250gsm (2 sides coated)", "Gloss Art Card 310gsm (2 sides coated)",
+                         "Super White 250gsm", "Linen 240gsm", "Suwen 240gsm", "Synthetic Paper 180micron",
+                         "Metal Ice 250gsm"]},
+            {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "round_corner", "label": "Round cornering (R6)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+            {"key": "hole_punch", "label": "Hole punching (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
         {"id": 105, "name": "Letterhead — Litho", "engine": "letterhead", "optsrc": "none",
          "accuracy": acc.get(105), "fields": LETTERHEAD_FIELDS},
         {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)", "engine": "billbook",
@@ -267,6 +276,7 @@ def build_data():
             "envelope": _load("envelope_params.json", {"base_curves": {}, "sizes": {}, "colour_delta": {}, "env_gsm": 100}),
             "folder": _load("folder_params.json", {"base_curves": {}, "sizes": {}, "paper_delta": {}, "ref_paper": ""}),
             "lshape": _load("lshape_params.json", {"curves": {}, "size_mm": [310, 442]}),
+            "bookmark": _load("bookmark_params.json", {"curves": {}, "fin_delta": {}, "size_mm": [50, 150]}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -292,7 +302,7 @@ def build_data():
                             37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
                             104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder",
-                            108: "lshape"},
+                            108: "lshape", 109: "bookmark"},
     }
 
 

@@ -311,8 +311,12 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 105, "name": "Letterhead — Litho"},
                {"id": 106, "name": "Envelope — Litho"},
                {"id": 107, "name": "Folder — Litho (Presentation Folder)"},
-               {"id": 108, "name": "L-Shape Plastic Folder — Digital"}]
+               {"id": 108, "name": "L-Shape Plastic Folder — Digital"},
+               {"id": 109, "name": "Bookmark — Digital"}]
 LSHAPE_PAPERS = ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]
+BOOKMARK_PAPERS = ["Gloss Art Card 250gsm (2 sides coated)", "Gloss Art Card 310gsm (2 sides coated)",
+                   "Super White 250gsm", "Linen 240gsm", "Suwen 240gsm", "Synthetic Paper 180micron",
+                   "Metal Ice 250gsm"]
 FOLDER_MOULDS = ["FPF 001 — 350x510mm", "FPF 004 — 371x534mm", "FPF 005 — 410x614mm",
                  "FPF 014 — 326x613mm", "FPF 015 — 324x635mm", "FPF 016 — 631x478mm"]
 FOLDER_PAPERS = ["Gloss Art Card 250gsm (1 side coated)", "Gloss Art Card 300gsm (1 side coated)",
@@ -375,7 +379,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               105: 8.2,  # letterhead: exact at sampled order qtys; 8.2 = held-out interp median
               106: 4.1,  # envelope: base LOO ~2%; held-out colour (additive) median 4.1%
               107: 3.5,  # folder (PF): base-curve LOO median 3.5%
-              108: 2.2}  # l-shape folder: per-paper curve LOO median 2.2%
+              108: 2.2,  # l-shape folder: per-paper curve LOO median 2.2%
+              109: 2.5}  # bookmark: per-(paper|colour) log-log curve LOO median 2.5%
 
 
 def _accuracy(product_id: int):
@@ -615,6 +620,13 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "bookmark": {"options": "/api/printoka/bookmark/options", "quote": "/api/printoka/bookmark/quote",
+                "fields": [
+                    {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": BOOKMARK_PAPERS},
+                    {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "round_corner", "label": "Round cornering (R6)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                    {"key": "hole_punch", "label": "Hole punching (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                ]},
     "lshape": {"options": "/api/printoka/lshape/options", "quote": "/api/printoka/lshape/quote",
                 "fields": [
                     {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": LSHAPE_PAPERS},
@@ -690,6 +702,8 @@ def _family(product_id: int) -> str:
         return "folder"
     if product_id == 108:
         return "lshape"
+    if product_id == 109:
+        return "bookmark"
     return "loose"
 
 
@@ -952,6 +966,34 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Bookmark (Digital, id 109) ----------
+@app.get("/api/printoka/bookmark/options")
+def bookmark_options(product: int = Query(109)):
+    return {}
+
+
+@app.get("/api/printoka/bookmark/quote")
+def bookmark_quote(product: int = Query(109), paper: str = Query("Gloss Art Card 250gsm (2 sides coated)"),
+                   colour: str = Query("4C (Front)"), qty: int = Query(...),
+                   round_corner: str = Query("No"), hole_punch: str = Query("No")):
+    from . import bookmark_engine as BM
+    rc = round_corner == "Yes"; hp = hole_punch == "Yes"
+    try:
+        cash = BM.cash_price(paper, colour, qty, round_corner=rc, hole_punch=hp)
+        fin = BM.finishing_cost(qty, round_corner=rc, hole_punch=hp)
+        wt = BM.weight_kg(paper, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    return {"config": {"product": product, "paper": paper, "colour": colour, "qty": qty,
+                       "round_corner": round_corner, "hole_punch": hole_punch},
+            "printoka_cash": round(cash, 2), "finishing_cost": round(fin, 2),
+            "method": "formula (per-config log-log curve)",
+            "note": "Bookmark (Digital). Round cornering / hole punching are optional add-ons. qty = pieces.",
+            "tiers": BM.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- L-Shape Plastic Folder (Digital, id 108) ----------
