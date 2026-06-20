@@ -4,6 +4,15 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **OPTION IMAGES (thumbnails) — matches Excard.** Where Excard shows image-based options,
+  the calculator now renders a thumbnail grid instead of a dropdown. Map is
+  `output/option_images.json` ({family:{field_key:{option_label:image_url}}}, **must be UTF-8**
+  — labels contain em-dashes), hotlinked from Excard (`/images/member/order_env/*`,
+  `/order_folder/*`). api.py `_attach_option_images()` injects `images` into the matching
+  schema field; both UIs render `renderImageGrid()` (clickable cards) for any field with an
+  `images` map; `build_standalone._attach_images()` bakes them in (engine→family map).
+  Currently wired: Envelope moulds (17) + Folder moulds (6). Packaging already had images.
+  To add more: capture the option image URLs and extend `option_images.json`.
 - **BUILDING ALL 52 — batch in progress.** Map of every catalogue product → its `/spec`
   order form saved at `output/spec_link_map.json` (most catalogue "products" are marketing
   pages funnelling into a shared spec form). Reusable form dumper: `app/formdump_url.py`.

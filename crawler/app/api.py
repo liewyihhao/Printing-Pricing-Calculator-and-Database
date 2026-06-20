@@ -679,6 +679,26 @@ FIELD_SCHEMAS = {
 }
 
 
+# Attach Excard option images (thumbnails) to image-bearing option fields. The map
+# (output/option_images.json) is {family: {field_key: {option_label: image_url}}} — hotlinked
+# from Excard so the calculator shows the same product images Excard does.
+def _attach_option_images():
+    f = UI_DIR.parent / "output" / "option_images.json"
+    if not f.exists():
+        return
+    imgs = _json.loads(f.read_text(encoding="utf-8"))
+    for fam, fields in imgs.items():
+        sch = FIELD_SCHEMAS.get(fam)
+        if not sch:
+            continue
+        for fld in sch["fields"]:
+            if fld["key"] in fields:
+                fld["images"] = fields[fld["key"]]
+
+
+_attach_option_images()
+
+
 def _family(product_id: int) -> str:
     if product_id in (19, 37):
         return "booklet"

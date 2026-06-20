@@ -17,7 +17,7 @@ UI = ROOT / "ui"
 
 def _load(p, default=None):
     f = OUT / p
-    return json.loads(f.read_text()) if f.exists() else default
+    return json.loads(f.read_text(encoding="utf-8")) if f.exists() else default
 
 
 def _multidieline_data(mats):
@@ -306,8 +306,25 @@ def build_data():
     }
 
 
+def _attach_images(data):
+    """Bake Excard option images into image-bearing fields (envelope mould / folder mould)."""
+    imgs = _load("option_images.json")
+    if not imgs:
+        return
+    # map engine -> image family
+    fam_by_engine = {"envelope": "envelope", "folder": "folder"}
+    for prod in data["products"]:
+        fam = fam_by_engine.get(prod.get("engine"))
+        if not fam or fam not in imgs:
+            continue
+        for fld in prod["fields"]:
+            if fld["key"] in imgs[fam]:
+                fld["images"] = imgs[fam][fld["key"]]
+
+
 def main():
     data = build_data()
+    _attach_images(data)
     tmpl = (UI / "_standalone_template.html").read_text(encoding="utf-8")
     html = tmpl.replace("/*__DATA__*/", json.dumps(data, ensure_ascii=False))
     (UI / "calculator_standalone.html").write_text(html, encoding="utf-8")
