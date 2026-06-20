@@ -309,7 +309,13 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 103, "name": "Customprint (= Loose Sheet Litho)"},
                {"id": 104, "name": "Notepad — Litho"},
                {"id": 105, "name": "Letterhead — Litho"},
-               {"id": 106, "name": "Envelope — Litho"}]
+               {"id": 106, "name": "Envelope — Litho"},
+               {"id": 107, "name": "Folder — Litho (Presentation Folder)"}]
+FOLDER_MOULDS = ["FPF 001 — 350x510mm", "FPF 004 — 371x534mm", "FPF 005 — 410x614mm",
+                 "FPF 014 — 326x613mm", "FPF 015 — 324x635mm", "FPF 016 — 631x478mm"]
+FOLDER_PAPERS = ["Gloss Art Card 250gsm (1 side coated)", "Gloss Art Card 300gsm (1 side coated)",
+                 "Gloss Art Card 250gsm (2 side coated)", "Gloss Art Card 310gsm (2 side coated)",
+                 "Gloss Art Card 360gsm (2 side coated)"]
 ENVELOPE_MODELS = [
     "OE4496NW — 114x248mm (Best Seller)", "OE4496W — 114x248mm (window)",
     "OE9013NW — 229x324mm", "EV4090NW — 102x229mm", "EV4090W — 102x229mm (window)",
@@ -365,7 +371,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               101: 1.7, 102: 1.7, 103: 1.7,  # aliases reuse loose-litho accuracy
               104: 5.2,  # notepad: exact at order qtys; 5.2 = held-out interp median
               105: 8.2,  # letterhead: exact at sampled order qtys; 8.2 = held-out interp median
-              106: 4.1}  # envelope: base LOO ~2%; held-out colour (additive) median 4.1%
+              106: 4.1,  # envelope: base LOO ~2%; held-out colour (additive) median 4.1%
+              107: 3.5}  # folder (PF): base-curve LOO median 3.5%
 
 
 def _accuracy(product_id: int):
@@ -605,6 +612,11 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "folder": {"options": "/api/printoka/folder/options", "quote": "/api/printoka/folder/quote",
+                "fields": [
+                    {"key": "mould", "label": "Folder mould (size)", "addon": True, "depends": [], "options": FOLDER_MOULDS},
+                    {"key": "paper", "label": "Paper (Gloss Art Card)", "addon": True, "depends": [], "options": FOLDER_PAPERS},
+                ]},
     "envelope": {"options": "/api/printoka/envelope/options", "quote": "/api/printoka/envelope/quote",
                 "fields": [
                     {"key": "model", "label": "Envelope model (size / window)", "addon": True, "depends": [], "options": ENVELOPE_MODELS},
@@ -667,6 +679,8 @@ def _family(product_id: int) -> str:
         return "letterhead"
     if product_id == 106:
         return "envelope"
+    if product_id == 107:
+        return "folder"
     return "loose"
 
 
@@ -929,6 +943,31 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Folder (Litho Presentation Folder, id 107) ----------
+@app.get("/api/printoka/folder/options")
+def folder_options(product: int = Query(107)):
+    return {}  # inline addon fields
+
+
+@app.get("/api/printoka/folder/quote")
+def folder_quote(product: int = Query(107), mould: str = Query("FPF 001 — 350x510mm"),
+                 paper: str = Query("Gloss Art Card 250gsm (1 side coated)"), qty: int = Query(...)):
+    from . import folder_engine as FD
+    try:
+        cash = FD.cash_price(mould, paper, qty)
+        wt = FD.weight_kg(mould, paper, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("Folder: Presentation Folder group (PF). Die-cutting + creasing compulsory "
+            "(included); no print-colour choice. Paper is an additive cost vs the 250gsm "
+            "1-side reference. Document/Karki/CD folder groups (DF/KF/CF) are pending. qty = pieces.")
+    return {"config": {"product": product, "mould": mould, "paper": paper, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per-mould curve + paper delta)",
+            "note": note, "tiers": FD.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Envelope (Litho, id 106) ----------

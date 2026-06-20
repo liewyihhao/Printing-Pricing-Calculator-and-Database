@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-20T08:23:56",
+ "scanned_at": "2026-06-20T21:02:47",
  "total": 52,
- "built": 13,
+ "built": 14,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -192,8 +192,10 @@
    "name": "Folder",
    "url": "https://www.excard.com.my/product/folder",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Folder Litho \u2014 Presentation Folder (107)"
+   ],
    "is_new": false
   },
   {

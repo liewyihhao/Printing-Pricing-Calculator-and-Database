@@ -10,6 +10,16 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Folder — Litho (id 107) BUILT (Presentation Folder group).** Drivers: mould group
+    (PF/DF/KF/CF) → mould (image radios) × paper (5 Gloss Art Card weights) × qty; no
+    print-colour; Die-cutting + creasing compulsory (included). Engine `app/folder_engine.py`
+    = per-mould base qty curve at 250gsm-1side ref + additive paper delta (from FPF 001
+    table). **Built for the PF group (6 moulds) — base-curve LOO median 3.5%, p90 6.2%.**
+    GAP: DF/KF/CF groups (5 niche moulds: document/karki/CD folders) do NOT offer the
+    250gsm-1side ref paper and wouldn't configure reliably headless — left pending (note in
+    quote). Sampler `app/folder_sampler.py` (mould via JS-click; core 42 / paper 10 / check 8),
+    params `output/folder_params.json`. Wired: PRODUCTS_UI(107), FIELD_SCHEMAS, _family,
+    `/api/printoka/folder/{options,quote}`, standalone (JS==Python verified).
   - **Envelope — Litho (id 106) BUILT.** Standalone Envelope product (NOT the loose-sheet
     add-on). Drivers: **mould/model** (17 image-radio moulds; code encodes size + window
     NW/W) × **print colour/side** (12) × qty. Compulsory Die-Cutting + Folding + Gluing

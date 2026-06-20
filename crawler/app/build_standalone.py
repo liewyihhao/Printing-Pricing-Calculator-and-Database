@@ -205,6 +205,15 @@ def build_data():
         {"key": "model", "label": "Envelope model (size / window)", "addon": True, "depends": [], "options": ENVELOPE_MODELS},
         {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ENVELOPE_COLOURS},
     ]
+    FOLDER_MOULDS = ["FPF 001 — 350x510mm", "FPF 004 — 371x534mm", "FPF 005 — 410x614mm",
+                     "FPF 014 — 326x613mm", "FPF 015 — 324x635mm", "FPF 016 — 631x478mm"]
+    FOLDER_PAPERS = ["Gloss Art Card 250gsm (1 side coated)", "Gloss Art Card 300gsm (1 side coated)",
+                     "Gloss Art Card 250gsm (2 side coated)", "Gloss Art Card 310gsm (2 side coated)",
+                     "Gloss Art Card 360gsm (2 side coated)"]
+    FOLDER_FIELDS = [
+        {"key": "mould", "label": "Folder mould (size)", "addon": True, "depends": [], "options": FOLDER_MOULDS},
+        {"key": "paper", "label": "Paper (Gloss Art Card)", "addon": True, "depends": [], "options": FOLDER_PAPERS},
+    ]
     products = [
         {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",
          "accuracy": acc.get(1), "fields": BIZCARD_FIELDS},
@@ -212,6 +221,8 @@ def build_data():
          "accuracy": acc.get(104), "fields": NOTEPAD_FIELDS},
         {"id": 106, "name": "Envelope — Litho", "engine": "envelope", "optsrc": "none",
          "accuracy": acc.get(106), "fields": ENVELOPE_FIELDS},
+        {"id": 107, "name": "Folder — Litho (Presentation Folder)", "engine": "folder", "optsrc": "none",
+         "accuracy": acc.get(107), "fields": FOLDER_FIELDS},
         {"id": 105, "name": "Letterhead — Litho", "engine": "letterhead", "optsrc": "none",
          "accuracy": acc.get(105), "fields": LETTERHEAD_FIELDS},
         {"id": 24, "name": "Bill-Book — Litho (NCR Carbonless)", "engine": "billbook",
@@ -250,6 +261,7 @@ def build_data():
             "notepad": _load("notepad_params.json", {"curve": {}, "size_mm": [80, 106], "content_sheets": 40, "content_gsm": 80}),
             "letterhead": _load("letterhead_params.json", {"curves": {}, "size_mm": [210, 297]}),
             "envelope": _load("envelope_params.json", {"base_curves": {}, "sizes": {}, "colour_delta": {}, "env_gsm": 100}),
+            "folder": _load("folder_params.json", {"base_curves": {}, "sizes": {}, "paper_delta": {}, "ref_paper": ""}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -274,7 +286,7 @@ def build_data():
         "engineByProduct": {1: "bizcard", 21: "litho", 50: "digital", 19: "booklet19",
                             37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
-                            104: "notepad", 105: "letterhead", 106: "envelope"},
+                            104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder"},
     }
 
 
