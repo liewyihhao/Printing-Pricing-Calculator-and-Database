@@ -19,6 +19,15 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Voucher — Litho (id 110) BUILT.** Complex (like Bill-Book): PackForm(Pad/Book/Loose) ×
+    Size(12) × ContentPaper(14) × ContentColour(4C Front/Both) × Sets(10/25/50) × Qty +
+    Perforation(0/1/2) + Numbering. Engine `app/voucher_engine.py` = **decomposed factor
+    model**: reference qty curve (log-log) × qty-interpolated factors (paper/colour/sets/
+    packform, exact at sampled q50/q300) × size factor (q100) + numbering delta. **Perforation
+    has NO online price effect** (verified). Single-option axes reconstruct EXACTLY (0%); core
+    LOO median 3.9%; multi-factor combinations approximated (badge 8%). Sampler
+    `app/voucher_sampler.py` (one-factor-at-a-time sweeps; resumable per section — note it can
+    stall after the long paper phase, just re-run to resume). Wired everywhere; JS==Python.
   - **Bookmark — Digital (id 109) BUILT.** Drivers: paper (7; Vellum OOS skipped) × colour
     (4C Front/Both) × qty, + Round Cornering (R6) / Hole Punching (6mm) additive add-ons.
     Engine `app/bookmark_engine.py` = per-(paper|colour) **log-log** qty curve (price is

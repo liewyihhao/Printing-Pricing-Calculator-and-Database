@@ -227,6 +227,22 @@ def build_data():
          "accuracy": acc.get(108), "fields": [
             {"key": "paper", "label": "Material", "addon": True, "depends": [],
              "options": ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]}]},
+        {"id": 110, "name": "Voucher — Litho", "engine": "voucher", "optsrc": "none",
+         "accuracy": acc.get(110), "fields": [
+            {"key": "packform", "label": "Form", "addon": True, "depends": [], "options": ["Pad", "Book", "Loose"]},
+            {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
+                "90mm x 140mm", "105mm x 145mm", "145mm x 145mm", "125mm x 175mm", "90mm x 190mm",
+                "107mm x 190mm", "60mm x 210mm", "145mm x 210mm", "55mm x 213mm", "95mm x 225mm",
+                "120mm x 230mm", "105mm x 300mm"]},
+            {"key": "paper", "label": "Content paper", "addon": True, "depends": [], "options": [
+                "Art Paper 100gsm", "Art Paper 130gsm", "Art Paper 150gsm", "Matte Art Paper 150gsm",
+                "Colour Paper Buff 75gsm", "Colour Paper Blue 75gsm", "Colour Paper Green 75gsm",
+                "Colour Paper Pink 75gsm", "Colour Paper Purple 75gsm", "Colour Paper Yellow 75gsm",
+                "Simili 80gsm", "Simili 100gsm", "Art Card 230gsm (2 sides coated)", "Art Card 260gsm (2 sides coated)"]},
+            {"key": "colour", "label": "Content colour", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "sets", "label": "Sets per book/pad", "addon": True, "depends": [], "options": ["10", "25", "50"]},
+            {"key": "perforation", "label": "Perforation lines (no online price change)", "addon": True, "depends": [], "options": ["0", "1", "2"]},
+            {"key": "numbering", "label": "Numbering", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
         {"id": 109, "name": "Bookmark — Digital", "engine": "bookmark", "optsrc": "none",
          "accuracy": acc.get(109), "fields": [
             {"key": "paper", "label": "Paper", "addon": True, "depends": [],
@@ -277,6 +293,7 @@ def build_data():
             "folder": _load("folder_params.json", {"base_curves": {}, "sizes": {}, "paper_delta": {}, "ref_paper": ""}),
             "lshape": _load("lshape_params.json", {"curves": {}, "size_mm": [310, 442]}),
             "bookmark": _load("bookmark_params.json", {"curves": {}, "fin_delta": {}, "size_mm": [50, 150]}),
+            "voucher": _load("voucher_params.json", {"core": {}, "paper_f": {}, "colour_f": {}, "sets_f": {}, "packform_f": {}, "size_f": {}, "perf_d": {}, "numbering_d": {}, "ref": {}}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -302,7 +319,7 @@ def build_data():
                             37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
                             104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder",
-                            108: "lshape", 109: "bookmark"},
+                            108: "lshape", 109: "bookmark", 110: "voucher"},
     }
 
 

@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-20T21:34:27",
+ "scanned_at": "2026-06-21T01:12:32",
  "total": 52,
- "built": 16,
+ "built": 17,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -250,8 +250,10 @@
    "name": "Voucher",
    "url": "https://www.excard.com.my/product/voucher",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Voucher Litho (110)"
+   ],
    "is_new": false
   },
   {

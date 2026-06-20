@@ -312,7 +312,16 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 106, "name": "Envelope — Litho"},
                {"id": 107, "name": "Folder — Litho (Presentation Folder)"},
                {"id": 108, "name": "L-Shape Plastic Folder — Digital"},
-               {"id": 109, "name": "Bookmark — Digital"}]
+               {"id": 109, "name": "Bookmark — Digital"},
+               {"id": 110, "name": "Voucher — Litho"}]
+VOUCHER_SIZES = ["90mm x 140mm", "105mm x 145mm", "145mm x 145mm", "125mm x 175mm", "90mm x 190mm",
+                 "107mm x 190mm", "60mm x 210mm", "145mm x 210mm", "55mm x 213mm", "95mm x 225mm",
+                 "120mm x 230mm", "105mm x 300mm"]
+VOUCHER_PAPERS = ["Art Paper 100gsm", "Art Paper 130gsm", "Art Paper 150gsm", "Matte Art Paper 150gsm",
+                  "Colour Paper Buff 75gsm", "Colour Paper Blue 75gsm", "Colour Paper Green 75gsm",
+                  "Colour Paper Pink 75gsm", "Colour Paper Purple 75gsm", "Colour Paper Yellow 75gsm",
+                  "Simili 80gsm", "Simili 100gsm", "Art Card 230gsm (2 sides coated)",
+                  "Art Card 260gsm (2 sides coated)"]
 LSHAPE_PAPERS = ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]
 BOOKMARK_PAPERS = ["Gloss Art Card 250gsm (2 sides coated)", "Gloss Art Card 310gsm (2 sides coated)",
                    "Super White 250gsm", "Linen 240gsm", "Suwen 240gsm", "Synthetic Paper 180micron",
@@ -380,7 +389,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               106: 4.1,  # envelope: base LOO ~2%; held-out colour (additive) median 4.1%
               107: 3.5,  # folder (PF): base-curve LOO median 3.5%
               108: 2.2,  # l-shape folder: per-paper curve LOO median 2.2%
-              109: 2.5}  # bookmark: per-(paper|colour) log-log curve LOO median 2.5%
+              109: 2.5,  # bookmark: per-(paper|colour) log-log curve LOO median 2.5%
+              110: 8.0}  # voucher: factor model — single axes exact, ~4% core interp + interactions
 
 
 def _accuracy(product_id: int):
@@ -620,6 +630,16 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "voucher": {"options": "/api/printoka/voucher/options", "quote": "/api/printoka/voucher/quote",
+                "fields": [
+                    {"key": "packform", "label": "Form", "addon": True, "depends": [], "options": ["Pad", "Book", "Loose"]},
+                    {"key": "size", "label": "Size", "addon": True, "depends": [], "options": VOUCHER_SIZES},
+                    {"key": "paper", "label": "Content paper", "addon": True, "depends": [], "options": VOUCHER_PAPERS},
+                    {"key": "colour", "label": "Content colour", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "sets", "label": "Sets per book/pad", "addon": True, "depends": [], "options": ["10", "25", "50"]},
+                    {"key": "perforation", "label": "Perforation lines (no online price change)", "addon": True, "depends": [], "options": ["0", "1", "2"]},
+                    {"key": "numbering", "label": "Numbering", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                ]},
     "bookmark": {"options": "/api/printoka/bookmark/options", "quote": "/api/printoka/bookmark/quote",
                 "fields": [
                     {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": BOOKMARK_PAPERS},
@@ -724,6 +744,8 @@ def _family(product_id: int) -> str:
         return "lshape"
     if product_id == 109:
         return "bookmark"
+    if product_id == 110:
+        return "voucher"
     return "loose"
 
 
@@ -986,6 +1008,36 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Voucher (Litho, id 110) ----------
+@app.get("/api/printoka/voucher/options")
+def voucher_options(product: int = Query(110)):
+    return {}
+
+
+@app.get("/api/printoka/voucher/quote")
+def voucher_quote(product: int = Query(110), packform: str = Query("Book"),
+                  size: str = Query("145mm x 210mm"), paper: str = Query("Art Paper 100gsm"),
+                  colour: str = Query("4C (Front)"), sets: str = Query("50"), qty: int = Query(...),
+                  perforation: str = Query("0"), numbering: str = Query("No")):
+    from . import voucher_engine as VC
+    try:
+        cash = VC.cash_price(packform, size, paper, colour, sets, qty,
+                             perforation=perforation, numbering=(numbering == "Yes"))
+        wt = VC.weight_kg(size, paper, sets, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("Voucher (Litho). qty = books/pads (x sets per book). Perforation lines have no "
+            "online price effect; numbering adds a per-run cost. Decomposed factor model: "
+            "single-option axes are exact, combinations are approximated.")
+    return {"config": {"product": product, "packform": packform, "size": size, "paper": paper,
+                       "colour": colour, "sets": sets, "qty": qty, "perforation": perforation,
+                       "numbering": numbering},
+            "printoka_cash": round(cash, 2), "method": "formula (reference curve x factors)",
+            "note": note, "tiers": VC.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Bookmark (Digital, id 109) ----------
