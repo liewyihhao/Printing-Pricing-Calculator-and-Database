@@ -313,7 +313,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 107, "name": "Folder — Litho (Presentation Folder)"},
                {"id": 108, "name": "L-Shape Plastic Folder — Digital"},
                {"id": 109, "name": "Bookmark — Digital"},
-               {"id": 110, "name": "Voucher — Litho"}]
+               {"id": 110, "name": "Voucher — Litho"},
+               {"id": 111, "name": "Computer Form — Litho (NCR)"}]
 VOUCHER_SIZES = ["90mm x 140mm", "105mm x 145mm", "145mm x 145mm", "125mm x 175mm", "90mm x 190mm",
                  "107mm x 190mm", "60mm x 210mm", "145mm x 210mm", "55mm x 213mm", "95mm x 225mm",
                  "120mm x 230mm", "105mm x 300mm"]
@@ -390,7 +391,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               107: 3.5,  # folder (PF): base-curve LOO median 3.5%
               108: 2.2,  # l-shape folder: per-paper curve LOO median 2.2%
               109: 2.5,  # bookmark: per-(paper|colour) log-log curve LOO median 2.5%
-              110: 8.0}  # voucher: factor model — single axes exact, ~4% core interp + interactions
+              110: 8.0,  # voucher: factor model — single axes exact, ~4% core interp + interactions
+              111: 4.0}  # computer form: factor model — axes exact, core LOO ~4%
 
 
 def _accuracy(product_id: int):
@@ -630,6 +632,16 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "computerform": {"options": "/api/printoka/computerform/options", "quote": "/api/printoka/computerform/quote",
+                "fields": [
+                    {"key": "package", "label": "Package", "addon": True, "depends": [],
+                     "options": ["Multi Layer Computer Form", "Single Layer Computer Form", "Pay Slip"]},
+                    {"key": "layers", "label": "Layers / plies (Multi Layer only)", "addon": True, "depends": [], "options": ["2", "3", "4", "5"]},
+                    {"key": "ups", "label": "Ups (forms per set)", "addon": True, "depends": [], "options": ["1", "2", "3"]},
+                    {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["1C", "2C", "4C"]},
+                    {"key": "copychange", "label": "Copy change (no online price change)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                    {"key": "numbering", "label": "Numbering (quoted separately)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                ]},
     "voucher": {"options": "/api/printoka/voucher/options", "quote": "/api/printoka/voucher/quote",
                 "fields": [
                     {"key": "packform", "label": "Form", "addon": True, "depends": [], "options": ["Pad", "Book", "Loose"]},
@@ -746,6 +758,8 @@ def _family(product_id: int) -> str:
         return "bookmark"
     if product_id == 110:
         return "voucher"
+    if product_id == 111:
+        return "computerform"
     return "loose"
 
 
@@ -1008,6 +1022,34 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Computer Form (Litho NCR, id 111) ----------
+@app.get("/api/printoka/computerform/options")
+def computerform_options(product: int = Query(111)):
+    return {}
+
+
+@app.get("/api/printoka/computerform/quote")
+def computerform_quote(product: int = Query(111), package: str = Query("Multi Layer Computer Form"),
+                       layers: str = Query("2"), ups: str = Query("1"), colour: str = Query("1C"),
+                       qty: int = Query(...), copychange: str = Query("No"), numbering: str = Query("No")):
+    from . import computerform_engine as CF
+    try:
+        cash = CF.cash_price(package, int(layers), ups, colour, qty,
+                             copychange=(copychange == "Yes"), numbering=(numbering == "Yes"))
+        wt = CF.weight_kg(int(layers), ups, qty, package=package)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("Computer Form (NCR), fixed 9.5\"x11\". qty = sets/forms. Per-ply tints are "
+            "price-neutral; copy change has no online price effect; numbering is quoted "
+            "separately. Layers apply to Multi Layer only.")
+    return {"config": {"product": product, "package": package, "layers": layers, "ups": ups,
+                       "colour": colour, "qty": qty, "copychange": copychange, "numbering": numbering},
+            "printoka_cash": round(cash, 2), "method": "formula (reference curve x factors)",
+            "note": note, "tiers": CF.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Voucher (Litho, id 110) ----------

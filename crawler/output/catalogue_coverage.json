@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-21T01:12:32",
+ "scanned_at": "2026-06-21T21:23:47",
  "total": 52,
- "built": 17,
+ "built": 18,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -163,8 +163,10 @@
    "name": "Computer Form",
    "url": "https://www.excard.com.my/product/computer-form",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Computer Form Litho NCR (111)"
+   ],
    "is_new": false
   },
   {

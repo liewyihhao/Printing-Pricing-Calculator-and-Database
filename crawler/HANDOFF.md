@@ -19,6 +19,14 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Computer Form — Litho (NCR) (id 111) BUILT.** Fixed 9.5"×11". Package(Multi Layer /
+    Single Layer / Pay Slip) × Layers(2–5, Multi only) × Ups(1–3) × Colour(1C/2C/4C) × Qty
+    + copy-change/numbering. Engine `app/computerform_engine.py` = Multi core qty curve
+    (log-log) × qty-interp layer/ups/colour factors (exact at q2000/q10000); Single & Pay-Slip
+    have own curves. **Copy change has NO online price effect; per-ply tints price-neutral;
+    numbering is quoted separately (its sweep stalled headless — a numbering-range input hangs
+    the read; left as a block charge).** core LOO median 3.9%, factor axes exact. Sampler
+    `app/computerform_sampler.py`. Wired everywhere; JS==Python.
   - **Voucher — Litho (id 110) BUILT.** Complex (like Bill-Book): PackForm(Pad/Book/Loose) ×
     Size(12) × ContentPaper(14) × ContentColour(4C Front/Both) × Sets(10/25/50) × Qty +
     Perforation(0/1/2) + Numbering. Engine `app/voucher_engine.py` = **decomposed factor

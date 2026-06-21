@@ -32,6 +32,7 @@ BUILT = {
     "l-shape-folder": ["L-Shape Plastic Folder Digital (108)"],
     "bookmark": ["Bookmark Digital (109)"],
     "voucher": ["Voucher Litho (110)"],
+    "computer-form": ["Computer Form Litho NCR (111)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

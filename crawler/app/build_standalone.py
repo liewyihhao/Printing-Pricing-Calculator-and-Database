@@ -227,6 +227,14 @@ def build_data():
          "accuracy": acc.get(108), "fields": [
             {"key": "paper", "label": "Material", "addon": True, "depends": [],
              "options": ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]}]},
+        {"id": 111, "name": "Computer Form — Litho (NCR)", "engine": "computerform", "optsrc": "none",
+         "accuracy": acc.get(111), "fields": [
+            {"key": "package", "label": "Package", "addon": True, "depends": [], "options": ["Multi Layer Computer Form", "Single Layer Computer Form", "Pay Slip"]},
+            {"key": "layers", "label": "Layers / plies (Multi Layer only)", "addon": True, "depends": [], "options": ["2", "3", "4", "5"]},
+            {"key": "ups", "label": "Ups (forms per set)", "addon": True, "depends": [], "options": ["1", "2", "3"]},
+            {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["1C", "2C", "4C"]},
+            {"key": "copychange", "label": "Copy change (no online price change)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+            {"key": "numbering", "label": "Numbering (quoted separately)", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
         {"id": 110, "name": "Voucher — Litho", "engine": "voucher", "optsrc": "none",
          "accuracy": acc.get(110), "fields": [
             {"key": "packform", "label": "Form", "addon": True, "depends": [], "options": ["Pad", "Book", "Loose"]},
@@ -294,6 +302,7 @@ def build_data():
             "lshape": _load("lshape_params.json", {"curves": {}, "size_mm": [310, 442]}),
             "bookmark": _load("bookmark_params.json", {"curves": {}, "fin_delta": {}, "size_mm": [50, 150]}),
             "voucher": _load("voucher_params.json", {"core": {}, "paper_f": {}, "colour_f": {}, "sets_f": {}, "packform_f": {}, "size_f": {}, "perf_d": {}, "numbering_d": {}, "ref": {}}),
+            "computerform": _load("computerform_params.json", {"core": {}, "single": {}, "payslip": {}, "layer_f": {}, "ups_f": {}, "colour_f": {}, "copychange_d": [], "numbering_d": [], "size_mm": [241.3, 279.4], "ncr_gsm": 55}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -319,7 +328,7 @@ def build_data():
                             37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
                             104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder",
-                            108: "lshape", 109: "bookmark", 110: "voucher"},
+                            108: "lshape", 109: "bookmark", 110: "voucher", 111: "computerform"},
     }
 
 
