@@ -19,6 +19,14 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Wire-O Notebook — Litho (id 112) BUILT (Hard Cover + VDP Hard Cover).** Fixed size/
+    paper/pages per cover. Drivers: cover type × additional content sheets (None/4/8/12) × qty
+    + compulsory cover lamination (Matte/Gloss Front = same price; Spot UV adds a delta) + hot
+    stamping (block, quoted separately). Engine `app/wireo_engine.py` = per-cover log-log qty
+    curve + additive lamination/add-content deltas. Hard Cover full (LOO median 2.3%); VDP Hard
+    Cover is genuinely low-qty (≤100). **GAP: Soft Cover + Exclusive Leather Cover don't offer
+    the Matte-Front reference lamination (cfg_fail headless) — left pending.** Sampler
+    `app/wireo_sampler.py`. Wired everywhere; JS==Python.
   - **Computer Form — Litho (NCR) (id 111) BUILT.** Fixed 9.5"×11". Package(Multi Layer /
     Single Layer / Pay Slip) × Layers(2–5, Multi only) × Ups(1–3) × Colour(1C/2C/4C) × Qty
     + copy-change/numbering. Engine `app/computerform_engine.py` = Multi core qty curve

@@ -1,0 +1,106 @@
+{
+"cover_curves": {
+"Hard Cover": {
+"10": 90.7,
+"30": 272.15,
+"50": 453.6,
+"100": 764.4,
+"200": 1387.2,
+"300": 2011.2,
+"500": 3086.4,
+"1000": 5776.8,
+"3000": 16538.4,
+"10000": 53212.8
+},
+"VDP Hard Cover": {
+"10": 245.45,
+"30": 374.15,
+"50": 502.7,
+"100": 824.4
+}
+},
+"lam_delta": {
+"Matte Lamination (Front)": [
+[
+50,
+0.0
+],
+[
+500,
+0.0
+]
+],
+"Matte Lamination (Front) + Spot UV (Front Cover)": [
+[
+500,
+312.0
+]
+],
+"Matte Lamination (Front) + Spot UV (Front and Back Cover)": [
+[
+500,
+312.0
+]
+],
+"Gloss Lamination (Front)": [
+[
+50,
+0.0
+],
+[
+500,
+0.0
+]
+]
+},
+"addc_delta": {
+"None": [
+[
+50,
+0.0
+],
+[
+500,
+0.0
+]
+],
+"4 sheets": [
+[
+50,
+56.39999999999998
+],
+[
+500,
+374.4000000000001
+]
+],
+"8 sheets": [
+[
+50,
+112.79999999999995
+],
+[
+500,
+747.5999999999999
+]
+],
+"12 sheets": [
+[
+50,
+170.39999999999998
+],
+[
+500,
+1121.9999999999995
+]
+]
+},
+"cover_wt": {
+"Hard Cover": 0.32,
+"VDP Hard Cover": 0.32,
+"Soft Cover": 0.18,
+"Exclusive Leather Cover": 0.38
+},
+"ref_lam": "Matte Lamination (Front)",
+"weight_factor": 1.2065
+}

@@ -33,6 +33,7 @@ BUILT = {
     "bookmark": ["Bookmark Digital (109)"],
     "voucher": ["Voucher Litho (110)"],
     "computer-form": ["Computer Form Litho NCR (111)"],
+    "wire-o-notebook": ["Wire-O Notebook Litho (112)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

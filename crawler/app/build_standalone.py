@@ -227,6 +227,14 @@ def build_data():
          "accuracy": acc.get(108), "fields": [
             {"key": "paper", "label": "Material", "addon": True, "depends": [],
              "options": ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]}]},
+        {"id": 112, "name": "Wire-O Notebook — Litho", "engine": "wireo", "optsrc": "none",
+         "accuracy": acc.get(112), "fields": [
+            {"key": "cover", "label": "Cover type", "addon": True, "depends": [], "options": ["Hard Cover", "VDP Hard Cover"]},
+            {"key": "lamination", "label": "Cover lamination (compulsory)", "addon": True, "depends": [], "options": [
+                "Matte Lamination (Front)", "Gloss Lamination (Front)",
+                "Matte Lamination (Front) + Spot UV (Front Cover)", "Matte Lamination (Front) + Spot UV (Front and Back Cover)"]},
+            {"key": "addcontent", "label": "Additional content sheets", "addon": True, "depends": [], "options": ["Not Required", "4 sheets", "8 sheets", "12 sheets"]},
+            {"key": "hot_stamping", "label": "Cover hot stamping (quoted separately)", "addon": True, "depends": [], "options": ["Not Required", "1C (Front Cover)", "2C (Front Cover)", "1C (Front & Back Cover)", "2C (Front & Back Cover)"]}]},
         {"id": 111, "name": "Computer Form — Litho (NCR)", "engine": "computerform", "optsrc": "none",
          "accuracy": acc.get(111), "fields": [
             {"key": "package", "label": "Package", "addon": True, "depends": [], "options": ["Multi Layer Computer Form", "Single Layer Computer Form", "Pay Slip"]},
@@ -303,6 +311,7 @@ def build_data():
             "bookmark": _load("bookmark_params.json", {"curves": {}, "fin_delta": {}, "size_mm": [50, 150]}),
             "voucher": _load("voucher_params.json", {"core": {}, "paper_f": {}, "colour_f": {}, "sets_f": {}, "packform_f": {}, "size_f": {}, "perf_d": {}, "numbering_d": {}, "ref": {}}),
             "computerform": _load("computerform_params.json", {"core": {}, "single": {}, "payslip": {}, "layer_f": {}, "ups_f": {}, "colour_f": {}, "copychange_d": [], "numbering_d": [], "size_mm": [241.3, 279.4], "ncr_gsm": 55}),
+            "wireo": _load("wireo_params.json", {"cover_curves": {}, "lam_delta": {}, "addc_delta": {}, "cover_wt": {}, "ref_lam": ""}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -328,7 +337,8 @@ def build_data():
                             37: "booklet37", 60: "sticker_digital", 61: "sticker_letterpress",
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
                             104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder",
-                            108: "lshape", 109: "bookmark", 110: "voucher", 111: "computerform"},
+                            108: "lshape", 109: "bookmark", 110: "voucher", 111: "computerform",
+                            112: "wireo"},
     }
 
 
