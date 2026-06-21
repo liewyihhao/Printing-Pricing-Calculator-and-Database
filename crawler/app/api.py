@@ -315,7 +315,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 109, "name": "Bookmark — Digital"},
                {"id": 110, "name": "Voucher — Litho"},
                {"id": 111, "name": "Computer Form — Litho (NCR)"},
-               {"id": 112, "name": "Wire-O Notebook — Litho"}]
+               {"id": 112, "name": "Wire-O Notebook — Litho"},
+               {"id": 113, "name": "PVC Card — Digital"}]
 WIREO_LAMS = ["Matte Lamination (Front)", "Gloss Lamination (Front)",
               "Matte Lamination (Front) + Spot UV (Front Cover)",
               "Matte Lamination (Front) + Spot UV (Front and Back Cover)"]
@@ -397,7 +398,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               109: 2.5,  # bookmark: per-(paper|colour) log-log curve LOO median 2.5%
               110: 8.0,  # voucher: factor model — single axes exact, ~4% core interp + interactions
               111: 4.0,  # computer form: factor model — axes exact, core LOO ~4%
-              112: 2.3}  # wire-o notebook: per-cover curve LOO median 2.3% (Hard Cover)
+              112: 2.3,  # wire-o notebook: per-cover curve LOO median 2.3% (Hard Cover)
+              113: 4.1}  # pvc card: qty curve LOO median 4.1% (colour neutral)
 
 
 def _accuracy(product_id: int):
@@ -637,6 +639,13 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "pvccard": {"options": "/api/printoka/pvccard/options", "quote": "/api/printoka/pvccard/quote",
+                "fields": [
+                    {"key": "orientation", "label": "Orientation (price-neutral)", "addon": True, "depends": [], "options": ["Portrait", "Landscape"]},
+                    {"key": "colour", "label": "Print colour (price-neutral)", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "round_corner", "label": "Round cornering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                    {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                ]},
     "wireo": {"options": "/api/printoka/wireo/options", "quote": "/api/printoka/wireo/quote",
                 "fields": [
                     {"key": "cover", "label": "Cover type", "addon": True, "depends": [], "options": ["Hard Cover", "VDP Hard Cover"]},
@@ -774,6 +783,8 @@ def _family(product_id: int) -> str:
         return "computerform"
     if product_id == 112:
         return "wireo"
+    if product_id == 113:
+        return "pvccard"
     return "loose"
 
 
@@ -1036,6 +1047,35 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- PVC Card (Digital, id 113) ----------
+@app.get("/api/printoka/pvccard/options")
+def pvccard_options(product: int = Query(113)):
+    return {}
+
+
+@app.get("/api/printoka/pvccard/quote")
+def pvccard_quote(product: int = Query(113), colour: str = Query("4C (Front)"),
+                  orientation: str = Query("Portrait"), qty: int = Query(...),
+                  round_corner: str = Query("No"), hole_punch: str = Query("No")):
+    from . import pvccard_engine as PV
+    rc = round_corner == "Yes"; hp = hole_punch == "Yes"
+    try:
+        cash = PV.cash_price(colour, qty, round_corner=rc, hole_punch=hp)
+        fin = PV.finishing_cost(qty, round_corner=rc, hole_punch=hp)
+        wt = PV.weight_kg(qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("PVC Card (CR80). Orientation & print colour are price-neutral; round cornering is "
+            "free; hole punching adds a per-run cost. qty = cards.")
+    return {"config": {"product": product, "colour": colour, "orientation": orientation, "qty": qty,
+                       "round_corner": round_corner, "hole_punch": hole_punch},
+            "printoka_cash": round(cash, 2), "finishing_cost": round(fin, 2),
+            "method": "formula (qty curve)", "note": note,
+            "tiers": PV.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Wire-O Notebook (Litho, id 112) ----------

@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-21T21:39:40",
+ "scanned_at": "2026-06-21T21:50:35",
  "total": 52,
- "built": 18,
+ "built": 19,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -328,8 +328,10 @@
    "name": "Pvc Card",
    "url": "https://www.excard.com.my/product/pvc-card",
    "category": "Cards",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "PVC Card Digital (113)"
+   ],
    "is_new": false
   },
   {

@@ -19,6 +19,10 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **PVC Card — Digital (id 113) BUILT.** Fixed CR80 card. Orientation & print colour are
+    PRICE-NEUTRAL (verified); round cornering is FREE; hole punching adds a per-run delta.
+    Engine `app/pvccard_engine.py` = qty curve (log-log) + hole-punch delta. LOO median 4.1%.
+    Sampler `app/pvccard_sampler.py`. Wired everywhere; JS==Python.
   - **Wire-O Notebook — Litho (id 112) BUILT (Hard Cover + VDP Hard Cover).** Fixed size/
     paper/pages per cover. Drivers: cover type × additional content sheets (None/4/8/12) × qty
     + compulsory cover lamination (Matte/Gloss Front = same price; Spot UV adds a delta) + hot

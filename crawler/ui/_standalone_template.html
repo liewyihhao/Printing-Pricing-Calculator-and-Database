@@ -400,6 +400,17 @@ function localQuote(prod, V, qty){
     wt=Math.round(sm[0]*sm[1]/1e6*(cg+(P.content_sheets||40)*(P.content_gsm||80))*qty/1000*WF*1000)/1000;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
       note:"Notepad: fixed 80x106mm, 40-sheet Simili content, Wire-O punch + Matte Lam (Both) compulsory. Cover paper & Spot UV do not change the online price. qty = books." }; }
+  else if(prod.engine==="pvccard"){
+    const cv=P.curves||{}, fd=P.fin_delta||{};
+    function iLL(o,q){const p=Object.keys(o).map(k=>[+k,o[k]]).sort((a,b)=>a[0]-b[0]);if(!p.length)return 0;const xs=p.map(x=>Math.log(x[0])),ys=p.map(x=>Math.log(x[1])),X=Math.log(Math.max(+q,1));if(X<=xs[0])return Math.exp(ys[0]);if(X>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(X<=xs[i]){const t=(X-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}
+    function lp(pts,x){if(!pts||!pts.length)return 0;pts=pts.slice().sort((a,b)=>a[0]-b[0]);if(x<=pts[0][0])return pts[0][1];if(x>=pts[pts.length-1][0])return pts[pts.length-1][1];for(let i=1;i<pts.length;i++)if(x<=pts[i][0]){const t=(x-pts[i-1][0])/(pts[i][0]-pts[i-1][0]);return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]);}}
+    let key=cv[V.colour]?V.colour:Object.keys(cv)[0]; let cash2=iLL(cv[key]||{},qty); let fin=0;
+    if(V.round_corner==="Yes") fin+=lp(fd.round_corner||[],qty);
+    if(V.hole_punch==="Yes") fin+=lp(fd.hole_punch||[],qty);
+    cash2+=fin;
+    wt=Math.round((P.card_wt||0.0056)*qty*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash2*100)/100, finishing_cost: Math.round(fin*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (qty curve)",
+      note:"PVC Card (CR80). Orientation & colour price-neutral; round cornering free; hole punching adds a cost. qty = cards." }; }
   else if(prod.engine==="wireo"){
     const P2=P;
     function interpLL(obj,q){const pts=Object.keys(obj).map(k=>[+k,obj[k]]).sort((a,b)=>a[0]-b[0]);if(!pts.length)return 0;const xs=pts.map(p=>Math.log(p[0])),ys=pts.map(p=>Math.log(p[1])),x=Math.log(Math.max(+q,1));if(x<=xs[0])return Math.exp(ys[0]);if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}
