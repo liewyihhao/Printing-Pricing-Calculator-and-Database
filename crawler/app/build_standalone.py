@@ -227,6 +227,19 @@ def build_data():
          "accuracy": acc.get(108), "fields": [
             {"key": "paper", "label": "Material", "addon": True, "depends": [],
              "options": ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]}]},
+        {"id": 114, "name": "Kad Kahwin — Digital", "engine": "kadkahwin", "optsrc": "none",
+         "accuracy": acc.get(114), "fields": [
+            {"key": "ordertype", "label": "Order type", "addon": True, "depends": [], "options": ["Standard Kad Kahwin", "Custom Die-cut Kad Kahwin"]},
+            {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
+                "DL (99mm x 210mm)", "2DL (198mm x 210mm)", "A7 (74mm x 105mm)", "A6 (105mm x 148mm)",
+                "A5 (148mm x 210mm)", "A4 (210mm x 297mm)", "Square (140mm x 280mm)"]},
+            {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
+                "Gloss Art Card 230gsm (2 sides coated)", "Gloss Art Card 260gsm (2 sides coated)",
+                "Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)",
+                "Super White 240gsm", "Linen 240gsm", "Suwen 240gsm", "Simili 140gsm",
+                "Metal Ice 250gsm", "Matte Art Paper 150gsm"]},
+            {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "hot_stamping", "label": "Hot stamping (quoted separately)", "addon": True, "depends": [], "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]}]},
         {"id": 113, "name": "PVC Card — Digital", "engine": "pvccard", "optsrc": "none",
          "accuracy": acc.get(113), "fields": [
             {"key": "orientation", "label": "Orientation (price-neutral)", "addon": True, "depends": [], "options": ["Portrait", "Landscape"]},
@@ -319,6 +332,7 @@ def build_data():
             "computerform": _load("computerform_params.json", {"core": {}, "single": {}, "payslip": {}, "layer_f": {}, "ups_f": {}, "colour_f": {}, "copychange_d": [], "numbering_d": [], "size_mm": [241.3, 279.4], "ncr_gsm": 55}),
             "wireo": _load("wireo_params.json", {"cover_curves": {}, "lam_delta": {}, "addc_delta": {}, "cover_wt": {}, "ref_lam": ""}),
             "pvccard": _load("pvccard_params.json", {"curves": {}, "fin_delta": {}, "card_wt": 0.0056}),
+            "kadkahwin": _load("kadkahwin_params.json", {"core": {}, "size_f": {}, "paper_f": {}, "colour_f": {}, "ordertype_f": {}, "ref": {}}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -345,7 +359,7 @@ def build_data():
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
                             104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder",
                             108: "lshape", 109: "bookmark", 110: "voucher", 111: "computerform",
-                            112: "wireo", 113: "pvccard"},
+                            112: "wireo", 113: "pvccard", 114: "kadkahwin"},
     }
 
 

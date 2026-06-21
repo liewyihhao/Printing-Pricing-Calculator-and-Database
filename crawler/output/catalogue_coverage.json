@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-21T21:50:35",
+ "scanned_at": "2026-06-21T22:19:22",
  "total": 52,
- "built": 19,
+ "built": 20,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -310,8 +310,10 @@
    "name": "Kad Kahwin",
    "url": "https://www.excard.com.my/product/kad-kahwin",
    "category": "Cards",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Kad Kahwin Digital (114)"
+   ],
    "is_new": false
   },
   {

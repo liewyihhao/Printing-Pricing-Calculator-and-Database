@@ -316,7 +316,14 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 110, "name": "Voucher — Litho"},
                {"id": 111, "name": "Computer Form — Litho (NCR)"},
                {"id": 112, "name": "Wire-O Notebook — Litho"},
-               {"id": 113, "name": "PVC Card — Digital"}]
+               {"id": 113, "name": "PVC Card — Digital"},
+               {"id": 114, "name": "Kad Kahwin — Digital"}]
+KK_SIZES = ["DL (99mm x 210mm)", "2DL (198mm x 210mm)", "A7 (74mm x 105mm)", "A6 (105mm x 148mm)",
+            "A5 (148mm x 210mm)", "A4 (210mm x 297mm)", "Square (140mm x 280mm)"]
+KK_PAPERS = ["Gloss Art Card 230gsm (2 sides coated)", "Gloss Art Card 260gsm (2 sides coated)",
+             "Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)",
+             "Super White 240gsm", "Linen 240gsm", "Suwen 240gsm", "Simili 140gsm",
+             "Metal Ice 250gsm", "Matte Art Paper 150gsm"]
 WIREO_LAMS = ["Matte Lamination (Front)", "Gloss Lamination (Front)",
               "Matte Lamination (Front) + Spot UV (Front Cover)",
               "Matte Lamination (Front) + Spot UV (Front and Back Cover)"]
@@ -399,7 +406,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               110: 8.0,  # voucher: factor model — single axes exact, ~4% core interp + interactions
               111: 4.0,  # computer form: factor model — axes exact, core LOO ~4%
               112: 2.3,  # wire-o notebook: per-cover curve LOO median 2.3% (Hard Cover)
-              113: 4.1}  # pvc card: qty curve LOO median 4.1% (colour neutral)
+              113: 4.1,  # pvc card: qty curve LOO median 4.1% (colour neutral)
+              114: 5.0}  # kad kahwin: factor model — axes exact, core LOO ~3%
 
 
 def _accuracy(product_id: int):
@@ -639,6 +647,14 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "kadkahwin": {"options": "/api/printoka/kadkahwin/options", "quote": "/api/printoka/kadkahwin/quote",
+                "fields": [
+                    {"key": "ordertype", "label": "Order type", "addon": True, "depends": [], "options": ["Standard Kad Kahwin", "Custom Die-cut Kad Kahwin"]},
+                    {"key": "size", "label": "Size", "addon": True, "depends": [], "options": KK_SIZES},
+                    {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": KK_PAPERS},
+                    {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "hot_stamping", "label": "Hot stamping (quoted separately)", "addon": True, "depends": [], "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]},
+                ]},
     "pvccard": {"options": "/api/printoka/pvccard/options", "quote": "/api/printoka/pvccard/quote",
                 "fields": [
                     {"key": "orientation", "label": "Orientation (price-neutral)", "addon": True, "depends": [], "options": ["Portrait", "Landscape"]},
@@ -785,6 +801,8 @@ def _family(product_id: int) -> str:
         return "wireo"
     if product_id == 113:
         return "pvccard"
+    if product_id == 114:
+        return "kadkahwin"
     return "loose"
 
 
@@ -1047,6 +1065,39 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Kad Kahwin (Digital, id 114) ----------
+_KK_OT = {"Standard Kad Kahwin": "1,Standard Kad Kahwin", "Custom Die-cut Kad Kahwin": "2,Custom Die-cut Kad Kahwin"}
+
+
+@app.get("/api/printoka/kadkahwin/options")
+def kadkahwin_options(product: int = Query(114)):
+    return {}
+
+
+@app.get("/api/printoka/kadkahwin/quote")
+def kadkahwin_quote(product: int = Query(114), ordertype: str = Query("Standard Kad Kahwin"),
+                    size: str = Query("A5 (148mm x 210mm)"),
+                    paper: str = Query("Gloss Art Card 260gsm (2 sides coated)"),
+                    colour: str = Query("4C (Front)"), qty: int = Query(...),
+                    hot_stamping: str = Query("Not Required")):
+    from . import kadkahwin_engine as KK
+    ot = _KK_OT.get(ordertype, ordertype)
+    try:
+        cash = KK.cash_price(ot, size, paper, colour, qty)
+        wt = KK.weight_kg(size, paper, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = "Kad Kahwin (wedding card). Folding code & hot stamping are quoted separately. qty = cards."
+    if hot_stamping not in ("Not Required", ""):
+        note += f" Hot stamping ({hot_stamping}) quoted separately."
+    return {"config": {"product": product, "ordertype": ordertype, "size": size, "paper": paper,
+                       "colour": colour, "qty": qty, "hot_stamping": hot_stamping},
+            "printoka_cash": round(cash, 2), "method": "formula (reference curve x factors)",
+            "note": note, "tiers": KK.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- PVC Card (Digital, id 113) ----------

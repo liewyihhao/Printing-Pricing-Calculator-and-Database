@@ -19,6 +19,14 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Kad Kahwin — Digital (id 114) BUILT.** Wedding card. OrderType(Standard / Custom
+    Die-cut) × Size(7) × Paper(10; Vellum OOS) × Colour(4C Front/Both) × Qty + folding/hot
+    stamping (block). Engine `app/kadkahwin_engine.py` = reference qty curve (log-log) ×
+    qty-interp size/paper/colour/ordertype factors (exact at q100/q500). core LOO 3.1%, axes
+    exact. Sampler `app/kadkahwin_sampler.py`. Wired everywhere; JS==Python.
+  - **TENT CARD (Litho/Tent_Card) DEFERRED.** Fixed size/paper/colour; price stays RM0 with
+    just lamination+qty set — the form needs an unidentified extra interaction (likely a size-
+    template click). Sampler `app/tentcard_sampler.py` written but captures 0; revisit.
   - **PVC Card — Digital (id 113) BUILT.** Fixed CR80 card. Orientation & print colour are
     PRICE-NEUTRAL (verified); round cornering is FREE; hole punching adds a per-run delta.
     Engine `app/pvccard_engine.py` = qty curve (log-log) + hole-punch delta. LOO median 4.1%.

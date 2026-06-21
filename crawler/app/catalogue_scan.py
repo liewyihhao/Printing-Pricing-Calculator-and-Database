@@ -35,6 +35,7 @@ BUILT = {
     "computer-form": ["Computer Form Litho NCR (111)"],
     "wire-o-notebook": ["Wire-O Notebook Litho (112)"],
     "pvc-card": ["PVC Card Digital (113)"],
+    "kad-kahwin": ["Kad Kahwin Digital (114)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],
