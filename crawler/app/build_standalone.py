@@ -227,6 +227,15 @@ def build_data():
          "accuracy": acc.get(108), "fields": [
             {"key": "paper", "label": "Material", "addon": True, "depends": [],
              "options": ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]}]},
+        {"id": 115, "name": "Kad Terima Kasih — Digital", "engine": "kadterima", "optsrc": "none",
+         "accuracy": acc.get(115), "fields": [
+            {"key": "size", "label": "Size", "addon": True, "depends": [], "options": ["52mm x 52mm", "40mm x 86mm", "40mm x 70mm"]},
+            {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
+                "Gloss Art Card 230gsm (2 sides coated)", "Gloss Art Card 260gsm (2 sides coated)",
+                "Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)",
+                "Super White 240gsm", "Metal Ice 250gsm"]},
+            {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "hole_punch", "label": "Hole punching (3mm)", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
         {"id": 114, "name": "Kad Kahwin — Digital", "engine": "kadkahwin", "optsrc": "none",
          "accuracy": acc.get(114), "fields": [
             {"key": "ordertype", "label": "Order type", "addon": True, "depends": [], "options": ["Standard Kad Kahwin", "Custom Die-cut Kad Kahwin"]},
@@ -333,6 +342,7 @@ def build_data():
             "wireo": _load("wireo_params.json", {"cover_curves": {}, "lam_delta": {}, "addc_delta": {}, "cover_wt": {}, "ref_lam": ""}),
             "pvccard": _load("pvccard_params.json", {"curves": {}, "fin_delta": {}, "card_wt": 0.0056}),
             "kadkahwin": _load("kadkahwin_params.json", {"core": {}, "size_f": {}, "paper_f": {}, "colour_f": {}, "ordertype_f": {}, "ref": {}}),
+            "kadterima": _load("kadterima_params.json", {"core": {}, "size_f": {}, "paper_f": {}, "colour_f": {}, "hp_delta": [], "ref": {}}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -359,7 +369,7 @@ def build_data():
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
                             104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder",
                             108: "lshape", 109: "bookmark", 110: "voucher", 111: "computerform",
-                            112: "wireo", 113: "pvccard", 114: "kadkahwin"},
+                            112: "wireo", 113: "pvccard", 114: "kadkahwin", 115: "kadterima"},
     }
 
 

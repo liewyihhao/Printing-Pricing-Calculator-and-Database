@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-21T22:19:22",
+ "scanned_at": "2026-06-22T07:31:15",
  "total": 52,
- "built": 20,
+ "built": 21,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -321,8 +321,10 @@
    "name": "Kad Terima Kasih",
    "url": "https://www.excard.com.my/product/kad-terima-kasih",
    "category": "Cards",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Kad Terima Kasih Digital (115)"
+   ],
    "is_new": false
   },
   {

@@ -317,7 +317,12 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 111, "name": "Computer Form — Litho (NCR)"},
                {"id": 112, "name": "Wire-O Notebook — Litho"},
                {"id": 113, "name": "PVC Card — Digital"},
-               {"id": 114, "name": "Kad Kahwin — Digital"}]
+               {"id": 114, "name": "Kad Kahwin — Digital"},
+               {"id": 115, "name": "Kad Terima Kasih — Digital"}]
+KT_SIZES = ["52mm x 52mm", "40mm x 86mm", "40mm x 70mm"]
+KT_PAPERS = ["Gloss Art Card 230gsm (2 sides coated)", "Gloss Art Card 260gsm (2 sides coated)",
+             "Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)",
+             "Super White 240gsm", "Metal Ice 250gsm"]
 KK_SIZES = ["DL (99mm x 210mm)", "2DL (198mm x 210mm)", "A7 (74mm x 105mm)", "A6 (105mm x 148mm)",
             "A5 (148mm x 210mm)", "A4 (210mm x 297mm)", "Square (140mm x 280mm)"]
 KK_PAPERS = ["Gloss Art Card 230gsm (2 sides coated)", "Gloss Art Card 260gsm (2 sides coated)",
@@ -407,7 +412,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               111: 4.0,  # computer form: factor model — axes exact, core LOO ~4%
               112: 2.3,  # wire-o notebook: per-cover curve LOO median 2.3% (Hard Cover)
               113: 4.1,  # pvc card: qty curve LOO median 4.1% (colour neutral)
-              114: 5.0}  # kad kahwin: factor model — axes exact, core LOO ~3%
+              114: 5.0,  # kad kahwin: factor model — axes exact, core LOO ~3%
+              115: 4.0}  # kad terima kasih: factor model — axes exact, core LOO ~4%
 
 
 def _accuracy(product_id: int):
@@ -647,6 +653,13 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "kadterima": {"options": "/api/printoka/kadterima/options", "quote": "/api/printoka/kadterima/quote",
+                "fields": [
+                    {"key": "size", "label": "Size", "addon": True, "depends": [], "options": KT_SIZES},
+                    {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": KT_PAPERS},
+                    {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "hole_punch", "label": "Hole punching (3mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                ]},
     "kadkahwin": {"options": "/api/printoka/kadkahwin/options", "quote": "/api/printoka/kadkahwin/quote",
                 "fields": [
                     {"key": "ordertype", "label": "Order type", "addon": True, "depends": [], "options": ["Standard Kad Kahwin", "Custom Die-cut Kad Kahwin"]},
@@ -803,6 +816,8 @@ def _family(product_id: int) -> str:
         return "pvccard"
     if product_id == 114:
         return "kadkahwin"
+    if product_id == 115:
+        return "kadterima"
     return "loose"
 
 
@@ -1065,6 +1080,33 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Kad Terima Kasih (Digital, id 115) ----------
+@app.get("/api/printoka/kadterima/options")
+def kadterima_options(product: int = Query(115)):
+    return {}
+
+
+@app.get("/api/printoka/kadterima/quote")
+def kadterima_quote(product: int = Query(115), size: str = Query("52mm x 52mm"),
+                    paper: str = Query("Gloss Art Card 260gsm (2 sides coated)"),
+                    colour: str = Query("4C (Front)"), qty: int = Query(...),
+                    hole_punch: str = Query("No")):
+    from . import kadterima_engine as KT
+    hp = hole_punch == "Yes"
+    try:
+        cash = KT.cash_price(size, paper, colour, qty, hole_punch=hp)
+        wt = KT.weight_kg(size, paper, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = "Kad Terima Kasih (thank-you gift tag). qty = tags."
+    return {"config": {"product": product, "size": size, "paper": paper, "colour": colour,
+                       "qty": qty, "hole_punch": hole_punch},
+            "printoka_cash": round(cash, 2), "method": "formula (reference curve x factors)",
+            "note": note, "tiers": KT.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Kad Kahwin (Digital, id 114) ----------
