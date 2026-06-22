@@ -1,0 +1,122 @@
+{
+"kadkahwin": {
+"lamination": [
+{
+"lam": "Matte Lamination (Front)",
+"qty": 100,
+"cash": 66.01
+},
+{
+"lam": "Matte Lamination (Front)",
+"qty": 500,
+"cash": 209.2
+},
+{
+"lam": "Matte Lamination (Both)",
+"qty": 100,
+"cash": 66.01
+},
+{
+"lam": "Matte Lamination (Both)",
+"qty": 500,
+"cash": 209.2
+},
+{
+"lam": "Gloss Lamination (Front)",
+"qty": 100,
+"cash": 66.01
+},
+{
+"lam": "Gloss Lamination (Front)",
+"qty": 500,
+"cash": 209.2
+},
+{
+"lam": "Gloss Lamination (Both)",
+"qty": 100,
+"cash": 66.01
+},
+{
+"lam": "Gloss Lamination (Both)",
+"qty": 500,
+"cash": 209.2
+}
+],
+"envelope": [
+{
+"env": "Not Required",
+"qty": 100,
+"cash": 66.01
+},
+{
+"env": "Not Required",
+"qty": 500,
+"cash": 209.2
+},
+{
+"env": "White",
+"qty": 100,
+"cash": 66.01
+},
+{
+"env": "White",
+"qty": 500,
+"cash": 209.2
+},
+{
+"env": "Pink",
+"qty": 100,
+"cash": 66.01
+},
+{
+"env": "Pink",
+"qty": 500,
+"cash": 209.2
+}
+]
+},
+"kadterima": {
+"lamination": [
+{
+"lam": "Matte Lamination (Front)",
+"qty": 100,
+"cash": 26.55
+},
+{
+"lam": "Matte Lamination (Front)",
+"qty": 500,
+"cash": 51.8
+},
+{
+"lam": "Matte Lamination (Both)",
+"qty": 100,
+"cash": 26.55
+},
+{
+"lam": "Matte Lamination (Both)",
+"qty": 500,
+"cash": 51.8
+},
+{
+"lam": "Gloss Lamination (Front)",
+"qty": 100,
+"cash": 26.55
+},
+{
+"lam": "Gloss Lamination (Front)",
+"qty": 500,
+"cash": 51.8
+},
+{
+"lam": "Gloss Lamination (Both)",
+"qty": 100,
+"cash": 26.55
+},
+{
+"lam": "Gloss Lamination (Both)",
+"qty": 500,
+"cash": 51.8
+}
+]
+}
+}

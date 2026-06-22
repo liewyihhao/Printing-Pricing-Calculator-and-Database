@@ -4,6 +4,19 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **OPTION-PARITY CHECKER (NEW) — `app/parity_checker.py`.** Deep-configures every built
+  product's live Excard form (reveals all dependent/finishing controls), captures EVERY
+  option, and diffs vs our FIELD_SCHEMAS → `output/parity_report.json` (served at
+  `/api/printoka/parity`). Run: `python -m app.parity_checker [family ...]` or `--print`.
+  Flags missing fields + missing option values (ignores Out-of-Stock, "Others" custom-size,
+  per-ply NCR tint dropdowns, VDP text sub-options, nav). **This caught real misses my
+  www-only dumps skipped.** Fixed so far: **Kad Kahwin + Kad Terima Kasih now offer
+  Lamination (Matte/Gloss × Front/Both) + Kad Kahwin Envelope (White/Pink)** — VERIFIED
+  price-neutral online (added as selectable fields with a "no online price change" note;
+  `output/kad_finishing.json`). Both now show 0 gaps. **REMAINING real gaps to close
+  (see report): Folder cover lamination, Bookmark lamination, PVC Card VDP sub-system,
+  Wire-O Soft/Exclusive-Leather covers (deferred).** The recurring scheduled task
+  `printoka-build-all-products` now runs the checker and closes gaps before building new ones.
 - **OPTION IMAGES (thumbnails) — matches Excard.** Where Excard shows image-based options,
   the calculator now renders a thumbnail grid instead of a dropdown. Map is
   `output/option_images.json` ({family:{field_key:{option_label:image_url}}}, **must be UTF-8**

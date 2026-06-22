@@ -251,6 +251,7 @@ def build_data():
                 "Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)",
                 "Super White 240gsm", "Metal Ice 250gsm"]},
             {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [], "options": ["Matte Lamination (Front)", "Matte Lamination (Both)", "Gloss Lamination (Front)", "Gloss Lamination (Both)"]},
             {"key": "hole_punch", "label": "Hole punching (3mm)", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
         {"id": 114, "name": "Kad Kahwin — Digital", "engine": "kadkahwin", "optsrc": "none",
          "accuracy": acc.get(114), "fields": [
@@ -264,6 +265,8 @@ def build_data():
                 "Super White 240gsm", "Linen 240gsm", "Suwen 240gsm", "Simili 140gsm",
                 "Metal Ice 250gsm", "Matte Art Paper 150gsm"]},
             {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [], "options": ["Matte Lamination (Front)", "Matte Lamination (Both)", "Gloss Lamination (Front)", "Gloss Lamination (Both)"]},
+            {"key": "envelope", "label": "Envelope (no online price change)", "addon": True, "depends": [], "options": ["Not Required", "White", "Pink"]},
             {"key": "hot_stamping", "label": "Hot stamping (quoted separately)", "addon": True, "depends": [], "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]}]},
         {"id": 113, "name": "PVC Card — Digital", "engine": "pvccard", "optsrc": "none",
          "accuracy": acc.get(113), "fields": [

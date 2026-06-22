@@ -324,6 +324,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 118, "name": "Wall Calendar — Litho"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
+KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
+            "Gloss Lamination (Front)", "Gloss Lamination (Both)"]
 KT_SIZES = ["52mm x 52mm", "40mm x 86mm", "40mm x 70mm"]
 KT_PAPERS = ["Gloss Art Card 230gsm (2 sides coated)", "Gloss Art Card 260gsm (2 sides coated)",
              "Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)",
@@ -673,6 +675,7 @@ FIELD_SCHEMAS = {
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": KT_SIZES},
                     {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": KT_PAPERS},
                     {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [], "options": KAD_LAMS},
                     {"key": "hole_punch", "label": "Hole punching (3mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
     "kadkahwin": {"options": "/api/printoka/kadkahwin/options", "quote": "/api/printoka/kadkahwin/quote",
@@ -681,6 +684,8 @@ FIELD_SCHEMAS = {
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": KK_SIZES},
                     {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": KK_PAPERS},
                     {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [], "options": KAD_LAMS},
+                    {"key": "envelope", "label": "Envelope (no online price change)", "addon": True, "depends": [], "options": ["Not Required", "White", "Pink"]},
                     {"key": "hot_stamping", "label": "Hot stamping (quoted separately)", "addon": True, "depends": [], "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]},
                 ]},
     "pvccard": {"options": "/api/printoka/pvccard/options", "quote": "/api/printoka/pvccard/quote",
@@ -984,6 +989,21 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
             "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
 
 
+# ---------- Parity checker (Excard options vs our build) ----------
+@app.get("/api/printoka/parity")
+def parity_report():
+    """Latest option-parity report: per built product, which Excard controls/options our
+    build is missing. Refresh with `python -m app.parity_checker`."""
+    f = UI_DIR.parent / "output" / "parity_report.json"
+    if not f.exists():
+        return {"status": "not_run", "note": "run python -m app.parity_checker"}
+    rep = _json.loads(f.read_text(encoding="utf-8"))
+    summary = {fam: {"gaps": len(r.get("gaps", [])), "detail": r.get("gaps", [])}
+               for fam, r in rep.items()}
+    return {"families": len(rep), "total_gaps": sum(v["gaps"] for v in summary.values()),
+            "by_family": summary}
+
+
 # ---------- Catalogue auto check-up (scan Excard + coverage) ----------
 @app.get("/api/printoka/catalogue/coverage")
 def catalogue_coverage():
@@ -1158,7 +1178,7 @@ def kadterima_options(product: int = Query(115)):
 def kadterima_quote(product: int = Query(115), size: str = Query("52mm x 52mm"),
                     paper: str = Query("Gloss Art Card 260gsm (2 sides coated)"),
                     colour: str = Query("4C (Front)"), qty: int = Query(...),
-                    hole_punch: str = Query("No")):
+                    hole_punch: str = Query("No"), lamination: str = Query("Matte Lamination (Front)")):
     from . import kadterima_engine as KT
     hp = hole_punch == "Yes"
     try:
@@ -1168,9 +1188,9 @@ def kadterima_quote(product: int = Query(115), size: str = Query("52mm x 52mm"),
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = "Kad Terima Kasih (thank-you gift tag). qty = tags."
+    note = "Kad Terima Kasih (thank-you gift tag). Lamination does not change the online price. qty = tags."
     return {"config": {"product": product, "size": size, "paper": paper, "colour": colour,
-                       "qty": qty, "hole_punch": hole_punch},
+                       "qty": qty, "hole_punch": hole_punch, "lamination": lamination},
             "printoka_cash": round(cash, 2), "method": "formula (reference curve x factors)",
             "note": note, "tiers": KT.tiers(cash), "weight_kg": round(wt, 3)}
 
@@ -1189,7 +1209,9 @@ def kadkahwin_quote(product: int = Query(114), ordertype: str = Query("Standard 
                     size: str = Query("A5 (148mm x 210mm)"),
                     paper: str = Query("Gloss Art Card 260gsm (2 sides coated)"),
                     colour: str = Query("4C (Front)"), qty: int = Query(...),
-                    hot_stamping: str = Query("Not Required")):
+                    hot_stamping: str = Query("Not Required"),
+                    lamination: str = Query("Matte Lamination (Front)"),
+                    envelope: str = Query("Not Required")):
     from . import kadkahwin_engine as KK
     ot = _KK_OT.get(ordertype, ordertype)
     try:
@@ -1199,11 +1221,13 @@ def kadkahwin_quote(product: int = Query(114), ordertype: str = Query("Standard 
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = "Kad Kahwin (wedding card). Folding code & hot stamping are quoted separately. qty = cards."
+    note = ("Kad Kahwin (wedding card). Lamination & envelope colour do not change the online "
+            "price; folding code & hot stamping are quoted separately. qty = cards.")
     if hot_stamping not in ("Not Required", ""):
         note += f" Hot stamping ({hot_stamping}) quoted separately."
     return {"config": {"product": product, "ordertype": ordertype, "size": size, "paper": paper,
-                       "colour": colour, "qty": qty, "hot_stamping": hot_stamping},
+                       "colour": colour, "qty": qty, "hot_stamping": hot_stamping,
+                       "lamination": lamination, "envelope": envelope},
             "printoka_cash": round(cash, 2), "method": "formula (reference curve x factors)",
             "note": note, "tiers": KK.tiers(cash), "weight_kg": round(wt, 3)}
 
