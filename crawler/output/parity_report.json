@@ -3,13 +3,6 @@
   "family": "notepad",
   "excard_controls": [
    {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
-   {
     "control": "ddlPaper",
     "options": [
      "Gloss Art Card 260gsm (2 side coated)",
@@ -39,13 +32,6 @@
  "letterhead": {
   "family": "letterhead",
   "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
    {
     "control": "ddlPaper",
     "options": [
@@ -87,15 +73,7 @@
  },
  "envelope": {
   "family": "envelope",
-  "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   }
-  ],
+  "excard_controls": [],
   "our_fields": {
    "model": [
     "OE4496NW — 114x248mm (Best Seller)",
@@ -136,13 +114,6 @@
  "folder": {
   "family": "folder",
   "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
    {
     "control": "ddlPaper",
     "options": [
@@ -187,31 +158,20 @@
     "Gloss Art Card 250gsm (2 side coated)",
     "Gloss Art Card 310gsm (2 side coated)",
     "Gloss Art Card 360gsm (2 side coated)"
+   ],
+   "lamination": [
+    "Not Required",
+    "Gloss Lamination (Front)",
+    "Matte Lamination (Front)",
+    "Matte Lamination (Front) + Spot UV (Front)",
+    "Gloss Waterbase Varnish (Front)"
    ]
   },
-  "gaps": [
-   {
-    "type": "missing_field",
-    "control": "rblLaminationSide",
-    "options": [
-     "Gloss Lamination (Front)",
-     "Matte Lamination (Front)",
-     "Matte Lamination (Front) + Spot UV (Front)",
-     "Gloss Waterbase Varnish (Front)"
-    ]
-   }
-  ]
+  "gaps": []
  },
  "lshape": {
   "family": "lshape",
   "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
    {
     "control": "ddlPaper",
     "options": [
@@ -231,13 +191,6 @@
  "bookmark": {
   "family": "bookmark",
   "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
    {
     "control": "ddlPaper",
     "options": [
@@ -293,6 +246,11 @@
     "4C (Front)",
     "4C (Both)"
    ],
+   "lamination": [
+    "Not Required",
+    "Matte Lamination (Both)",
+    "Gloss Lamination (Both)"
+   ],
    "round_corner": [
     "No",
     "Yes"
@@ -304,11 +262,17 @@
   },
   "gaps": [
    {
-    "type": "missing_field",
-    "control": "rblLaminationSide",
-    "options": [
-     "Matte Lamination (Both)",
-     "Gloss Lamination (Both)"
+    "type": "missing_options",
+    "control": "rblRoundCorner",
+    "missing": [
+     "Round Corner"
+    ]
+   },
+   {
+    "type": "missing_options",
+    "control": "rblPunchHole",
+    "missing": [
+     "Hole Punching (6mm)"
     ]
    }
   ]
@@ -316,13 +280,6 @@
  "voucher": {
   "family": "voucher",
   "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
    {
     "control": "ddlSize",
     "options": [
@@ -459,44 +416,6 @@
   "family": "computerform",
   "excard_controls": [
    {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
-   {
-    "control": "ddlLayer",
-    "options": [
-     "2",
-     "3",
-     "4",
-     "5"
-    ]
-   },
-   {
-    "control": "ddlLayer1",
-    "options": [
-     "NCR White 55gsm",
-     "NCR Yellow 55gsm",
-     "NCR Green 55gsm",
-     "NCR Pink 55gsm",
-     "NCR Blue 55gsm",
-     "NCR White 80gsm"
-    ]
-   },
-   {
-    "control": "ddlLayer2",
-    "options": [
-     "NCR White 55gsm",
-     "NCR Yellow 55gsm",
-     "NCR Green 55gsm",
-     "NCR Pink 55gsm",
-     "NCR Blue 55gsm",
-     "NCR White 80gsm"
-    ]
-   },
-   {
     "control": "rblPackage",
     "options": [
      "Multi Layer Computer Form",
@@ -566,43 +485,11 @@
     "Yes"
    ]
   },
-  "gaps": [
-   {
-    "type": "missing_field",
-    "control": "ddlLayer1",
-    "options": [
-     "NCR White 55gsm",
-     "NCR Yellow 55gsm",
-     "NCR Green 55gsm",
-     "NCR Pink 55gsm",
-     "NCR Blue 55gsm",
-     "NCR White 80gsm"
-    ]
-   },
-   {
-    "type": "missing_field",
-    "control": "ddlLayer2",
-    "options": [
-     "NCR White 55gsm",
-     "NCR Yellow 55gsm",
-     "NCR Green 55gsm",
-     "NCR Pink 55gsm",
-     "NCR Blue 55gsm",
-     "NCR White 80gsm"
-    ]
-   }
-  ]
+  "gaps": []
  },
  "wireo": {
   "family": "wireo",
   "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
    {
     "control": "ddlCoverLamination",
     "options": [
@@ -686,13 +573,6 @@
   "family": "pvccard",
   "excard_controls": [
    {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
-   {
     "control": "ddlSizeOrientation",
     "options": [
      "Portrait",
@@ -711,46 +591,6 @@
     "options": [
      "Not Required",
      "Variable Data Printing (Front)"
-    ]
-   },
-   {
-    "control": "ddlVDPType",
-    "options": [
-     "Numbering only",
-     "Numbering + Text",
-     "Text only"
-    ]
-   },
-   {
-    "control": "ddlVDPFontType",
-    "options": [
-     "Arial",
-     "Century Gothic",
-     "Times New Roman",
-     "Allergro",
-     "Bazooka",
-     "Calligrapher",
-     "Chaucer",
-     "Cloister Black BT",
-     "Comic Sans MS",
-     "English 111 Vivace"
-    ]
-   },
-   {
-    "control": "ddlVDPBoldType",
-    "options": [
-     "Regular",
-     "Bold only",
-     "Italic only",
-     "Bold & Italic"
-    ]
-   },
-   {
-    "control": "ddlFontAlignment",
-    "options": [
-     "From Left",
-     "From Center",
-     "From Right"
     ]
    },
    {
@@ -786,63 +626,12 @@
      "Not Required",
      "Variable Data Printing (Front)"
     ]
-   },
-   {
-    "type": "missing_field",
-    "control": "ddlVDPType",
-    "options": [
-     "Numbering only",
-     "Numbering + Text",
-     "Text only"
-    ]
-   },
-   {
-    "type": "missing_field",
-    "control": "ddlVDPFontType",
-    "options": [
-     "Arial",
-     "Century Gothic",
-     "Times New Roman",
-     "Allergro",
-     "Bazooka",
-     "Calligrapher",
-     "Chaucer",
-     "Cloister Black BT",
-     "Comic Sans MS",
-     "English 111 Vivace"
-    ]
-   },
-   {
-    "type": "missing_field",
-    "control": "ddlVDPBoldType",
-    "options": [
-     "Regular",
-     "Bold only",
-     "Italic only",
-     "Bold & Italic"
-    ]
-   },
-   {
-    "type": "missing_field",
-    "control": "ddlFontAlignment",
-    "options": [
-     "From Left",
-     "From Center",
-     "From Right"
-    ]
    }
   ]
  },
  "kadkahwin": {
   "family": "kadkahwin",
   "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
    {
     "control": "ddlSize",
     "options": [
@@ -984,13 +773,6 @@
   "family": "kadterima",
   "excard_controls": [
    {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
-   {
     "control": "ddlSize",
     "options": [
      "52mm x 52mm",
@@ -1068,13 +850,6 @@
   "family": "staticcling",
   "excard_controls": [
    {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
-   {
     "control": "ddlSize",
     "options": [
      "54mm x 89mm",
@@ -1086,8 +861,7 @@
      "165mm x 90mm",
      "220mm x 90mm",
      "104mm x 420mm",
-     "310mm x 445mm",
-     "Others"
+     "310mm x 445mm"
     ]
    },
    {
@@ -1095,46 +869,6 @@
     "options": [
      "Not Required",
      "Variable Data Printing (VDP)"
-    ]
-   },
-   {
-    "control": "ddlVDPType",
-    "options": [
-     "Numbering only",
-     "Numbering + Text",
-     "Text only"
-    ]
-   },
-   {
-    "control": "ddlVDPFontType",
-    "options": [
-     "Arial",
-     "Century Gothic",
-     "Times New Roman",
-     "Allergro",
-     "Bazooka",
-     "Calligrapher",
-     "Chaucer",
-     "Cloister Black BT",
-     "Comic Sans MS",
-     "English 111 Vivace"
-    ]
-   },
-   {
-    "control": "ddlVDPBoldType",
-    "options": [
-     "Regular",
-     "Bold only",
-     "Italic only",
-     "Bold & Italic"
-    ]
-   },
-   {
-    "control": "ddlFontAlignment",
-    "options": [
-     "From Left",
-     "From Center",
-     "From Right"
     ]
    },
    {
@@ -1169,58 +903,17 @@
     "Variable Data Printing (VDP)"
    ]
   },
-  "gaps": [
-   {
-    "type": "missing_options",
-    "control": "ddlSize",
-    "missing": [
-     "Others"
-    ]
-   },
-   {
-    "type": "missing_field",
-    "control": "ddlFontAlignment",
-    "options": [
-     "From Left",
-     "From Center",
-     "From Right"
-    ]
-   }
-  ]
+  "gaps": []
  },
  "wallcal": {
   "family": "wallcal",
-  "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   }
-  ],
+  "excard_controls": [],
   "our_fields": {},
-  "gaps": [
-   {
-    "type": "missing_field",
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   }
-  ]
+  "gaps": []
  },
  "loose": {
   "family": "loose",
   "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
    {
     "control": "ddlSize",
     "options": [
@@ -1232,8 +925,7 @@
      "A6 (148mm x 105mm)",
      "3xA4 (297mm x 630mm)",
      "4xA4 (297mm x 840mm)",
-     "4xA5 (210mm x 594mm)",
-     "Others"
+     "4xA5 (210mm x 594mm)"
     ]
    },
    {
@@ -1312,13 +1004,6 @@
  "loose_digital": {
   "family": "loose_digital",
   "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
    {
     "control": "ddlSize",
     "options": [
@@ -1445,13 +1130,6 @@
   "family": "booklet",
   "excard_controls": [
    {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
-   {
     "control": "ddlSize",
     "options": [
      "A4 (210mm x 297mm)",
@@ -1503,33 +1181,6 @@
     ]
    },
    {
-    "control": "ddlCoverLamination",
-    "options": [
-     "Matte Lamination (Front)",
-     "Matte Lamination (Both)",
-     "Matte Lamination (Front) + Spot UV (Front)",
-     "Matte Lamination (Both) + Spot UV (Front)",
-     "Gloss Lamination (Front)",
-     "Gloss Lamination (Both)",
-     "UV Varnish (Front)",
-     "UV Varnish (Both)",
-     "Gloss Waterbase Varnish (Front)",
-     "Gloss Waterbase Varnish (Both)"
-    ]
-   },
-   {
-    "control": "ddl_embossing",
-    "options": [
-     "90mm x 30mm",
-     "90mm x 70mm",
-     "95mm x 206mm",
-     "101mm x 144mm",
-     "144mm x 206mm",
-     "194mm x 206mm",
-     "206mm x 294mm"
-    ]
-   },
-   {
     "control": "ddlCoverHSColourNum",
     "options": [
      "1C (Front)",
@@ -1557,28 +1208,6 @@
      "Green",
      "Red",
      "Silver"
-    ]
-   },
-   {
-    "control": "ddlContentPaper",
-    "options": [
-     "Simili 80gsm",
-     "Simili 100gsm",
-     "Gloss Art Paper 80gsm",
-     "Gloss Art Paper 100gsm",
-     "Gloss Art Paper 128gsm",
-     "Gloss Art Paper 150gsm",
-     "Matte Art Paper 100gsm",
-     "Matte Art Paper 130gsm",
-     "Matte Art Paper 150gsm",
-     "Gloss Art Card 230gsm (2 side coated)"
-    ]
-   },
-   {
-    "control": "ddlContentPrintColour",
-    "options": [
-     "1C (Both)",
-     "4C (Both)"
     ]
    },
    {
@@ -1682,13 +1311,6 @@
   "family": "billbook",
   "excard_controls": [
    {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
-   {
     "control": "ddlSize",
     "options": [
      "145mm x 210mm",
@@ -1727,8 +1349,7 @@
      "210mm x 291mm",
      "B4 (250mm x 353mm)",
      "291mm x 420mm",
-     "F3 (330mm x 420mm)",
-     "Others"
+     "F3 (330mm x 420mm)"
     ]
    },
    {
@@ -1748,26 +1369,6 @@
      "NCR - 4 Layers",
      "NCR - 5 Layers",
      "NCR - 6 Layer"
-    ]
-   },
-   {
-    "control": "ddlLayer1",
-    "options": [
-     "NCR White 50gsm",
-     "NCR Green 50gsm",
-     "NCR Blue 50gsm",
-     "NCR Yellow 50gsm",
-     "NCR Pink 50gsm"
-    ]
-   },
-   {
-    "control": "ddlLayer2",
-    "options": [
-     "NCR White 50gsm",
-     "NCR Green 50gsm",
-     "NCR Blue 50gsm",
-     "NCR Yellow 50gsm",
-     "NCR Pink 50gsm"
     ]
    },
    {
@@ -1897,35 +1498,6 @@
   },
   "gaps": [
    {
-    "type": "missing_options",
-    "control": "ddlSize",
-    "missing": [
-     "Others"
-    ]
-   },
-   {
-    "type": "missing_field",
-    "control": "ddlLayer1",
-    "options": [
-     "NCR White 50gsm",
-     "NCR Green 50gsm",
-     "NCR Blue 50gsm",
-     "NCR Yellow 50gsm",
-     "NCR Pink 50gsm"
-    ]
-   },
-   {
-    "type": "missing_field",
-    "control": "ddlLayer2",
-    "options": [
-     "NCR White 50gsm",
-     "NCR Green 50gsm",
-     "NCR Blue 50gsm",
-     "NCR Yellow 50gsm",
-     "NCR Pink 50gsm"
-    ]
-   },
-   {
     "type": "missing_field",
     "control": "rblPaper",
     "options": [
@@ -1939,26 +1511,16 @@
   "family": "sticker_digital",
   "excard_controls": [
    {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
-   {
     "control": "ddlpaper",
     "options": [
      "Mirror Kote",
      "Mirror Kote (Strong Glue)",
      "Transparent OPP",
      "White PP (Polypropylene)",
-     "White PE (Polyethylene) - 20% OFF",
      "Synthetic Paper",
      "Printing Paper",
      "Brown Craft Paper",
-     "Matte Silver Polyester - 20% OFF",
      "Bright Silver Polyester",
-     "Removable Transparent OPP - 20% OFF",
      "Removable White PP",
      "Warranty Sticker"
     ]
@@ -2076,15 +1638,6 @@
   "gaps": [
    {
     "type": "missing_options",
-    "control": "ddlpaper",
-    "missing": [
-     "White PE (Polyethylene) - 20% OFF",
-     "Matte Silver Polyester - 20% OFF",
-     "Removable Transparent OPP - 20% OFF"
-    ]
-   },
-   {
-    "type": "missing_options",
     "control": "rdCategory",
     "missing": [
      "Multiple Dieline (Available for different size and different shape)",
@@ -2096,13 +1649,6 @@
  "sticker_letterpress": {
   "family": "sticker_letterpress",
   "excard_controls": [
-   {
-    "control": "",
-    "options": [
-     "Track Order",
-     "Product"
-    ]
-   },
    {
     "control": "ddlHotStampingColour1",
     "options": [
