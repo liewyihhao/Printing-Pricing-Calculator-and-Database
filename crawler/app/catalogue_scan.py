@@ -37,6 +37,8 @@ BUILT = {
     "pvc-card": ["PVC Card Digital (113)"],
     "kad-kahwin": ["Kad Kahwin Digital (114)"],
     "kad-terima-kasih": ["Kad Terima Kasih Digital (115)"],
+    "static-cling-window-sticker": ["Static Cling Window Sticker Digital (116)"],
+    "car-sticker": ["Car Sticker Digital (117, = static cling form)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

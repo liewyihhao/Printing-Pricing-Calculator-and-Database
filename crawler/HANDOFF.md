@@ -19,6 +19,11 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Static Cling Window Sticker (id 116) + Car Sticker (id 117) BUILT** (one engine, two
+    products — same Excard form `/spec/Digital/Static_Cling_Window_Sticker`). Drivers: Size(10)
+    × Qty × Print direction (Face Out=Face In; Both Side ≈1.5×) + VDP. Engine
+    `app/staticcling_engine.py` = reference qty curve (log-log) × qty-interp size/direction/vdp
+    factors. core LOO 5.9%, axes exact. Sampler `app/staticcling_sampler.py`. Wired everywhere; JS==Python.
   - **Kad Terima Kasih — Digital (id 115) BUILT.** Thank-you gift tag. Size(3) × Paper(6;
     Vellum OOS) × Colour(4C Front/Both) × Qty + Hole Punching (3mm). Engine
     `app/kadterima_engine.py` = reference qty curve (log-log) × qty-interp size/paper/colour

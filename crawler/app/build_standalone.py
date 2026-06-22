@@ -227,6 +227,20 @@ def build_data():
          "accuracy": acc.get(108), "fields": [
             {"key": "paper", "label": "Material", "addon": True, "depends": [],
              "options": ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]}]},
+        {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
+         "accuracy": acc.get(116), "fields": [
+            {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
+                "54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
+                "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]},
+            {"key": "direction", "label": "Print direction", "addon": True, "depends": [], "options": ["Face Out View", "Face In View", "Both Side View"]},
+            {"key": "vdp", "label": "Variable Data Printing", "addon": True, "depends": [], "options": ["Not Required", "Variable Data Printing (VDP)"]}]},
+        {"id": 117, "name": "Car Sticker — Digital (= Static Cling form)", "engine": "staticcling", "optsrc": "none",
+         "accuracy": acc.get(117), "fields": [
+            {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
+                "54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
+                "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]},
+            {"key": "direction", "label": "Print direction", "addon": True, "depends": [], "options": ["Face Out View", "Face In View", "Both Side View"]},
+            {"key": "vdp", "label": "Variable Data Printing", "addon": True, "depends": [], "options": ["Not Required", "Variable Data Printing (VDP)"]}]},
         {"id": 115, "name": "Kad Terima Kasih — Digital", "engine": "kadterima", "optsrc": "none",
          "accuracy": acc.get(115), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": ["52mm x 52mm", "40mm x 86mm", "40mm x 70mm"]},
@@ -343,6 +357,7 @@ def build_data():
             "pvccard": _load("pvccard_params.json", {"curves": {}, "fin_delta": {}, "card_wt": 0.0056}),
             "kadkahwin": _load("kadkahwin_params.json", {"core": {}, "size_f": {}, "paper_f": {}, "colour_f": {}, "ordertype_f": {}, "ref": {}}),
             "kadterima": _load("kadterima_params.json", {"core": {}, "size_f": {}, "paper_f": {}, "colour_f": {}, "hp_delta": [], "ref": {}}),
+            "staticcling": _load("staticcling_params.json", {"core": {}, "size_f": {}, "direction_f": {}, "vdp_f": {}, "ref": {}, "cling_gsm": 200}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -369,7 +384,8 @@ def build_data():
                             24: "billbook", 101: "litho", 102: "litho", 103: "litho",
                             104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder",
                             108: "lshape", 109: "bookmark", 110: "voucher", 111: "computerform",
-                            112: "wireo", 113: "pvccard", 114: "kadkahwin", 115: "kadterima"},
+                            112: "wireo", 113: "pvccard", 114: "kadkahwin", 115: "kadterima",
+                            116: "staticcling", 117: "staticcling"},
     }
 
 

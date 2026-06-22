@@ -318,7 +318,11 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 112, "name": "Wire-O Notebook — Litho"},
                {"id": 113, "name": "PVC Card — Digital"},
                {"id": 114, "name": "Kad Kahwin — Digital"},
-               {"id": 115, "name": "Kad Terima Kasih — Digital"}]
+               {"id": 115, "name": "Kad Terima Kasih — Digital"},
+               {"id": 116, "name": "Static Cling Window Sticker — Digital"},
+               {"id": 117, "name": "Car Sticker — Digital (= Static Cling form)"}]
+SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
+            "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KT_SIZES = ["52mm x 52mm", "40mm x 86mm", "40mm x 70mm"]
 KT_PAPERS = ["Gloss Art Card 230gsm (2 sides coated)", "Gloss Art Card 260gsm (2 sides coated)",
              "Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)",
@@ -413,7 +417,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               112: 2.3,  # wire-o notebook: per-cover curve LOO median 2.3% (Hard Cover)
               113: 4.1,  # pvc card: qty curve LOO median 4.1% (colour neutral)
               114: 5.0,  # kad kahwin: factor model — axes exact, core LOO ~3%
-              115: 4.0}  # kad terima kasih: factor model — axes exact, core LOO ~4%
+              115: 4.0,  # kad terima kasih: factor model — axes exact, core LOO ~4%
+              116: 5.9, 117: 5.9}  # static cling / car sticker: factor model, core LOO ~5.9%
 
 
 def _accuracy(product_id: int):
@@ -653,6 +658,12 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "staticcling": {"options": "/api/printoka/staticcling/options", "quote": "/api/printoka/staticcling/quote",
+                "fields": [
+                    {"key": "size", "label": "Size", "addon": True, "depends": [], "options": SC_SIZES},
+                    {"key": "direction", "label": "Print direction", "addon": True, "depends": [], "options": ["Face Out View", "Face In View", "Both Side View"]},
+                    {"key": "vdp", "label": "Variable Data Printing", "addon": True, "depends": [], "options": ["Not Required", "Variable Data Printing (VDP)"]},
+                ]},
     "kadterima": {"options": "/api/printoka/kadterima/options", "quote": "/api/printoka/kadterima/quote",
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": KT_SIZES},
@@ -818,6 +829,8 @@ def _family(product_id: int) -> str:
         return "kadkahwin"
     if product_id == 115:
         return "kadterima"
+    if product_id in (116, 117):
+        return "staticcling"
     return "loose"
 
 
@@ -1080,6 +1093,31 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------
+@app.get("/api/printoka/staticcling/options")
+def staticcling_options(product: int = Query(116)):
+    return {}
+
+
+@app.get("/api/printoka/staticcling/quote")
+def staticcling_quote(product: int = Query(116), size: str = Query("100mm x 100mm"),
+                      direction: str = Query("Face Out View"), qty: int = Query(...),
+                      vdp: str = Query("Not Required")):
+    from . import staticcling_engine as SC
+    try:
+        cash = SC.cash_price(size, direction, qty, vdp=vdp)
+        wt = SC.weight_kg(size, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    nm = "Car Sticker" if product == 117 else "Static Cling Window Sticker"
+    note = f"{nm} (static-cling vinyl). Face In = Face Out price; Both Side View prints both sides. qty = pieces."
+    return {"config": {"product": product, "size": size, "direction": direction, "qty": qty, "vdp": vdp},
+            "printoka_cash": round(cash, 2), "method": "formula (reference curve x factors)",
+            "note": note, "tiers": SC.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Kad Terima Kasih (Digital, id 115) ----------

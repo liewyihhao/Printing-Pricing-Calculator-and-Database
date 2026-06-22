@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-22T07:31:15",
+ "scanned_at": "2026-06-22T18:13:34",
  "total": 52,
- "built": 21,
+ "built": 23,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -482,8 +482,10 @@
    "name": "Car Sticker",
    "url": "https://www.excard.com.my/product/car-sticker",
    "category": "Stickers & Labels",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Car Sticker Digital (117, = static cling form)"
+   ],
    "is_new": false
   },
   {
@@ -513,8 +515,10 @@
    "name": "Static Cling Window Sticker",
    "url": "https://www.excard.com.my/product/static-cling-window-sticker",
    "category": "Stickers & Labels",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Static Cling Window Sticker Digital (116)"
+   ],
    "is_new": false
   }
  ]
