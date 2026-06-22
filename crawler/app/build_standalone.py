@@ -213,6 +213,9 @@ def build_data():
     FOLDER_FIELDS = [
         {"key": "mould", "label": "Folder mould (size)", "addon": True, "depends": [], "options": FOLDER_MOULDS},
         {"key": "paper", "label": "Paper (Gloss Art Card)", "addon": True, "depends": [], "options": FOLDER_PAPERS},
+        {"key": "lamination", "label": "Cover lamination (quoted separately)", "addon": True, "depends": [],
+         "options": ["Not Required", "Gloss Lamination (Front)", "Matte Lamination (Front)",
+                     "Matte Lamination (Front) + Spot UV (Front)", "Gloss Waterbase Varnish (Front)"]},
     ]
     products = [
         {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",
@@ -313,6 +316,7 @@ def build_data():
                          "Super White 250gsm", "Linen 240gsm", "Suwen 240gsm", "Synthetic Paper 180micron",
                          "Metal Ice 250gsm"]},
             {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [], "options": ["Not Required", "Matte Lamination (Both)", "Gloss Lamination (Both)"]},
             {"key": "round_corner", "label": "Round cornering (R6)", "addon": True, "depends": [], "options": ["No", "Yes"]},
             {"key": "hole_punch", "label": "Hole punching (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
         {"id": 105, "name": "Letterhead — Litho", "engine": "letterhead", "optsrc": "none",

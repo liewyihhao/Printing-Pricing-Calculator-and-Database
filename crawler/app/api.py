@@ -726,6 +726,7 @@ FIELD_SCHEMAS = {
                 "fields": [
                     {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": BOOKMARK_PAPERS},
                     {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [], "options": ["Not Required", "Matte Lamination (Both)", "Gloss Lamination (Both)"]},
                     {"key": "round_corner", "label": "Round cornering (R6)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "hole_punch", "label": "Hole punching (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
@@ -737,6 +738,9 @@ FIELD_SCHEMAS = {
                 "fields": [
                     {"key": "mould", "label": "Folder mould (size)", "addon": True, "depends": [], "options": FOLDER_MOULDS},
                     {"key": "paper", "label": "Paper (Gloss Art Card)", "addon": True, "depends": [], "options": FOLDER_PAPERS},
+                    {"key": "lamination", "label": "Cover lamination (quoted separately)", "addon": True, "depends": [],
+                     "options": ["Not Required", "Gloss Lamination (Front)", "Matte Lamination (Front)",
+                                 "Matte Lamination (Front) + Spot UV (Front)", "Gloss Waterbase Varnish (Front)"]},
                 ]},
     "envelope": {"options": "/api/printoka/envelope/options", "quote": "/api/printoka/envelope/quote",
                 "fields": [
@@ -1358,7 +1362,8 @@ def bookmark_options(product: int = Query(109)):
 @app.get("/api/printoka/bookmark/quote")
 def bookmark_quote(product: int = Query(109), paper: str = Query("Gloss Art Card 250gsm (2 sides coated)"),
                    colour: str = Query("4C (Front)"), qty: int = Query(...),
-                   round_corner: str = Query("No"), hole_punch: str = Query("No")):
+                   round_corner: str = Query("No"), hole_punch: str = Query("No"),
+                   lamination: str = Query("Not Required")):
     from . import bookmark_engine as BM
     rc = round_corner == "Yes"; hp = hole_punch == "Yes"
     try:
@@ -1373,7 +1378,7 @@ def bookmark_quote(product: int = Query(109), paper: str = Query("Gloss Art Card
                        "round_corner": round_corner, "hole_punch": hole_punch},
             "printoka_cash": round(cash, 2), "finishing_cost": round(fin, 2),
             "method": "formula (per-config log-log curve)",
-            "note": "Bookmark (Digital). Round cornering / hole punching are optional add-ons. qty = pieces.",
+            "note": "Bookmark (Digital). Lamination does not change the online price; round cornering / hole punching are optional add-ons. qty = pieces.",
             "tiers": BM.tiers(cash), "weight_kg": round(wt, 3)}
 
 
@@ -1408,7 +1413,8 @@ def folder_options(product: int = Query(107)):
 
 @app.get("/api/printoka/folder/quote")
 def folder_quote(product: int = Query(107), mould: str = Query("FPF 001 — 350x510mm"),
-                 paper: str = Query("Gloss Art Card 250gsm (1 side coated)"), qty: int = Query(...)):
+                 paper: str = Query("Gloss Art Card 250gsm (1 side coated)"), qty: int = Query(...),
+                 lamination: str = Query("Not Required")):
     from . import folder_engine as FD
     try:
         cash = FD.cash_price(mould, paper, qty)
@@ -1419,7 +1425,8 @@ def folder_quote(product: int = Query(107), mould: str = Query("FPF 001 — 350x
         return JSONResponse({"error": "no price"}, status_code=400)
     note = ("Folder: Presentation Folder group (PF). Die-cutting + creasing compulsory "
             "(included); no print-colour choice. Paper is an additive cost vs the 250gsm "
-            "1-side reference. Document/Karki/CD folder groups (DF/KF/CF) are pending. qty = pieces.")
+            "1-side reference. Cover lamination (if selected) is quoted separately. "
+            "Document/Karki/CD folder groups (DF/KF/CF) are pending. qty = pieces.")
     return {"config": {"product": product, "mould": mould, "paper": paper, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "formula (per-mould curve + paper delta)",
             "note": note, "tiers": FD.tiers(cash), "weight_kg": round(wt, 3)}
