@@ -280,7 +280,7 @@ def build_data():
             {"key": "vdp", "label": "Variable Data Printing (Front)", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
         {"id": 112, "name": "Wire-O Notebook — Litho", "engine": "wireo", "optsrc": "none",
          "accuracy": acc.get(112), "fields": [
-            {"key": "cover", "label": "Cover type", "addon": True, "depends": [], "options": ["Hard Cover", "VDP Hard Cover"]},
+            {"key": "cover", "label": "Cover type", "addon": True, "depends": [], "options": ["Hard Cover", "VDP Hard Cover", "Soft Cover"]},
             {"key": "lamination", "label": "Cover lamination (compulsory)", "addon": True, "depends": [], "options": [
                 "Matte Lamination (Front)", "Gloss Lamination (Front)",
                 "Matte Lamination (Front) + Spot UV (Front Cover)", "Matte Lamination (Front) + Spot UV (Front and Back Cover)"]},

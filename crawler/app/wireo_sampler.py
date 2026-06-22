@@ -16,7 +16,7 @@ from playwright.async_api import async_playwright
 from .browser import launch, login
 from . import accounts
 from .logging_setup import log
-from .billbook_sampler import _sel, _safe_read, _wait
+from .billbook_sampler import _sel, _safe_read, _wait, _opts
 
 OUT = Path(__file__).resolve().parent.parent / "output"
 URL = "https://www.excard.com.my/spec/Litho/Wire-O_Notebook"
@@ -43,8 +43,13 @@ async def _radio(page, name, value):
 async def _config(page, cover, lam=REF_LAM, addc=None):
     await page.goto(URL, wait_until="domcontentloaded"); await _wait(page); await asyncio.sleep(0.8)
     await _radio(page, "rblOrderDesc", cover)
+    # Soft / Exclusive Leather covers don't offer the Matte-Front reference lamination;
+    # fall back to whatever lamination the cover does offer (first real option).
     if not await _sel(page, "ddlCoverLamination", lam):
-        return False
+        avail = await _opts(page, "ddlCoverLamination")
+        if not avail or not await _sel(page, "ddlCoverLamination", avail[0]):
+            return False
+        log.info("wo.lam_fallback", cover=cover, lam=avail[0])
     if addc:
         await _sel(page, "ddlAddContent", addc)
     await asyncio.sleep(0.4)
