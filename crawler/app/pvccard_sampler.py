@@ -33,7 +33,7 @@ async def _radio(page, name, value):
     return False
 
 
-async def _config(page, colour, rc=False, hp=False):
+async def _config(page, colour, rc=False, hp=False, vdp=False):
     await page.goto(URL, wait_until="domcontentloaded"); await _wait(page); await asyncio.sleep(0.8)
     await _sel(page, "ddlSizeOrientation", "Portrait")
     if not await _sel(page, "rblPrintColourSide", colour):
@@ -44,6 +44,11 @@ async def _config(page, colour, rc=False, hp=False):
                 break
     if hp:
         await _radio(page, "rblPunchHole", "Hole Punching,1")
+    if vdp:
+        for v in ("Variable Data Printing (Front)", "Variable Data Printing (Front),1"):
+            if await _sel(page, "ddlVDP", v):
+                break
+        await _wait(page); await asyncio.sleep(0.4)
     await asyncio.sleep(0.4)
     return True
 
@@ -91,6 +96,17 @@ async def run(account_id=1):
                     if c:
                         data["finishing"].append({"kind": kind, "qty": q, "cash": c})
             out.write_text(json.dumps(data, indent=0)); log.info("pvc.finishing")
+
+        if not any(r["kind"] == "vdp" for r in data["finishing"]):
+            # VDP delta vs the existing "base" rows (same 4C Front, no finishing config).
+            if await _config(page, "4C (Front)", vdp=True):
+                for q in (100, 1000):
+                    c = await _read(page, q)
+                    if c:
+                        data["finishing"].append({"kind": "vdp", "qty": q, "cash": c})
+                out.write_text(json.dumps(data, indent=0)); log.info("pvc.vdp")
+            else:
+                log.info("pvc.vdp_cfg_fail")
         try: await b.close()
         except Exception: pass
     out.write_text(json.dumps(data, indent=0))

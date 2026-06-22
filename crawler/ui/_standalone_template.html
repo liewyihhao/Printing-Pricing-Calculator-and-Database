@@ -251,7 +251,7 @@ function billbookPrice(P, V, qty){
   if(!key||!cv[key]) return {cash:0,wt:0};
   let base=interpLogPts(Object.keys(cv[key]).map(k=>[+k,cv[key][k]]),qty)*billbookSizeFactor(V.size,P);
   if(V.packform==="Pad") base*=(P.pad_factor||0.988);
-  if(V.punch==="Yes") base += (P.punch_per_book||0.358)*qty;
+  if(V.punch==="Yes"||V.punch==="Required (6mm)") base += (P.punch_per_book||0.358)*qty;
   const mm=(P.size_mm||{})[V.size]||[210,297];
   const setsN = setsEff==="-" ? 50 : parseInt(setsEff);
   const sheets=qty*setsN*nLayers;
@@ -299,7 +299,7 @@ function stickerCategoryPrice(P,cat,h,w,paper,colour,qty,diameter){
       const prem=cashSticker(P,50,50,paper,colour,500)/Math.max(cashSticker(P,50,50,"Mirror Kote",colour,500),1e-6);
       pts=base.map(p=>[p[0],p[1]*prem]); }
     return interpLogPts(pts,qty); }
-  if(cat==="Kiss Cut") return interpLogPts((SC.kiss_cut||[]).map(r=>[r.qty,r.cash]),qty);
+  if(cat==="Kiss Cut"||cat==="Kiss Cut (1up/sheet)") return interpLogPts((SC.kiss_cut||[]).map(r=>[r.qty,r.cash]),qty);
   return cash(h,w);  // Rectangle/Square, Custom Die-Cut
 }
 function cashSticker(P,h,w,paper,colour,qty){
@@ -446,12 +446,14 @@ function localQuote(prod, V, qty){
     function iLL(o,q){const p=Object.keys(o).map(k=>[+k,o[k]]).sort((a,b)=>a[0]-b[0]);if(!p.length)return 0;const xs=p.map(x=>Math.log(x[0])),ys=p.map(x=>Math.log(x[1])),X=Math.log(Math.max(+q,1));if(X<=xs[0])return Math.exp(ys[0]);if(X>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(X<=xs[i]){const t=(X-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}
     function lp(pts,x){if(!pts||!pts.length)return 0;pts=pts.slice().sort((a,b)=>a[0]-b[0]);if(x<=pts[0][0])return pts[0][1];if(x>=pts[pts.length-1][0])return pts[pts.length-1][1];for(let i=1;i<pts.length;i++)if(x<=pts[i][0]){const t=(x-pts[i-1][0])/(pts[i][0]-pts[i-1][0]);return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]);}}
     let key=cv[V.colour]?V.colour:Object.keys(cv)[0]; let cash2=iLL(cv[key]||{},qty); let fin=0;
-    if(V.round_corner==="Yes") fin+=lp(fd.round_corner||[],qty);
-    if(V.hole_punch==="Yes") fin+=lp(fd.hole_punch||[],qty);
+    if(V.round_corner==="Yes"||V.round_corner==="Round Corner") fin+=lp(fd.round_corner||[],qty);
+    if(V.hole_punch==="Yes"||V.hole_punch==="Required (6mm)") fin+=lp(fd.hole_punch||[],qty);
+    if(V.vdp==="Yes"||V.vdp==="Variable Data Printing (Front)") fin+=lp(fd.vdp||[],qty);
     cash2+=fin;
     wt=Math.round((P.card_wt||0.0056)*qty*WF*1000)/1000;
-    return { printoka_cash: Math.round(cash2*100)/100, finishing_cost: Math.round(fin*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (qty curve)",
-      note:"PVC Card (CR80). Orientation & colour price-neutral; round cornering free; hole punching adds a cost. qty = cards." }; }
+    let ntPvc="PVC Card (CR80). Orientation & colour price-neutral; round cornering free; hole punching and Variable Data Printing each add a cost. qty = cards.";
+    if(V.vdp==="Variable Data Printing (Front)") ntPvc+=" VDP price not yet sampled — contact us for accurate VDP pricing.";
+    return { printoka_cash: Math.round(cash2*100)/100, finishing_cost: Math.round(fin*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (qty curve)", note:ntPvc }; }
   else if(prod.engine==="wireo"){
     const P2=P;
     function interpLL(obj,q){const pts=Object.keys(obj).map(k=>[+k,obj[k]]).sort((a,b)=>a[0]-b[0]);if(!pts.length)return 0;const xs=pts.map(p=>Math.log(p[0])),ys=pts.map(p=>Math.log(p[1])),x=Math.log(Math.max(+q,1));if(x<=xs[0])return Math.exp(ys[0]);if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}
@@ -510,8 +512,8 @@ function localQuote(prod, V, qty){
     if(!cv[key]) key=Object.keys(cv).find(k=>k.startsWith(V.paper+"|"))||Object.keys(cv).find(k=>k.endsWith("|"+V.colour))||Object.keys(cv)[0];
     const c=cv[key]||{}; let cash2=interpLogLog(Object.keys(c).map(k=>[+k,c[k]]),qty);
     let fin=0;
-    if(V.round_corner==="Yes") fin+=linq(fd.round_corner||[[0,0]],qty);
-    if(V.hole_punch==="Yes") fin+=linq(fd.hole_punch||[[0,0]],qty);
+    if(V.round_corner==="Yes"||V.round_corner==="Round Corner") fin+=linq(fd.round_corner||[[0,0]],qty);
+    if(V.hole_punch==="Yes"||V.hole_punch==="Hole Punching (6mm)") fin+=linq(fd.hole_punch||[[0,0]],qty);
     cash2+=fin;
     const sm=P.size_mm||[50,150]; const g=(/(\d+)\s*(gsm|micron)/.exec(V.paper||"")||[])[1]||250;
     const wt2=Math.round(sm[0]*sm[1]/1e6*(+g)*qty/1000*WF*1000)/1000;
@@ -574,7 +576,7 @@ function localQuote(prod, V, qty){
       return { printoka_cash: Math.round(cash2*100)/100, finishing_cost:0, tiers: tiers(cash2),
         weight_kg: wt2, method:"formula (CD curve)",
         note:"CD disc label (fixed shape); Mirror Kote / Printing Paper only." }; }
-    if(prod.stickerMethod==="digital" && V.category==="Multiple Dieline"){
+    if(prod.stickerMethod==="digital" && (V.category==="Multiple Dieline"||V.category==="Multiple Dieline (Available for different size and different shape)")){
       const ss=V.sheet_size||"A3+"; const cash2=multidielinePrice(ss, qty, V.paper, V.colour)*sMult;
       const SMM={"A3+":[317,425],"A4":[210,297],"A5":[148,210]}, [sh,sw]=SMM[ss]||SMM["A3+"];
       const wt2=Math.round(sh*sw/1e6*150*qty/1000*WF*sMult*1000)/1000;

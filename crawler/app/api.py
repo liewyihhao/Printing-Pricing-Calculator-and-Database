@@ -617,7 +617,7 @@ FIELD_SCHEMAS = {
                     {"key": "type", "label": "Product type", "addon": True, "depends": [],
                      "options": ["Sticker", "CD"]},
                     {"key": "category", "label": "Cut type (Sticker only)", "addon": True, "depends": [],
-                     "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut", "Multiple Dieline"]},
+                     "options": ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round", "No Cut", "Kiss Cut (1up/sheet)", "Multiple Dieline (Available for different size and different shape)"]},
                     {"key": "paper", "label": "Material", "addon": True, "depends": [],
                      "options": ["Mirror Kote", "Mirror Kote (Strong Glue)", "Transparent OPP",
                                  "White PP (Polypropylene)", "White PE (Polyethylene)", "Synthetic Paper",
@@ -649,6 +649,7 @@ FIELD_SCHEMAS = {
                 ]},
     "billbook": {"options": "/api/printoka/billbook/options", "quote": "/api/printoka/billbook/quote",
                 "fields": [
+                    {"key": "paper", "label": "Paper type", "addon": True, "depends": [], "options": ["NCR (Carbonize Paper)", "Normal Paper"]},
                     {"key": "packform", "label": "Form", "addon": True, "depends": [], "options": ["Book", "Pad"]},
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": BILLBOOK_SIZES},
                     {"key": "layers", "label": "Plies (NCR layers)", "addon": True, "depends": [],
@@ -659,8 +660,8 @@ FIELD_SCHEMAS = {
                     {"key": "binding", "label": "Binding location", "addon": True, "depends": [],
                      "options": ["Portrait - Left side binding", "Portrait - Top side binding",
                                  "Landscape - Left side binding", "Landscape - Top side binding"]},
-                    {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
-                    {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                    {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["Not Required", "Required"]},
+                    {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["Not Required", "Required (6mm)"]},
                 ]},
     "wallcal": {"options": "/api/printoka/wallcal/options", "quote": "/api/printoka/wallcal/quote",
                 "fields": []},
@@ -692,8 +693,9 @@ FIELD_SCHEMAS = {
                 "fields": [
                     {"key": "orientation", "label": "Orientation (price-neutral)", "addon": True, "depends": [], "options": ["Portrait", "Landscape"]},
                     {"key": "colour", "label": "Print colour (price-neutral)", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
-                    {"key": "round_corner", "label": "Round cornering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
-                    {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                    {"key": "vdp", "label": "Variable Data Printing (price may change — contact us)", "addon": True, "depends": [], "options": ["Not Required", "Variable Data Printing (Front)"]},
+                    {"key": "round_corner", "label": "Round cornering (free)", "addon": True, "depends": [], "options": ["Not Required", "Round Corner"]},
+                    {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["Not Required", "Required (6mm)"]},
                 ]},
     "wireo": {"options": "/api/printoka/wireo/options", "quote": "/api/printoka/wireo/quote",
                 "fields": [
@@ -727,8 +729,8 @@ FIELD_SCHEMAS = {
                     {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": BOOKMARK_PAPERS},
                     {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
                     {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [], "options": ["Not Required", "Matte Lamination (Both)", "Gloss Lamination (Both)"]},
-                    {"key": "round_corner", "label": "Round cornering (R6)", "addon": True, "depends": [], "options": ["No", "Yes"]},
-                    {"key": "hole_punch", "label": "Hole punching (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
+                    {"key": "round_corner", "label": "Round cornering", "addon": True, "depends": [], "options": ["Not Required", "Round Corner"]},
+                    {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["Not Required", "Hole Punching (6mm)"]},
                 ]},
     "lshape": {"options": "/api/printoka/lshape/options", "quote": "/api/printoka/lshape/quote",
                 "fields": [
@@ -949,7 +951,7 @@ def sticker_quote(product: int = Query(60), height: float = Query(0),
                     "printoka_cash": round(cash, 2), "finishing_cost": 0.0,
                     "method": "formula (CD curve)",
                     "tiers": SE.tiers(cash), "weight_kg": round(wt, 3)}
-        if method == "digital" and category == "Multiple Dieline":
+        if method == "digital" and category in ("Multiple Dieline", "Multiple Dieline (Available for different size and different shape)"):
             from . import sticker_categories as SC
             cash = SC.category_price(category, 0, 0, paper, colour, qty, sheet_size=sheet_size) * mult
             sh, sw = MD_SHEET_MM.get(sheet_size, (317, 425))
@@ -1245,21 +1247,24 @@ def pvccard_options(product: int = Query(113)):
 @app.get("/api/printoka/pvccard/quote")
 def pvccard_quote(product: int = Query(113), colour: str = Query("4C (Front)"),
                   orientation: str = Query("Portrait"), qty: int = Query(...),
-                  round_corner: str = Query("No"), hole_punch: str = Query("No")):
+                  round_corner: str = Query("Not Required"), hole_punch: str = Query("Not Required"),
+                  vdp: str = Query("Not Required")):
     from . import pvccard_engine as PV
-    rc = round_corner == "Yes"; hp = hole_punch == "Yes"
+    rc = round_corner not in ("Not Required", "No")
+    hp = hole_punch not in ("Not Required", "No")
+    vd = vdp not in ("Not Required", "No")
     try:
-        cash = PV.cash_price(colour, qty, round_corner=rc, hole_punch=hp)
-        fin = PV.finishing_cost(qty, round_corner=rc, hole_punch=hp)
+        cash = PV.cash_price(colour, qty, round_corner=rc, hole_punch=hp, vdp=vd)
+        fin = PV.finishing_cost(qty, round_corner=rc, hole_punch=hp, vdp=vd)
         wt = PV.weight_kg(qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
     note = ("PVC Card (CR80). Orientation & print colour are price-neutral; round cornering is "
-            "free; hole punching adds a per-run cost. qty = cards.")
+            "free; hole punching and Variable Data Printing each add a per-run cost. qty = cards.")
     return {"config": {"product": product, "colour": colour, "orientation": orientation, "qty": qty,
-                       "round_corner": round_corner, "hole_punch": hole_punch},
+                       "round_corner": round_corner, "hole_punch": hole_punch, "vdp": vdp},
             "printoka_cash": round(cash, 2), "finishing_cost": round(fin, 2),
             "method": "formula (qty curve)", "note": note,
             "tiers": PV.tiers(cash), "weight_kg": round(wt, 3)}
@@ -1362,10 +1367,10 @@ def bookmark_options(product: int = Query(109)):
 @app.get("/api/printoka/bookmark/quote")
 def bookmark_quote(product: int = Query(109), paper: str = Query("Gloss Art Card 250gsm (2 sides coated)"),
                    colour: str = Query("4C (Front)"), qty: int = Query(...),
-                   round_corner: str = Query("No"), hole_punch: str = Query("No"),
+                   round_corner: str = Query("Not Required"), hole_punch: str = Query("Not Required"),
                    lamination: str = Query("Not Required")):
     from . import bookmark_engine as BM
-    rc = round_corner == "Yes"; hp = hole_punch == "Yes"
+    rc = round_corner not in ("Not Required", "No"); hp = hole_punch not in ("Not Required", "No")
     try:
         cash = BM.cash_price(paper, colour, qty, round_corner=rc, hole_punch=hp)
         fin = BM.finishing_cost(qty, round_corner=rc, hole_punch=hp)
@@ -1516,25 +1521,30 @@ def billbook_options(product: int = Query(24)):
 
 @app.get("/api/printoka/billbook/quote")
 def billbook_quote(product: int = Query(24), size: str = Query("A4 (210mm x 297mm)"),
+                   paper: str = Query("NCR (Carbonize Paper)"),
                    layers: str = Query("NCR - 2 Layers"), colour: str = Query("1C (Front)"),
                    sets: str = Query("50"), qty: int = Query(...), packform: str = Query("Book"),
                    binding: str = Query("Portrait - Left side binding"),
-                   numbering: str = Query("No"), punch: str = Query("No")):
+                   numbering: str = Query("Not Required"), punch: str = Query("Not Required")):
+    if paper == "Normal Paper":
+        return JSONResponse({"error": "Normal Paper billbook pricing not yet sampled — contact us for quote."}, status_code=400)
     from . import billbook_engine as BB
     import re
     n_layers = int(re.search(r"(\d+)", layers).group(1)) if re.search(r"(\d+)", layers) else 2
     sets_eff = sets if n_layers == 2 else "-"   # 3+ ply: sets fixed (no dropdown on Excard)
+    do_num = numbering in ("Yes", "Required")
+    do_punch = punch in ("Yes", "Required (6mm)")
     try:
         cash = BB.cash_price(size, layers, colour, sets_eff, qty, packform=packform,
-                             numbering=(numbering == "Yes"), punch=(punch == "Yes"))
+                             numbering=do_num, punch=do_punch)
         wt = BB.weight_kg(size, layers, sets_eff, qty, packform=packform)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": f"no price for {layers}/{colour}"}, status_code=400)
-    return {"config": {"product": product, "size": size, "layers": layers, "colour": colour,
-                       "sets": sets_eff, "qty": qty, "packform": packform, "binding": binding,
-                       "numbering": numbering, "punch": punch},
+    return {"config": {"product": product, "paper": paper, "size": size, "layers": layers,
+                       "colour": colour, "sets": sets_eff, "qty": qty, "packform": packform,
+                       "binding": binding, "numbering": numbering, "punch": punch},
             "printoka_cash": round(cash, 2), "method": "formula (per-config curve)",
             "note": "Numbering is free; binding orientation is price-neutral. qty = number of books/pads.",
             "tiers": BB.tiers(cash), "weight_kg": round(wt, 3)}

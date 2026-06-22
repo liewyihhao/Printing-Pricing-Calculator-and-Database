@@ -79,7 +79,7 @@ def _fin_delta(kind, qty):
     return _lin(d.get(kind, [(0, 0.0)]), qty)
 
 
-def cash_price(colour, qty, round_corner=False, hole_punch=False):
+def cash_price(colour, qty, round_corner=False, hole_punch=False, vdp=False):
     cv = _curves()
     key = colour if colour in cv else next(iter(cv), None)
     if not key:
@@ -89,12 +89,15 @@ def cash_price(colour, qty, round_corner=False, hole_punch=False):
         cash += _fin_delta("round_corner", qty)
     if hole_punch:
         cash += _fin_delta("hole_punch", qty)
+    if vdp:
+        cash += _fin_delta("vdp", qty)
     return max(cash, 0.0)
 
 
-def finishing_cost(qty, round_corner=False, hole_punch=False):
+def finishing_cost(qty, round_corner=False, hole_punch=False, vdp=False):
     return (_fin_delta("round_corner", qty) if round_corner else 0.0) + \
-           (_fin_delta("hole_punch", qty) if hole_punch else 0.0)
+           (_fin_delta("hole_punch", qty) if hole_punch else 0.0) + \
+           (_fin_delta("vdp", qty) if vdp else 0.0)
 
 
 def tiers(cash):

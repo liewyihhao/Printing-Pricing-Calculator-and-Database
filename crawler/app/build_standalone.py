@@ -276,7 +276,8 @@ def build_data():
             {"key": "orientation", "label": "Orientation (price-neutral)", "addon": True, "depends": [], "options": ["Portrait", "Landscape"]},
             {"key": "colour", "label": "Print colour (price-neutral)", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
             {"key": "round_corner", "label": "Round cornering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
-            {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
+            {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["No", "Yes"]},
+            {"key": "vdp", "label": "Variable Data Printing (Front)", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
         {"id": 112, "name": "Wire-O Notebook — Litho", "engine": "wireo", "optsrc": "none",
          "accuracy": acc.get(112), "fields": [
             {"key": "cover", "label": "Cover type", "addon": True, "depends": [], "options": ["Hard Cover", "VDP Hard Cover"]},
