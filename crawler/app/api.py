@@ -430,7 +430,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               119: 0.0,  # arch file: flat RM5.00/unit — linear qty curve, exact
               120: 1.1,  # desk calendar hard stand: per-cat qty curve LOO median 1.12% (cat=1)
               121: 0.7,  # desk calendar soft stand: qty curve LOO median 0.67%
-              122: 2.0}  # wire-o wall calendar: qty curve (to be measured)
+              122: 0.8}  # wire-o wall calendar: qty curve LOO median 0.82%
 
 
 def _accuracy(product_id: int):
