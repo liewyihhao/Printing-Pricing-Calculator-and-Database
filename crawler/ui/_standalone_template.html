@@ -406,6 +406,27 @@ function localQuote(prod, V, qty){
     wt=Math.round(sm[0]*sm[1]/1e6*((P.back_gsm||300)+(P.content_sheets||12)*(P.content_gsm||60))*qty/1000*WF*1000)/1000;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
       note:"Wall Calendar: fixed 260x265mm, Boxboard backing + Simili 60gsm 12-sheet content; Folding + Side Stitching compulsory. qty = calendars." }; }
+  else if(prod.engine==="archfile"){
+    const c=P.curve||{}; cash=interpLogPts(Object.keys(c).map(k=>[+k,c[k]]),qty);
+    wt=Math.round((P.unit_wt||0.42)*qty*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
+      note:"Arch File: fixed spec — Steel Binding (4 ring & Metal Clip) + Wire-O + Oval curve + 2 L-shape corners + Lamination (Front), all compulsory. qty = files." }; }
+  else if(prod.engine==="deskcal_hard"){
+    const DC=DATA.params.deskcal||{}; const catMap={"WDCH 001 (Portrait)":"1","WDCH 002 (Landscape)":"2","DCHS 001 (Hot Stamping - Portrait)":"3"};
+    const catKey=catMap[V.cat||""]||"1"; const hc=(DC.hard_curves||{})[catKey]||{}; cash=interpLogPts(Object.keys(hc).map(k=>[+k,hc[k]]),qty);
+    wt=Math.round((DC.hard_unit_kg||0.35)*qty*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve per model)",
+      note:"Desk Calendar Hard Stand: Litho printing, rigid stand. qty = calendars." }; }
+  else if(prod.engine==="deskcal_soft"){
+    const DC=DATA.params.deskcal||{}; const sc=DC.soft_curve||{}; cash=interpLogPts(Object.keys(sc).map(k=>[+k,sc[k]]),qty);
+    wt=Math.round((DC.soft_unit_kg||0.25)*qty*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
+      note:"Desk Calendar Soft Stand: Wire-O binding + cardboard cover. Hole Punching + Wire-O + Creasing compulsory. qty = calendars." }; }
+  else if(prod.engine==="wireow"){
+    const WOW=DATA.params.wireow||{}; const c=WOW.curve||{}; cash=interpLogPts(Object.keys(c).map(k=>[+k,c[k]]),qty);
+    wt=Math.round((WOW.unit_kg||0.30)*qty*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
+      note:"Wire-O Wall Calendar: Litho, Wire-O binding + hanger. Hole Punching + Wire-O Binding (White) + Hanger compulsory. qty = calendars." }; }
   else if(prod.engine==="staticcling"){
     const P2=P;
     function interpLL(obj,q){const pts=Object.keys(obj).map(k=>[+k,obj[k]]).sort((a,b)=>a[0]-b[0]);if(!pts.length)return 0;const xs=pts.map(p=>Math.log(p[0])),ys=pts.map(p=>Math.log(p[1])),x=Math.log(Math.max(+q,1));if(x<=xs[0])return Math.exp(ys[0]);if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}

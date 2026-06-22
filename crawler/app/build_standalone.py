@@ -232,6 +232,16 @@ def build_data():
              "options": ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]}]},
         {"id": 118, "name": "Wall Calendar — Litho", "engine": "wallcal", "optsrc": "none",
          "accuracy": acc.get(118), "fields": []},
+        {"id": 119, "name": "Arch File — Digital", "engine": "archfile", "optsrc": "none",
+         "accuracy": acc.get(119), "fields": []},
+        {"id": 120, "name": "Desk Calendar — Hard Stand (Litho)", "engine": "deskcal_hard", "optsrc": "none",
+         "accuracy": acc.get(120), "fields": [
+            {"key": "cat", "label": "Model", "addon": True, "depends": [], "options": [
+                "WDCH 001 (Portrait)", "WDCH 002 (Landscape)", "DCHS 001 (Hot Stamping - Portrait)"]}]},
+        {"id": 121, "name": "Desk Calendar — Soft Stand (Litho)", "engine": "deskcal_soft", "optsrc": "none",
+         "accuracy": acc.get(121), "fields": []},
+        {"id": 122, "name": "Wire-O Wall Calendar — Litho", "engine": "wireow", "optsrc": "none",
+         "accuracy": acc.get(122), "fields": []},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -369,6 +379,9 @@ def build_data():
             "kadterima": _load("kadterima_params.json", {"core": {}, "size_f": {}, "paper_f": {}, "colour_f": {}, "hp_delta": [], "ref": {}}),
             "staticcling": _load("staticcling_params.json", {"core": {}, "size_f": {}, "direction_f": {}, "vdp_f": {}, "ref": {}, "cling_gsm": 200}),
             "wallcal": _load("wallcal_params.json", {"curve": {}, "size_mm": [260, 265], "content_sheets": 12, "content_gsm": 60, "back_gsm": 300}),
+            "archfile": _load("archfile_params.json", {"curve": {}, "unit_wt": 0.42}),
+            "deskcal": _load("deskcal_params.json", {"soft_curve": {}, "hard_curves": {}, "hard_unit_kg": 0.35, "soft_unit_kg": 0.25}),
+            "wireow": _load("wireow_params.json", {"curve": {}, "unit_kg": 0.30}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -396,7 +409,8 @@ def build_data():
                             104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder",
                             108: "lshape", 109: "bookmark", 110: "voucher", 111: "computerform",
                             112: "wireo", 113: "pvccard", 114: "kadkahwin", 115: "kadterima",
-                            116: "staticcling", 117: "staticcling", 118: "wallcal"},
+                            116: "staticcling", 117: "staticcling", 118: "wallcal", 119: "archfile",
+                            120: "deskcal_hard", 121: "deskcal_soft", 122: "wireow"},
     }
 
 

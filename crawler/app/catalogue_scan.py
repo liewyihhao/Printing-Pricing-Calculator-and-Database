@@ -40,6 +40,10 @@ BUILT = {
     "static-cling-window-sticker": ["Static Cling Window Sticker Digital (116)"],
     "car-sticker": ["Car Sticker Digital (117, = static cling form)"],
     "wall-calendar": ["Wall Calendar Litho (118)"],
+    "arch-file": ["Arch File Digital (119)"],
+    "desk-calendar-hard-stand": ["Desk Calendar Hard Stand Litho (120)"],
+    "desk-calendar-soft-stand": ["Desk Calendar Soft Stand Litho (121)"],
+    "wire-o-wall-calendar": ["Wire-O Wall Calendar Litho (122)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],
@@ -87,8 +91,9 @@ def coverage():
     new = sorted(cur_slugs - prev_slugs)
     removed = sorted(prev_slugs - cur_slugs)
     for p in cur["products"]:
-        p["built"] = p["slug"] in BUILT
-        p["built_as"] = BUILT.get(p["slug"], [])
+        slug_key = p["slug"].lower()
+        p["built"] = slug_key in BUILT
+        p["built_as"] = BUILT.get(slug_key, [])
         p["is_new"] = p["slug"] in new and bool(prev_slugs)  # only flag new if we had a baseline
     cov = {"scanned_at": cur["scanned_at"], "total": cur["count"],
            "built": sum(1 for p in cur["products"] if p["built"]),

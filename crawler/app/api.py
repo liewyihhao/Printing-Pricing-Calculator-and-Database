@@ -321,7 +321,11 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 115, "name": "Kad Terima Kasih — Digital"},
                {"id": 116, "name": "Static Cling Window Sticker — Digital"},
                {"id": 117, "name": "Car Sticker — Digital (= Static Cling form)"},
-               {"id": 118, "name": "Wall Calendar — Litho"}]
+               {"id": 118, "name": "Wall Calendar — Litho"},
+               {"id": 119, "name": "Arch File — Digital"},
+               {"id": 120, "name": "Desk Calendar — Hard Stand (Litho)"},
+               {"id": 121, "name": "Desk Calendar — Soft Stand (Litho)"},
+               {"id": 122, "name": "Wire-O Wall Calendar — Litho"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
@@ -422,7 +426,11 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               114: 5.0,  # kad kahwin: factor model — axes exact, core LOO ~3%
               115: 4.0,  # kad terima kasih: factor model — axes exact, core LOO ~4%
               116: 5.9, 117: 5.9,  # static cling / car sticker: factor model, core LOO ~5.9%
-              118: 1.7}  # wall calendar: qty curve LOO median 1.7%
+              118: 1.7,  # wall calendar: qty curve LOO median 1.7%
+              119: 0.0,  # arch file: flat RM5.00/unit — linear qty curve, exact
+              120: 1.1,  # desk calendar hard stand: per-cat qty curve LOO median 1.12% (cat=1)
+              121: 0.7,  # desk calendar soft stand: qty curve LOO median 0.67%
+              122: 2.0}  # wire-o wall calendar: qty curve (to be measured)
 
 
 def _accuracy(product_id: int):
@@ -665,6 +673,17 @@ FIELD_SCHEMAS = {
                 ]},
     "wallcal": {"options": "/api/printoka/wallcal/options", "quote": "/api/printoka/wallcal/quote",
                 "fields": []},
+    "archfile": {"options": "/api/printoka/archfile/options", "quote": "/api/printoka/archfile/quote",
+                "fields": []},
+    "deskcal_hard": {"options": "/api/printoka/deskcal/options", "quote": "/api/printoka/deskcal/quote",
+                "fields": [
+                    {"key": "cat", "label": "Model", "addon": True, "depends": [], "options": [
+                        "WDCH 001 (Portrait)", "WDCH 002 (Landscape)", "DCHS 001 (Hot Stamping - Portrait)"]},
+                ]},
+    "deskcal_soft": {"options": "/api/printoka/deskcal_soft/options", "quote": "/api/printoka/deskcal_soft/quote",
+                "fields": []},
+    "wireow": {"options": "/api/printoka/wireow/options", "quote": "/api/printoka/wireow/quote",
+                "fields": []},
     "staticcling": {"options": "/api/printoka/staticcling/options", "quote": "/api/printoka/staticcling/quote",
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": SC_SIZES},
@@ -848,6 +867,14 @@ def _family(product_id: int) -> str:
         return "staticcling"
     if product_id == 118:
         return "wallcal"
+    if product_id == 119:
+        return "archfile"
+    if product_id == 120:
+        return "deskcal_hard"
+    if product_id == 121:
+        return "deskcal_soft"
+    if product_id == 122:
+        return "wireow"
     return "loose"
 
 
@@ -1147,6 +1174,103 @@ def wallcal_quote(product: int = Query(118), qty: int = Query(...)):
     return {"config": {"product": product, "qty": qty}, "printoka_cash": round(cash, 2),
             "method": "formula (qty curve)", "note": note,
             "tiers": WC.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Arch File (Digital, id 119) ----------
+@app.get("/api/printoka/archfile/options")
+def archfile_options(product: int = Query(119)):
+    return {}
+
+
+@app.get("/api/printoka/archfile/quote")
+def archfile_quote(product: int = Query(119), qty: int = Query(...)):
+    from . import archfile_engine as AF
+    try:
+        cash = AF.cash_price(qty); wt = AF.weight_kg(qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("Arch File: fixed spec — Steel Binding (4 ring & Metal Clip) + Wire-O + Oval curve "
+            "+ 2 L-shape corners + Lamination (Front), all compulsory (included). qty = files.")
+    return {"config": {"product": product, "qty": qty}, "printoka_cash": round(cash, 2),
+            "method": "formula (qty curve)", "note": note,
+            "tiers": AF.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Desk Calendar Hard Stand (Litho, id 120) ----------
+_DESKCAL_CAT_MAP = {
+    "WDCH 001 (Portrait)": "1", "Portrait": "1",
+    "WDCH 002 (Landscape)": "2", "Landscape": "2",
+    "DCHS 001 (Hot Stamping - Portrait)": "3", "Hot Stamping": "3",
+}
+
+
+@app.get("/api/printoka/deskcal/options")
+def deskcal_options(product: int = Query(120)):
+    from . import deskcal_engine as DC
+    return {"cat": list(DC.HARD_CATS.values())}
+
+
+@app.get("/api/printoka/deskcal/quote")
+def deskcal_quote(product: int = Query(120), cat: str = Query("WDCH 001 (Portrait)"), qty: int = Query(...)):
+    from . import deskcal_engine as DC
+    cat_val = _DESKCAL_CAT_MAP.get(cat, "1")
+    try:
+        cash = DC.cash_price("hard", qty, cat_val); wt = DC.weight_kg("hard", qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = (f"Desk Calendar Hard Stand: model={cat}, qty={qty}. "
+            "Hot Stamping - Portrait model: Hot Stamping compulsory (included).")
+    return {"config": {"product": product, "cat": cat, "qty": qty}, "printoka_cash": round(cash, 2),
+            "method": "formula (qty curve per model)", "note": note,
+            "tiers": DC.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Desk Calendar Soft Stand (Litho, id 121) ----------
+@app.get("/api/printoka/deskcal_soft/options")
+def deskcal_soft_options(product: int = Query(121)):
+    return {}
+
+
+@app.get("/api/printoka/deskcal_soft/quote")
+def deskcal_soft_quote(product: int = Query(121), qty: int = Query(...)):
+    from . import deskcal_engine as DC
+    try:
+        cash = DC.cash_price("soft", qty); wt = DC.weight_kg("soft", qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("Desk Calendar Soft Stand: Wire-O binding + cardboard cover, fixed spec. "
+            "Hole Punching + Wire-O Binding (Black) + Creasing compulsory (included). qty = calendars.")
+    return {"config": {"product": product, "qty": qty}, "printoka_cash": round(cash, 2),
+            "method": "formula (qty curve)", "note": note,
+            "tiers": DC.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Wire-O Wall Calendar (Litho, id 122) ----------
+@app.get("/api/printoka/wireow/options")
+def wireow_options(product: int = Query(122)):
+    return {}
+
+
+@app.get("/api/printoka/wireow/quote")
+def wireow_quote(product: int = Query(122), qty: int = Query(...)):
+    from . import wireow_engine as WOW
+    try:
+        cash = WOW.cash_price(qty); wt = WOW.weight_kg(qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("Wire-O Wall Calendar: fixed spec, Wire-O binding + hanger. "
+            "Hole Punching + Wire-O Binding (White) + Hanger compulsory (included). qty = calendars.")
+    return {"config": {"product": product, "qty": qty}, "printoka_cash": round(cash, 2),
+            "method": "formula (qty curve)", "note": note,
+            "tiers": WOW.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------
