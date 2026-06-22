@@ -4,6 +4,20 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **PARITY GAPS CLOSED (7 → 1).** `parity_checker` now reports just **1 real gap**:
+  Wire-O **Exclusive Leather Cover** — genuinely deferred (cfg_fails headless: its cover
+  lamination dropdown is unreadable, same class as Tent Card). Closed this session:
+  - **PVC Card VDP** (id 113): Variable Data Printing (Front) is a priced add-on
+    (+RM40@100, +RM130@1000). Sampled the delta → `vdp` finishing delta in `pvccard_engine`
+    + `vdp` field in schema/standalone. JS==Python exact.
+  - **Wire-O Soft Cover** (id 112): sampler now falls back to the cover's first available
+    lamination (Soft Cover → Matte Both) when the Matte-Front reference is absent; captured
+    full qty curve, wired into schema/standalone. JS==Python exact.
+  - Booklet `rdbidning` was a **checker false positive** (our `binding` is a dynamic cascade
+    field; Excard control is misspelled) — suppressed via KEYWORD_FIELDS in `parity_checker`.
+  - bookmark / billbook / sticker_digital flags were **transient deep-configure reads** (gone
+    on re-run); bookmark RC/HP are Yes/No toggle noise (engine already applies the deltas).
+  - billbook "Normal Paper" (non-NCR variant) noted as a deferred sub-system if it recurs.
 - **OPTION-PARITY CHECKER (NEW) — `app/parity_checker.py`.** Deep-configures every built
   product's live Excard form (reveals all dependent/finishing controls), captures EVERY
   option, and diffs vs our FIELD_SCHEMAS → `output/parity_report.json` (served at

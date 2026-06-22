@@ -115,7 +115,10 @@ KEYWORD_FIELDS = {"laminat": ("lamination", "surface", "finishing"), "punch": ("
                   "hole": ("punch", "hole"), "corner": ("corner",), "fold": ("fold",),
                   "emboss": ("emboss",), "stamp": ("hot_stamping", "stamp"),
                   "envelope": ("envelope",), "round": ("round_corner", "corner"),
-                  "vdp": ("vdp",), "size": ("size",), "paper": ("paper",), "colour": ("colour", "color")}
+                  "vdp": ("vdp",), "size": ("size",), "paper": ("paper",), "colour": ("colour", "color"),
+                  # Excard's binding control is the misspelled "rdbidning"; our booklet field is the
+                  # dynamic `binding` cascade (options fetched at runtime, so they read empty here).
+                  "binding": ("binding",), "bidning": ("binding",)}
 
 
 def _diff(family, excard):
