@@ -320,7 +320,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 114, "name": "Kad Kahwin — Digital"},
                {"id": 115, "name": "Kad Terima Kasih — Digital"},
                {"id": 116, "name": "Static Cling Window Sticker — Digital"},
-               {"id": 117, "name": "Car Sticker — Digital (= Static Cling form)"}]
+               {"id": 117, "name": "Car Sticker — Digital (= Static Cling form)"},
+               {"id": 118, "name": "Wall Calendar — Litho"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KT_SIZES = ["52mm x 52mm", "40mm x 86mm", "40mm x 70mm"]
@@ -418,7 +419,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               113: 4.1,  # pvc card: qty curve LOO median 4.1% (colour neutral)
               114: 5.0,  # kad kahwin: factor model — axes exact, core LOO ~3%
               115: 4.0,  # kad terima kasih: factor model — axes exact, core LOO ~4%
-              116: 5.9, 117: 5.9}  # static cling / car sticker: factor model, core LOO ~5.9%
+              116: 5.9, 117: 5.9,  # static cling / car sticker: factor model, core LOO ~5.9%
+              118: 1.7}  # wall calendar: qty curve LOO median 1.7%
 
 
 def _accuracy(product_id: int):
@@ -658,6 +660,8 @@ FIELD_SCHEMAS = {
                     {"key": "numbering", "label": "Numbering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                     {"key": "punch", "label": "Hole punch (6mm)", "addon": True, "depends": [], "options": ["No", "Yes"]},
                 ]},
+    "wallcal": {"options": "/api/printoka/wallcal/options", "quote": "/api/printoka/wallcal/quote",
+                "fields": []},
     "staticcling": {"options": "/api/printoka/staticcling/options", "quote": "/api/printoka/staticcling/quote",
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": SC_SIZES},
@@ -831,6 +835,8 @@ def _family(product_id: int) -> str:
         return "kadterima"
     if product_id in (116, 117):
         return "staticcling"
+    if product_id == 118:
+        return "wallcal"
     return "loose"
 
 
@@ -1093,6 +1099,28 @@ def packaging_dieline(box: str = Query(...), L: float = Query(0), W: float = Que
     if not dl:
         return JSONResponse({"error": f"no dieline for {box}"}, status_code=404)
     return dl
+
+
+# ---------- Wall Calendar (Litho, id 118) ----------
+@app.get("/api/printoka/wallcal/options")
+def wallcal_options(product: int = Query(118)):
+    return {}
+
+
+@app.get("/api/printoka/wallcal/quote")
+def wallcal_quote(product: int = Query(118), qty: int = Query(...)):
+    from . import wallcal_engine as WC
+    try:
+        cash = WC.cash_price(qty); wt = WC.weight_kg(qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = ("Wall Calendar: fixed 260x265mm, Boxboard backing + Simili 60gsm 12-sheet content; "
+            "Folding + Side Stitching compulsory (included). qty = calendars.")
+    return {"config": {"product": product, "qty": qty}, "printoka_cash": round(cash, 2),
+            "method": "formula (qty curve)", "note": note,
+            "tiers": WC.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------

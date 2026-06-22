@@ -227,6 +227,8 @@ def build_data():
          "accuracy": acc.get(108), "fields": [
             {"key": "paper", "label": "Material", "addon": True, "depends": [],
              "options": ["Synthetic Paper 180micron", "Frosted Plastic 200 micron (0.2mm)"]}]},
+        {"id": 118, "name": "Wall Calendar — Litho", "engine": "wallcal", "optsrc": "none",
+         "accuracy": acc.get(118), "fields": []},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -358,6 +360,7 @@ def build_data():
             "kadkahwin": _load("kadkahwin_params.json", {"core": {}, "size_f": {}, "paper_f": {}, "colour_f": {}, "ordertype_f": {}, "ref": {}}),
             "kadterima": _load("kadterima_params.json", {"core": {}, "size_f": {}, "paper_f": {}, "colour_f": {}, "hp_delta": [], "ref": {}}),
             "staticcling": _load("staticcling_params.json", {"core": {}, "size_f": {}, "direction_f": {}, "vdp_f": {}, "ref": {}, "cling_gsm": 200}),
+            "wallcal": _load("wallcal_params.json", {"curve": {}, "size_mm": [260, 265], "content_sheets": 12, "content_gsm": 60, "back_gsm": 300}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -385,7 +388,7 @@ def build_data():
                             104: "notepad", 105: "letterhead", 106: "envelope", 107: "folder",
                             108: "lshape", 109: "bookmark", 110: "voucher", 111: "computerform",
                             112: "wireo", 113: "pvccard", 114: "kadkahwin", 115: "kadterima",
-                            116: "staticcling", 117: "staticcling"},
+                            116: "staticcling", 117: "staticcling", 118: "wallcal"},
     }
 
 

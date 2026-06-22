@@ -19,6 +19,11 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - **Brochure / Flyer / Customprint (ids 101/102/103)** = pure aliases of Loose Sheet Litho
     (their order page IS `/spec/Litho/Loose_Sheet`) — surfaced as products reusing the litho
     engine/options/standalone. Accuracy = loose-litho 1.7%.
+  - **Wall Calendar — Litho (id 118) BUILT.** Fixed spec (260×265mm, Boxboard backing +
+    Simili 60gsm 12-sheet content, Folding + Side Stitching compulsory). Qty-only curve
+    (log-log), LOO median 1.7%. Sampler `app/wallcal_sampler.py`, engine `app/wallcal_engine.py`.
+    Wired everywhere; JS==Python. (Desk Calendar Hard/Soft Stand at /spec/Litho/
+    Desk_Calendar_(Hard_Stand)/(Soft_Stand) + Wire-O Wall Calendar still pending.)
   - **Static Cling Window Sticker (id 116) + Car Sticker (id 117) BUILT** (one engine, two
     products — same Excard form `/spec/Digital/Static_Cling_Window_Sticker`). Drivers: Size(10)
     × Qty × Print direction (Face Out=Face In; Both Side ≈1.5×) + VDP. Engine

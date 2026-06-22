@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-22T18:13:34",
+ "scanned_at": "2026-06-22T18:21:22",
  "total": 52,
- "built": 23,
+ "built": 24,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -281,8 +281,10 @@
    "name": "Wall Calendar",
    "url": "https://www.excard.com.my/product/wall-calendar",
    "category": "Calendars & Diary",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Wall Calendar Litho (118)"
+   ],
    "is_new": false
   },
   {

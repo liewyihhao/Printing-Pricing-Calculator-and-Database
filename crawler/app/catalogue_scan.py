@@ -39,6 +39,7 @@ BUILT = {
     "kad-terima-kasih": ["Kad Terima Kasih Digital (115)"],
     "static-cling-window-sticker": ["Static Cling Window Sticker Digital (116)"],
     "car-sticker": ["Car Sticker Digital (117, = static cling form)"],
+    "wall-calendar": ["Wall Calendar Litho (118)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],
