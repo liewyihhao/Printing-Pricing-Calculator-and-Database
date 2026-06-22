@@ -20,7 +20,7 @@ WARRANTY_FILE = OUT / "sticker_warranty.json"
 CD_FILE = OUT / "sticker_cd.json"
 CD_PAPERS = ["Mirror Kote", "Printing Paper"]
 CATEGORIES = ["Rectangle/Square", "Custom Die-Cut", "Standard Shape", "Round",
-              "No Cut", "Kiss Cut", "Multiple Dieline"]
+              "No Cut", "Kiss Cut (1up/sheet)", "Multiple Dieline (Available for different size and different shape)"]
 MD_SHEET_SIZES = ["A3+", "A4", "A5"]   # Delivery Sheet Size (317x425 / 210x297 / 148x210 mm)
 _CACHE: dict = {}
 
@@ -231,7 +231,7 @@ def cd_price(paper, colour, qty):
 
 
 def category_price(category, h, w, paper, colour, qty, diameter=0, sheet_size="A3+"):
-    if category == "Multiple Dieline":
+    if category in ("Multiple Dieline", "Multiple Dieline (Available for different size and different shape)"):
         return multidieline_price(sheet_size, qty, paper, colour)
     # Warranty Sticker: use its own area x qty curve for the per-piece cut categories
     if paper == "Warranty Sticker" and category in (
@@ -252,6 +252,6 @@ def category_price(category, h, w, paper, colour, qty, diameter=0, sheet_size="A
         return SE.cash_price("digital", h, w, paper, colour, qty) * _std_mult()
     if cat == "No Cut":
         return _interp(_nocut_pts(paper), qty)
-    if cat == "Kiss Cut":
+    if cat in ("Kiss Cut", "Kiss Cut (1up/sheet)"):
         return _interp([(r["qty"], r["cash"]) for r in _data().get("kiss_cut", [])], qty)
     return SE.cash_price("digital", h, w, paper, colour, qty)
