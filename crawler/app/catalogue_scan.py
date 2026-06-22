@@ -44,6 +44,7 @@ BUILT = {
     "desk-calendar-hard-stand": ["Desk Calendar Hard Stand Litho (120)"],
     "desk-calendar-soft-stand": ["Desk Calendar Soft Stand Litho (121)"],
     "wire-o-wall-calendar": ["Wire-O Wall Calendar Litho (122)"],
+    "banner": ["Banner Litho (123)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

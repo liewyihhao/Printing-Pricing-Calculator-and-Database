@@ -242,6 +242,11 @@ def build_data():
          "accuracy": acc.get(121), "fields": []},
         {"id": 122, "name": "Wire-O Wall Calendar — Litho", "engine": "wireow", "optsrc": "none",
          "accuracy": acc.get(122), "fields": []},
+        {"id": 123, "name": "Banner — Litho", "engine": "banner", "optsrc": "none",
+         "accuracy": acc.get(123), "fields": [
+            {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
+                "3ft x 2ft", "4ft x 2ft", "6ft x 2ft", "4ft x 3ft", "8ft x 3ft",
+                "10ft x 3ft", "18ft x 3ft", "8ft x 4ft", "10ft x 4ft", "20ft x 4ft"]}]},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -382,6 +387,7 @@ def build_data():
             "archfile": _load("archfile_params.json", {"curve": {}, "unit_wt": 0.42}),
             "deskcal": _load("deskcal_params.json", {"soft_curve": {}, "hard_curves": {}, "hard_unit_kg": 0.35, "soft_unit_kg": 0.25}),
             "wireow": _load("wireow_params.json", {"curve": {}, "unit_kg": 0.30}),
+            "banner": _load("banner_params.json", {"curves": {}, "sizes": [], "material_gsm": 400, "ft_to_m": 0.3048}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -410,7 +416,8 @@ def build_data():
                             108: "lshape", 109: "bookmark", 110: "voucher", 111: "computerform",
                             112: "wireo", 113: "pvccard", 114: "kadkahwin", 115: "kadterima",
                             116: "staticcling", 117: "staticcling", 118: "wallcal", 119: "archfile",
-                            120: "deskcal_hard", 121: "deskcal_soft", 122: "wireow"},
+                            120: "deskcal_hard", 121: "deskcal_soft", 122: "wireow",
+                            123: "banner"},
     }
 
 

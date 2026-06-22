@@ -325,7 +325,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 119, "name": "Arch File — Digital"},
                {"id": 120, "name": "Desk Calendar — Hard Stand (Litho)"},
                {"id": 121, "name": "Desk Calendar — Soft Stand (Litho)"},
-               {"id": 122, "name": "Wire-O Wall Calendar — Litho"}]
+               {"id": 122, "name": "Wire-O Wall Calendar — Litho"},
+               {"id": 123, "name": "Banner — Litho"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
@@ -430,7 +431,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               119: 0.0,  # arch file: flat RM5.00/unit — linear qty curve, exact
               120: 1.1,  # desk calendar hard stand: per-cat qty curve LOO median 1.12% (cat=1)
               121: 0.7,  # desk calendar soft stand: qty curve LOO median 0.67%
-              122: 0.8}  # wire-o wall calendar: qty curve LOO median 0.82%
+              122: 0.8,  # wire-o wall calendar: qty curve LOO median 0.82%
+              123: 0.9}  # banner: per-size qty curve LOO median 0.9%
 
 
 def _accuracy(product_id: int):
@@ -684,6 +686,12 @@ FIELD_SCHEMAS = {
                 "fields": []},
     "wireow": {"options": "/api/printoka/wireow/options", "quote": "/api/printoka/wireow/quote",
                 "fields": []},
+    "banner": {"options": "/api/printoka/banner/options", "quote": "/api/printoka/banner/quote",
+                "fields": [
+                    {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
+                        "3ft x 2ft", "4ft x 2ft", "6ft x 2ft", "4ft x 3ft", "8ft x 3ft",
+                        "10ft x 3ft", "18ft x 3ft", "8ft x 4ft", "10ft x 4ft", "20ft x 4ft"]},
+                ]},
     "staticcling": {"options": "/api/printoka/staticcling/options", "quote": "/api/printoka/staticcling/quote",
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": SC_SIZES},
@@ -875,6 +883,8 @@ def _family(product_id: int) -> str:
         return "deskcal_soft"
     if product_id == 122:
         return "wireow"
+    if product_id == 123:
+        return "banner"
     return "loose"
 
 
@@ -1271,6 +1281,31 @@ def wireow_quote(product: int = Query(122), qty: int = Query(...)):
     return {"config": {"product": product, "qty": qty}, "printoka_cash": round(cash, 2),
             "method": "formula (qty curve)", "note": note,
             "tiers": WOW.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Banner (Litho, id 123) ----------
+_BANNER_SIZES = ["3ft x 2ft", "4ft x 2ft", "6ft x 2ft", "4ft x 3ft", "8ft x 3ft",
+                 "10ft x 3ft", "18ft x 3ft", "8ft x 4ft", "10ft x 4ft", "20ft x 4ft"]
+
+
+@app.get("/api/printoka/banner/options")
+def banner_options(product: int = Query(123)):
+    return {"sizes": _BANNER_SIZES}
+
+
+@app.get("/api/printoka/banner/quote")
+def banner_quote(product: int = Query(123), size: str = Query("3ft x 2ft"), qty: int = Query(...)):
+    from . import banner_engine as BN
+    try:
+        cash = BN.cash_price(size, qty); wt = BN.weight_kg(size, qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = "Banner (solvent-print vinyl on tarpaulin). Fixed material 400gsm. qty = pieces."
+    return {"config": {"product": product, "size": size, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per-size qty curve)",
+            "note": note, "tiers": BN.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------

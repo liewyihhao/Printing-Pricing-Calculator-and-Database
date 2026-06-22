@@ -427,6 +427,13 @@ function localQuote(prod, V, qty){
     wt=Math.round((WOW.unit_kg||0.30)*qty*WF*1000)/1000;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
       note:"Wire-O Wall Calendar: Litho, Wire-O binding + hanger. Hole Punching + Wire-O Binding (White) + Hanger compulsory. qty = calendars." }; }
+  else if(prod.engine==="banner"){
+    const BN=DATA.params.banner||{}; const bc=(BN.curves||{})[V.size||"3ft x 2ft"]||{}; cash=interpLogPts(Object.keys(bc).map(k=>[+k,bc[k]]),qty);
+    const bparts=(V.size||"3ft x 2ft").toLowerCase().replace(/ft/g,"").split("x"); const FT=BN.ft_to_m||0.3048;
+    const bw=parseFloat(bparts[0])*FT, bh=parseFloat(bparts[1])*FT;
+    wt=Math.round(bw*bh*(BN.material_gsm||400)*qty/1000*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-size qty curve)",
+      note:"Banner (solvent-print vinyl tarpaulin). qty = pieces." }; }
   else if(prod.engine==="staticcling"){
     const P2=P;
     function interpLL(obj,q){const pts=Object.keys(obj).map(k=>[+k,obj[k]]).sort((a,b)=>a[0]-b[0]);if(!pts.length)return 0;const xs=pts.map(p=>Math.log(p[0])),ys=pts.map(p=>Math.log(p[1])),x=Math.log(Math.max(+q,1));if(x<=xs[0])return Math.exp(ys[0]);if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}
