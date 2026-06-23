@@ -1,0 +1,18 @@
+{
+"curves": {
+"Metalised Pet Film": {
+"100": 298.5,
+"200": 514.0,
+"300": 681.0,
+"500": 773.5,
+"1000": 971.5,
+"2000": 1521.0,
+"3000": 2008.0,
+"5000": 2953.5
+}
+},
+"variant_field": "paper",
+"unit_wt": 0.015,
+"note": "Standing Pouch (Litho, Metalised Pet Film). Lamination Matte/Gloss price-neutral. Transparent Pet Film pending. qty = pouches.",
+"weight_factor": 1.2065
+}

@@ -55,6 +55,7 @@ BUILT = {
     "hanger": ["Hanger Digital (134)"],
     "magnet": ["Magnet Digital (135)"],
     "hard-cover-menu": ["Hard Cover Menu Digital (136)"],
+    "standing-pouch": ["Standing Pouch Litho (137)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],
