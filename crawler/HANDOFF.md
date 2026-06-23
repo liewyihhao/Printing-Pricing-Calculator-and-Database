@@ -4,6 +4,22 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **41/52 BUILT.** New this session via a reusable generic engine `simpleqty_engine`
+  (per-variant log-log qty curve; params in `output/<tag>_params.json` as
+  `{curves,variant_field,unit_wt,note}`; one JS branch `engine:"simpleqty"`,`paramKey` in
+  the template; `variant_field` may be a string or a list → composite "a|b" key):
+  - **Button Badge (132)** qty curve, lamination neutral. **Hand Fan (133)** per-paper.
+  - **Hanger (134)** per (paper × colour). **Magnet (135)** per shape (Soft Touch +~RM4).
+  - **Hard Cover Menu (136)** per (order × add-content); Cover-only aliased across add-content.
+  - **Standing Pouch (137)** Metalised Pet Film only (Transparent deferred — stale headless reads).
+  - **KEY SAMPLER INSIGHT:** these Digital forms reset compulsory selects (lamination, and
+    for hanger print colour) on every qty change, so price reads RM0 unless those fields are
+    re-applied AFTER qty. `gifts_sampler._sweep_qty(..., reapply=[(name,val),...], lam_field=)`
+    handles it. Reusable triage: `app/batch_formdump.py` (one login, many /spec dumps).
+  - **STILL UNBUILT (11), all genuinely hard headless:** Tent Card, Bunting, Wobbler,
+    Papan Kopi, Money Packet, Mask Keeper, Non-Woven Bag (empty cascade), Sublimation Shirt
+    (complex model/sleeve/fabric quote), Stamp Chop + Pre-Inked Stamp (shape→model→per-line
+    configurator), Wire-O Exclusive Leather cover. Need a non-headless / deeper-interaction pass.
 - **TASK B PROGRESS — Arch File + Pillow + Desk Calendar finished; 3 deferred.**
   - **Arch File (id 119) BUILT** — flat RM5.00/unit qty curve (LOO 0%), fixed spec
     (steel binding + wire-O + corners + lamination all compulsory). Full pipeline, JS==Python.
