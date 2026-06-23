@@ -1,0 +1,28 @@
+{
+"curves": {
+"Gloss Art Card 310gsm": {
+"50": 113.14,
+"100": 146.41,
+"200": 218.3,
+"300": 290.18,
+"400": 366.03,
+"500": 437.91,
+"600": 509.8,
+"800": 657.53
+},
+"Gloss Art Card 360gsm": {
+"50": 119.79,
+"100": 154.88,
+"200": 229.9,
+"300": 304.92,
+"400": 384.78,
+"500": 459.8,
+"600": 536.03,
+"800": 690.91
+}
+},
+"variant_field": "paper",
+"unit_wt": 0.02,
+"note": "Hand Fan (Digital). Per-paper qty curve; price shown at Matte Lamination (Both). qty = fans.",
+"weight_factor": 1.2065
+}

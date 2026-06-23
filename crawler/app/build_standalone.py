@@ -317,6 +317,12 @@ def build_data():
          "optsrc": "none", "accuracy": acc.get(132), "fields": [
             {"key": "lamination", "label": "Lamination (price-neutral)", "addon": True, "depends": [],
              "options": ["Gloss", "Soft Touch"]}]},
+        {"id": 133, "name": "Hand Fan — Digital", "engine": "simpleqty", "paramKey": "handfan",
+         "optsrc": "none", "accuracy": acc.get(133), "fields": [
+            {"key": "paper", "label": "Paper", "addon": True, "depends": [],
+             "options": ["Gloss Art Card 310gsm", "Gloss Art Card 360gsm"]},
+            {"key": "lamination", "label": "Lamination (priced at Matte Both)", "addon": True, "depends": [],
+             "options": ["Matte Lamination (Both)", "Gloss Lamination (Both)"]}]},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -467,6 +473,7 @@ def build_data():
             "papankopi": _load("papankopi_params.json", {"curves": {}, "sizes": [], "size_dims_mm": {}, "board_gsm": 1200}),
             "pillow": _load("pillow_params.json", {"curve": {}, "pillow_kg": 0.60}),
             "buttonbadge": _load("buttonbadge_params.json", {"curves": {}, "variant_field": "", "unit_wt": 0.012}),
+            "handfan": _load("handfan_params.json", {"curves": {}, "variant_field": "paper", "unit_wt": 0.02}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -498,7 +505,7 @@ def build_data():
                             120: "deskcal_hard", 121: "deskcal_soft", 122: "wireow",
                             123: "banner", 124: "bunting", 125: "rollup", 126: "wobbler",
                             127: "paperbag", 128: "canvastote", 129: "mug",
-                            130: "papankopi", 131: "pillow", 132: "buttonbadge"},
+                            130: "papankopi", 131: "pillow", 132: "buttonbadge", 133: "handfan"},
     }
 
 

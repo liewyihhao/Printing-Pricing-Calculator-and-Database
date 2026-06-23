@@ -51,6 +51,7 @@ BUILT = {
     "mug": ["Mug Litho (129)"],
     "pillow": ["Pillow Litho (131)"],
     "button-badge": ["Button Badge Digital (132)"],
+    "hand-fan": ["Hand Fan Digital (133)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

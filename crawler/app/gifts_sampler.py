@@ -16,7 +16,7 @@ from playwright.async_api import async_playwright
 from .browser import launch, login
 from . import accounts
 from .logging_setup import log
-from .billbook_sampler import _sel, _safe_read, _wait, _radio
+from .billbook_sampler import _sel, _safe_read, _wait, _radio, _opts
 
 OUT = Path(__file__).resolve().parent.parent / "output"
 BASE = "https://www.excard.com.my"
@@ -28,17 +28,23 @@ async def _qopts(page, name):
         "return Array.from(s.options).map(o=>o.value).filter(v=>v&&!v.startsWith('-'));}", name)
 
 
-async def _sweep_qty(page, qty_sel, qtys, prev=None):
-    """Return {qty:cash}, polling until price changes off prev (stale-read guard)."""
+async def _sweep_qty(page, qty_sel, qtys, prev=None, lam_field=None, lam_value=None):
+    """Return {qty:cash}, polling until price changes off prev (stale-read guard).
+    On these forms changing qty resets a compulsory lamination select, so if
+    lam_field/lam_value are given, re-apply lamination AFTER each qty (price calc
+    only fires once the last required field is set)."""
     res = {}
     for q in qtys:
         if not await _sel(page, qty_sel, str(q)):
             continue
+        if lam_field and lam_value:
+            await asyncio.sleep(0.4)
+            await _sel(page, lam_field, lam_value)
         c = None
         for _ in range(12):
             await asyncio.sleep(0.6)
             c = (await _safe_read(page)).get("before_discount")
-            if c is not None and (prev is None or c != prev):
+            if c is not None and c != 0 and (prev is None or c != prev):
                 break
         if c:
             res[q] = c; prev = c
@@ -56,7 +62,9 @@ async def sample_fan(page):
         if not await _sel(page, "ddlPaper", paper):
             log.warning("fan.paper_fail", paper=paper); continue
         await asyncio.sleep(0.5)
-        res = await _sweep_qty(page, "comboQty", qtys)
+        lam_opts = await _opts(page, "rblLaminationSide")  # compulsory; reset on each qty change
+        lam0 = lam_opts[0] if lam_opts else None
+        res = await _sweep_qty(page, "comboQty", qtys, lam_field="rblLaminationSide", lam_value=lam0)
         for q, c in res.items():
             data["core"].append({"variant": paper, "qty": q, "cash": c})
         out.write_text(json.dumps(data, indent=0)); log.info("fan", paper=paper, n=len(res))
@@ -74,8 +82,10 @@ async def sample_hanger(page):
         await _wait(page); await asyncio.sleep(1.0)
         if not await _sel(page, "ddlPaper", paper):
             log.warning("hanger.paper_fail", paper=paper); continue
-        await _sel(page, "rblLaminationSide", lams[0]); await asyncio.sleep(0.5)
-        res = await _sweep_qty(page, "comboQty", qtys)
+        await asyncio.sleep(0.4)
+        lo = await _opts(page, "rblLaminationSide")
+        lam0 = (lams[0] if lams[0] in (lo or []) else (lo[0] if lo else None))
+        res = await _sweep_qty(page, "comboQty", qtys, lam_field="rblLaminationSide", lam_value=lam0)
         for q, c in res.items():
             data["core"].append({"variant": paper, "qty": q, "cash": c})
         out.write_text(json.dumps(data, indent=0)); log.info("hanger", paper=paper, n=len(res))
@@ -84,11 +94,9 @@ async def sample_hanger(page):
     await _wait(page); await asyncio.sleep(1.0)
     await _sel(page, "ddlPaper", papers[0]); await asyncio.sleep(0.4)
     for lam in lams:
-        if await _sel(page, "rblLaminationSide", lam):
-            await asyncio.sleep(0.4)
-            r = await _sweep_qty(page, "comboQty", [200])
-            for q, c in r.items():
-                data["lam"].append({"lam": lam, "qty": q, "cash": c})
+        r = await _sweep_qty(page, "comboQty", [200], lam_field="rblLaminationSide", lam_value=lam)
+        for q, c in r.items():
+            data["lam"].append({"lam": lam, "qty": q, "cash": c})
     out.write_text(json.dumps(data, indent=0)); log.info("hanger.lam", n=len(data["lam"]))
 
 
