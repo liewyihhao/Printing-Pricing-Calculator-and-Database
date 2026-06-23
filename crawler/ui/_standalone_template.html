@@ -434,6 +434,59 @@ function localQuote(prod, V, qty){
     wt=Math.round(bw*bh*(BN.material_gsm||400)*qty/1000*WF*1000)/1000;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-size qty curve)",
       note:"Banner (solvent-print vinyl tarpaulin). qty = pieces." }; }
+  else if(prod.engine==="bunting"){
+    const BT=DATA.params.bunting||{}; const btkey=(V.size||"2ft x 5ft")+"|"+(V.paper||"Tarpaulin 300gsm");
+    const btc=(BT.curves||{})[btkey]||{}; cash=interpLogPts(Object.keys(btc).map(k=>[+k,btc[k]]),qty);
+    const btparts=(V.size||"2ft x 5ft").toLowerCase().replace(/ft/g,"").split("x"); const BTF=BT.ft_to_m||0.3048;
+    const btw=parseFloat(btparts[0])*BTF, bth=parseFloat(btparts[1])*BTF;
+    const btgsm=(BT.paper_gsm||{})[V.paper||"Tarpaulin 300gsm"]||300;
+    wt=Math.round(btw*bth*btgsm*qty/1000*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-size-paper qty curve)",
+      note:"Bunting. qty = pieces." }; }
+  else if(prod.engine==="rollup"){
+    const RU=DATA.params.rollup||{}; const ruc=(RU.curves||{})[V.lam||"Matte Lamination"]||{};
+    cash=interpLogPts(Object.keys(ruc).map(k=>[+k,ruc[k]]),qty);
+    wt=Math.round((RU.stand_w_m||0.85)*(RU.stand_h_m||2.0)*(RU.material_gsm||400)*qty/1000*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-lam qty curve)",
+      note:"Roll-Up Stand: 0.85m × 2.00m panel. qty = stands." }; }
+  else if(prod.engine==="wobbler"){
+    const WB=DATA.params.wobbler||{}; const wbkey=(V.orient||"Portrait")+"|"+(V.paper||"Gloss Art Card 250gsm")+"|"+(V.lam||"Matte Lamination (Front)");
+    const wbc=(WB.curves||{})[wbkey]||{}; cash=interpLogPts(Object.keys(wbc).map(k=>[+k,wbc[k]]),qty);
+    if(V.finishing&&V.finishing!=="-"){const fd=(WB.finish_deltas||{})[V.finishing]||{};const fdpts=Object.keys(fd).map(k=>[+k,fd[k]]).sort((a,b)=>a[0]-b[0]);if(fdpts.length){let dl=fdpts[0][1];for(let i=1;i<fdpts.length;i++){if(qty<=fdpts[i][0]){const t=(qty-fdpts[i-1][0])/(fdpts[i][0]-fdpts[i-1][0]);dl=fdpts[i-1][1]+t*(fdpts[i][1]-fdpts[i-1][1]);break;}else dl=fdpts[i][1];}cash+=dl;}}
+    const wbgsm=(WB.paper_gsm||{})[V.paper||"Gloss Art Card 250gsm"]||250;
+    wt=Math.round((WB.wobbler_w_m||0.095)*(WB.wobbler_h_m||0.21)*wbgsm*qty/1000*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-combo qty curve + finishing delta)",
+      note:"Wobbler (Digital). qty = pieces." }; }
+  else if(prod.engine==="paperbag"){
+    const PB=DATA.params.paperbag||{}; const pbc=(PB.curves||{})[V.paper||"Gloss Art Paper 157gsm"]||{};
+    cash=interpLogPts(Object.keys(pbc).map(k=>[+k,pbc[k]]),qty);
+    const pbgsm=(PB.paper_gsm||{})[V.paper||"Gloss Art Paper 157gsm"]||157;
+    wt=Math.round((PB.bag_sheet_m2||0.16)*pbgsm*qty/1000*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-paper qty curve)",
+      note:"Paper Bag. Folding + Gluing + Hole Punching compulsory. qty = bags." }; }
+  else if(prod.engine==="canvastote"){
+    const CT=DATA.params.canvastote||{}; const ctc=(CT.curves||{})[V.colour||"1C (Front)"]||{};
+    cash=interpLogPts(Object.keys(ctc).map(k=>[+k,ctc[k]]),qty);
+    wt=Math.round((CT.bag_w_m||0.38)*(CT.bag_h_m||0.42)*(CT.canvas_gsm||250)*qty/1000*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-colour qty curve)",
+      note:"Canvas Tote Bag. qty = bags." }; }
+  else if(prod.engine==="mug"){
+    const MG=DATA.params.mug||{}; const mgc=MG.curve||{}; cash=interpLogPts(Object.keys(mgc).map(k=>[+k,mgc[k]]),qty);
+    wt=Math.round((MG.mug_kg||0.35)*qty*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
+      note:"Mug: standard ceramic sublimation. qty = mugs." }; }
+  else if(prod.engine==="papankopi"){
+    const PK=DATA.params.papankopi||{}; const pkc=(PK.curves||{})[V.size||"537mm x 334mm"]||{};
+    cash=interpLogPts(Object.keys(pkc).map(k=>[+k,pkc[k]]),qty);
+    const pkdims=(PK.size_dims_mm||{})[V.size||"537mm x 334mm"]||[537,334];
+    wt=Math.round(pkdims[0]/1000*pkdims[1]/1000*(PK.board_gsm||1200)*qty/1000*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-size qty curve)",
+      note:"Papan Kopi / Sachet Board. Hole Punching compulsory. qty = boards." }; }
+  else if(prod.engine==="pillow"){
+    const PL=DATA.params.pillow||{}; const plc=PL.curve||{}; cash=interpLogPts(Object.keys(plc).map(k=>[+k,plc[k]]),qty);
+    wt=Math.round((PL.pillow_kg||0.60)*qty*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
+      note:"Pillow: standard 40cm × 40cm sublimation with filling. qty = pillows." }; }
   else if(prod.engine==="staticcling"){
     const P2=P;
     function interpLL(obj,q){const pts=Object.keys(obj).map(k=>[+k,obj[k]]).sort((a,b)=>a[0]-b[0]);if(!pts.length)return 0;const xs=pts.map(p=>Math.log(p[0])),ys=pts.map(p=>Math.log(p[1])),x=Math.log(Math.max(+q,1));if(x<=xs[0])return Math.exp(ys[0]);if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}

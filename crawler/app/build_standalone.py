@@ -247,6 +247,42 @@ def build_data():
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
                 "3ft x 2ft", "4ft x 2ft", "6ft x 2ft", "4ft x 3ft", "8ft x 3ft",
                 "10ft x 3ft", "18ft x 3ft", "8ft x 4ft", "10ft x 4ft", "20ft x 4ft"]}]},
+        {"id": 124, "name": "Bunting — Litho", "engine": "bunting", "optsrc": "none",
+         "accuracy": acc.get(124), "fields": [
+            {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
+                "2ft x 5ft", "2ft x 6ft", "2.5ft x 6ft"]},
+            {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": [
+                "Tarpaulin 300gsm", "Synthetic Paper 180micron"]}]},
+        {"id": 125, "name": "Roll-Up Stand — Litho", "engine": "rollup", "optsrc": "none",
+         "accuracy": acc.get(125), "fields": [
+            {"key": "lam", "label": "Lamination", "addon": True, "depends": [], "options": [
+                "Matte Lamination", "Gloss Lamination"]}]},
+        {"id": 126, "name": "Wobbler — Digital", "engine": "wobbler", "optsrc": "none",
+         "accuracy": acc.get(126), "fields": [
+            {"key": "orient", "label": "Orientation", "addon": True, "depends": [], "options": [
+                "Portrait", "Landscape"]},
+            {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
+                "Gloss Art Card 250gsm", "Gloss Art Card 310gsm"]},
+            {"key": "lam", "label": "Lamination", "addon": True, "depends": [], "options": [
+                "Matte Lamination (Front)", "Gloss Lamination (Front)"]},
+            {"key": "finishing", "label": "Finishing", "addon": True, "depends": [], "options": [
+                "-", "Round Cornering (R6),4,1", "Digital Die-cutting,0,0"]}]},
+        {"id": 127, "name": "Paper Bag — Litho", "engine": "paperbag", "optsrc": "none",
+         "accuracy": acc.get(127), "fields": [
+            {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
+                "Gloss Art Paper 157gsm", "Gloss Art Card 190gsm (1 side coated)"]}]},
+        {"id": 128, "name": "Canvas Tote Bag — Litho", "engine": "canvastote", "optsrc": "none",
+         "accuracy": acc.get(128), "fields": [
+            {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": [
+                "1C (Front)", "1C (Both)"]}]},
+        {"id": 129, "name": "Mug — Litho", "engine": "mug", "optsrc": "none",
+         "accuracy": acc.get(129), "fields": []},
+        {"id": 130, "name": "Papan Kopi / Sachet Board — Litho", "engine": "papankopi", "optsrc": "none",
+         "accuracy": acc.get(130), "fields": [
+            {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
+                "537mm x 334mm", "622mm x 346mm", "547mm x 346mm"]}]},
+        {"id": 131, "name": "Pillow — Litho", "engine": "pillow", "optsrc": "none",
+         "accuracy": acc.get(131), "fields": []},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -388,6 +424,14 @@ def build_data():
             "deskcal": _load("deskcal_params.json", {"soft_curve": {}, "hard_curves": {}, "hard_unit_kg": 0.35, "soft_unit_kg": 0.25}),
             "wireow": _load("wireow_params.json", {"curve": {}, "unit_kg": 0.30}),
             "banner": _load("banner_params.json", {"curves": {}, "sizes": [], "material_gsm": 400, "ft_to_m": 0.3048}),
+            "bunting": _load("bunting_params.json", {"curves": {}, "sizes": [], "papers": [], "paper_gsm": {}}),
+            "rollup": _load("rollup_params.json", {"curves": {}, "lams": [], "stand_w_m": 0.85, "stand_h_m": 2.0, "material_gsm": 400}),
+            "wobbler": _load("wobbler_params.json", {"curves": {}, "orients": [], "papers": [], "lams": [], "finishings": [], "paper_gsm": {}, "wobbler_w_m": 0.095, "wobbler_h_m": 0.21, "finish_deltas": {}}),
+            "paperbag": _load("paperbag_params.json", {"curves": {}, "papers": [], "paper_gsm": {}, "bag_sheet_m2": 0.16}),
+            "canvastote": _load("canvastote_params.json", {"curves": {}, "colours": [], "bag_w_m": 0.38, "bag_h_m": 0.42, "canvas_gsm": 250}),
+            "mug": _load("mug_params.json", {"curve": {}, "mug_kg": 0.35}),
+            "papankopi": _load("papankopi_params.json", {"curves": {}, "sizes": [], "size_dims_mm": {}, "board_gsm": 1200}),
+            "pillow": _load("pillow_params.json", {"curve": {}, "pillow_kg": 0.60}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -417,7 +461,9 @@ def build_data():
                             112: "wireo", 113: "pvccard", 114: "kadkahwin", 115: "kadterima",
                             116: "staticcling", 117: "staticcling", 118: "wallcal", 119: "archfile",
                             120: "deskcal_hard", 121: "deskcal_soft", 122: "wireow",
-                            123: "banner"},
+                            123: "banner", 124: "bunting", 125: "rollup", 126: "wobbler",
+                            127: "paperbag", 128: "canvastote", 129: "mug",
+                            130: "papankopi", 131: "pillow"},
     }
 
 

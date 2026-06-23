@@ -326,7 +326,15 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 120, "name": "Desk Calendar — Hard Stand (Litho)"},
                {"id": 121, "name": "Desk Calendar — Soft Stand (Litho)"},
                {"id": 122, "name": "Wire-O Wall Calendar — Litho"},
-               {"id": 123, "name": "Banner — Litho"}]
+               {"id": 123, "name": "Banner — Litho"},
+               {"id": 124, "name": "Bunting — Litho"},
+               {"id": 125, "name": "Roll-Up Stand — Litho"},
+               {"id": 126, "name": "Wobbler — Digital"},
+               {"id": 127, "name": "Paper Bag — Litho"},
+               {"id": 128, "name": "Canvas Tote Bag — Litho"},
+               {"id": 129, "name": "Mug — Litho"},
+               {"id": 130, "name": "Papan Kopi / Sachet Board — Litho"},
+               {"id": 131, "name": "Pillow — Litho"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
@@ -432,7 +440,15 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               120: 1.1,  # desk calendar hard stand: per-cat qty curve LOO median 1.12% (cat=1)
               121: 0.7,  # desk calendar soft stand: qty curve LOO median 0.67%
               122: 0.8,  # wire-o wall calendar: qty curve LOO median 0.82%
-              123: 0.9}  # banner: per-size qty curve LOO median 0.9%
+              123: 0.9,  # banner: per-size qty curve LOO median 0.9%
+              124: 1.5,  # bunting: TBD (re-sample needed)
+              125: 0.68,  # rollup: per-lam qty curve LOO median 0.68%
+              126: 2.0,  # wobbler: TBD (re-sample needed)
+              127: 17.4,  # paperbag: per-paper qty curve LOO 17% (anomalous q200 dip)
+              128: 0.79,  # canvastote: per-colour qty curve LOO median 0.79%
+              129: 0.53,  # mug: qty curve LOO median 0.53%
+              130: 1.5,  # papankopi: TBD (sampler fix needed)
+              131: 1.5}  # pillow: TBD after engine build
 
 
 def _accuracy(product_id: int):
@@ -692,6 +708,48 @@ FIELD_SCHEMAS = {
                         "3ft x 2ft", "4ft x 2ft", "6ft x 2ft", "4ft x 3ft", "8ft x 3ft",
                         "10ft x 3ft", "18ft x 3ft", "8ft x 4ft", "10ft x 4ft", "20ft x 4ft"]},
                 ]},
+    "bunting": {"options": "/api/printoka/bunting/options", "quote": "/api/printoka/bunting/quote",
+                "fields": [
+                    {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
+                        "2ft x 5ft", "2ft x 6ft", "2.5ft x 6ft"]},
+                    {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": [
+                        "Tarpaulin 300gsm", "Synthetic Paper 180micron"]},
+                ]},
+    "rollup": {"options": "/api/printoka/rollup/options", "quote": "/api/printoka/rollup/quote",
+                "fields": [
+                    {"key": "lam", "label": "Lamination", "addon": True, "depends": [], "options": [
+                        "Matte Lamination", "Gloss Lamination"]},
+                ]},
+    "wobbler": {"options": "/api/printoka/wobbler/options", "quote": "/api/printoka/wobbler/quote",
+                "fields": [
+                    {"key": "orient", "label": "Orientation", "addon": True, "depends": [], "options": [
+                        "Portrait", "Landscape"]},
+                    {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
+                        "Gloss Art Card 250gsm", "Gloss Art Card 310gsm"]},
+                    {"key": "lam", "label": "Lamination", "addon": True, "depends": [], "options": [
+                        "Matte Lamination (Front)", "Gloss Lamination (Front)"]},
+                    {"key": "finishing", "label": "Finishing", "addon": True, "depends": [], "options": [
+                        "-", "Round Cornering (R6),4,1", "Digital Die-cutting,0,0"]},
+                ]},
+    "paperbag": {"options": "/api/printoka/paperbag/options", "quote": "/api/printoka/paperbag/quote",
+                "fields": [
+                    {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
+                        "Gloss Art Paper 157gsm", "Gloss Art Card 190gsm (1 side coated)"]},
+                ]},
+    "canvastote": {"options": "/api/printoka/canvastote/options", "quote": "/api/printoka/canvastote/quote",
+                "fields": [
+                    {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": [
+                        "1C (Front)", "1C (Both)"]},
+                ]},
+    "mug": {"options": "/api/printoka/mug/options", "quote": "/api/printoka/mug/quote",
+                "fields": []},
+    "papankopi": {"options": "/api/printoka/papankopi/options", "quote": "/api/printoka/papankopi/quote",
+                "fields": [
+                    {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
+                        "537mm x 334mm", "622mm x 346mm", "547mm x 346mm"]},
+                ]},
+    "pillow": {"options": "/api/printoka/pillow/options", "quote": "/api/printoka/pillow/quote",
+                "fields": []},
     "staticcling": {"options": "/api/printoka/staticcling/options", "quote": "/api/printoka/staticcling/quote",
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": SC_SIZES},
@@ -885,6 +943,22 @@ def _family(product_id: int) -> str:
         return "wireow"
     if product_id == 123:
         return "banner"
+    if product_id == 124:
+        return "bunting"
+    if product_id == 125:
+        return "rollup"
+    if product_id == 126:
+        return "wobbler"
+    if product_id == 127:
+        return "paperbag"
+    if product_id == 128:
+        return "canvastote"
+    if product_id == 129:
+        return "mug"
+    if product_id == 130:
+        return "papankopi"
+    if product_id == 131:
+        return "pillow"
     return "loose"
 
 
@@ -1306,6 +1380,184 @@ def banner_quote(product: int = Query(123), size: str = Query("3ft x 2ft"), qty:
     return {"config": {"product": product, "size": size, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "formula (per-size qty curve)",
             "note": note, "tiers": BN.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Bunting (Litho, id 124) ----------
+@app.get("/api/printoka/bunting/options")
+def bunting_options(product: int = Query(124)):
+    from . import bunting_engine as BT
+    return {"sizes": BT.SIZES, "papers": BT.PAPERS}
+
+
+@app.get("/api/printoka/bunting/quote")
+def bunting_quote(product: int = Query(124), size: str = Query("2ft x 5ft"),
+                  paper: str = Query("Tarpaulin 300gsm"), qty: int = Query(...)):
+    from . import bunting_engine as BT
+    try:
+        cash = BT.cash_price(size, paper, qty); wt = BT.weight_kg(size, paper, qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = f"Bunting: {size}, {paper}. qty = pieces."
+    return {"config": {"product": product, "size": size, "paper": paper, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per-size-paper qty curve)",
+            "note": note, "tiers": BT.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Roll-Up Stand (Litho, id 125) ----------
+@app.get("/api/printoka/rollup/options")
+def rollup_options(product: int = Query(125)):
+    from . import rollup_engine as RU
+    return {"lams": RU.LAMS}
+
+
+@app.get("/api/printoka/rollup/quote")
+def rollup_quote(product: int = Query(125), lam: str = Query("Matte Lamination"), qty: int = Query(...)):
+    from . import rollup_engine as RU
+    try:
+        cash = RU.cash_price(lam, qty); wt = RU.weight_kg(qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = f"Roll-Up Stand: 0.85m × 2.00m panel, {lam}. qty = stands."
+    return {"config": {"product": product, "lam": lam, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per-lam qty curve)",
+            "note": note, "tiers": RU.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Wobbler (Digital, id 126) ----------
+@app.get("/api/printoka/wobbler/options")
+def wobbler_options(product: int = Query(126)):
+    from . import wobbler_engine as WB
+    return {"orients": WB.ORIENTS, "papers": WB.PAPERS, "lams": WB.LAMS, "finishings": WB.FINISHINGS}
+
+
+@app.get("/api/printoka/wobbler/quote")
+def wobbler_quote(product: int = Query(126), orient: str = Query("Portrait"),
+                  paper: str = Query("Gloss Art Card 250gsm"),
+                  lam: str = Query("Matte Lamination (Front)"),
+                  finishing: str = Query("-"), qty: int = Query(...)):
+    from . import wobbler_engine as WB
+    try:
+        cash = WB.cash_price(orient, paper, lam, qty, finishing); wt = WB.weight_kg(paper, qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = f"Wobbler: {orient}, {paper}, {lam}. qty = pieces."
+    return {"config": {"product": product, "orient": orient, "paper": paper, "lam": lam, "finishing": finishing, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per-combo qty curve + finishing delta)",
+            "note": note, "tiers": WB.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Paper Bag (Litho, id 127) ----------
+@app.get("/api/printoka/paperbag/options")
+def paperbag_options(product: int = Query(127)):
+    from . import paperbag_engine as PB
+    return {"papers": PB.PAPERS}
+
+
+@app.get("/api/printoka/paperbag/quote")
+def paperbag_quote(product: int = Query(127), paper: str = Query("Gloss Art Paper 157gsm"), qty: int = Query(...)):
+    from . import paperbag_engine as PB
+    try:
+        cash = PB.cash_price(paper, qty); wt = PB.weight_kg(paper, qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = f"Paper Bag: {paper}. Folding + Gluing + Hole Punching compulsory. qty = bags."
+    return {"config": {"product": product, "paper": paper, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per-paper qty curve)",
+            "note": note, "tiers": PB.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Canvas Tote Bag (Litho, id 128) ----------
+@app.get("/api/printoka/canvastote/options")
+def canvastote_options(product: int = Query(128)):
+    from . import canvastote_engine as CT
+    return {"colours": CT.COLOURS}
+
+
+@app.get("/api/printoka/canvastote/quote")
+def canvastote_quote(product: int = Query(128), colour: str = Query("1C (Front)"), qty: int = Query(...)):
+    from . import canvastote_engine as CT
+    try:
+        cash = CT.cash_price(colour, qty); wt = CT.weight_kg(qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = f"Canvas Tote Bag: {colour}. qty = bags."
+    return {"config": {"product": product, "colour": colour, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per-colour qty curve)",
+            "note": note, "tiers": CT.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Mug (Litho, id 129) ----------
+@app.get("/api/printoka/mug/options")
+def mug_options(product: int = Query(129)):
+    return {}
+
+
+@app.get("/api/printoka/mug/quote")
+def mug_quote(product: int = Query(129), qty: int = Query(...)):
+    from . import mug_engine as MG
+    try:
+        cash = MG.cash_price(qty); wt = MG.weight_kg(qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = "Mug: standard ceramic sublimation. qty = mugs."
+    return {"config": {"product": product, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (qty curve)",
+            "note": note, "tiers": MG.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Papan Kopi / Sachet Board (Litho, id 130) ----------
+@app.get("/api/printoka/papankopi/options")
+def papankopi_options(product: int = Query(130)):
+    from . import papankopi_engine as PK
+    return {"sizes": PK.SIZES}
+
+
+@app.get("/api/printoka/papankopi/quote")
+def papankopi_quote(product: int = Query(130), size: str = Query("537mm x 334mm"), qty: int = Query(...)):
+    from . import papankopi_engine as PK
+    try:
+        cash = PK.cash_price(size, qty); wt = PK.weight_kg(size, qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = f"Papan Kopi / Sachet Board: {size}. Hole Punching compulsory. qty = boards."
+    return {"config": {"product": product, "size": size, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per-size qty curve)",
+            "note": note, "tiers": PK.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Pillow (Litho, id 131) ----------
+@app.get("/api/printoka/pillow/options")
+def pillow_options(product: int = Query(131)):
+    return {}
+
+
+@app.get("/api/printoka/pillow/quote")
+def pillow_quote(product: int = Query(131), qty: int = Query(...)):
+    from . import pillow_engine as PL
+    try:
+        cash = PL.cash_price(qty); wt = PL.weight_kg(qty)
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    note = "Pillow: standard 40cm × 40cm sublimation with filling. qty = pillows."
+    return {"config": {"product": product, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (qty curve)",
+            "note": note, "tiers": PL.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------
