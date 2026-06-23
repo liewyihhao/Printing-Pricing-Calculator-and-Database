@@ -49,6 +49,7 @@ BUILT = {
     "paper-bag": ["Paper Bag Litho (127)"],
     "canvas-tote-bag": ["Canvas Tote Bag Litho (128)"],
     "mug": ["Mug Litho (129)"],
+    "pillow": ["Pillow Litho (131)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],
