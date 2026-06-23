@@ -487,6 +487,13 @@ function localQuote(prod, V, qty){
     wt=Math.round((PL.pillow_kg||0.60)*qty*WF*1000)/1000;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
       note:"Pillow: standard 40cm × 40cm sublimation with filling. qty = pillows." }; }
+  else if(prod.engine==="simpleqty"){
+    const P2=DATA.params[prod.paramKey]||{}; const cv=P2.curves||{};
+    const vf=P2.variant_field; let key=(vf&&V[vf]&&cv[V[vf]])?V[vf]:Object.keys(cv)[0];
+    cash=interpLogPts(Object.keys(cv[key]||{}).map(k=>[+k,cv[key][k]]),qty);
+    wt=Math.round((P2.unit_wt||0.05)*qty*WF*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt,
+      method:"formula (qty curve)", note:P2.note||"" }; }
   else if(prod.engine==="staticcling"){
     const P2=P;
     function interpLL(obj,q){const pts=Object.keys(obj).map(k=>[+k,obj[k]]).sort((a,b)=>a[0]-b[0]);if(!pts.length)return 0;const xs=pts.map(p=>Math.log(p[0])),ys=pts.map(p=>Math.log(p[1])),x=Math.log(Math.max(+q,1));if(x<=xs[0])return Math.exp(ys[0]);if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}

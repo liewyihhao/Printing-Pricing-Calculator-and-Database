@@ -334,7 +334,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 128, "name": "Canvas Tote Bag — Litho"},
                {"id": 129, "name": "Mug — Litho"},
                {"id": 130, "name": "Papan Kopi / Sachet Board — Litho"},
-               {"id": 131, "name": "Pillow — Litho"}]
+               {"id": 131, "name": "Pillow — Litho"},
+               {"id": 132, "name": "Button Badge — Digital"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
@@ -448,7 +449,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               128: 0.79,  # canvastote: per-colour qty curve LOO median 0.79%
               129: 0.53,  # mug: qty curve LOO median 0.53%
               130: 1.5,  # papankopi: TBD (sampler fix needed)
-              131: 0.0}  # pillow: qty curve LOO median 0.03% (effectively exact)
+              131: 0.0,  # pillow: qty curve LOO median 0.03% (effectively exact)
+              132: 3.3}  # button badge: qty curve LOO median 3.27%; lamination price-neutral
 
 
 def _accuracy(product_id: int):
@@ -750,6 +752,10 @@ FIELD_SCHEMAS = {
                 ]},
     "pillow": {"options": "/api/printoka/pillow/options", "quote": "/api/printoka/pillow/quote",
                 "fields": []},
+    "buttonbadge": {"options": "/api/printoka/buttonbadge/options", "quote": "/api/printoka/buttonbadge/quote",
+                "fields": [
+                    {"key": "lamination", "label": "Lamination (price-neutral)", "addon": True, "depends": [],
+                     "options": ["Gloss", "Soft Touch"]}]},
     "staticcling": {"options": "/api/printoka/staticcling/options", "quote": "/api/printoka/staticcling/quote",
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": SC_SIZES},
@@ -959,6 +965,8 @@ def _family(product_id: int) -> str:
         return "papankopi"
     if product_id == 131:
         return "pillow"
+    if product_id == 132:
+        return "buttonbadge"
     return "loose"
 
 
@@ -1558,6 +1566,39 @@ def pillow_quote(product: int = Query(131), qty: int = Query(...)):
     return {"config": {"product": product, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "formula (qty curve)",
             "note": note, "tiers": PL.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Button Badge (Digital, id 132) — generic simpleqty engine ----------
+import functools as _functools
+
+
+@_functools.lru_cache(maxsize=None)
+def _simpleqty_params(tag: str):
+    import json as _json
+    from pathlib import Path as _Path
+    f = _Path(__file__).resolve().parent.parent / "output" / f"{tag}_params.json"
+    return _json.loads(f.read_text()) if f.exists() else {"curves": {}, "variant_field": ""}
+
+
+@app.get("/api/printoka/buttonbadge/options")
+def buttonbadge_options(product: int = Query(132)):
+    return {}
+
+
+@app.get("/api/printoka/buttonbadge/quote")
+def buttonbadge_quote(product: int = Query(132), qty: int = Query(...),
+                      lamination: str = Query("Gloss")):
+    from . import simpleqty_engine as SQ
+    p = _simpleqty_params("buttonbadge")
+    try:
+        cash = SQ.cash_price(p, "-", qty); wt = SQ.weight_kg(p, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    return {"config": {"product": product, "qty": qty, "lamination": lamination},
+            "printoka_cash": round(cash, 2), "method": "formula (qty curve)",
+            "note": p.get("note", ""), "tiers": SQ.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------

@@ -77,7 +77,7 @@ def _drop_unsampled(data):
     params = data["params"]
     kept = []
     for p in data["products"]:
-        key = _PARAMS_KEY.get(p["engine"], p["engine"])
+        key = p.get("paramKey") or _PARAMS_KEY.get(p["engine"], p["engine"])
         if key in params and _params_unsampled(params[key]):
             print(f"  [skip unsampled] id={p['id']} {p['name']} (engine={p['engine']})")
             continue
@@ -313,6 +313,10 @@ def build_data():
                 "537mm x 334mm", "622mm x 346mm", "547mm x 346mm"]}]},
         {"id": 131, "name": "Pillow — Litho", "engine": "pillow", "optsrc": "none",
          "accuracy": acc.get(131), "fields": []},
+        {"id": 132, "name": "Button Badge — Digital", "engine": "simpleqty", "paramKey": "buttonbadge",
+         "optsrc": "none", "accuracy": acc.get(132), "fields": [
+            {"key": "lamination", "label": "Lamination (price-neutral)", "addon": True, "depends": [],
+             "options": ["Gloss", "Soft Touch"]}]},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -462,6 +466,7 @@ def build_data():
             "mug": _load("mug_params.json", {"curve": {}, "mug_kg": 0.35}),
             "papankopi": _load("papankopi_params.json", {"curves": {}, "sizes": [], "size_dims_mm": {}, "board_gsm": 1200}),
             "pillow": _load("pillow_params.json", {"curve": {}, "pillow_kg": 0.60}),
+            "buttonbadge": _load("buttonbadge_params.json", {"curves": {}, "variant_field": "", "unit_wt": 0.012}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -493,7 +498,7 @@ def build_data():
                             120: "deskcal_hard", 121: "deskcal_soft", 122: "wireow",
                             123: "banner", 124: "bunting", 125: "rollup", 126: "wobbler",
                             127: "paperbag", 128: "canvastote", 129: "mug",
-                            130: "papankopi", 131: "pillow"},
+                            130: "papankopi", 131: "pillow", 132: "buttonbadge"},
     }
 
 
