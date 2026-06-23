@@ -448,7 +448,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               128: 0.79,  # canvastote: per-colour qty curve LOO median 0.79%
               129: 0.53,  # mug: qty curve LOO median 0.53%
               130: 1.5,  # papankopi: TBD (sampler fix needed)
-              131: 1.5}  # pillow: TBD after engine build
+              131: 0.0}  # pillow: qty curve LOO median 0.03% (effectively exact)
 
 
 def _accuracy(product_id: int):
