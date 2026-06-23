@@ -336,7 +336,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 130, "name": "Papan Kopi / Sachet Board — Litho"},
                {"id": 131, "name": "Pillow — Litho"},
                {"id": 132, "name": "Button Badge — Digital"},
-               {"id": 133, "name": "Hand Fan — Digital"}]
+               {"id": 133, "name": "Hand Fan — Digital"},
+               {"id": 134, "name": "Hanger — Digital"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
@@ -452,7 +453,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               130: 1.5,  # papankopi: TBD (sampler fix needed)
               131: 0.0,  # pillow: qty curve LOO median 0.03% (effectively exact)
               132: 3.3,  # button badge: qty curve LOO median 3.27%; lamination price-neutral
-              133: 3.3}  # hand fan: per-paper qty curve LOO median 3.27%
+              133: 3.3,  # hand fan: per-paper qty curve LOO median 3.27%
+              134: 2.5}  # hanger: per-(paper x colour) qty curve LOO median 2.49%
 
 
 def _accuracy(product_id: int):
@@ -764,6 +766,14 @@ FIELD_SCHEMAS = {
                      "options": ["Gloss Art Card 310gsm", "Gloss Art Card 360gsm"]},
                     {"key": "lamination", "label": "Lamination (priced at Matte Both)", "addon": True, "depends": [],
                      "options": ["Matte Lamination (Both)", "Gloss Lamination (Both)"]}]},
+    "hanger": {"options": "/api/printoka/hanger/options", "quote": "/api/printoka/hanger/quote",
+                "fields": [
+                    {"key": "paper", "label": "Paper", "addon": True, "depends": [],
+                     "options": ["Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)"]},
+                    {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [],
+                     "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "lamination", "label": "Lamination (priced at Matte Both)", "addon": True, "depends": [],
+                     "options": ["Matte Lamination (Both)", "Gloss Lamination (Both)"]}]},
     "staticcling": {"options": "/api/printoka/staticcling/options", "quote": "/api/printoka/staticcling/quote",
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": SC_SIZES},
@@ -977,6 +987,8 @@ def _family(product_id: int) -> str:
         return "buttonbadge"
     if product_id == 133:
         return "handfan"
+    if product_id == 134:
+        return "hanger"
     return "loose"
 
 
@@ -1631,6 +1643,30 @@ def handfan_quote(product: int = Query(133), qty: int = Query(...),
         return JSONResponse({"error": "no price"}, status_code=400)
     return {"config": {"product": product, "qty": qty, "paper": paper, "lamination": lamination},
             "printoka_cash": round(cash, 2), "method": "formula (per-paper qty curve)",
+            "note": p.get("note", ""), "tiers": SQ.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Hanger (Digital, id 134) — generic simpleqty engine, paper x colour ----------
+@app.get("/api/printoka/hanger/options")
+def hanger_options(product: int = Query(134)):
+    return {}
+
+
+@app.get("/api/printoka/hanger/quote")
+def hanger_quote(product: int = Query(134), qty: int = Query(...),
+                 paper: str = Query("Gloss Art Card 310gsm (2 sides coated)"),
+                 colour: str = Query("4C (Front)"),
+                 lamination: str = Query("Matte Lamination (Both)")):
+    from . import simpleqty_engine as SQ
+    p = _simpleqty_params("hanger")
+    try:
+        cash = SQ.cash_price(p, f"{paper}|{colour}", qty); wt = SQ.weight_kg(p, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    return {"config": {"product": product, "qty": qty, "paper": paper, "colour": colour, "lamination": lamination},
+            "printoka_cash": round(cash, 2), "method": "formula (per-paper×colour qty curve)",
             "note": p.get("note", ""), "tiers": SQ.tiers(cash), "weight_kg": round(wt, 3)}
 
 

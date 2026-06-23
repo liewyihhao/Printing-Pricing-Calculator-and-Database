@@ -323,6 +323,14 @@ def build_data():
              "options": ["Gloss Art Card 310gsm", "Gloss Art Card 360gsm"]},
             {"key": "lamination", "label": "Lamination (priced at Matte Both)", "addon": True, "depends": [],
              "options": ["Matte Lamination (Both)", "Gloss Lamination (Both)"]}]},
+        {"id": 134, "name": "Hanger — Digital", "engine": "simpleqty", "paramKey": "hanger",
+         "optsrc": "none", "accuracy": acc.get(134), "fields": [
+            {"key": "paper", "label": "Paper", "addon": True, "depends": [],
+             "options": ["Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)"]},
+            {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [],
+             "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "lamination", "label": "Lamination (priced at Matte Both)", "addon": True, "depends": [],
+             "options": ["Matte Lamination (Both)", "Gloss Lamination (Both)"]}]},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -474,6 +482,7 @@ def build_data():
             "pillow": _load("pillow_params.json", {"curve": {}, "pillow_kg": 0.60}),
             "buttonbadge": _load("buttonbadge_params.json", {"curves": {}, "variant_field": "", "unit_wt": 0.012}),
             "handfan": _load("handfan_params.json", {"curves": {}, "variant_field": "paper", "unit_wt": 0.02}),
+            "hanger": _load("hanger_params.json", {"curves": {}, "variant_field": ["paper", "colour"], "unit_wt": 0.03}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -505,7 +514,8 @@ def build_data():
                             120: "deskcal_hard", 121: "deskcal_soft", 122: "wireow",
                             123: "banner", 124: "bunting", 125: "rollup", 126: "wobbler",
                             127: "paperbag", 128: "canvastote", 129: "mug",
-                            130: "papankopi", 131: "pillow", 132: "buttonbadge", 133: "handfan"},
+                            130: "papankopi", 131: "pillow", 132: "buttonbadge", 133: "handfan",
+                            134: "hanger"},
     }
 
 

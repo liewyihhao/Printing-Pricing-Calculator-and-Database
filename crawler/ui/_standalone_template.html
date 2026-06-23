@@ -489,7 +489,11 @@ function localQuote(prod, V, qty){
       note:"Pillow: standard 40cm × 40cm sublimation with filling. qty = pillows." }; }
   else if(prod.engine==="simpleqty"){
     const P2=DATA.params[prod.paramKey]||{}; const cv=P2.curves||{};
-    const vf=P2.variant_field; let key=(vf&&V[vf]&&cv[V[vf]])?V[vf]:Object.keys(cv)[0];
+    const vf=P2.variant_field;
+    let key;
+    if(Array.isArray(vf)) key=vf.map(f=>V[f]).join("|");
+    else key=(vf&&V[vf])?V[vf]:null;
+    if(!(key in cv)) key=Object.keys(cv)[0];
     cash=interpLogPts(Object.keys(cv[key]||{}).map(k=>[+k,cv[key][k]]),qty);
     wt=Math.round((P2.unit_wt||0.05)*qty*WF*1000)/1000;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt,
