@@ -53,6 +53,7 @@ BUILT = {
     "button-badge": ["Button Badge Digital (132)"],
     "hand-fan": ["Hand Fan Digital (133)"],
     "hanger": ["Hanger Digital (134)"],
+    "magnet": ["Magnet Digital (135)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

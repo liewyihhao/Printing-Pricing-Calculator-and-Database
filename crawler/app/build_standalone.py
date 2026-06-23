@@ -331,6 +331,12 @@ def build_data():
              "options": ["4C (Front)", "4C (Both)"]},
             {"key": "lamination", "label": "Lamination (priced at Matte Both)", "addon": True, "depends": [],
              "options": ["Matte Lamination (Both)", "Gloss Lamination (Both)"]}]},
+        {"id": 135, "name": "Magnet — Digital", "engine": "simpleqty", "paramKey": "magnet",
+         "optsrc": "none", "accuracy": acc.get(135), "fields": [
+            {"key": "shape", "label": "Shape", "addon": True, "depends": [],
+             "options": ["Rectangle/Square", "Round", "Custom Die-Cut"]},
+            {"key": "finishing", "label": "Finishing (Soft Touch ~+RM4)", "addon": True, "depends": [],
+             "options": ["Matte Laminate (Front)", "Gloss Laminate (Front)", "Soft Touch Laminate (Front)"]}]},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -483,6 +489,7 @@ def build_data():
             "buttonbadge": _load("buttonbadge_params.json", {"curves": {}, "variant_field": "", "unit_wt": 0.012}),
             "handfan": _load("handfan_params.json", {"curves": {}, "variant_field": "paper", "unit_wt": 0.02}),
             "hanger": _load("hanger_params.json", {"curves": {}, "variant_field": ["paper", "colour"], "unit_wt": 0.03}),
+            "magnet": _load("magnet_params.json", {"curves": {}, "variant_field": "shape", "unit_wt": 0.012}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -515,7 +522,7 @@ def build_data():
                             123: "banner", 124: "bunting", 125: "rollup", 126: "wobbler",
                             127: "paperbag", 128: "canvastote", 129: "mug",
                             130: "papankopi", 131: "pillow", 132: "buttonbadge", 133: "handfan",
-                            134: "hanger"},
+                            134: "hanger", 135: "magnet"},
     }
 
 
