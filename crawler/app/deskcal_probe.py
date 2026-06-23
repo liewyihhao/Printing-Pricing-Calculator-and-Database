@@ -1,82 +1,53 @@
-"""Probe Desk Calendar forms to understand options and pricing."""
-import asyncio
+"""One-off probe: Desk Calendar (Hard/Soft Stand) — identify rdCategory labels and how
+price moves over category x qty. Prints findings; writes nothing permanent.
+
+  python -m app.deskcal_probe ["Hard"|"Soft"]
+"""
+from __future__ import annotations
+import asyncio, sys
 from playwright.async_api import async_playwright
 from .browser import launch, login
 from . import accounts
+from .billbook_sampler import _sel, _safe_read, _wait, _radio
 
-URLS = {
-    "HardStand": "https://www.excard.com.my/spec/Litho/Desk_Calendar_(Hard_Stand)",
-    "SoftStand": "https://www.excard.com.my/spec/Litho/Desk_Calendar_(Soft_Stand)",
-}
+STAND = sys.argv[1] if len(sys.argv) > 1 else "Hard"
+URL = f"https://www.excard.com.my/spec/Litho/Desk_Calendar_({STAND}_Stand)"
+QTYS = [10, 50, 100, 500, 1000]
 
-async def get_radios(page):
+
+async def _radio_labels(page, name):
+    """Return [(value, label)] for radio group name$=name (label = nearest text)."""
     return await page.evaluate(
-        "() => { var rows = [];"
-        " var radios = document.querySelectorAll('input[type=radio]');"
-        " for (var i=0; i<radios.length; i++) {"
-        "   var r = radios[i];"
-        "   var name = (r.name||'').split('$').pop();"
-        "   if (/country|courier/i.test(name)) continue;"
-        "   var p = r.closest('label') || r.parentElement;"
-        "   var lbl = p ? p.innerText.trim() : r.value;"
-        "   rows.push({name: name, value: r.value, label: lbl});"
-        " }"
-        " return rows; }"
-    )
+        """(name)=>{const out=[];document.querySelectorAll(`input[name$='${name}']`).forEach(el=>{
+            let lab='';const id=el.id;
+            if(id){const l=document.querySelector(`label[for='${id}']`);if(l)lab=l.innerText.trim();}
+            if(!lab&&el.parentElement)lab=el.parentElement.innerText.trim();
+            out.push([el.value,lab]);});return out;}""", name)
 
-async def get_prices(page):
-    return await page.evaluate(
-        "() => { var els = document.querySelectorAll('[id],[class]');"
-        " var out = [];"
-        " for (var i=0; i<els.length; i++) {"
-        "   var e = els[i];"
-        "   if (!e.offsetParent) continue;"
-        "   if (!/price|Price|cash|Cash/.test(e.id + e.className)) continue;"
-        "   var t = e.innerText.trim().slice(0,80);"
-        "   if (!t || t==='RM' || t.length<2) continue;"
-        "   out.push({id: (e.id||'').split('$').pop(), t: t});"
-        " }"
-        " return out.slice(0,8); }"
-    )
 
-async def probe():
-    a = accounts.get(1)
+async def run(account_id=1):
+    a = accounts.get(account_id)
     async with async_playwright() as pw:
-        b = await launch(pw)
-        ctx = await b.new_context(viewport={"width": 1440, "height": 1600})
-        page = await ctx.new_page()
-        await login(page, username=a.username, password=a.password)
+        b = await launch(pw); ctx = await b.new_context(viewport={"width": 1440, "height": 1500})
+        page = await ctx.new_page(); await login(page, username=a.username, password=a.password)
+        await page.goto(URL, wait_until="domcontentloaded"); await _wait(page); await asyncio.sleep(1.5)
+        labels = await _radio_labels(page, "rdCategory")
+        print(f"=== Desk Calendar ({STAND} Stand) rdCategory ===")
+        for v, l in labels:
+            print(f"  value={v!r} label={l!r}")
+        for v, l in labels:
+            if not await _radio(page, "rdCategory", v):
+                print(f"  [cfg_fail] {v}"); continue
+            await asyncio.sleep(0.6)
+            row = []
+            for q in QTYS:
+                if await _sel(page, "comboQty", str(q)):
+                    await asyncio.sleep(0.8)
+                    row.append((q, (await _safe_read(page)).get("before_discount")))
+            print(f"  cat {v} ({l[:30]}): {row}")
+        try: await b.close()
+        except Exception: pass
 
-        for tag, url in URLS.items():
-            print(f"\n=== {tag} ===")
-            await page.goto(url, wait_until="domcontentloaded")
-            try:
-                await page.wait_for_load_state("networkidle", timeout=12000)
-            except Exception:
-                pass
-            await asyncio.sleep(2)
-
-            rows = await get_radios(page)
-            for r in rows:
-                print(f"  radio [{r['name']}] val={r['value']!r} lbl={r['label']!r}")
-
-            for qty in ["100", "200", "500", "1000"]:
-                await page.goto(url, wait_until="domcontentloaded")
-                try:
-                    await page.wait_for_load_state("networkidle", timeout=10000)
-                except Exception:
-                    pass
-                await asyncio.sleep(1.5)
-                try:
-                    await page.select_option("select[name$='comboQty']", qty)
-                    await asyncio.sleep(1.5)
-                except Exception as ex:
-                    print(f"  qty={qty}: select failed: {ex}")
-                    continue
-                prices = await get_prices(page)
-                print(f"  qty={qty}: {prices}")
-
-        await b.close()
 
 if __name__ == "__main__":
-    asyncio.run(probe())
+    asyncio.run(run())

@@ -50,18 +50,25 @@ async def sample_hard(page, data: dict):
         if not await _radio(page, "rdCategory", cat_val):
             log.warning("deskcal.hard.cat_fail", cat=cat_val); continue
         await asyncio.sleep(1.0)
+        prev = None
         for q in HARD_QTYS:
             if any(r["cat"] == cat_val and r["qty"] == q for r in data["hard"]):
+                prev = next((r["cash"] for r in data["hard"] if r["cat"] == cat_val and r["qty"] == q), prev)
                 continue
             if not await _sel(page, "comboQty", str(q)):
                 log.warning("deskcal.hard.qty_fail", cat=cat_val, qty=q); continue
-            await asyncio.sleep(1.0)
-            r = await _safe_read(page)
-            c = r.get("before_discount")
+            # Each qty has a distinct price; poll until the price actually CHANGES off the
+            # previous qty's value (guards against reading the pre-AJAX stale price).
+            c = None
+            for _ in range(12):
+                await asyncio.sleep(0.7)
+                c = (await _safe_read(page)).get("before_discount")
+                if c is not None and (prev is None or c != prev):
+                    break
             if not c:
                 log.warning("deskcal.hard.no_price", cat=cat_val, qty=q); continue
             rec = {"cat": cat_val, "cat_label": cat_label, "qty": q, "cash": c}
-            data["hard"].append(rec)
+            data["hard"].append(rec); prev = c
             log.info("deskcal.hard", cat=cat_val, qty=q, cash=c)
 
 
