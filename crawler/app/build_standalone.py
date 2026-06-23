@@ -337,6 +337,14 @@ def build_data():
              "options": ["Rectangle/Square", "Round", "Custom Die-Cut"]},
             {"key": "finishing", "label": "Finishing (Soft Touch ~+RM4)", "addon": True, "depends": [],
              "options": ["Matte Laminate (Front)", "Gloss Laminate (Front)", "Soft Touch Laminate (Front)"]}]},
+        {"id": 136, "name": "Hard Cover Menu — Digital", "engine": "simpleqty", "paramKey": "hardmenu",
+         "optsrc": "none", "accuracy": acc.get(136), "fields": [
+            {"key": "order", "label": "Order", "addon": True, "depends": [],
+             "options": ["Cover + Content", "Cover only", "Content only"]},
+            {"key": "addcontent", "label": "Add content sheets (Cover only: -)", "addon": True, "depends": [],
+             "options": ["12", "16", "-"]},
+            {"key": "lamination", "label": "Lamination (price-neutral)", "addon": True, "depends": [],
+             "options": ["Gloss Lamination (Both)", "Matte Lamination (Both)"]}]},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -490,6 +498,7 @@ def build_data():
             "handfan": _load("handfan_params.json", {"curves": {}, "variant_field": "paper", "unit_wt": 0.02}),
             "hanger": _load("hanger_params.json", {"curves": {}, "variant_field": ["paper", "colour"], "unit_wt": 0.03}),
             "magnet": _load("magnet_params.json", {"curves": {}, "variant_field": "shape", "unit_wt": 0.012}),
+            "hardmenu": _load("hardmenu_params.json", {"curves": {}, "variant_field": ["order", "addcontent"], "unit_wt": 0.30}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -522,7 +531,7 @@ def build_data():
                             123: "banner", 124: "bunting", 125: "rollup", 126: "wobbler",
                             127: "paperbag", 128: "canvastote", 129: "mug",
                             130: "papankopi", 131: "pillow", 132: "buttonbadge", 133: "handfan",
-                            134: "hanger", 135: "magnet"},
+                            134: "hanger", 135: "magnet", 136: "hardmenu"},
     }
 
 

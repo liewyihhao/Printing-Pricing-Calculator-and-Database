@@ -338,7 +338,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 132, "name": "Button Badge — Digital"},
                {"id": 133, "name": "Hand Fan — Digital"},
                {"id": 134, "name": "Hanger — Digital"},
-               {"id": 135, "name": "Magnet — Digital"}]
+               {"id": 135, "name": "Magnet — Digital"},
+               {"id": 136, "name": "Hard Cover Menu — Digital"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
@@ -456,7 +457,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               132: 3.3,  # button badge: qty curve LOO median 3.27%; lamination price-neutral
               133: 3.3,  # hand fan: per-paper qty curve LOO median 3.27%
               134: 2.5,  # hanger: per-(paper x colour) qty curve LOO median 2.49%
-              135: 1.0}  # magnet: per-shape qty curve LOO median 0.97%
+              135: 1.0,  # magnet: per-shape qty curve LOO median 0.97%
+              136: 2.2}  # hard cover menu: per-(order x add-content) qty curve LOO median 2.2%
 
 
 def _accuracy(product_id: int):
@@ -782,6 +784,14 @@ FIELD_SCHEMAS = {
                      "options": ["Rectangle/Square", "Round", "Custom Die-Cut"]},
                     {"key": "finishing", "label": "Finishing (Soft Touch ~+RM4)", "addon": True, "depends": [],
                      "options": ["Matte Laminate (Front)", "Gloss Laminate (Front)", "Soft Touch Laminate (Front)"]}]},
+    "hardmenu": {"options": "/api/printoka/hardmenu/options", "quote": "/api/printoka/hardmenu/quote",
+                "fields": [
+                    {"key": "order", "label": "Order", "addon": True, "depends": [],
+                     "options": ["Cover + Content", "Cover only", "Content only"]},
+                    {"key": "addcontent", "label": "Add content sheets (Cover only: -)", "addon": True, "depends": [],
+                     "options": ["12", "16", "-"]},
+                    {"key": "lamination", "label": "Lamination (price-neutral)", "addon": True, "depends": [],
+                     "options": ["Gloss Lamination (Both)", "Matte Lamination (Both)"]}]},
     "staticcling": {"options": "/api/printoka/staticcling/options", "quote": "/api/printoka/staticcling/quote",
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": SC_SIZES},
@@ -999,6 +1009,8 @@ def _family(product_id: int) -> str:
         return "hanger"
     if product_id == 135:
         return "magnet"
+    if product_id == 136:
+        return "hardmenu"
     return "loose"
 
 
@@ -1700,6 +1712,30 @@ def magnet_quote(product: int = Query(135), qty: int = Query(...),
         return JSONResponse({"error": "no price"}, status_code=400)
     return {"config": {"product": product, "qty": qty, "shape": shape, "finishing": finishing},
             "printoka_cash": round(cash, 2), "method": "formula (per-shape qty curve)",
+            "note": p.get("note", ""), "tiers": SQ.tiers(cash), "weight_kg": round(wt, 3)}
+
+
+# ---------- Hard Cover Menu (Digital, id 136) — generic simpleqty engine ----------
+@app.get("/api/printoka/hardmenu/options")
+def hardmenu_options(product: int = Query(136)):
+    return {}
+
+
+@app.get("/api/printoka/hardmenu/quote")
+def hardmenu_quote(product: int = Query(136), qty: int = Query(...),
+                   order: str = Query("Cover + Content"), addcontent: str = Query("12"),
+                   lamination: str = Query("Gloss Lamination (Both)")):
+    from . import simpleqty_engine as SQ
+    p = _simpleqty_params("hardmenu")
+    ac = "-" if order == "Cover only" else addcontent
+    try:
+        cash = SQ.cash_price(p, f"{order}|{ac}", qty); wt = SQ.weight_kg(p, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    return {"config": {"product": product, "qty": qty, "order": order, "addcontent": ac, "lamination": lamination},
+            "printoka_cash": round(cash, 2), "method": "formula (per-config qty curve)",
             "note": p.get("note", ""), "tiers": SQ.tiers(cash), "weight_kg": round(wt, 3)}
 
 
