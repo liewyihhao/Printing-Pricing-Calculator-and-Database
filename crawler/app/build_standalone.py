@@ -56,6 +56,36 @@ def accuracy():
     return {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 6.3, 61: 10.5, 24: 2.5}
 
 
+# engine name (as used in the products list) -> key in the baked params dict
+_PARAMS_KEY = {"deskcal_hard": "deskcal", "deskcal_soft": "deskcal"}
+# curve-like keys; a product whose params has one of these and they're ALL empty is unsampled
+_CURVE_KEYS = ("curve", "curves", "core", "data", "soft_curve", "hard_curves",
+               "base_curves", "cover_curves")
+
+
+def _params_unsampled(blob):
+    """True only if the blob clearly has curve data that is entirely empty."""
+    if not isinstance(blob, dict):
+        return False
+    present = [blob[k] for k in _CURVE_KEYS if k in blob]
+    return bool(present) and all(not v for v in present)
+
+
+def _drop_unsampled(data):
+    """Hide products whose engine params have no sampled curve yet (avoid RM0 in the UI).
+    They reappear automatically once their *_params.json is populated."""
+    params = data["params"]
+    kept = []
+    for p in data["products"]:
+        key = _PARAMS_KEY.get(p["engine"], p["engine"])
+        if key in params and _params_unsampled(params[key]):
+            print(f"  [skip unsampled] id={p['id']} {p['name']} (engine={p['engine']})")
+            continue
+        kept.append(p)
+    data["products"] = kept
+    return data
+
+
 def build_data():
     acc = accuracy()
     digital = json.loads((ROOT / "digital_options.json").read_text())
@@ -485,6 +515,7 @@ def _attach_images(data):
 
 def main():
     data = build_data()
+    _drop_unsampled(data)
     _attach_images(data)
     tmpl = (UI / "_standalone_template.html").read_text(encoding="utf-8")
     html = tmpl.replace("/*__DATA__*/", json.dumps(data, ensure_ascii=False))

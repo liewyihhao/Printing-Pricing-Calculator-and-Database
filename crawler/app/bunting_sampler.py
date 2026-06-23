@@ -1,4 +1,5 @@
-"""Sample Bunting (Litho) prices. Drivers: ddlSize (3) x ddlPaper (2) x comboQty (1-300).
+"""Sample Bunting (Litho) prices. Drivers: ddlSize (3) x ddlPaper (2) x comboQty.
+Min qty appears to be 100+. Uses extra sleeps for ASP.NET cascade.
 
 Saves output/bunting_samples.json: {"data": [{size, paper, qty, cash}]}.
   python -m app.bunting_sampler [account]
@@ -17,7 +18,15 @@ URL = "https://www.excard.com.my/spec/Litho/Bunting"
 
 SIZES = ["2ft x 5ft", "2ft x 6ft", "2.5ft x 6ft"]
 PAPERS = ["Tarpaulin 300gsm", "Synthetic Paper 180micron"]
-QTYS = [1, 2, 3, 5, 10, 20, 30, 50, 100, 200, 300]
+# Bunting comboQty offers small quantities (1..~50); sample a representative subset of
+# whatever the form actually exposes (read dynamically).
+QTY_PREF = [1, 2, 3, 5, 8, 10, 15, 20, 30, 50, 100, 200, 300, 500]
+
+
+async def _qty_opts(page):
+    return await page.evaluate(
+        "()=>{var s=document.querySelector('select[name$=\"comboQty\"]');if(!s)return[];"
+        "return Array.from(s.options).map(o=>o.value).filter(v=>v&&!v.startsWith('-'));}")
 
 
 async def run(account_id=1):
@@ -30,25 +39,34 @@ async def run(account_id=1):
         page = await ctx.new_page(); await login(page, username=a.username, password=a.password)
         for size in SIZES:
             for paper in PAPERS:
-                await page.goto(URL, wait_until="domcontentloaded"); await _wait(page); await asyncio.sleep(1.0)
+                await page.goto(URL, wait_until="domcontentloaded"); await _wait(page); await asyncio.sleep(2.0)
                 if not await _sel(page, "ddlSize", size):
                     log.warning("bunting.size_fail", size=size); continue
-                await asyncio.sleep(0.5)
+                await asyncio.sleep(1.5)
                 if not await _sel(page, "ddlPaper", paper):
                     log.warning("bunting.paper_fail", paper=paper); continue
-                await asyncio.sleep(0.5)
-                for q in QTYS:
+                await asyncio.sleep(2.0)
+                avail = set(int(v) for v in await _qty_opts(page) if v.isdigit())
+                qtys = [q for q in QTY_PREF if q in avail] or sorted(avail)[:14]
+                prev = None
+                for q in qtys:
                     if (size, paper, q) in done:
+                        prev = next((r["cash"] for r in data["data"]
+                                     if r["size"] == size and r["paper"] == paper and r["qty"] == q), prev)
                         continue
                     if not await _sel(page, "comboQty", str(q)):
                         log.warning("bunting.qty_fail", size=size, paper=paper, qty=q); continue
-                    await asyncio.sleep(1.0)
-                    r = await _safe_read(page)
-                    c = r.get("before_discount")
+                    # poll until price changes off the previous qty (guards pre-AJAX stale read)
+                    c = None
+                    for _ in range(12):
+                        await asyncio.sleep(0.7)
+                        c = (await _safe_read(page)).get("before_discount")
+                        if c is not None and (prev is None or c != prev):
+                            break
                     if not c:
                         log.warning("bunting.no_price", size=size, paper=paper, qty=q); continue
                     data["data"].append({"size": size, "paper": paper, "qty": q, "cash": c})
-                    done.add((size, paper, q))
+                    done.add((size, paper, q)); prev = c
                     out.write_text(json.dumps(data, indent=0))
                     log.info("bunting", size=size, paper=paper, qty=q, cash=c)
         try: await b.close()

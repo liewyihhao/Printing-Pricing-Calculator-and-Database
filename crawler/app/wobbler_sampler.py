@@ -47,18 +47,24 @@ async def run(account_id=1):
                     if not await _sel(page, "rblLaminationSide", lam):
                         log.warning("wobbler.lam_fail", lam=lam); continue
                     await asyncio.sleep(0.5)
+                    prev = None
                     for q in QTYS:
                         if (orient, paper, lam, q) in done_core:
+                            prev = next((r["cash"] for r in data["core"] if r["orient"] == orient
+                                         and r["paper"] == paper and r["lam"] == lam and r["qty"] == q), prev)
                             continue
                         if not await _sel(page, "comboQty", str(q)):
                             log.warning("wobbler.qty_fail", qty=q); continue
-                        await asyncio.sleep(1.0)
-                        r = await _safe_read(page)
-                        c = r.get("before_discount")
+                        c = None
+                        for _ in range(12):
+                            await asyncio.sleep(0.7)
+                            c = (await _safe_read(page)).get("before_discount")
+                            if c is not None and (prev is None or c != prev):
+                                break
                         if not c:
                             log.warning("wobbler.no_price", orient=orient, paper=paper, lam=lam, qty=q); continue
                         data["core"].append({"orient": orient, "paper": paper, "lam": lam, "qty": q, "cash": c})
-                        done_core.add((orient, paper, lam, q))
+                        done_core.add((orient, paper, lam, q)); prev = c
                         out.write_text(json.dumps(data, indent=0))
                         log.info("wobbler.core", orient=orient, paper=paper, lam=lam, qty=q, cash=c)
 

@@ -4,6 +4,22 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **TASK B PROGRESS — Arch File + Pillow + Desk Calendar finished; 3 deferred.**
+  - **Arch File (id 119) BUILT** — flat RM5.00/unit qty curve (LOO 0%), fixed spec
+    (steel binding + wire-O + corners + lamination all compulsory). Full pipeline, JS==Python.
+  - **Pillow (id 131) BUILT** — had 19 samples but no params; built params (LOO 0.03%), JS==Python.
+  - **Desk Calendar Hard Stand (id 120) FIXED** — prior curve had stale-read plateaus; rewrote
+    the sampler read to poll until the price changes off the previous qty. cat3 (Hot Stamping)
+    clean; cat1/cat2 (WDCH Portrait/Landscape) keep genuine Excard caps (confirmed real — same
+    code samples cat3 cleanly). LOO 1.12%, JS==Python.
+  - **Empty-params guard in build_standalone** — `_drop_unsampled()` hides any product whose
+    engine params have no sampled curve (avoids RM0 in the shipped UI; auto-reappears once
+    `*_params.json` is populated). Currently hides 124/126/130.
+  - **DEFERRED (headless-hard, like Tent Card): Bunting (124), Wobbler (126), Papan Kopi (130).**
+    Samplers were made robust (dynamic qty opts + change-poll read) but the Excard forms render
+    NO price headless (0–1 points; papankopi even times out navigating). Engines/api/scaffold
+    exist; they just need a non-headless sample pass. They are hidden from the standalone.
+  - Note: live api PRODUCTS still lists 124/126/130 (quote returns a graceful "no price" error).
 - **PARITY GAPS CLOSED (7 → 1).** `parity_checker` now reports just **1 real gap**:
   Wire-O **Exclusive Leather Cover** — genuinely deferred (cfg_fails headless: its cover
   lamination dropdown is unreadable, same class as Tent Card). Closed this session:

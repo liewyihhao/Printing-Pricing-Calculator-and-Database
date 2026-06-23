@@ -41,19 +41,25 @@ async def run(account_id=1):
             qtys = await _get_qty_opts(page)
             if not qtys:
                 qtys = [str(q) for q in QTYS_TRY]
+            prev = None
             for q_str in qtys:
                 q = int(q_str)
                 if (size, q) in done:
+                    prev = next((r["cash"] for r in data["data"] if r["size"] == size and r["qty"] == q), prev)
                     continue
                 if not await _sel(page, "comboQty", q_str):
                     log.warning("papankopi.qty_fail", size=size, qty=q); continue
-                await asyncio.sleep(1.0)
-                r = await _safe_read(page)
-                c = r.get("before_discount")
+                # poll until price changes off the previous qty (guards pre-AJAX stale read)
+                c = None
+                for _ in range(12):
+                    await asyncio.sleep(0.7)
+                    c = (await _safe_read(page)).get("before_discount")
+                    if c is not None and (prev is None or c != prev):
+                        break
                 if not c:
                     log.warning("papankopi.no_price", size=size, qty=q); continue
                 data["data"].append({"size": size, "qty": q, "cash": c})
-                done.add((size, q))
+                done.add((size, q)); prev = c
                 out.write_text(json.dumps(data, indent=0))
                 log.info("papankopi", size=size, qty=q, cash=c)
         try: await b.close()
