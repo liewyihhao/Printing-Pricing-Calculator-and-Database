@@ -431,7 +431,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               104: 5.2,  # notepad: exact at order qtys; 5.2 = held-out interp median
               105: 8.2,  # letterhead: exact at sampled order qtys; 8.2 = held-out interp median
               106: 4.1,  # envelope: base LOO ~2%; held-out colour (additive) median 4.1%
-              107: 3.5,  # folder (PF): base-curve LOO median 3.5%
+              107: 0.0,  # folder: EXACT v4 price-list lookup (all mould groups + colour + lam + protective)
               108: 2.2,  # l-shape folder: per-paper curve LOO median 2.2%
               109: 2.5,  # bookmark: per-(paper|colour) log-log curve LOO median 2.5%
               110: 8.0,  # voucher: factor model — single axes exact, ~4% core interp + interactions
@@ -874,11 +874,21 @@ FIELD_SCHEMAS = {
                 ]},
     "folder": {"options": "/api/printoka/folder/options", "quote": "/api/printoka/folder/quote",
                 "fields": [
-                    {"key": "mould", "label": "Folder mould (size)", "addon": True, "depends": [], "options": FOLDER_MOULDS},
-                    {"key": "paper", "label": "Paper (Gloss Art Card)", "addon": True, "depends": [], "options": FOLDER_PAPERS},
-                    {"key": "lamination", "label": "Cover lamination (quoted separately)", "addon": True, "depends": [],
-                     "options": ["Not Required", "Gloss Lamination (Front)", "Matte Lamination (Front)",
-                                 "Matte Lamination (Front) + Spot UV (Front)", "Gloss Waterbase Varnish (Front)"]},
+                    {"key": "model", "label": "Folder model", "addon": True, "depends": [], "options": [
+                        "FPF 001", "FPF 004", "FPF 005", "FPF 014", "FPF 015", "FPF 016",
+                        "FDF 001", "FDF 002", "FKF 001", "FKF 002", "FCD 004"]},
+                    {"key": "paper", "label": "Paper (Gloss Art Card)", "addon": True, "depends": [], "options": [
+                        "Gloss Art Card 210gsm (1 side coated)", "Gloss Art Card 250gsm (1 side coated)",
+                        "Gloss Art Card 260gsm (1 side coated)", "Gloss Art Card 300gsm (1 side coated)",
+                        "Gloss Art Card 230gsm (2 side coated)", "Gloss Art Card 250gsm (2 side coated)",
+                        "Gloss Art Card 310gsm (2 side coated)", "Gloss Art Card 360gsm (2 side coated)"]},
+                    {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "lamination", "label": "Lamination", "addon": True, "depends": [], "options": [
+                        "Gloss Lamination (Front)", "Matte Lamination (Front)", "Matte Lamination (Front) + Spot UV (Front)",
+                        "Gloss Waterbase Varnish (Front)", "Gloss Lamination (Both)", "Matte Lamination (Both)",
+                        "Matte Lamination (Both) + Spot UV (Front)", "Gloss Waterbase Varnish (Both)"]},
+                    {"key": "protective", "label": "Colour protective layer (back)", "addon": True, "depends": [],
+                     "options": ["N/A", "Gloss Waterbase Varnish (Back)"]},
                 ]},
     "envelope": {"options": "/api/printoka/envelope/options", "quote": "/api/printoka/envelope/quote",
                 "fields": [
@@ -1635,6 +1645,15 @@ def _simpleqty_params(tag: str):
     return _json.loads(f.read_text()) if f.exists() else {"curves": {}, "variant_field": ""}
 
 
+@_functools.lru_cache(maxsize=None)
+def _pl_params(tag: str):
+    """Load a generic price-list lookup params file (<tag>_pl_params.json)."""
+    import json as _json
+    from pathlib import Path as _Path
+    f = _Path(__file__).resolve().parent.parent / "output" / f"{tag}_pl_params.json"
+    return _json.loads(f.read_text()) if f.exists() else {"axis_cols": [], "curves": {}}
+
+
 @app.get("/api/printoka/buttonbadge/options")
 def buttonbadge_options(product: int = Query(132)):
     return {}
@@ -2042,24 +2061,28 @@ def folder_options(product: int = Query(107)):
 
 
 @app.get("/api/printoka/folder/quote")
-def folder_quote(product: int = Query(107), mould: str = Query("FPF 001 — 350x510mm"),
-                 paper: str = Query("Gloss Art Card 250gsm (1 side coated)"), qty: int = Query(...),
-                 lamination: str = Query("Not Required")):
-    from . import folder_engine as FD
+def folder_quote(product: int = Query(107), model: str = Query("FPF 001"),
+                 paper: str = Query("Gloss Art Card 250gsm (1 side coated)"),
+                 colour: str = Query("4C (Front)"), qty: int = Query(...),
+                 lamination: str = Query("Gloss Lamination (Front)"),
+                 protective: str = Query("N/A")):
+    from . import pricelist_engine as PE
+    p = _pl_params("folder")
+    cfg = {"Model": model, "Paper": paper, "Print Colour": colour,
+           "Lamination": lamination, "Colour Protective Layer": protective}
     try:
-        cash = FD.cash_price(mould, paper, qty)
-        wt = FD.weight_kg(mould, paper, qty)
+        cash = PE.cash_price(p, cfg, qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = ("Folder: Presentation Folder group (PF). Die-cutting + creasing compulsory "
-            "(included); no print-colour choice. Paper is an additive cost vs the 250gsm "
-            "1-side reference. Cover lamination (if selected) is quoted separately. "
-            "Document/Karki/CD folder groups (DF/KF/CF) are pending. qty = pieces.")
-    return {"config": {"product": product, "mould": mould, "paper": paper, "qty": qty},
-            "printoka_cash": round(cash, 2), "method": "formula (per-mould curve + paper delta)",
-            "note": note, "tiers": FD.tiers(cash), "weight_kg": round(wt, 3)}
+    note = ("Folder (exact v4 price-list lookup). Covers all mould groups "
+            "(Presentation/Document/Key/CD Jacket), print colour, all laminations incl Spot UV, "
+            "and the back colour-protective layer. Die-cutting + creasing compulsory. qty = pieces.")
+    return {"config": {"product": product, "model": model, "paper": paper, "colour": colour,
+                       "lamination": lamination, "protective": protective, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)",
+            "note": note, "tiers": PE.tiers(cash), "weight_kg": 0.0}
 
 
 # ---------- Envelope (Litho, id 106) ----------

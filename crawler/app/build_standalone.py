@@ -254,8 +254,24 @@ def build_data():
          "accuracy": acc.get(104), "fields": NOTEPAD_FIELDS},
         {"id": 106, "name": "Envelope — Litho", "engine": "envelope", "optsrc": "none",
          "accuracy": acc.get(106), "fields": ENVELOPE_FIELDS},
-        {"id": 107, "name": "Folder — Litho (Presentation Folder)", "engine": "folder", "optsrc": "none",
-         "accuracy": acc.get(107), "fields": FOLDER_FIELDS},
+        {"id": 107, "name": "Folder — Litho", "engine": "pricelist", "paramKey": "folder",
+         "axisFields": ["model", "paper", "colour", "lamination", "protective"], "optsrc": "none",
+         "accuracy": 0.0, "fields": [
+            {"key": "model", "label": "Folder model", "addon": True, "depends": [], "options": [
+                "FPF 001", "FPF 004", "FPF 005", "FPF 014", "FPF 015", "FPF 016",
+                "FDF 001", "FDF 002", "FKF 001", "FKF 002", "FCD 004"]},
+            {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
+                "Gloss Art Card 210gsm (1 side coated)", "Gloss Art Card 250gsm (1 side coated)",
+                "Gloss Art Card 260gsm (1 side coated)", "Gloss Art Card 300gsm (1 side coated)",
+                "Gloss Art Card 230gsm (2 side coated)", "Gloss Art Card 250gsm (2 side coated)",
+                "Gloss Art Card 310gsm (2 side coated)", "Gloss Art Card 360gsm (2 side coated)"]},
+            {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "lamination", "label": "Lamination", "addon": True, "depends": [], "options": [
+                "Gloss Lamination (Front)", "Matte Lamination (Front)", "Matte Lamination (Front) + Spot UV (Front)",
+                "Gloss Waterbase Varnish (Front)", "Gloss Lamination (Both)", "Matte Lamination (Both)",
+                "Matte Lamination (Both) + Spot UV (Front)", "Gloss Waterbase Varnish (Both)"]},
+            {"key": "protective", "label": "Colour protective layer (back)", "addon": True, "depends": [],
+             "options": ["N/A", "Gloss Waterbase Varnish (Back)"]}]},
         {"id": 108, "name": "L-Shape Plastic Folder — Digital", "engine": "lshape", "optsrc": "none",
          "accuracy": acc.get(108), "fields": [
             {"key": "paper", "label": "Material", "addon": True, "depends": [],
@@ -478,7 +494,7 @@ def build_data():
             "notepad": _load("notepad_params.json", {"curve": {}, "size_mm": [80, 106], "content_sheets": 40, "content_gsm": 80}),
             "letterhead": _load("letterhead_params.json", {"curves": {}, "size_mm": [210, 297]}),
             "envelope": _load("envelope_params.json", {"base_curves": {}, "sizes": {}, "colour_delta": {}, "env_gsm": 100}),
-            "folder": _load("folder_params.json", {"base_curves": {}, "sizes": {}, "paper_delta": {}, "ref_paper": ""}),
+            "folder": _load("folder_pl_params.json", {"axis_cols": [], "curves": {}}),
             "lshape": _load("lshape_params.json", {"curves": {}, "size_mm": [310, 442]}),
             "bookmark": _load("bookmark_params.json", {"curves": {}, "fin_delta": {}, "size_mm": [50, 150]}),
             "voucher": _load("voucher_params.json", {"core": {}, "paper_f": {}, "colour_f": {}, "sets_f": {}, "packform_f": {}, "size_f": {}, "perf_d": {}, "numbering_d": {}, "ref": {}}),
