@@ -46,6 +46,8 @@ BUILT = {
     "wire-o-wall-calendar": ["Wire-O Wall Calendar Litho (122)"],
     "banner": ["Banner Litho (123)"],
     "roll-up-stand": ["Roll-Up Stand Litho (125)"],
+    "bunting": ["Bunting Litho (124)"],
+    "wobbler": ["Wobbler Digital (126)"],
     "paper-bag": ["Paper Bag Litho (127)"],
     "canvas-tote-bag": ["Canvas Tote Bag Litho (128)"],
     "mug": ["Mug Litho (129)"],
