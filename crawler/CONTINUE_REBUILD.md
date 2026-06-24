@@ -33,6 +33,26 @@ Document-Key-CD mould groups / Spot UV, Letterhead Pad packing. Every `"no price
 - **Folder (107) REBUILT EXACT** from `folder.csv` (9265 rows → 692 config curves). Axes:
   Model(11, all groups) × Paper(8) × Print Colour(4C Front/Both) × Lamination(8 incl Spot UV) ×
   Colour Protective Layer(N/A / Gloss Waterbase Varnish Back). JS==Python verified vs live price-list.
+- **Letterhead (105) REBUILT EXACT** from `letterhead.csv`. Axes: Paper(6) × Print Colour
+  (1C/2C/4C Front, 4C Both) × Packing(Loose / Pad 100pcs). **Pad packing** was the missed priced
+  axis. paramKey `letterhead`. JS==Python exact (maxdiff 0 / 336 cases).
+- **PVC Card (113) REBUILT EXACT** from `pvc_card.csv`. Axes: Print Colour(4C Front/Both) × Hole
+  Punch × VDP — **Hole Punch + VDP are PRICED** (old model treated them as separate/neutral).
+  Orientation/size confirmed price-neutral. paramKey `pvccard` (note tag≠csv: built with
+  `csv_name='pvc_card.csv'`). JS==Python exact (maxdiff 0 / 128 cases).
+- **Money Packet (138) NEW PRODUCT, EXACT** from `money_packet_standard.csv`. Axes:
+  Model(MP 101/103/104) × Package(Normal/Dual/5/6 Design) × Paper × Finishing. Packing method
+  price-neutral. JS==Python exact (maxdiff 0 / 273 cases). NOTE: only the **Standard** category is
+  built — the other 3 Money-Packet categories (Hot Stamping / Premium / Packaging) still need CSV
+  export + a multi-category lookup.
+
+## BROWSER STATUS (2026-06-25 session)
+
+Chrome extension `Browser 1` (deviceId 104892cb-…) is paired and `tabs_context_mcp` responds, but
+**`navigate` and `computer` both hang for the full 300s timeout** and the tab never leaves
+`chrome://newtab` — the extension's navigate/CDP path is wedged. Could not export any new CSVs this
+session. **Next session: ask the user to reload/re-pair the Chrome extension (or restart Chrome)
+before attempting browser exports.** All 4 products above were built from CSVs already on disk.
 
 ## THE PIPELINE (repeat per product)
 
@@ -58,15 +78,12 @@ Document-Key-CD mould groups / Spot UV, Letterhead Pad packing. Every `"no price
 5. **Verify**: `python -m app.build_standalone`, then node-vs-python check on `<tag>_pl_params.json`
    (must be exact). Commit small `output/*_pl_params.json` (force-add) + code; never the `*_samples_*`.
 
-## NEXT UP (have CSV, not yet wired)
+## NEXT UP (needs browser CSV export — blocked until extension is un-wedged)
 
-- **Letterhead (105)** — `letterhead.csv` (467 rows). Axes: **Paper(6)** × **Print Colour(1C/2C/4C
-  Front, 4C Both)** × **Packing (Loose / Pad 100pcs)**. Pad packing is the missed axis. Wire as pricelist.
-- **PVC Card (113)** — `pvc_card.csv`. Axes: Print Colour(4C Front) × Hole Punch × VDP (orientation/size
-  fixed). Already correct, but convert to exact lookup for consistency.
-- **Money Packet (NEW, target id 138?)** — have `money_packet_standard.csv` only; export the other 3
-  categories (Hot Stamping / Premium / Packaging) and build a multi-category lookup, then ADD as a new
-  product. Also build **Mask Keeper** and **Non-Woven Bag** (new v4 products) the same way.
+- **Money Packet** — export the other 3 categories (Hot Stamping / Premium / Packaging), extend the
+  `money_packet` lookup to a multi-category model (add a Category axis or per-category param files).
+- **Mask Keeper** and **Non-Woven Bag** — new v4 products, build fresh via the same lookup approach.
+- Letterhead(105), PVC Card(113), Money Packet-Standard(138) are DONE (see above).
 
 ## STILL TO AUDIT/REBUILD (re-verify every neutral/separate claim vs v4 price-list)
 
