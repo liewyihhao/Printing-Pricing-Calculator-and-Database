@@ -4,6 +4,24 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **43/52 BUILT.** Added **Bunting (124)** and **Wobbler (126)** by fixing what blocked them
+  (found via new `app/autoconfig_probe.py`, which auto-configures every control and reports
+  the price + any still-empty required field):
+  - **Bunting**: price was RM0 because `ddlColourProtective` (fitting: Wood / PVC Pipe /
+    Wood+Wire — a real price driver) was unset AND resets on qty change. Sampler re-applies it
+    per qty; built on simpleqty (size|paper|fitting), Tarpaulin 300gsm, 9 variants, LOO 2.81%.
+    Synthetic Paper deferred (renders 1 pt headless).
+  - **Wobbler**: compulsory `rblLaminationSide` resets per qty — re-applied per qty; 8
+    orient×paper×lam curves via its own engine, LOO ~4.3%.
+  - **REMAINING 9 — confirmed not headless-buildable:**
+    - *No online price table at all (quote-only products):* **Money Packet, Non-Woven Bag,
+      Mask Keeper** — `price_table=false`, no qty/spec controls. Not buildable (no price to read).
+    - *Price table exists but won't compute headless:* **Papan Kopi / Sachet Board** —
+      size+qty set but price cell stays empty (dynamic-qty / bestseller hidden-field quirk).
+    - *Complex configurators / interactions:* **Tent Card** (size template), **Sublimation
+      Shirt** (model/sleeve/fabric quote), **Stamp Chop + Pre-Inked Stamp** (shape→model→per-
+      line), **Wire-O Exclusive Leather** cover (cfg_fail headless).
+    These need a non-headless / scripted-interaction pass (or simply have no online price).
 - **41/52 BUILT.** New this session via a reusable generic engine `simpleqty_engine`
   (per-variant log-log qty curve; params in `output/<tag>_params.json` as
   `{curves,variant_field,unit_wt,note}`; one JS branch `engine:"simpleqty"`,`paramKey` in

@@ -90,7 +90,13 @@ async def run(paths):
                 radios_empty = await page.evaluate(
                     "()=>{const seen={};document.querySelectorAll('input[type=radio]').forEach(r=>{if(!r.offsetParent)return;const n=r.name.split('$').pop();seen[n]=seen[n]||false;if(r.checked)seen[n]=true;});return Object.keys(seen).filter(k=>!seen[k]);}")
                 radios_empty = [e for e in radios_empty if not any(k in e.lower() for k in SKIP)]
-                print(f"=== {path}  PRICE={price}  empty_selects={empty}  unchecked_radios={radios_empty}")
+                meta = await page.evaluate("""()=>({
+                    price_table: !!document.getElementById('tblProductPrice'),
+                    has_qty: !!document.querySelector("select[name$='comboQty'],select[name$='ddlQty']"),
+                    ctrls: [...document.querySelectorAll('select,input[type=radio]')].map(e=>(e.name||'').split('$').pop()).filter((v,i,a)=>v&&a.indexOf(v)===i).filter(n=>!['ddlOtherCountryCode','rblOrderCountryCode','rblCourier','rblOtherOrderCountryCode','review-filter',''].includes(n))
+                })""")
+                print(f"=== {path}  PRICE={price}  price_table={meta['price_table']}  has_qty={meta['has_qty']}  empty={empty}  unchecked={radios_empty}")
+                print(f"     ctrls={meta['ctrls']}")
             except Exception as e:  # noqa: BLE001
                 print(f"=== {path}  ERROR {str(e)[:90]}")
         try: await b.close()
