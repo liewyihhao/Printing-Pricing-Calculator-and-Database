@@ -499,6 +499,17 @@ def build_data():
          "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
         {"id": 103, "name": "Customprint (= Loose Sheet Litho)", "engine": "litho",
          "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
+        {"id": 138, "name": "Money Packet — Litho", "engine": "pricelist", "paramKey": "money_packet",
+         "axisFields": ["model", "package", "paper", "finishing"], "optsrc": "none",
+         "accuracy": 0.0, "fields": [
+            {"key": "model", "label": "Model (size)", "addon": True, "depends": [], "options": [
+                "MP 101", "MP 103", "MP 104"]},
+            {"key": "package", "label": "Package (number of designs)", "addon": True, "depends": [], "options": [
+                "Normal", "Dual Design", "5 Design", "6 Design"]},
+            {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
+                "Gloss Art Paper 130gsm", "Linen 140gsm", "Art Paper 157gsm"]},
+            {"key": "finishing", "label": "Finishing", "addon": True, "depends": [], "options": [
+                "N/A", "Matte Lamination", "Soft Touch Lamination"]}]},
     ]
     return {
         "products": products,
@@ -515,6 +526,7 @@ def build_data():
             "letterhead": _load("letterhead_pl_params.json", {"axis_cols": [], "curves": {}}),
             "envelope": _load("envelope_params.json", {"base_curves": {}, "sizes": {}, "colour_delta": {}, "env_gsm": 100}),
             "folder": _load("folder_pl_params.json", {"axis_cols": [], "curves": {}}),
+            "money_packet": _load("money_packet_pl_params.json", {"axis_cols": [], "curves": {}}),
             "lshape": _load("lshape_params.json", {"curves": {}, "size_mm": [310, 442]}),
             "bookmark": _load("bookmark_params.json", {"curves": {}, "fin_delta": {}, "size_mm": [50, 150]}),
             "voucher": _load("voucher_params.json", {"core": {}, "paper_f": {}, "colour_f": {}, "sets_f": {}, "packform_f": {}, "size_f": {}, "perf_d": {}, "numbering_d": {}, "ref": {}}),
