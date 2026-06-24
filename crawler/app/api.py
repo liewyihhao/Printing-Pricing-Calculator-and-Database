@@ -429,7 +429,7 @@ def printoka_products():
 FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24: 2.5,
               101: 1.7, 102: 1.7, 103: 1.7,  # aliases reuse loose-litho accuracy
               104: 5.2,  # notepad: exact at order qtys; 5.2 = held-out interp median
-              105: 8.2,  # letterhead: exact at sampled order qtys; 8.2 = held-out interp median
+              105: 0.0,  # letterhead: EXACT v4 price-list lookup (paper x colour x packing Loose/Pad)
               106: 4.1,  # envelope: base LOO ~2%; held-out colour (additive) median 4.1%
               107: 0.0,  # folder: EXACT v4 price-list lookup (all mould groups + colour + lam + protective)
               108: 2.2,  # l-shape folder: per-paper curve LOO median 2.2%
@@ -903,6 +903,8 @@ FIELD_SCHEMAS = {
                                  "Conqueror 100gsm Cream Laid"]},
                     {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [],
                      "options": ["1C (Front)", "2C (Front)", "4C (Front)", "4C (Both)"]},
+                    {"key": "packing", "label": "Packing", "addon": True, "depends": [],
+                     "options": ["Loose", "Pad (100 pcs per pad)"]},
                 ]},
     "notepad": {"options": "/api/printoka/notepad/options", "quote": "/api/printoka/notepad/quote",
                 "fields": [
@@ -2118,21 +2120,24 @@ def letterhead_options(product: int = Query(105)):
 
 @app.get("/api/printoka/letterhead/quote")
 def letterhead_quote(product: int = Query(105), paper: str = Query("Simili 80gsm"),
-                     colour: str = Query("4C (Front)"), qty: int = Query(...)):
-    from . import letterhead_engine as LH
+                     colour: str = Query("4C (Front)"), qty: int = Query(...),
+                     packing: str = Query("Loose")):
+    from . import pricelist_engine as PE
+    p = _pl_params("letterhead")
+    cfg = {"Paper": paper, "Print Colour": colour, "Packing": packing}
     try:
-        cash = LH.cash_price(paper, colour, qty)
-        wt = LH.weight_kg(paper, qty)
+        cash = PE.cash_price(p, cfg, qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = ("Letterhead: fixed A4 (210x297mm). The 4 Conqueror 100gsm finishes are price-"
-            "identical. Exact at sampled order quantities (500/1000/1500); other quantities "
-            "interpolate. qty = sheets.")
-    return {"config": {"product": product, "paper": paper, "colour": colour, "qty": qty},
-            "printoka_cash": round(cash, 2), "method": "formula (per-config qty curve)", "note": note,
-            "tiers": LH.tiers(cash), "weight_kg": round(wt, 3)}
+    note = ("Letterhead (exact v4 price-list lookup). Fixed A4 (210x297mm). Axes: Paper x "
+            "Print Colour x Packing (Loose / Pad 100pcs). Exact at listed order quantities; "
+            "other quantities interpolate. qty = sheets.")
+    return {"config": {"product": product, "paper": paper, "colour": colour,
+                       "packing": packing, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
+            "tiers": PE.tiers(cash), "weight_kg": 0.0}
 
 
 # ---------- Notepad (Litho, id 104) ----------
