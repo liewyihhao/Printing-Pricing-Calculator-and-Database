@@ -223,6 +223,18 @@ def build_data():
         {"key": "packing", "label": "Packing", "addon": True, "depends": [],
          "options": ["Loose", "Pad (100 pcs per pad)"]},
     ]
+    MONEY_PACKET_FIELDS = [
+        {"key": "model", "label": "Model (MP 101=154x79.5mm · MP 103=79.5x154mm · MP 104=85x167mm)", "addon": True, "depends": [],
+         "options": ["MP 101", "MP 103", "MP 104"]},
+        {"key": "package", "label": "Package (number of designs)", "addon": True, "depends": [],
+         "options": ["Normal", "Dual Design", "5 Design", "6 Design"]},
+        {"key": "paper", "label": "Paper", "addon": True, "depends": [],
+         "options": ["Gloss Art Paper 130gsm", "Linen 140gsm", "Art Paper 157gsm"]},
+        {"key": "finishing", "label": "Finishing", "addon": True, "depends": [],
+         "options": ["N/A", "Matte Lamination", "Soft Touch Lamination"]},
+        {"key": "packing", "label": "Packing method (price-neutral; for info)", "addon": True, "depends": [],
+         "options": ["5pcs / Pack", "6pcs / Pack", "8pcs / Pack", "10pcs / Pack"]},
+    ]
     ENVELOPE_MODELS = [
         "OE4496NW — 114x248mm (Best Seller)", "OE4496W — 114x248mm (window)",
         "OE9013NW — 229x324mm", "EV4090NW — 102x229mm", "EV4090W — 102x229mm (window)",
@@ -370,6 +382,9 @@ def build_data():
              "options": ["Metalised Pet Film"]},
             {"key": "lamination", "label": "Lamination (price-neutral)", "addon": True, "depends": [],
              "options": ["Matte Lamination", "Gloss Lamination"]}]},
+        {"id": 138, "name": "Money Packet — Litho", "engine": "pricelist", "paramKey": "money_packet",
+         "axisFields": ["model", "package", "paper", "finishing"], "optsrc": "none",
+         "accuracy": 0.0, "fields": MONEY_PACKET_FIELDS},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -409,13 +424,15 @@ def build_data():
             {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [], "options": ["Matte Lamination (Front)", "Matte Lamination (Both)", "Gloss Lamination (Front)", "Gloss Lamination (Both)"]},
             {"key": "envelope", "label": "Envelope (no online price change)", "addon": True, "depends": [], "options": ["Not Required", "White", "Pink"]},
             {"key": "hot_stamping", "label": "Hot stamping (quoted separately)", "addon": True, "depends": [], "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]}]},
-        {"id": 113, "name": "PVC Card — Digital", "engine": "pvccard", "optsrc": "none",
-         "accuracy": acc.get(113), "fields": [
-            {"key": "orientation", "label": "Orientation (price-neutral)", "addon": True, "depends": [], "options": ["Portrait", "Landscape"]},
-            {"key": "colour", "label": "Print colour (price-neutral)", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
-            {"key": "round_corner", "label": "Round cornering (free)", "addon": True, "depends": [], "options": ["No", "Yes"]},
-            {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["No", "Yes"]},
-            {"key": "vdp", "label": "Variable Data Printing (Front)", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
+        {"id": 113, "name": "PVC Card — Digital", "engine": "pricelist", "paramKey": "pvccard",
+         "axisFields": ["colour", "hole_punch", "vdp"], "optsrc": "none",
+         "accuracy": 0.0, "fields": [
+            {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [],
+             "options": ["Not Required", "Hole Punching (6mm)"]},
+            {"key": "vdp", "label": "Variable Data Printing", "addon": True, "depends": [],
+             "options": ["Not Required", "Variable Data Printing (Front)",
+                         "Variable Data Printing (Back)", "Variable Data Printing (Both)"]}]},
         {"id": 112, "name": "Wire-O Notebook — Litho", "engine": "wireo", "optsrc": "none",
          "accuracy": acc.get(112), "fields": [
             {"key": "cover", "label": "Cover type", "addon": True, "depends": [], "options": ["Hard Cover", "VDP Hard Cover", "Soft Cover"]},
@@ -503,7 +520,7 @@ def build_data():
             "voucher": _load("voucher_params.json", {"core": {}, "paper_f": {}, "colour_f": {}, "sets_f": {}, "packform_f": {}, "size_f": {}, "perf_d": {}, "numbering_d": {}, "ref": {}}),
             "computerform": _load("computerform_params.json", {"core": {}, "single": {}, "payslip": {}, "layer_f": {}, "ups_f": {}, "colour_f": {}, "copychange_d": [], "numbering_d": [], "size_mm": [241.3, 279.4], "ncr_gsm": 55}),
             "wireo": _load("wireo_params.json", {"cover_curves": {}, "lam_delta": {}, "addc_delta": {}, "cover_wt": {}, "ref_lam": ""}),
-            "pvccard": _load("pvccard_params.json", {"curves": {}, "fin_delta": {}, "card_wt": 0.0056}),
+            "pvccard": _load("pvccard_pl_params.json", {"axis_cols": [], "curves": {}}),
             "kadkahwin": _load("kadkahwin_params.json", {"core": {}, "size_f": {}, "paper_f": {}, "colour_f": {}, "ordertype_f": {}, "ref": {}}),
             "kadterima": _load("kadterima_params.json", {"core": {}, "size_f": {}, "paper_f": {}, "colour_f": {}, "hp_delta": [], "ref": {}}),
             "staticcling": _load("staticcling_params.json", {"core": {}, "size_f": {}, "direction_f": {}, "vdp_f": {}, "ref": {}, "cling_gsm": 200}),
@@ -526,6 +543,7 @@ def build_data():
             "magnet": _load("magnet_params.json", {"curves": {}, "variant_field": "shape", "unit_wt": 0.012}),
             "hardmenu": _load("hardmenu_params.json", {"curves": {}, "variant_field": ["order", "addcontent"], "unit_wt": 0.30}),
             "pouch": _load("pouch_params.json", {"curves": {}, "variant_field": "paper", "unit_wt": 0.015}),
+            "money_packet": _load("money_packet_pl_params.json", {"axis_cols": [], "curves": {}, "unit_wt": 0.006}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -558,7 +576,8 @@ def build_data():
                             123: "banner", 124: "bunting", 125: "rollup", 126: "wobbler",
                             127: "paperbag", 128: "canvastote", 129: "mug",
                             130: "papankopi", 131: "pillow", 132: "buttonbadge", 133: "handfan",
-                            134: "hanger", 135: "magnet", 136: "hardmenu", 137: "pouch"},
+                            134: "hanger", 135: "magnet", 136: "hardmenu", 137: "pouch",
+                            138: "money_packet"},
     }
 
 

@@ -340,7 +340,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 134, "name": "Hanger — Digital"},
                {"id": 135, "name": "Magnet — Digital"},
                {"id": 136, "name": "Hard Cover Menu — Digital"},
-               {"id": 137, "name": "Standing Pouch — Litho"}]
+               {"id": 137, "name": "Standing Pouch — Litho"},
+               {"id": 138, "name": "Money Packet — Litho"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
@@ -437,7 +438,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               110: 8.0,  # voucher: factor model — single axes exact, ~4% core interp + interactions
               111: 4.0,  # computer form: factor model — axes exact, core LOO ~4%
               112: 2.3,  # wire-o notebook: per-cover curve LOO median 2.3% (Hard Cover)
-              113: 4.1,  # pvc card: qty curve LOO median 4.1% (colour neutral)
+              113: 0.0,  # pvc card: EXACT v4 price-list lookup (colour x hole punch x VDP; all priced)
               114: 5.0,  # kad kahwin: factor model — axes exact, core LOO ~3%
               115: 4.0,  # kad terima kasih: factor model — axes exact, core LOO ~4%
               116: 5.9, 117: 5.9,  # static cling / car sticker: factor model, core LOO ~5.9%
@@ -460,7 +461,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               134: 2.5,  # hanger: per-(paper x colour) qty curve LOO median 2.49%
               135: 1.0,  # magnet: per-shape qty curve LOO median 0.97%
               136: 2.2,  # hard cover menu: per-(order x add-content) qty curve LOO median 2.2%
-              137: 9.6}  # standing pouch (Metalised): qty curve LOO median 9.6% (non-smooth curve)
+              137: 9.6,  # standing pouch (Metalised): qty curve LOO median 9.6% (non-smooth curve)
+              138: 0.0}  # money packet: EXACT v4 price-list lookup (model x package x paper x finishing)
 
 
 def _accuracy(product_id: int):
@@ -827,11 +829,9 @@ FIELD_SCHEMAS = {
                 ]},
     "pvccard": {"options": "/api/printoka/pvccard/options", "quote": "/api/printoka/pvccard/quote",
                 "fields": [
-                    {"key": "orientation", "label": "Orientation (price-neutral)", "addon": True, "depends": [], "options": ["Portrait", "Landscape"]},
-                    {"key": "colour", "label": "Print colour (price-neutral)", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
-                    {"key": "vdp", "label": "Variable Data Printing (price may change — contact us)", "addon": True, "depends": [], "options": ["Not Required", "Variable Data Printing (Front)"]},
-                    {"key": "round_corner", "label": "Round cornering (free)", "addon": True, "depends": [], "options": ["Not Required", "Round Corner"]},
-                    {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["Not Required", "Required (6mm)"]},
+                    {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+                    {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["Not Required", "Hole Punching (6mm)"]},
+                    {"key": "vdp", "label": "Variable Data Printing", "addon": True, "depends": [], "options": ["Not Required", "Variable Data Printing (Front)", "Variable Data Printing (Back)", "Variable Data Printing (Both)"]},
                 ]},
     "wireo": {"options": "/api/printoka/wireo/options", "quote": "/api/printoka/wireo/quote",
                 "fields": [
@@ -912,6 +912,19 @@ FIELD_SCHEMAS = {
                      "options": ["Gloss Art Card 260gsm (2 side coated)", "Gloss Art Card 310gsm (2 side coated)"]},
                     {"key": "lamination", "label": "Lamination (Matte Both compulsory; +Spot UV adds a cost)", "addon": True, "depends": [],
                      "options": ["Matte Lamination (Both)", "Matte Lamination (Both) + Spot UV (Front Cover)"]},
+                ]},
+    "money_packet": {"options": "/api/printoka/money_packet/options", "quote": "/api/printoka/money_packet/quote",
+                "fields": [
+                    {"key": "model", "label": "Model (MP 101=154x79.5mm · MP 103=79.5x154mm · MP 104=85x167mm)", "addon": True, "depends": [], "options": [
+                        "MP 101", "MP 103", "MP 104"]},
+                    {"key": "package", "label": "Package (number of designs)", "addon": True, "depends": [], "options": [
+                        "Normal", "Dual Design", "5 Design", "6 Design"]},
+                    {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
+                        "Gloss Art Paper 130gsm", "Linen 140gsm", "Art Paper 157gsm"]},
+                    {"key": "finishing", "label": "Finishing", "addon": True, "depends": [], "options": [
+                        "N/A", "Matte Lamination", "Soft Touch Lamination"]},
+                    {"key": "packing", "label": "Packing method (price-neutral; for info)", "addon": True, "depends": [], "options": [
+                        "5pcs / Pack", "6pcs / Pack", "8pcs / Pack", "10pcs / Pack"]},
                 ]},
     "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
                 "fields": [
@@ -1034,6 +1047,8 @@ def _family(product_id: int) -> str:
         return "hardmenu"
     if product_id == 137:
         return "pouch"
+    if product_id == 138:
+        return "money_packet"
     return "loose"
 
 
@@ -1794,6 +1809,38 @@ def pouch_quote(product: int = Query(137), qty: int = Query(...),
             "note": p.get("note", ""), "tiers": SQ.tiers(cash), "weight_kg": round(wt, 3)}
 
 
+# ---------- Money Packet (Litho, id 138) — exact v4 price-list lookup ----------
+@app.get("/api/printoka/money_packet/options")
+def money_packet_options(product: int = Query(138)):
+    return {}  # all fields are inline addon fields in the schema
+
+
+@app.get("/api/printoka/money_packet/quote")
+def money_packet_quote(product: int = Query(138), qty: int = Query(...),
+                       model: str = Query("MP 101"),
+                       package: str = Query("Normal"),
+                       paper: str = Query("Gloss Art Paper 130gsm"),
+                       finishing: str = Query("N/A"),
+                       packing: str = Query("10pcs / Pack")):
+    from . import pricelist_engine as PE
+    p = _pl_params("money_packet")
+    cfg = {"Model": model, "Package": package, "Paper": paper, "Finishing": finishing}
+    try:
+        cash = PE.cash_price(p, cfg, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price"}, status_code=400)
+    wt = round(p.get("unit_wt", 0.006) * qty, 3)
+    note = ("Money Packet Standard (exact v4 price-list lookup). 3 models (MP 101/103/104), "
+            "4 package types (Normal/Dual/5/6 Design), 3 papers, 2 finishings. "
+            "Packing Method (5/6/8/10 pcs per pack) is price-neutral. qty = pcs.")
+    return {"config": {"product": product, "model": model, "package": package,
+                       "paper": paper, "finishing": finishing, "packing": packing, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
+            "tiers": PE.tiers(cash), "weight_kg": wt}
+
+
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------
 @app.get("/api/printoka/staticcling/options")
 def staticcling_options(product: int = Query(116)):
@@ -1891,28 +1938,24 @@ def pvccard_options(product: int = Query(113)):
 
 @app.get("/api/printoka/pvccard/quote")
 def pvccard_quote(product: int = Query(113), colour: str = Query("4C (Front)"),
-                  orientation: str = Query("Portrait"), qty: int = Query(...),
-                  round_corner: str = Query("Not Required"), hole_punch: str = Query("Not Required"),
+                  qty: int = Query(...), hole_punch: str = Query("Not Required"),
                   vdp: str = Query("Not Required")):
-    from . import pvccard_engine as PV
-    rc = round_corner not in ("Not Required", "No")
-    hp = hole_punch not in ("Not Required", "No")
-    vd = vdp not in ("Not Required", "No")
+    from . import pricelist_engine as PE
+    p = _pl_params("pvccard")
+    cfg = {"Print Colour": colour, "Hole Punch": hole_punch, "VDP": vdp}
     try:
-        cash = PV.cash_price(colour, qty, round_corner=rc, hole_punch=hp, vdp=vd)
-        fin = PV.finishing_cost(qty, round_corner=rc, hole_punch=hp, vdp=vd)
-        wt = PV.weight_kg(qty)
+        cash = PE.cash_price(p, cfg, qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = ("PVC Card (CR80). Orientation & print colour are price-neutral; round cornering is "
-            "free; hole punching and Variable Data Printing each add a per-run cost. qty = cards.")
-    return {"config": {"product": product, "colour": colour, "orientation": orientation, "qty": qty,
-                       "round_corner": round_corner, "hole_punch": hole_punch, "vdp": vdp},
-            "printoka_cash": round(cash, 2), "finishing_cost": round(fin, 2),
-            "method": "formula (qty curve)", "note": note,
-            "tiers": PV.tiers(cash), "weight_kg": round(wt, 3)}
+    note = ("PVC Card (CR80, 0.80mm Gloss, Round Cornering compulsory). Exact v4 price-list "
+            "lookup. Orientation/size price-neutral. Print colour (4C Front/Both), Hole Punching "
+            "and Variable Data Printing are each PRICED. qty = cards.")
+    return {"config": {"product": product, "colour": colour, "qty": qty,
+                       "hole_punch": hole_punch, "vdp": vdp},
+            "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
+            "tiers": PE.tiers(cash), "weight_kg": 0.0}
 
 
 # ---------- Wire-O Notebook (Litho, id 112) ----------
