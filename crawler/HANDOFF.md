@@ -4,6 +4,15 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **EXACT REBUILD FROM v4 PRICE-LISTS IN PROGRESS — see `CONTINUE_REBUILD.md`.** An audit found the
+  original www-form sampling had **silent option-select failures**, so several priced options were
+  wrongly modelled as "no price change" (root cause). We now rebuild affected products EXACTLY from the
+  authoritative v4 price-list CSV exports. **New generic `app/pricelist_engine.py`** + a generic
+  `"pricelist"` standalone JS branch do exact config-lookup with qty interpolation. **Notepad (104)
+  fixed** (Spot UV is priced) and **Folder (107) fully rebuilt exact** (all mould groups + print colour
+  + 8 laminations + protective layer; 692 config curves). CSVs live in `output/v4_pricelists/`. Next:
+  Letterhead (Pad packing), then re-verify every "neutral/quoted-separately" claim across products.
+  Chrome extension paired; user logged into v4 (acct 142059498); downloads enabled for v4.excard.com.my.
 - **43/52 BUILT.** Added **Bunting (124)** and **Wobbler (126)** by fixing what blocked them
   (found via new `app/autoconfig_probe.py`, which auto-configures every control and reports
   the price + any still-empty required field):
