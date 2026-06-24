@@ -449,7 +449,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               123: 0.9,  # banner: per-size qty curve LOO median 0.9%
               124: 2.8,  # bunting (Tarpaulin): per size×fitting qty curve LOO median 2.81%
               125: 0.68,  # rollup: per-lam qty curve LOO median 0.68%
-              126: 2.0,  # wobbler: TBD (re-sample needed)
+              126: 4.3,  # wobbler: per orient×paper×lam qty curve LOO median ~4.3%
               127: 17.4,  # paperbag: per-paper qty curve LOO 17% (anomalous q200 dip)
               128: 0.79,  # canvastote: per-colour qty curve LOO median 0.79%
               129: 0.53,  # mug: qty curve LOO median 0.53%
