@@ -55,11 +55,12 @@ async def run(account_id=1):
                             continue
                         if not await _sel(page, "comboQty", str(q)):
                             log.warning("wobbler.qty_fail", qty=q); continue
+                        await asyncio.sleep(0.35); await _sel(page, "rblLaminationSide", lam)  # resets on qty change
                         c = None
                         for _ in range(12):
                             await asyncio.sleep(0.7)
                             c = (await _safe_read(page)).get("before_discount")
-                            if c is not None and (prev is None or c != prev):
+                            if c is not None and c != 0 and (prev is None or c != prev):
                                 break
                         if not c:
                             log.warning("wobbler.no_price", orient=orient, paper=paper, lam=lam, qty=q); continue
@@ -86,6 +87,8 @@ async def run(account_id=1):
                 if (rc, q) in done_fin:
                     continue
                 if not await _sel(page, "comboQty", str(q)): continue
+                await asyncio.sleep(0.35); await _sel(page, "rblLaminationSide", ref[2])
+                await asyncio.sleep(0.35); await _radio(page, "rblRoundCorner", rc)
                 await asyncio.sleep(1.0)
                 r = await _safe_read(page)
                 c = r.get("before_discount")

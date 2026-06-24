@@ -277,12 +277,13 @@ def build_data():
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
                 "3ft x 2ft", "4ft x 2ft", "6ft x 2ft", "4ft x 3ft", "8ft x 3ft",
                 "10ft x 3ft", "18ft x 3ft", "8ft x 4ft", "10ft x 4ft", "20ft x 4ft"]}]},
-        {"id": 124, "name": "Bunting — Litho", "engine": "bunting", "optsrc": "none",
-         "accuracy": acc.get(124), "fields": [
+        {"id": 124, "name": "Bunting — Litho", "engine": "simpleqty", "paramKey": "bunting",
+         "optsrc": "none", "accuracy": acc.get(124), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
                 "2ft x 5ft", "2ft x 6ft", "2.5ft x 6ft"]},
-            {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": [
-                "Tarpaulin 300gsm", "Synthetic Paper 180micron"]}]},
+            {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": ["Tarpaulin 300gsm"]},
+            {"key": "protective", "label": "Fitting", "addon": True, "depends": [], "options": [
+                "Wood", "PVC Pipe", "Wood+Wire"]}]},
         {"id": 125, "name": "Roll-Up Stand — Litho", "engine": "rollup", "optsrc": "none",
          "accuracy": acc.get(125), "fields": [
             {"key": "lam", "label": "Lamination", "addon": True, "depends": [], "options": [

@@ -447,7 +447,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               121: 0.7,  # desk calendar soft stand: qty curve LOO median 0.67%
               122: 0.8,  # wire-o wall calendar: qty curve LOO median 0.82%
               123: 0.9,  # banner: per-size qty curve LOO median 0.9%
-              124: 1.5,  # bunting: TBD (re-sample needed)
+              124: 2.8,  # bunting (Tarpaulin): per size×fitting qty curve LOO median 2.81%
               125: 0.68,  # rollup: per-lam qty curve LOO median 0.68%
               126: 2.0,  # wobbler: TBD (re-sample needed)
               127: 17.4,  # paperbag: per-paper qty curve LOO 17% (anomalous q200 dip)
@@ -724,8 +724,9 @@ FIELD_SCHEMAS = {
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
                         "2ft x 5ft", "2ft x 6ft", "2.5ft x 6ft"]},
-                    {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": [
-                        "Tarpaulin 300gsm", "Synthetic Paper 180micron"]},
+                    {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": ["Tarpaulin 300gsm"]},
+                    {"key": "protective", "label": "Fitting", "addon": True, "depends": [], "options": [
+                        "Wood", "PVC Pipe", "Wood+Wire"]},
                 ]},
     "rollup": {"options": "/api/printoka/rollup/options", "quote": "/api/printoka/rollup/quote",
                 "fields": [
@@ -1447,24 +1448,24 @@ def banner_quote(product: int = Query(123), size: str = Query("3ft x 2ft"), qty:
 # ---------- Bunting (Litho, id 124) ----------
 @app.get("/api/printoka/bunting/options")
 def bunting_options(product: int = Query(124)):
-    from . import bunting_engine as BT
-    return {"sizes": BT.SIZES, "papers": BT.PAPERS}
+    return {}
 
 
 @app.get("/api/printoka/bunting/quote")
 def bunting_quote(product: int = Query(124), size: str = Query("2ft x 5ft"),
-                  paper: str = Query("Tarpaulin 300gsm"), qty: int = Query(...)):
-    from . import bunting_engine as BT
+                  paper: str = Query("Tarpaulin 300gsm"), protective: str = Query("Wood"),
+                  qty: int = Query(...)):
+    from . import simpleqty_engine as SQ
+    p = _simpleqty_params("bunting")
     try:
-        cash = BT.cash_price(size, paper, qty); wt = BT.weight_kg(size, paper, qty)
-    except Exception as e:
+        cash = SQ.cash_price(p, f"{size}|{paper}|{protective}", qty); wt = SQ.weight_kg(p, qty)
+    except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = f"Bunting: {size}, {paper}. qty = pieces."
-    return {"config": {"product": product, "size": size, "paper": paper, "qty": qty},
-            "printoka_cash": round(cash, 2), "method": "formula (per-size-paper qty curve)",
-            "note": note, "tiers": BT.tiers(cash), "weight_kg": round(wt, 3)}
+    return {"config": {"product": product, "size": size, "paper": paper, "protective": protective, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "formula (per size×fitting qty curve)",
+            "note": p.get("note", ""), "tiers": SQ.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- Roll-Up Stand (Litho, id 125) ----------
