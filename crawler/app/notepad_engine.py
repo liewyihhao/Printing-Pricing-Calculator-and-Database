@@ -2,10 +2,11 @@
 
 Fixed-spec product (Size 80x106mm, content Simili 80gsm 40 sheets, 4C+4C cover / 1C
 content, Wire-O punch compulsory). Price model (from output/notepad_samples.json):
-  * Price depends ONLY on QUANTITY (books). VERIFIED on the live form: cover paper
-    (260gsm vs 310gsm) and lamination (Matte Both vs + Spot UV Front Cover) do NOT change
-    the online price (266g & Spot UV are block/included). So one qty curve, log-interp,
-    exact at Excard's order quantities. Paper only changes the WEIGHT estimate.
+  * Base qty curve at Matte Lamination (Both). Cover paper (260gsm vs 310gsm) is
+    genuinely price-neutral (verified on the v4 price-list — both RM338.80@250).
+  * Spot UV (Front Cover) IS a priced add-on (corrected 2026-06: the original sampling
+    silently failed to select Spot UV and recorded the base price). Delta from the v4
+    price-list: +RM22@250 … +RM726@20000, qty-interpolated.
 
   cash_price(paper, qty, lamination) -> RM
 """
@@ -51,7 +52,8 @@ def _interp(curve: dict, qty):
 
 
 def _curve():
-    """Single qty->cash curve (paper/lamination verified price-neutral online)."""
+    """Single qty->cash curve at the base lamination (Matte Both). Cover paper
+    (260gsm vs 310gsm) is genuinely price-neutral online (verified on v4 price-list)."""
     if "c" in _CACHE:
         return _CACHE["c"]
     cv: dict = {}
@@ -61,8 +63,37 @@ def _curve():
     return cv
 
 
+def _spotuv_delta(qty):
+    """Spot UV (Front Cover) add-on delta vs the base Matte-Both price, qty-interpolated.
+    Spot UV IS priced on the live form (v4 price-list); not neutral."""
+    if "sd" not in _CACHE:
+        base = {str(r["qty"]): r["cash"] for r in _data().get("core", [])}
+        pts = {}
+        for r in _data().get("spotuv", []):
+            q = str(r["qty"])
+            if q in base:
+                pts[r["qty"]] = r["cash"] - base[q]
+        _CACHE["sd"] = sorted(pts.items())
+    pts = _CACHE["sd"]
+    if not pts:
+        return 0.0
+    xs = [p[0] for p in pts]; ys = [p[1] for p in pts]; x = float(qty)
+    if x <= xs[0]:
+        return ys[0]
+    if x >= xs[-1]:
+        return ys[-1]
+    for i in range(1, len(xs)):
+        if x <= xs[i]:
+            t = (x - xs[i-1]) / (xs[i] - xs[i-1])
+            return ys[i-1] + t * (ys[i] - ys[i-1])
+    return ys[-1]
+
+
 def cash_price(paper=None, qty=0, lamination=LAM_BASE):
-    return _interp(_curve(), qty)
+    cash = _interp(_curve(), qty)
+    if lamination and "Spot UV" in lamination:
+        cash += _spotuv_delta(qty)
+    return cash
 
 
 def tiers(cash):
@@ -78,7 +109,9 @@ def weight_kg(paper, qty):
 
 
 def build_params():
-    p = {"curve": _curve(), "size_mm": SIZE_MM, "content_sheets": CONTENT_SHEETS,
+    _spotuv_delta(500)  # warm cache
+    p = {"curve": _curve(), "spotuv_delta": _CACHE.get("sd", []),
+         "size_mm": SIZE_MM, "content_sheets": CONTENT_SHEETS,
          "content_gsm": CONTENT_GSM, "weight_factor": WEIGHT_FACTOR}
     PARAMS.write_text(json.dumps(p, indent=0))
     return p

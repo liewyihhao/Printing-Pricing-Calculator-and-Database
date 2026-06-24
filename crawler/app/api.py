@@ -898,7 +898,7 @@ FIELD_SCHEMAS = {
                 "fields": [
                     {"key": "paper", "label": "Cover paper (weight only; no price change)", "addon": True, "depends": [],
                      "options": ["Gloss Art Card 260gsm (2 side coated)", "Gloss Art Card 310gsm (2 side coated)"]},
-                    {"key": "lamination", "label": "Lamination (Matte Both compulsory; Spot UV quoted separately)", "addon": True, "depends": [],
+                    {"key": "lamination", "label": "Lamination (Matte Both compulsory; +Spot UV adds a cost)", "addon": True, "depends": [],
                      "options": ["Matte Lamination (Both)", "Matte Lamination (Both) + Spot UV (Front Cover)"]},
                 ]},
     "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
