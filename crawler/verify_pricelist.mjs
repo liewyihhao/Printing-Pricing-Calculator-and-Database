@@ -35,8 +35,8 @@ const CASES = [
   ["tent_card_pl_params", { Model: "TC 003", Lamination: "Matte Lamination (Both)" }, 300, 181.7],
   ["tent_card_pl_params", { Model: "TC 003", Lamination: "Matte Lamination (Both)" }, 750, null], // interpolated
   ["tent_card_pl_params", { Model: "TC 004", Lamination: "Matte Lamination (Both) + Spot UV (Front)" }, 500, 565.8],
-  ["letterhead_pl_params", { Paper: "Simili 80gsm", "Print Colour": "4C (Both)", Packing: "Loose" }, 500, null],
-  ["letterhead_pl_params", { Paper: "Simili 80gsm", "Print Colour": "4C (Both)", Packing: "Pad 100pcs" }, 500, null],
+  ["letterhead_pl_params", { Paper: "Simili 80gsm", "Print Colour": "4C (Both)", Packing: "Loose" }, 500, 434.5],
+  ["letterhead_pl_params", { Paper: "Simili 80gsm", "Print Colour": "4C (Both)", Packing: "Pad (100 pcs per pad)" }, 500, 105.25],
   ["folder_pl_params", { Model: "FPF 001", Paper: "Gloss Art Card 250gsm (1 side coated)", "Print Colour": "4C (Front)", Lamination: "Matte Lamination (Front)", "Colour Protective Layer": "N/A" }, 250, 678.6],
   ["folder_pl_params", { Model: "FPF 001", Paper: "Gloss Art Card 250gsm (1 side coated)", "Print Colour": "4C (Front)", Lamination: "Matte Lamination (Front)", "Colour Protective Layer": "N/A" }, 500, 921.35],
   ["non_woven_bag_pl_params", { Model: "WN-B5", "Print Colour": "1C (Front)" }, 100, null],
