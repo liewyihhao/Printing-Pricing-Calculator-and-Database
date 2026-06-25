@@ -1,5 +1,5 @@
 {
- "scanned_at": "2026-06-25T08:32:35",
+ "scanned_at": "2026-06-25T08:36:13",
  "count": 52,
  "products": [
   {
@@ -403,8 +403,10 @@
    "name": "Papan Kopi",
    "url": "https://www.excard.com.my/product/papan-kopi",
    "category": "Misc",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Papan Kopi / Sachet Board Litho (130)"
+   ],
    "is_new": false
   },
   {
@@ -478,8 +480,10 @@
    "name": "Sachet Board",
    "url": "https://www.excard.com.my/product/sachet-board",
    "category": "Packaging & Boxes",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Papan Kopi / Sachet Board Litho (130, sachet board same product)"
+   ],
    "is_new": false
   },
   {

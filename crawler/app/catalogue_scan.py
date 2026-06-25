@@ -63,6 +63,8 @@ BUILT = {
     "tent-card": ["Tent Card Litho (140)"],
     "stamp-chop": ["Stamp Chop (141)"],
     "pre-inked-stamp": ["Stamp Chop (141, pre-inked stamps included)"],
+    "papan-kopi": ["Papan Kopi / Sachet Board Litho (130)"],
+    "sachet-board": ["Papan Kopi / Sachet Board Litho (130, sachet board same product)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

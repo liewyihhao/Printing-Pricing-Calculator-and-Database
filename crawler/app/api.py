@@ -457,7 +457,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               127: 17.4,  # paperbag: per-paper qty curve LOO 17% (anomalous q200 dip)
               128: 0.79,  # canvastote: per-colour qty curve LOO median 0.79%
               129: 0.53,  # mug: qty curve LOO median 0.53%
-              130: 1.5,  # papankopi: TBD (sampler fix needed)
+              130: 0.0,  # papan kopi: EXACT v4 price-list lookup (model)
               131: 0.0,  # pillow: qty curve LOO median 0.03% (effectively exact)
               132: 3.3,  # button badge: qty curve LOO median 3.27%; lamination price-neutral
               133: 3.3,  # hand fan: per-paper qty curve LOO median 3.27%
@@ -764,10 +764,10 @@ FIELD_SCHEMAS = {
                 ]},
     "mug": {"options": "/api/printoka/mug/options", "quote": "/api/printoka/mug/quote",
                 "fields": []},
-    "papankopi": {"options": "/api/printoka/papankopi/options", "quote": "/api/printoka/papankopi/quote",
+    "papan_kopi": {"options": "/api/printoka/papan_kopi/options", "quote": "/api/printoka/papan_kopi/quote",
                 "fields": [
-                    {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
-                        "537mm x 334mm", "622mm x 346mm", "547mm x 346mm"]},
+                    {"key": "model", "label": "Model (SB 01=537x334mm 20win · SB 02=622x346mm 20win · SB 03=547x346mm 20win · SB 04=547x346mm 15win)", "addon": True, "depends": [], "options": [
+                        "SB 01", "SB 02", "SB 03", "SB 04"]},
                 ]},
     "pillow": {"options": "/api/printoka/pillow/options", "quote": "/api/printoka/pillow/quote",
                 "fields": []},
@@ -1068,7 +1068,7 @@ def _family(product_id: int) -> str:
     if product_id == 129:
         return "mug"
     if product_id == 130:
-        return "papankopi"
+        return "papan_kopi"
     if product_id == 131:
         return "pillow"
     if product_id == 132:
@@ -1649,26 +1649,29 @@ def mug_quote(product: int = Query(129), qty: int = Query(...)):
             "note": note, "tiers": MG.tiers(cash), "weight_kg": round(wt, 3)}
 
 
-# ---------- Papan Kopi / Sachet Board (Litho, id 130) ----------
-@app.get("/api/printoka/papankopi/options")
-def papankopi_options(product: int = Query(130)):
-    from . import papankopi_engine as PK
-    return {"sizes": PK.SIZES}
+# ---------- Papan Kopi / Sachet Board (Litho, id 130) — exact v4 price-list lookup ----------
+@app.get("/api/printoka/papan_kopi/options")
+def papan_kopi_options(product: int = Query(130)):
+    return {}
 
 
-@app.get("/api/printoka/papankopi/quote")
-def papankopi_quote(product: int = Query(130), size: str = Query("537mm x 334mm"), qty: int = Query(...)):
-    from . import papankopi_engine as PK
+@app.get("/api/printoka/papan_kopi/quote")
+def papan_kopi_quote(product: int = Query(130), qty: int = Query(...),
+                     model: str = Query("SB 01")):
+    from . import pricelist_engine as PE
+    p = _pl_params("papan_kopi")
+    cfg = {"Model": model}
     try:
-        cash = PK.cash_price(size, qty); wt = PK.weight_kg(size, qty)
-    except Exception as e:
+        cash = PE.cash_price(p, cfg, qty)
+    except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = f"Papan Kopi / Sachet Board: {size}. Hole Punching compulsory. qty = boards."
-    return {"config": {"product": product, "size": size, "qty": qty},
-            "printoka_cash": round(cash, 2), "method": "formula (per-size qty curve)",
-            "note": note, "tiers": PK.tiers(cash), "weight_kg": round(wt, 3)}
+    note = ("Papan Kopi / Sachet Board (exact v4 price-list lookup). 4 models with fixed specs. "
+            "Compulsory: Boxboard Grey Back 400gsm, Gloss Water Based Varnish (Front), 4C Front, Die-Cutting. qty = boards.")
+    return {"config": {"product": product, "model": model, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
+            "tiers": PE.tiers(cash)}
 
 
 # ---------- Pillow (Litho, id 131) ----------
