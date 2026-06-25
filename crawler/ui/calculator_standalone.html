@@ -44,13 +44,34 @@ tailwind.config = { theme: { extend: {
 
 <main class="max-w-[1180px] mx-auto px-4 sm:px-8 py-7">
   <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Simulate a quote</h1>
-  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-6">Self-contained — formulas &amp; calibrated parameters are baked into this file. No server, no network.</p>
-  <div id="prodgrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-7"></div>
+  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-5">Pick a product, configure it, and see the price instantly. For exact products the Cash price <span class="font-medium text-slate-600">matches Excard's online price</span> — membership tiers are your savings below it.</p>
+
+  <div id="picker">
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
+      <div class="relative flex-1">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="m17 17-3.5-3.5" stroke-linecap="round"/></svg>
+        <input id="psearch" type="text" placeholder="Search products — e.g. card, folder, sticker, banner…" autocomplete="off"
+          class="fieldsel w-full rounded-xl border hairline bg-white pl-9 pr-9 py-2.5 text-[13.5px]">
+        <button id="pclear" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full bg-slate-100 text-slate-500 grid place-items-center text-[13px] hover:bg-slate-200">×</button>
+      </div>
+      <div class="text-[12px] text-slate-400"><span id="pcount"></span> products</div>
+    </div>
+    <div id="pcats" class="flex flex-wrap gap-1.5 mb-4"></div>
+    <div id="prodgrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-3"></div>
+    <div id="pempty" class="hidden text-center text-slate-400 text-[13px] py-10">No products match your search.</div>
+  </div>
   <div id="calc" class="hidden grid md:grid-cols-[1fr_372px] gap-5">
     <div class="bg-white rounded-xl border hairline shadow-card p-5">
+      <button id="changeprod" class="hidden inline-flex items-center gap-1.5 text-[12px] font-medium text-slate-500 hover:text-brand-600 mb-3">
+        <svg class="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 12 6 8l4-4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        All products
+      </button>
       <div class="flex items-center justify-between mb-4">
-        <h3 id="cfgtitle" class="font-semibold text-[15px] text-ink">Configuration</h3>
-        <span id="acc" class="text-[12px]"></span>
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div id="cfgorb" class="h-8 w-8 rounded-lg brand-gradient grid place-items-center text-white text-[12px] font-bold shrink-0"></div>
+          <h3 id="cfgtitle" class="font-semibold text-[15px] text-ink truncate">Configuration</h3>
+        </div>
+        <span id="acc" class="text-[12px] shrink-0 ml-2"></span>
       </div>
       <div id="fields" class="space-y-4"></div>
       <div class="mt-4">
@@ -73,6 +94,16 @@ tailwind.config = { theme: { extend: {
         <div id="perunit" class="text-[12px] opacity-90"></div>
       </div>
       <div class="p-5">
+        <div id="excard_cmp" class="hidden mb-4 rounded-lg bg-slate-50 border hairline px-3.5 py-2.5">
+          <div class="flex items-center justify-between text-[13px]">
+            <span class="text-slate-500">Excard online price</span>
+            <span id="ex_price" class="tabular-nums font-medium text-slate-700"></span>
+          </div>
+          <div class="flex items-center justify-between text-[13px] mt-1">
+            <span class="text-emerald-700 font-medium">You save (Platinum)</span>
+            <span id="ex_save" class="tabular-nums font-semibold text-emerald-700"></span>
+          </div>
+        </div>
         <div class="text-[12px] font-semibold text-slate-400 uppercase tracking-wide mb-2">By membership tier</div>
         <div id="tiers" class="space-y-1.5 text-[13px]"><div class="text-slate-400">Configure a job…</div></div>
         <div id="deliv" class="mt-2 pt-2 border-t hairline text-[13px] hidden">
@@ -729,25 +760,69 @@ function localQuote(prod, V, qty){
 
 // ---------- UI ----------
 let S={prod:null,values:{},fields:[],t:null};
+// ---------- product categories (keyword-derived, for the picker filter) ----------
+const CATEGORIES=[
+  {key:"all",   label:"All"},
+  {key:"cards", label:"Cards & Stationery", kw:["business card","pvc card","name card","letterhead","envelope","folder","kad ","voucher","computer form","bookmark","money packet"]},
+  {key:"print", label:"Books & Pads",        kw:["booklet","notepad","bill-book","wire-o notebook","loose sheet","brochure","flyer","customprint","menu","hard cover"]},
+  {key:"stickers",label:"Stickers & Labels", kw:["sticker","label","magnet","cling","car sticker"]},
+  {key:"signage",label:"Marketing & Signage",kw:["banner","bunting","roll-up","wobbler","hanger","standee","poster"]},
+  {key:"packaging",label:"Packaging & Bags", kw:["bag","pouch","box","papan kopi","sachet","mask keeper","non-woven"]},
+  {key:"calendar",label:"Calendars",         kw:["calendar"]},
+  {key:"promo", label:"Promo & Gifts",       kw:["mug","pillow","badge","fan","hand fan","button","canvas","arch file"]},
+];
+function catOf(p){ const n=(p.name||"").toLowerCase();
+  for(const c of CATEGORIES){ if(c.key==="all"||c.key==="promo")continue; if((c.kw||[]).some(k=>n.includes(k)))return c.key; }
+  if(CATEGORIES.find(c=>c.key==="promo").kw.some(k=>n.includes(k)))return "promo";
+  return "print"; }
+const PFILTER={q:"",cat:"all"};
+function catCount(key){ return DATA.products.filter(p=>key==="all"||catOf(p)===key).length; }
+function renderCats(){
+  $("pcats").innerHTML = CATEGORIES.filter(c=>c.key==="all"||catCount(c.key)>0).map(c=>{
+    const active=PFILTER.cat===c.key;
+    return `<button data-cat="${c.key}" class="catchip rounded-full border px-3 py-1 text-[12px] font-medium transition ${active?'bg-ink text-white border-ink':'bg-white text-slate-600 hairline hover:border-slate-300'}">${c.label}<span class="${active?'opacity-70':'text-slate-400'} ml-1">${catCount(c.key)}</span></button>`;
+  }).join("");
+  $("pcats").querySelectorAll(".catchip").forEach(b=>b.onclick=()=>{ PFILTER.cat=b.dataset.cat; renderCats(); renderProducts(); });
+}
 function renderProducts(){
-  $("prodgrid").innerHTML = DATA.products.map(p=>`
-    <div class="prodcard bg-white rounded-xl border hairline shadow-card p-4" data-id="${p.id}">
+  const q=PFILTER.q.trim().toLowerCase();
+  const list=DATA.products.filter(p=>(PFILTER.cat==="all"||catOf(p)===PFILTER.cat) && (!q||p.name.toLowerCase().includes(q)));
+  $("pcount").textContent=list.length;
+  $("pempty").classList.toggle("hidden",list.length>0);
+  $("prodgrid").innerHTML = list.map(p=>{
+    const exact=p.accuracy===0;
+    const badge=exact
+      ? `<span class="inline-flex items-center gap-1 text-[10.5px] text-emerald-700 font-semibold mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Matches Excard</span>`
+      : `<span class="text-[10.5px] text-slate-400 font-medium mt-0.5 block">${p.accuracy!=null?'±'+p.accuracy+'% vs Excard':'estimate'}</span>`;
+    return `
+    <button type="button" class="prodcard text-left bg-white rounded-xl border hairline shadow-card p-4" data-id="${p.id}">
       <div class="flex items-center gap-2.5">
-        <div class="pc-orb h-9 w-9 rounded-lg brand-gradient grid place-items-center text-white text-[13px] font-bold">${p.name[0]}</div>
-        <div class="min-w-0"><div class="font-semibold text-slate-800 text-[13px] leading-tight truncate">${p.name}</div>
-          <div class="text-[11px] text-emerald-600 font-medium mt-0.5">${p.accuracy!=null?'±'+p.accuracy+'% median':'formula'}</div></div>
-      </div></div>`).join("");
+        <div class="pc-orb h-9 w-9 rounded-lg brand-gradient grid place-items-center text-white text-[13px] font-bold shrink-0">${p.name[0]}</div>
+        <div class="min-w-0"><div class="font-semibold text-slate-800 text-[13px] leading-tight truncate">${p.name}</div>${badge}</div>
+      </div></button>`; }).join("");
   $("prodgrid").querySelectorAll(".prodcard").forEach(c=>c.onclick=()=>selectProduct(+c.dataset.id));
+}
+function initPicker(){
   $("dest").innerHTML = DELIVERY.map(d=>`<option value="${d.code}">${d.label} — RM${d.rate}/kg</option>`).join("");
   $("dest").onchange = quote;
-  if(DATA.products.length) selectProduct(DATA.products[0].id);
+  $("psearch").oninput=()=>{ PFILTER.q=$("psearch").value; $("pclear").classList.toggle("hidden",!PFILTER.q); renderProducts(); };
+  $("pclear").onclick=()=>{ $("psearch").value=""; PFILTER.q=""; $("pclear").classList.add("hidden"); renderProducts(); $("psearch").focus(); };
+  $("changeprod").onclick=changeProduct;
+  renderCats(); renderProducts();
 }
+function changeProduct(){ S.prod=null; $("calc").classList.add("hidden"); $("changeprod").classList.add("hidden");
+  $("picker").classList.remove("hidden"); window.scrollTo({top:0,behavior:"smooth"}); }
 function selectProduct(id){
   const prod=DATA.products.find(p=>p.id===id); S.prod=prod; S.values={}; S.fields=prod.fields;
-  $("prodgrid").querySelectorAll(".prodcard").forEach(c=>c.classList.toggle("active",+c.dataset.id===id));
+  $("picker").classList.add("hidden");
   $("calc").classList.remove("hidden"); $("calc").classList.add("fade");
+  $("changeprod").classList.remove("hidden");
+  $("cfgorb").textContent=prod.name[0];
   $("cfgtitle").textContent=prod.name;
-  $("acc").innerHTML = prod.accuracy!=null?`<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">±${prod.accuracy}% vs Excard</span>`:"";
+  $("acc").innerHTML = prod.accuracy===0
+    ? `<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Exact — matches Excard</span>`
+    : (prod.accuracy!=null?`<span class="inline-flex items-center gap-1.5 text-slate-500 bg-slate-100 border hairline rounded-full px-2.5 py-1 font-medium">±${prod.accuracy}% vs Excard</span>`:"");
+  window.scrollTo({top:0,behavior:"smooth"});
   $("fields").innerHTML = S.fields.map(f=> f.type==="number"
     ? `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
         <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></div>`
@@ -804,7 +879,12 @@ function quote(){
   try{ const q=localQuote(S.prod,S.values,qty);
     $("bigprice").textContent=RM(q.printoka_cash); $("bigprice").classList.remove("pricepulse"); void $("bigprice").offsetWidth; $("bigprice").classList.add("pricepulse");
     $("perunit").textContent=RM(q.printoka_cash/qty)+" / unit";
-    $("tiers").innerHTML=TIERS.map(t=>`<div class="flex items-center justify-between py-1"><span class="text-slate-500">${t}</span><span class="tabular-nums font-medium text-ink">${RM(q.tiers[t])}</span></div>`).join("");
+    $("tiers").innerHTML=TIERS.map(t=>`<div class="flex items-center justify-between py-1"><span class="text-slate-500">${t}${t==="Cash"?'<span class="text-slate-300 text-[11px]"> (list)</span>':''}</span><span class="tabular-nums font-medium ${t==="Platinum"?'text-emerald-700':'text-ink'}">${RM(q.tiers[t])}</span></div>`).join("");
+    // Excard comparison: for exact products the Cash price IS Excard's online price
+    if(S.prod.accuracy===0){ $("excard_cmp").classList.remove("hidden");
+      $("ex_price").textContent=RM(q.printoka_cash);
+      $("ex_save").textContent="−"+RM(q.printoka_cash-q.tiers.Platinum)+" (14%)"; }
+    else $("excard_cmp").classList.add("hidden");
     const dv=deliveryFee(q.weight_kg, $("dest").value);
     $("deliv").classList.remove("hidden");
     $("deliv_label").textContent=`Delivery — ${dv.label} (${dv.kg} kg × RM${dv.rate})`;
@@ -815,11 +895,11 @@ function quote(){
     $("bd").classList.remove("hidden");
     $("bd_mat").textContent=RM(material); $("bd_print").textContent=RM(printing); $("bd_fin").textContent=RM(fin); $("bd_del").textContent=RM(dv.fee);
     $("bd_total").textContent=RM(q.printoka_cash+dv.fee);
-    $("fb").classList.remove("hidden"); window._lastQuote={product:prod.name,values:S.values,qty,dest:$("dest").value,cash:q.printoka_cash};
+    $("fb").classList.remove("hidden"); window._lastQuote={product:S.prod.name,values:S.values,qty,dest:$("dest").value,cash:q.printoka_cash};
     $("status").textContent=q.note||"";
   }catch(e){ $("status").textContent=e.message||"Could not price this combination."; clearPrice(e.quote_only?"Contact Excard for quote":"—"); }
 }
-function clearPrice(msg){ $("bigprice").textContent="RM —"; $("perunit").textContent=""; $("tiers").innerHTML=`<div class="text-slate-400">${msg}</div>`; ["meta","deliv","bd","fb"].forEach(id=>{const e=$(id); if(e)e.classList.add("hidden");}); }
+function clearPrice(msg){ $("bigprice").textContent="RM —"; $("perunit").textContent=""; $("tiers").innerHTML=`<div class="text-slate-400">${msg}</div>`; ["meta","deliv","bd","fb","excard_cmp"].forEach(id=>{const e=$(id); if(e)e.classList.add("hidden");}); }
 document.addEventListener("click", e=>{
   if(e.target && e.target.id==="fb_send"){
     const txt=$("fb_text").value.trim(); if(!txt){ $("fb_status").textContent="Type something first."; return; }
@@ -828,7 +908,7 @@ document.addEventListener("click", e=>{
       ()=>{ $("fb_status").textContent="Copy failed; select & copy: "+payload; });
   }
 });
-renderProducts();
+initPicker();
 </script>
 </body>
 </html>
