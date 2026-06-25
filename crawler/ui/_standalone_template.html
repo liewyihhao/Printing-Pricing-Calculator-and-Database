@@ -406,9 +406,10 @@ function localQuote(prod, V, qty){
   if(V.custom_w && V.custom_h) V = {...V, size:`${parseInt(V.custom_w)}mm x ${parseInt(V.custom_h)}mm`};
   const pkgMult = (m=>{const x=/^(\d+)\s*in\s*1/i.exec(m||"");return x?+x[1]:1;})(V.package);
   if(prod.engine==="litho"){
-    const env=envCost(V.envelope,qty);
-    cash=((curveLookup(C.loose21, `${V.size}|${V.paper}|${V.colour}`, qty) ?? cashLitho(P,V.size,V.paper,V.colour,qty))+env)*pkgMult;
-    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,128)*qty/1000*WF*pkgMult*100)/100; }
+    const lf=looseFinishingCost(V,qty,V.size), env=envCost(V.envelope,qty);
+    cash=((curveLookup(C.loose21, `${V.size}|${V.paper}|${V.colour}`, qty) ?? cashLitho(P,V.size,V.paper,V.colour,qty))+lf+env)*pkgMult;
+    const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,128)*qty/1000*WF*pkgMult*100)/100;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost: Math.round((lf+env)*pkgMult*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula (litho + finishing add-ons)" }; }
   else if(prod.engine==="digital"){ const lf=looseFinishingCost(V,qty,V.size), env=envCost(V.envelope,qty);
     cash=(cashDigital(P,V.size,V.paper,V.colour,qty)+lf+env)*pkgMult;
     const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*pkgMult*100)/100;

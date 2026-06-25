@@ -111,13 +111,17 @@ def build_data():
         {"key": "custom_w", "label": "Custom width (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
         {"key": "custom_h", "label": "Custom height (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
     ]
-    LOOSE_DIGITAL_FIELDS = LOOSE_FIELDS + [
+    # Post-print finishing add-ons. Priced by Excard's finishing line independent of the
+    # print method, so litho (21) and digital (50) loose sheets share the same dataset.
+    LOOSE_FINISHING_FIELDS = [
         {"key": "hot_stamping", "label": "Hot stamping", "addon": True, "depends": [],
          "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]},
         {"key": "fold", "label": "Folding", "addon": True, "depends": [],
          "options": ["None", "1Fa", "2Fa", "2Fb", "2Fc", "3Fa", "3Fb", "4Fa", "4Fb"]},
         {"key": "punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["No", "3mm", "6mm"]},
     ]
+    LOOSE_LITHO_FIELDS = LOOSE_FIELDS + LOOSE_FINISHING_FIELDS
+    LOOSE_DIGITAL_FIELDS = LOOSE_FIELDS + LOOSE_FINISHING_FIELDS
     BOOKLET_FIELDS = [
         {"key": "orientation", "label": "Orientation", "depends": []},
         {"key": "size", "label": "Size", "depends": ["orientation"]},
@@ -515,7 +519,7 @@ def build_data():
         {"id": 61, "name": "Label Sticker — Letterpress (Hot Stamping)", "engine": "sticker", "optsrc": "none",
          "accuracy": acc.get(61), "fields": STICKER_L_FIELDS, "stickerMethod": "letterpress"},
         {"id": 21, "name": "Loose Sheet — Litho (Offset)", "engine": "litho",
-         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
+         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_LITHO_FIELDS},
         {"id": 50, "name": "Loose Sheet — Digital", "engine": "digital",
          "optsrc": "digital50", "accuracy": acc.get(50), "fields": LOOSE_DIGITAL_FIELDS},
         {"id": 19, "name": "Booklet — Litho (Offset)", "engine": "booklet",
@@ -524,11 +528,11 @@ def build_data():
          "optsrc": "booklet37", "accuracy": acc.get(37), "fields": BOOKLET_FIELDS},
         # Aliases of Loose Sheet Litho (same Excard order form) — reuse litho engine+options.
         {"id": 101, "name": "Brochure (= Loose Sheet Litho)", "engine": "litho",
-         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
+         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_LITHO_FIELDS},
         {"id": 102, "name": "Flyer (= Loose Sheet Litho)", "engine": "litho",
-         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
+         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_LITHO_FIELDS},
         {"id": 103, "name": "Customprint (= Loose Sheet Litho)", "engine": "litho",
-         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_FIELDS},
+         "optsrc": "loose21", "accuracy": acc.get(21), "fields": LOOSE_LITHO_FIELDS},
     ]
     return {
         "products": products,
