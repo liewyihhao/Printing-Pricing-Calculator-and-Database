@@ -2125,10 +2125,11 @@ def pvccard_quote(product: int = Query(113), colour: str = Query("4C (Front)"),
     note = ("PVC Card (CR80, 0.80mm Gloss, Round Cornering compulsory). Exact v4 price-list "
             "lookup. Orientation/size price-neutral. Print colour (4C Front/Both), Hole Punching "
             "and Variable Data Printing are each PRICED. qty = cards.")
+    wt = round(0.0056 * qty, 3)  # CR80 PVC card ~5.6g each
     return {"config": {"product": product, "colour": colour, "qty": qty,
                        "hole_punch": hole_punch, "vdp": vdp},
             "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
-            "tiers": PE.tiers(cash), "weight_kg": 0.0}
+            "tiers": PE.tiers(cash), "weight_kg": wt}
 
 
 # ---------- Wire-O Notebook (Litho, id 112) ----------
@@ -2297,10 +2298,11 @@ def folder_quote(product: int = Query(107), model: str = Query("FPF 001"),
     note = ("Folder (exact v4 price-list lookup). Covers all mould groups "
             "(Presentation/Document/Key/CD Jacket), print colour, all laminations incl Spot UV, "
             "and the back colour-protective layer. Die-cutting + creasing compulsory. qty = pieces.")
+    wt = round(0.040 * qty, 3)  # ~40g per presentation folder
     return {"config": {"product": product, "model": model, "paper": paper, "colour": colour,
                        "lamination": lamination, "protective": protective, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)",
-            "note": note, "tiers": PE.tiers(cash), "weight_kg": 0.0}
+            "note": note, "tiers": PE.tiers(cash), "weight_kg": wt}
 
 
 # ---------- Envelope (Litho, id 106) ----------
@@ -2350,10 +2352,12 @@ def letterhead_quote(product: int = Query(105), paper: str = Query("Simili 80gsm
     note = ("Letterhead (exact v4 price-list lookup). Fixed A4 (210x297mm). Axes: Paper x "
             "Print Colour x Packing (Loose / Pad 100pcs). Exact at listed order quantities; "
             "other quantities interpolate. qty = sheets.")
+    gsm = 100 if "100" in paper else 80
+    wt = round(0.210 * 0.297 * gsm / 1000 * qty, 3)  # A4 physical weight per sheet
     return {"config": {"product": product, "paper": paper, "colour": colour,
                        "packing": packing, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
-            "tiers": PE.tiers(cash), "weight_kg": 0.0}
+            "tiers": PE.tiers(cash), "weight_kg": wt}
 
 
 # ---------- Notepad (Litho, id 104) ----------
@@ -2376,7 +2380,8 @@ def notepad_quote(product: int = Query(104),
         return JSONResponse({"error": "no price"}, status_code=400)
     note = ("Notepad: fixed 80x106mm, Simili 80gsm 40-sheet content, 4C+4C cover / 1C content, "
             "Wire-O hole punch + Matte Lamination (Both) compulsory (included). Cover paper "
-            "(260/310gsm) and Spot UV do not change the online price (block/included). qty = books.")
+            "(260/310gsm) price-neutral (affects weight only). Spot UV (Front Cover) adds a cost delta. "
+            "qty = books.")
     return {"config": {"product": product, "paper": paper, "lamination": lamination, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "formula (qty curve)", "note": note,
             "tiers": NP.tiers(cash), "weight_kg": round(wt, 3)}
