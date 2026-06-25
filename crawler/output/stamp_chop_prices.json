@@ -1,0 +1,174 @@
+{
+  "Pre-Inked Stamp": {
+    "Rectangle": {
+      "DF 1331 — 8mm × 26 mm": 19.5,
+      "DF 1340 — 8mm × 35 mm": 20.0,
+      "DF 1355 — 8mm × 50 mm": 21.0,
+      "DF 1370 — 8mm × 65 mm": 23.0,
+      "DF 1383 — 8mm × 78 mm": 25.0,
+      "DF 1442 — 9mm × 38 mm": 13.0,
+      "DF 1743 — 12mm × 38 mm": 22.0,
+      "DF 1755 — 12mm × 50 mm": 22.0,
+      "DF 1767 — 12mm × 62 mm": 23.0,
+      "DF 1778 — 12mm × 73 mm": 25.0,
+      "DF 1791 — 12mm × 86 mm": 26.5,
+      "DF 2243 — 17mm × 38 mm": 23.0,
+      "DF 2255 — 17mm × 50 mm": 24.0,
+      "DF 2267 — 17mm × 62 mm": 26.0,
+      "DF 2278 — 17mm × 73 mm": 28.0,
+      "DF 2291 — 17mm × 86 mm": 29.0,
+      "DF 2843 — 23mm × 38 mm": 24.0,
+      "DF 2855 — 23mm × 50 mm": 26.0,
+      "DF 2867 — 23mm × 62 mm": 27.0,
+      "DF 2878 — 23mm × 73 mm": 29.0,
+      "DF 2891 — 23mm × 86 mm": 30.0,
+      "DF 28103 — 23mm × 97 mm": 32.0,
+      "DF 3255 — 27mm × 50 mm": 27.0,
+      "DF 3267 — 27mm × 62 mm": 28.0,
+      "DF 3278 — 27mm × 73 mm": 32.0,
+      "DF 3291 — 27mm × 86 mm": 33.0,
+      "DF 32103 — 26mm × 97 mm": 38.0,
+      "DF 3338 — 28mm × 33 mm": 26.0,
+      "DF 3555 — 30mm × 50 mm": 27.0,
+      "DF 4355 — 38mm × 50 mm": 30.0,
+      "DF 4367 — 38mm × 62 mm": 36.0,
+      "DF 4378 — 38mm × 73 mm": 39.0,
+      "DF 4391 — 38mm × 86 mm": 43.0,
+      "DF 43103 — 37mm × 97 mm": 45.0,
+      "DF 5355 — 47mm × 49 mm": 36.0,
+      "DF 5367 — 47mm × 61 mm": 39.0,
+      "DF 5378 — 47mm × 72 mm": 42.0,
+      "DF 5391 — 47mm × 85 mm": 47.0,
+      "DF 53103 — 47mm × 97 mm": 54.0,
+      "DF 6760 — 61mm × 54 mm": 45.0,
+      "DF 6785 — 60mm × 78 mm": 48.0,
+      "DF 67103 — 60mm × 96 mm": 58.0,
+      "DF 78103 — 71mm × 96 mm": 67.0,
+      "DF 90130 — 83mm × 123 mm": 103.0
+    },
+    "Round": {
+      "DF 19 — Ø 15 mm": 18.0,
+      "DF 24 — Ø 20 mm": 19.5,
+      "DF 26 — Ø 22 mm": 21.5,
+      "DF 35 — Ø 31 mm": 25.0,
+      "DF 42 — Ø 38 mm": 27.0,
+      "DF 47 — Ø 43 mm": 31.0,
+      "DF 50 — Ø 46 mm": 33.0,
+      "DF 54 — Ø 50 mm": 38.0,
+      "DF 65 — Ø 61 mm": 48.0
+    },
+    "Oval": {
+      "DFOV 45 — 40mm × 28 mm": 28.0,
+      "DFOV 49 — 44mm × 29 mm": 28.0,
+      "DFOV 54 — 49mm × 34 mm": 30.5,
+      "DFOV 65 — 60mm × 40 mm": 33.0
+    },
+    "Square": {
+      "DF 2626 — 21mm × 21 mm": 24.5,
+      "DF 3030 — 25mm × 25 mm": 25.0
+    },
+    "Key Chain": {
+      "DF 13 — Ø 10 mm": 12.0,
+      "DFK 1028 — 6 × 24 mm": 11.5
+    }
+  },
+  "Self-Inked Stamp": {
+    "Rectangle": {
+      "CSI-20 — 17mm × 45 mm": 28.0,
+      "CSI-30 — 21mm × 56 mm": 32.0,
+      "CSI-35 — 22mm × 66 mm": 41.0
+    },
+    "Round": {
+      "C-17 — Ø 15 mm": 25.0,
+      "C-24 — Ø 22 mm": 28.0,
+      "C-30 — Ø 29 mm": 32.0
+    }
+  },
+  "Rubber Stamp": {
+    "Rectangle": {
+      "RS 1032 — 30mm × 8 mm": 5.4,
+      "RS 1532 — 30mm × 13 mm": 6.0,
+      "RS 1042 — 40mm × 8 mm": 6.0,
+      "RS 1542 — 40mm × 13 mm": 7.2,
+      "RS 2045 — 43mm × 18 mm": 8.4,
+      "RS 2545 — 43mm × 23 mm": 8.4,
+      "RS 3045 — 43mm × 28 mm": 10.2,
+      "RS 1052 — 50mm × 8 mm": 6.0,
+      "RS 1552 — 50mm × 13 mm": 7.2,
+      "RS 2055 — 53mm × 18 mm": 8.4,
+      "RS 2555 — 53mm × 23 mm": 9.6,
+      "RS 3055 — 53mm × 28 mm": 10.2,
+      "RS 1062 — 60mm × 8 mm": 6.0,
+      "RS 1562 — 60mm × 13 mm": 8.4,
+      "RS 2065 — 63mm × 18 mm": 9.6,
+      "RS 2565 — 63mm × 23 mm": 9.6,
+      "RS 3065 — 63mm × 28 mm": 11.4,
+      "RS 3565 — 63mm × 33 mm": 13.2,
+      "RS 1072 — 70mm × 8 mm": 7.2,
+      "RS 1572 — 70mm × 13 mm": 8.4,
+      "RS 2075 — 73mm × 18 mm": 10.2,
+      "RS 2575 — 73mm × 23 mm": 11.4,
+      "RS 3075 — 73mm × 28 mm": 13.2
+    },
+    "Round": {
+      "RSD 27 — Ø 25 mm": 9.6,
+      "RSD 35 — Ø 33 mm": 9.6,
+      "RSD 40 — Ø 38 mm": 9.6,
+      "RSD 45 — Ø 43 mm": 10.8,
+      "RSD 51 — Ø 49 mm": 14.4
+    }
+  },
+  "Stock Stamp": {
+    "English": {
+      "SE 01 — CERTIFIED TRUE COPY": 3.0,
+      "SE 02 — CERTIFIED TRUE COPY (with Signature)": 3.0,
+      "SE 03 — URGENT": 3.0,
+      "SE 04 — PRIVATE & CONFIDENTIAL": 3.0,
+      "SE 05 — ORIGINAL": 3.0,
+      "SE 06 — COPY": 3.0,
+      "SE 07 — RECEIVED (Space)": 3.0,
+      "SE 08 — RECEIVED": 3.0,
+      "SE 09 — POSTED (Space)": 3.0,
+      "SE 10 — PAID WITH DATE": 3.0,
+      "SE 11 — E-MAILED": 3.0,
+      "SE 12 — DRAFT": 3.0,
+      "SE 13 — PLEASE CHOP SIGN & RETURN (with Signature)": 3.0,
+      "SE 14 — IMPORTANT": 3.0,
+      "SE 15 — DELIVERED": 3.0,
+      "SE 16 — CASH": 3.0,
+      "SE 17 — CHECKED": 3.0,
+      "SE 18 — CANCELLED (Space)": 3.0,
+      "SE 19 — BY HAND": 3.0,
+      "SE 20 — THIS COPY FOR": 3.0,
+      "SE 21 — THIS ACCOUNT IS NOW OVERDUE PLEASE REMIT!": 3.0,
+      "SE 22 — PAID": 3.0,
+      "SE 23 — PAID (Space)": 3.0,
+      "SE 24 — DUPLICATE": 3.0,
+      "SE 25 — CONFIDENTIAL": 3.0,
+      "SE 26 — C.O.D": 3.0,
+      "SE 27 — CONFIRMED": 3.0,
+      "SE 28 — APPROVED": 3.0,
+      "SE 29 — AMENDED": 3.0,
+      "SE 30 — VERY GOOD": 3.0,
+      "SE 31 — IMPROVING": 3.0,
+      "SE 32 — GOOD": 3.0,
+      "SE 33 — EXCELLENT": 3.0
+    },
+    "Malay": {
+      "SM 01 — SEGERA": 3.0,
+      "SM 02 — SALINAN DIAKUI SAH (with Signature)": 3.0,
+      "SM 03 — SALINAN": 3.0,
+      "SM 04 — DITERIMA (Space)": 3.0,
+      "SM 05 — DIBAYAR": 3.0,
+      "SM 06 — DIBAYAR (Space)": 3.0,
+      "SM 07 — DIBATALKAN (Space)": 3.0,
+      "SM 08 — DIBATALKAN": 3.0
+    },
+    "Sign": {
+      "SS 01 — Index Finger Points Right": 3.0,
+      "SS 02 — Index Finger Points Left": 3.0,
+      "SS 03 — Index Finger 2 Points Right": 3.0,
+      "SS 04 — Index Finger 2 Points Left": 3.0
+    }
+  }
+}

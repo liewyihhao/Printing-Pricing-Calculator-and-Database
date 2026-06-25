@@ -1,5 +1,5 @@
 {
- "scanned_at": "2026-06-25T08:23:30",
+ "scanned_at": "2026-06-25T08:32:35",
  "count": 52,
  "products": [
   {
@@ -7,8 +7,10 @@
    "name": "Stamp Chop",
    "url": "https://www.excard.com.my/product/Stamp-chop",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Stamp Chop (141)"
+   ],
    "is_new": false
   },
   {
@@ -432,8 +434,10 @@
    "name": "Pre Inked Stamp",
    "url": "https://www.excard.com.my/product/pre-inked-stamp",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Stamp Chop (141, pre-inked stamps included)"
+   ],
    "is_new": false
   },
   {
@@ -514,8 +518,10 @@
    "name": "Tent Card",
    "url": "https://www.excard.com.my/product/tent-card",
    "category": "Cards",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Tent Card Litho (140)"
+   ],
    "is_new": false
   },
   {

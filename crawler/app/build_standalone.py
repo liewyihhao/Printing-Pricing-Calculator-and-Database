@@ -235,6 +235,12 @@ def build_data():
         {"key": "packing", "label": "Packing method (price-neutral; for info)", "addon": True, "depends": [],
          "options": ["5pcs / Pack", "6pcs / Pack", "8pcs / Pack", "10pcs / Pack"]},
     ]
+    TENT_CARD_FIELDS = [
+        {"key": "model", "label": "Model (TC 003=294x86mm · TC 004=294x140mm)", "addon": True, "depends": [],
+         "options": ["TC 003", "TC 004"]},
+        {"key": "lamination", "label": "Lamination", "addon": True, "depends": [],
+         "options": ["Matte Lamination (Both)", "Matte Lamination (Both) + Spot UV (Front)"]},
+    ]
     NON_WOVEN_BAG_FIELDS = [
         {"key": "model", "label": "Model (determines size · WN-B5=200x230x80mm · WS-A4=280x330x80mm · WS-A3P=350x350x100mm · WS-A3L=420x320x100mm · WH-A4=280x330x80mm)", "addon": True, "depends": [],
          "options": ["WN-B5", "WS-A4", "WS-A3P", "WS-A3L", "WH-A4"]},
@@ -404,6 +410,15 @@ def build_data():
         {"id": 139, "name": "Non-Woven Bag — Litho", "engine": "pricelist", "paramKey": "non_woven_bag",
          "axisFields": ["model", "print_colour"], "optsrc": "none",
          "accuracy": 0.0, "fields": NON_WOVEN_BAG_FIELDS},
+        {"id": 140, "name": "Tent Card — Litho", "engine": "pricelist", "paramKey": "tent_card",
+         "axisFields": ["model", "lamination"], "optsrc": "none",
+         "accuracy": 0.0, "fields": TENT_CARD_FIELDS},
+        {"id": 141, "name": "Stamp Chop", "engine": "stamp", "optsrc": "stamp_chop",
+         "accuracy": 0.0, "fields": [
+             {"key": "stamp_type", "label": "Stamp Type", "optionsKey": "stamp_types", "depends": []},
+             {"key": "category", "label": "Category", "optionsKey": "categories", "depends": ["stamp_type"]},
+             {"key": "model_key", "label": "Model", "optionsKey": "model_keys", "depends": ["stamp_type", "category"]},
+         ]},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -564,6 +579,8 @@ def build_data():
             "pouch": _load("pouch_params.json", {"curves": {}, "variant_field": "paper", "unit_wt": 0.015}),
             "money_packet": _load("money_packet_pl_params.json", {"axis_cols": [], "curves": {}, "unit_wt": 0.006}),
             "non_woven_bag": _load("non_woven_bag_pl_params.json", {"axis_cols": [], "curves": {}}),
+            "tent_card": _load("tent_card_pl_params.json", {"axis_cols": [], "curves": {}}),
+            "stamp_chop": _load("stamp_chop_prices.json", {}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -597,7 +614,8 @@ def build_data():
                             127: "paperbag", 128: "canvastote", 129: "mug",
                             130: "papankopi", 131: "pillow", 132: "buttonbadge", 133: "handfan",
                             134: "hanger", 135: "magnet", 136: "hardmenu", 137: "pouch",
-                            138: "money_packet", 139: "non_woven_bag"},
+                            138: "money_packet", 139: "non_woven_bag",
+                            140: "tent_card", 141: "stamp_chop"},
     }
 
 

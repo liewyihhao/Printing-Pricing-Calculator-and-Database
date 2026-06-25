@@ -342,7 +342,9 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 136, "name": "Hard Cover Menu — Digital"},
                {"id": 137, "name": "Standing Pouch — Litho"},
                {"id": 138, "name": "Money Packet — Litho"},
-               {"id": 139, "name": "Non-Woven Bag — Litho"}]
+               {"id": 139, "name": "Non-Woven Bag — Litho"},
+               {"id": 140, "name": "Tent Card — Litho"},
+               {"id": 141, "name": "Stamp Chop"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
@@ -464,7 +466,9 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               136: 2.2,  # hard cover menu: per-(order x add-content) qty curve LOO median 2.2%
               137: 9.6,  # standing pouch (Metalised): qty curve LOO median 9.6% (non-smooth curve)
               138: 0.0,  # money packet: EXACT v4 price-list lookup (model x package x paper x finishing)
-              139: 0.0}  # non-woven bag: EXACT v4 price-list lookup (model x print colour)
+              139: 0.0,  # non-woven bag: EXACT v4 price-list lookup (model x print colour)
+              140: 0.0,  # tent card: EXACT v4 price-list lookup (model x lamination)
+              141: 0.0}  # stamp chop: EXACT v4 unit price lookup (type x category x model)
 
 
 def _accuracy(product_id: int):
@@ -928,6 +932,19 @@ FIELD_SCHEMAS = {
                     {"key": "packing", "label": "Packing method (price-neutral; for info)", "addon": True, "depends": [], "options": [
                         "5pcs / Pack", "6pcs / Pack", "8pcs / Pack", "10pcs / Pack"]},
                 ]},
+    "tent_card": {"options": "/api/printoka/tent_card/options", "quote": "/api/printoka/tent_card/quote",
+                "fields": [
+                    {"key": "model", "label": "Model (TC 003=294x86mm · TC 004=294x140mm)", "addon": True, "depends": [], "options": [
+                        "TC 003", "TC 004"]},
+                    {"key": "lamination", "label": "Lamination", "addon": True, "depends": [], "options": [
+                        "Matte Lamination (Both)", "Matte Lamination (Both) + Spot UV (Front)"]},
+                ]},
+    "stamp_chop": {"options": "/api/printoka/stamp_chop/options", "quote": "/api/printoka/stamp_chop/quote",
+                "fields": [
+                    {"key": "stamp_type", "label": "Stamp Type", "optionsKey": "stamp_types", "depends": []},
+                    {"key": "category", "label": "Category", "optionsKey": "categories", "depends": ["stamp_type"]},
+                    {"key": "model_key", "label": "Model", "optionsKey": "model_keys", "depends": ["stamp_type", "category"]},
+                ]},
     "non_woven_bag": {"options": "/api/printoka/non_woven_bag/options", "quote": "/api/printoka/non_woven_bag/quote",
                 "fields": [
                     {"key": "model", "label": "Model (determines size · WN-B5=200x230x80mm · WS-A4=280x330x80mm · WS-A3P=350x350x100mm · WS-A3L=420x320x100mm · WH-A4=280x330x80mm)", "addon": True, "depends": [], "options": [
@@ -1070,6 +1087,10 @@ def _family(product_id: int) -> str:
         return "money_packet"
     if product_id == 139:
         return "non_woven_bag"
+    if product_id == 140:
+        return "tent_card"
+    if product_id == 141:
+        return "stamp_chop"
     return "loose"
 
 
@@ -1891,6 +1912,68 @@ def non_woven_bag_quote(product: int = Query(139), qty: int = Query(...),
                        "handle_colour": handle_colour, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
             "tiers": PE.tiers(cash)}
+
+
+# ---------- Tent Card (Litho, id 140) — exact v4 price-list lookup ----------
+@app.get("/api/printoka/tent_card/options")
+def tent_card_options(product: int = Query(140)):
+    return {}
+
+
+@app.get("/api/printoka/tent_card/quote")
+def tent_card_quote(product: int = Query(140), qty: int = Query(...),
+                    model: str = Query("TC 003"),
+                    lamination: str = Query("Matte Lamination (Both)")):
+    from . import pricelist_engine as PE
+    p = _pl_params("tent_card")
+    cfg = {"Model": model, "Lamination": lamination}
+    try:
+        cash = PE.cash_price(p, cfg, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price for this configuration"}, status_code=400)
+    note = ("Tent Card (exact v4 price-list lookup). 2 models (TC 003=294x86mm, TC 004=294x140mm). "
+            "Paper (Art Card 310gsm), Print Colour (4C Front), and Die-Cutting are compulsory (included). qty = pcs.")
+    return {"config": {"product": product, "model": model, "lamination": lamination, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
+            "tiers": PE.tiers(cash)}
+
+
+# ---------- Stamp Chop (id 141) — exact v4 unit price lookup ----------
+import json as _json_stamp
+
+@app.get("/api/printoka/stamp_chop/options")
+def stamp_chop_options(product: int = Query(141)):
+    f = _Path(__file__).resolve().parent.parent / "output" / "stamp_chop_prices.json"
+    prices = _json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
+    return {
+        "stamp_types": sorted(prices.keys()),
+        "categories": {st: sorted(cats.keys()) for st, cats in prices.items()},
+        "model_keys": {st: {cat: sorted(models.keys()) for cat, models in cats.items()}
+                      for st, cats in prices.items()},
+    }
+
+
+@app.get("/api/printoka/stamp_chop/quote")
+def stamp_chop_quote(product: int = Query(141), qty: int = Query(...),
+                     stamp_type: str = Query("Pre-Inked Stamp"),
+                     category: str = Query("Rectangle"),
+                     model_key: str = Query(...)):
+    f = _Path(__file__).resolve().parent.parent / "output" / "stamp_chop_prices.json"
+    if not f.exists():
+        return JSONResponse({"error": "stamp_chop_prices.json not found"}, status_code=500)
+    prices = _json.loads(f.read_text(encoding="utf-8"))
+    unit_price = (prices.get(stamp_type, {}).get(category, {}).get(model_key))
+    if unit_price is None:
+        return JSONResponse({"error": f"no price for {stamp_type}/{category}/{model_key}"}, status_code=400)
+    cash = unit_price * qty
+    note = f"Stamp: {stamp_type} / {category} / {model_key}. Unit price × qty."
+    from . import pricelist_engine as PE
+    return {"config": {"product": product, "stamp_type": stamp_type, "category": category,
+                       "model_key": model_key, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
+            "tiers": PE.tiers(cash), "weight_kg": round(0.05 * qty, 3)}
 
 
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------

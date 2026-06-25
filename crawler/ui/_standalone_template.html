@@ -354,6 +354,10 @@ function localOptions(prod, fieldKey, V){
     if(fieldKey==="size") return ct.sizes;
     if(fieldKey==="paper") return ct.papers;
     if(fieldKey==="colour") return ct.colours; }
+  if(src==="stamp_chop"){ const SC=DATA.params.stamp_chop||{};
+    if(fieldKey==="stamp_type") return Object.keys(SC).sort();
+    if(fieldKey==="category") return Object.keys(SC[V.stamp_type]||{}).sort();
+    if(fieldKey==="model_key") return Object.keys((SC[V.stamp_type]||{})[V.category]||{}).sort(); }
   return [];
 }
 
@@ -707,6 +711,12 @@ function localQuote(prod, V, qty){
     wt=Math.round(wh*ww/1e6*150*qty/1000*WF*sMult*1000)/1000;
     return { printoka_cash: Math.round(cash2*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (imposition)",
       note:(V.hot_stamping&&V.hot_stamping!=="Not Required")?("Hot stamping ("+V.hot_stamping+") block/foil charge quoted separately."):null }; }
+  else if(prod.engine==="stamp"){
+    const SC=DATA.params.stamp_chop||{};
+    const unitPrice=((SC[V.stamp_type]||{})[V.category]||{})[V.model_key]||0;
+    cash=unitPrice*qty; wt=Math.round(0.05*qty*1000)/1000;
+    return {printoka_cash:Math.round(cash*100)/100,finishing_cost:0,tiers:tiers(cash),weight_kg:wt,
+      method:"exact (v4 price-list lookup)",note:"Stamp unit price × qty. Bag Colour / Handle etc. price-neutral."}; }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
     const fin=finishingCost(V,qty); cash=(cashBizcard(P,ct,V.size,V.paper,V.colour,qty)+fin)*pkgMult;
     const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*pkgMult*1000)/1000;
