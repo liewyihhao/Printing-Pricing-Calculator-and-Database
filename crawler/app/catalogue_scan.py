@@ -65,6 +65,8 @@ BUILT = {
     "pre-inked-stamp": ["Stamp Chop (141, pre-inked stamps included)"],
     "papan-kopi": ["Papan Kopi / Sachet Board Litho (130)"],
     "sachet-board": ["Papan Kopi / Sachet Board Litho (130, sachet board same product)"],
+    "mask-keeper": ["Mask Keeper Litho (142, quote only — no v4 price-list data)"],
+    "sublimation-shirt": ["Sublimation Shirt (143, quote only — no v4 price-list data)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],

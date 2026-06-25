@@ -717,6 +717,8 @@ function localQuote(prod, V, qty){
     cash=unitPrice*qty; wt=Math.round(0.05*qty*1000)/1000;
     return {printoka_cash:Math.round(cash*100)/100,finishing_cost:0,tiers:tiers(cash),weight_kg:wt,
       method:"exact (v4 price-list lookup)",note:"Stamp unit price × qty. Bag Colour / Handle etc. price-neutral."}; }
+  else if(prod.engine==="contact"){
+    throw Object.assign(new Error("No automated pricing available. Please contact Excard directly for a quote."), {quote_only:true}); }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
     const fin=finishingCost(V,qty); cash=(cashBizcard(P,ct,V.size,V.paper,V.colour,qty)+fin)*pkgMult;
     const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*pkgMult*1000)/1000;
@@ -815,7 +817,7 @@ function quote(){
     $("bd_total").textContent=RM(q.printoka_cash+dv.fee);
     $("fb").classList.remove("hidden"); window._lastQuote={product:prod.name,values:S.values,qty,dest:$("dest").value,cash:q.printoka_cash};
     $("status").textContent=q.note||"";
-  }catch(e){ $("status").textContent="Could not price this combination."; clearPrice("—"); }
+  }catch(e){ $("status").textContent=e.message||"Could not price this combination."; clearPrice(e.quote_only?"Contact Excard for quote":"—"); }
 }
 function clearPrice(msg){ $("bigprice").textContent="RM —"; $("perunit").textContent=""; $("tiers").innerHTML=`<div class="text-slate-400">${msg}</div>`; ["meta","deliv","bd","fb"].forEach(id=>{const e=$(id); if(e)e.classList.add("hidden");}); }
 document.addEventListener("click", e=>{

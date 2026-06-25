@@ -1,5 +1,5 @@
 {
- "scanned_at": "2026-06-25T08:36:13",
+ "scanned_at": "2026-06-25T08:42:53",
  "count": 52,
  "products": [
   {
@@ -350,8 +350,10 @@
    "name": "Mask Keeper",
    "url": "https://www.excard.com.my/product/mask-keeper",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Mask Keeper Litho (142, quote only \u2014 no v4 price-list data)"
+   ],
    "is_new": false
   },
   {
@@ -513,8 +515,10 @@
    "name": "Sublimation Shirt",
    "url": "https://www.excard.com.my/product/sublimation-shirt",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Sublimation Shirt (143, quote only \u2014 no v4 price-list data)"
+   ],
    "is_new": false
   },
   {

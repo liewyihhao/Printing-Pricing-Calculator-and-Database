@@ -344,7 +344,9 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 138, "name": "Money Packet — Litho"},
                {"id": 139, "name": "Non-Woven Bag — Litho"},
                {"id": 140, "name": "Tent Card — Litho"},
-               {"id": 141, "name": "Stamp Chop"}]
+               {"id": 141, "name": "Stamp Chop"},
+               {"id": 142, "name": "Mask Keeper — Litho"},
+               {"id": 143, "name": "Sublimation Shirt"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
@@ -468,7 +470,9 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               138: 0.0,  # money packet: EXACT v4 price-list lookup (model x package x paper x finishing)
               139: 0.0,  # non-woven bag: EXACT v4 price-list lookup (model x print colour)
               140: 0.0,  # tent card: EXACT v4 price-list lookup (model x lamination)
-              141: 0.0}  # stamp chop: EXACT v4 unit price lookup (type x category x model)
+              141: 0.0,  # stamp chop: EXACT v4 unit price lookup (type x category x model)
+              142: None,  # mask keeper: v4 price-list returns 500, quote only
+              143: None}  # sublimation shirt: v4 price-list returns 500, quote only
 
 
 def _accuracy(product_id: int):
@@ -962,6 +966,10 @@ FIELD_SCHEMAS = {
                         "Red", "Maroon", "Green", "Milo Green", "Dark Green", "Turquoise", "Cyan",
                         "Royal Blue", "Navy Blue", "Dark Purple", "Light Brown", "Dark Brown", "Grey"]},
                 ]},
+    "mask_keeper": {"options": "/api/printoka/mask_keeper/options", "quote": "/api/printoka/mask_keeper/quote",
+                "fields": []},
+    "sublimation_shirt": {"options": "/api/printoka/sublimation_shirt/options", "quote": "/api/printoka/sublimation_shirt/quote",
+                "fields": []},
     "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
                 "fields": [
                     {"key": "orientation", "label": "Orientation", "optionsKey": "orientations", "depends": []},
@@ -1091,6 +1099,10 @@ def _family(product_id: int) -> str:
         return "tent_card"
     if product_id == 141:
         return "stamp_chop"
+    if product_id == 142:
+        return "mask_keeper"
+    if product_id == 143:
+        return "sublimation_shirt"
     return "loose"
 
 
@@ -1977,6 +1989,28 @@ def stamp_chop_quote(product: int = Query(141), qty: int = Query(...),
                        "model_key": model_key, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
             "tiers": PE.tiers(cash), "weight_kg": round(0.05 * qty, 3)}
+
+
+# ---------- Mask Keeper (id 142) — quote only, v4 price-list returns 500 ----------
+@app.get("/api/printoka/mask_keeper/options")
+def mask_keeper_options(product: int = Query(142)):
+    return {}
+
+
+@app.get("/api/printoka/mask_keeper/quote")
+def mask_keeper_quote(product: int = Query(142), qty: int = Query(...)):
+    return JSONResponse({"error": "Mask Keeper pricing is not available online. Please contact Excard directly for a quote.", "quote_only": True}, status_code=400)
+
+
+# ---------- Sublimation Shirt (id 143) — quote only, v4 price-list returns 500 ----------
+@app.get("/api/printoka/sublimation_shirt/options")
+def sublimation_shirt_options(product: int = Query(143)):
+    return {}
+
+
+@app.get("/api/printoka/sublimation_shirt/quote")
+def sublimation_shirt_quote(product: int = Query(143), qty: int = Query(...)):
+    return JSONResponse({"error": "Sublimation Shirt pricing is not available online. Please contact Excard directly for a quote.", "quote_only": True}, status_code=400)
 
 
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------

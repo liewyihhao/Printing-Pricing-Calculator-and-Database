@@ -421,6 +421,12 @@ def build_data():
              {"key": "category", "label": "Category", "optionsKey": "categories", "depends": ["stamp_type"]},
              {"key": "model_key", "label": "Model", "optionsKey": "model_keys", "depends": ["stamp_type", "category"]},
          ]},
+        {"id": 142, "name": "Mask Keeper — Litho", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [],
+         "note": "No automated pricing available. Contact Excard directly for a quote."},
+        {"id": 143, "name": "Sublimation Shirt", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [],
+         "note": "No automated pricing available. Contact Excard directly for a quote."},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -617,7 +623,8 @@ def build_data():
                             130: "papan_kopi", 131: "pillow", 132: "buttonbadge", 133: "handfan",
                             134: "hanger", 135: "magnet", 136: "hardmenu", 137: "pouch",
                             138: "money_packet", 139: "non_woven_bag",
-                            140: "tent_card", 141: "stamp_chop"},
+                            140: "tent_card", 141: "stamp_chop",
+                            142: "contact", 143: "contact"},
     }
 
 
