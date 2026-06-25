@@ -210,7 +210,7 @@ def build_data():
     NOTEPAD_FIELDS = [
         {"key": "paper", "label": "Cover paper (weight only; no price change)", "addon": True, "depends": [],
          "options": ["Gloss Art Card 260gsm (2 side coated)", "Gloss Art Card 310gsm (2 side coated)"]},
-        {"key": "lamination", "label": "Lamination (Matte Both compulsory; Spot UV quoted separately)", "addon": True, "depends": [],
+        {"key": "lamination", "label": "Lamination (Matte Both compulsory; +Spot UV adds a cost)", "addon": True, "depends": [],
          "options": ["Matte Lamination (Both)", "Matte Lamination (Both) + Spot UV (Front Cover)"]},
     ]
     LETTERHEAD_FIELDS = [
@@ -270,18 +270,6 @@ def build_data():
     ENVELOPE_FIELDS = [
         {"key": "model", "label": "Envelope model (size / window)", "addon": True, "depends": [], "options": ENVELOPE_MODELS},
         {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ENVELOPE_COLOURS},
-    ]
-    FOLDER_MOULDS = ["FPF 001 — 350x510mm", "FPF 004 — 371x534mm", "FPF 005 — 410x614mm",
-                     "FPF 014 — 326x613mm", "FPF 015 — 324x635mm", "FPF 016 — 631x478mm"]
-    FOLDER_PAPERS = ["Gloss Art Card 250gsm (1 side coated)", "Gloss Art Card 300gsm (1 side coated)",
-                     "Gloss Art Card 250gsm (2 side coated)", "Gloss Art Card 310gsm (2 side coated)",
-                     "Gloss Art Card 360gsm (2 side coated)"]
-    FOLDER_FIELDS = [
-        {"key": "mould", "label": "Folder mould (size)", "addon": True, "depends": [], "options": FOLDER_MOULDS},
-        {"key": "paper", "label": "Paper (Gloss Art Card)", "addon": True, "depends": [], "options": FOLDER_PAPERS},
-        {"key": "lamination", "label": "Cover lamination (quoted separately)", "addon": True, "depends": [],
-         "options": ["Not Required", "Gloss Lamination (Front)", "Matte Lamination (Front)",
-                     "Matte Lamination (Front) + Spot UV (Front)", "Gloss Waterbase Varnish (Front)"]},
     ]
     products = [
         {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",

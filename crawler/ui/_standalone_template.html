@@ -716,7 +716,7 @@ function localQuote(prod, V, qty){
     const unitPrice=((SC[V.stamp_type]||{})[V.category]||{})[V.model_key]||0;
     cash=unitPrice*qty; wt=Math.round(0.05*qty*1000)/1000;
     return {printoka_cash:Math.round(cash*100)/100,finishing_cost:0,tiers:tiers(cash),weight_kg:wt,
-      method:"exact (v4 price-list lookup)",note:"Stamp unit price × qty. Bag Colour / Handle etc. price-neutral."}; }
+      method:"exact (v4 price-list lookup)",note:"Stamp Chop: unit price × qty. Weight est. ~0.05 kg/stamp."}; }
   else if(prod.engine==="contact"){
     throw Object.assign(new Error("No automated pricing available. Please contact Excard directly for a quote."), {quote_only:true}); }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;

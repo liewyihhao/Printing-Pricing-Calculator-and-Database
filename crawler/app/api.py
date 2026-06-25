@@ -1681,9 +1681,10 @@ def papan_kopi_quote(product: int = Query(130), qty: int = Query(...),
         return JSONResponse({"error": "no price"}, status_code=400)
     note = ("Papan Kopi / Sachet Board (exact v4 price-list lookup). 4 models with fixed specs. "
             "Compulsory: Boxboard Grey Back 400gsm, Gloss Water Based Varnish (Front), 4C Front, Die-Cutting. qty = boards.")
+    wt = round(p.get("unit_wt", 0.08) * qty, 3)
     return {"config": {"product": product, "model": model, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
-            "tiers": PE.tiers(cash)}
+            "tiers": PE.tiers(cash), "weight_kg": wt}
 
 
 # ---------- Pillow (Litho, id 131) ----------
@@ -1922,11 +1923,12 @@ def non_woven_bag_quote(product: int = Query(139), qty: int = Query(...),
         return JSONResponse({"error": "no price for this model/print colour combination"}, status_code=400)
     note = ("Non-Woven Bag (exact v4 price-list lookup). Model determines size. "
             "Bag Colour, Handle Length, Handle Colour are price-neutral. qty = pcs.")
+    wt = round(p.get("unit_wt", 0.035) * qty, 3)
     return {"config": {"product": product, "model": model, "print_colour": print_colour,
                        "bag_colour": bag_colour, "handle_length": handle_length,
                        "handle_colour": handle_colour, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
-            "tiers": PE.tiers(cash)}
+            "tiers": PE.tiers(cash), "weight_kg": wt}
 
 
 # ---------- Tent Card (Litho, id 140) — exact v4 price-list lookup ----------
@@ -1950,17 +1952,16 @@ def tent_card_quote(product: int = Query(140), qty: int = Query(...),
         return JSONResponse({"error": "no price for this configuration"}, status_code=400)
     note = ("Tent Card (exact v4 price-list lookup). 2 models (TC 003=294x86mm, TC 004=294x140mm). "
             "Paper (Art Card 310gsm), Print Colour (4C Front), and Die-Cutting are compulsory (included). qty = pcs.")
+    wt = round(p.get("unit_wt", 0.02) * qty, 3)
     return {"config": {"product": product, "model": model, "lamination": lamination, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
-            "tiers": PE.tiers(cash)}
+            "tiers": PE.tiers(cash), "weight_kg": wt}
 
 
 # ---------- Stamp Chop (id 141) — exact v4 unit price lookup ----------
-import json as _json_stamp
-
 @app.get("/api/printoka/stamp_chop/options")
 def stamp_chop_options(product: int = Query(141)):
-    f = _Path(__file__).resolve().parent.parent / "output" / "stamp_chop_prices.json"
+    f = Path(__file__).resolve().parent.parent / "output" / "stamp_chop_prices.json"
     prices = _json.loads(f.read_text(encoding="utf-8")) if f.exists() else {}
     return {
         "stamp_types": sorted(prices.keys()),
@@ -1975,7 +1976,7 @@ def stamp_chop_quote(product: int = Query(141), qty: int = Query(...),
                      stamp_type: str = Query("Pre-Inked Stamp"),
                      category: str = Query("Rectangle"),
                      model_key: str = Query(...)):
-    f = _Path(__file__).resolve().parent.parent / "output" / "stamp_chop_prices.json"
+    f = Path(__file__).resolve().parent.parent / "output" / "stamp_chop_prices.json"
     if not f.exists():
         return JSONResponse({"error": "stamp_chop_prices.json not found"}, status_code=500)
     prices = _json.loads(f.read_text(encoding="utf-8"))
