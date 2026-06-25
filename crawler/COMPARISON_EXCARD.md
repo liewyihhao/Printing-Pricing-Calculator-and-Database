@@ -25,7 +25,7 @@ For **formula products** (still calibrated from the old `/spec` sampling), the C
 | Letterhead (105) | 466 | **100.0 %** | 0.0000 % | 0.0000 % |
 | PVC Card (113) | 528 | **100.0 %** | 0.0000 % | 0.0000 % |
 | Money Packet (138, Standard) | 495 | **100.0 %** | 0.0000 % | 0.0000 % |
-| Folder (107) | 9 264 | 87.0 % exact; CD Jacket uses avg | 0.0000 % (non-CD) / ≈1.2 % (CD Jacket) | 8.83 % |
+| Folder (107) | 9 264 | 74.0 % exact; CD Jacket rows use avg | 0.0000 % overall (CD Jacket: ≈1–4 %) | 4.41 % |
 
 ### Worked purchaser examples (our price vs Excard online)
 
@@ -58,8 +58,9 @@ The rebuild fixed silently-mispriced options that the old `/spec` sampler had re
   did not export as a column**. The build_params engine now **averages the two prices** for every
   duplicated CD Jacket spec (all 1205 spec+qty combos had exactly 2 prices), halving the expected
   error vs the prior last-write-wins approach:
-  - Before averaging: median 2.4 %, max 8.8 %
-  - After averaging: median 1.2 %, max 3.4 % (still approximate — the exact hidden option is unknown)
+  - Before averaging (last-write-wins): 87 % of rows exact-to-cent, max 8.8 % error
+  - After averaging: 74 % exact-to-cent (CD Jacket rows never match either individual price exactly),
+    but max error halved to 4.4 % — a better unbiased estimate when the hidden option is unknown
   Presentation / Document / Key Folder categories remain **100 % exact**. Fully resolving CD Jacket
   needs the v4 generate-form to reveal the hidden option — pending the Chrome extension.
 
