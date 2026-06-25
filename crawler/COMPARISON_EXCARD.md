@@ -25,7 +25,7 @@ For **formula products** (still calibrated from the old `/spec` sampling), the C
 | Letterhead (105) | 466 | **100.0 %** | 0.0000 % | 0.0000 % |
 | PVC Card (113) | 528 | **100.0 %** | 0.0000 % | 0.0000 % |
 | Money Packet (138, Standard) | 495 | **100.0 %** | 0.0000 % | 0.0000 % |
-| Folder (107) | 9 264 | 87.0 % | 0.0000 % | 8.83 % |
+| Folder (107) | 9 264 | 87.0 % exact; CD Jacket uses avg | 0.0000 % (non-CD) / ≈1.2 % (CD Jacket) | 8.83 % |
 
 ### Worked purchaser examples (our price vs Excard online)
 
@@ -51,13 +51,17 @@ The rebuild fixed silently-mispriced options that the old `/spec` sampler had re
 - **Folder** — all mould groups, every lamination incl. Spot UV, and the back colour-protective
   layer are now priced exactly.
 
-## Known gap
+## Known gap (partially mitigated)
 
 - **Folder → CD Jacket category (13 % of folder rows):** Excard's exported CSV contains rows with
-  byte-identical visible specs but two different prices (e.g. RM 868.00 vs RM 937.65 for the same
-  spec). There is a **hidden option dimension Excard did not export as a column** (median spread
-  +2.4 %, up to +8.8 %). Presentation / Document / Key folder categories are exact. Resolving CD
-  Jacket needs the v4 generate-form to reveal the hidden option — pending the Chrome extension.
+  byte-identical visible specs but two different prices — there is a **hidden option dimension Excard
+  did not export as a column**. The build_params engine now **averages the two prices** for every
+  duplicated CD Jacket spec (all 1205 spec+qty combos had exactly 2 prices), halving the expected
+  error vs the prior last-write-wins approach:
+  - Before averaging: median 2.4 %, max 8.8 %
+  - After averaging: median 1.2 %, max 3.4 % (still approximate — the exact hidden option is unknown)
+  Presentation / Document / Key Folder categories remain **100 % exact**. Fully resolving CD Jacket
+  needs the v4 generate-form to reveal the hidden option — pending the Chrome extension.
 
 ## Not yet re-verified against v4 (still on old `/spec` calibration)
 

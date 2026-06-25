@@ -4,6 +4,17 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **52/52 BUILT. PARITY CHECKER SHOWS 0 REAL GAPS (2026-06-25 session 2).** All 52 Excard catalogue
+  products are built and verified. Improvements this session (all committed + pushed):
+  - **Loose Sheet Litho finishing consistency** — api.py now applies hot_stamping/fold/punch finishing
+    to litho (product 21/101/102/103) matching the standalone. Also added finishing fields to the `loose`
+    FIELD_SCHEMAS in api.py. The finishing dataset is shared with digital (loose_finishing_50.json).
+  - **Folder CD Jacket accuracy improved** — `pricelist_engine.build_params` now supports
+    `average_dupes=True`. Folder params rebuilt with averaging: CD Jacket median error 2.4% → 1.2%
+    (Excard's CSV has a hidden option not exported as a column; averaging halves the expected error).
+    PF/DF/KF mould groups remain 100% exact.
+  - **Chrome extension still wedged** (navigate hangs after 300s). No new CSVs could be downloaded.
+    Next session: ask user to reload/re-pair the Chrome extension before attempting CSV exports.
 - **WEIGHT FIXES + STALE NOTE CORRECTED (2026-06-25).** folder_quote, letterhead_quote, and
   pvccard_quote were returning `weight_kg: 0.0` — now fixed with proper estimates:
   - **Folder** ~40g/piece (A4 folder open area × 250gsm + lamination)

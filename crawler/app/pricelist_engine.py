@@ -59,12 +59,14 @@ def tiers(cash: float) -> dict:
 
 
 def build_params(tag: str, axis_cols, qty_col="Quantity", price_col="WM Price",
-                 note="", csv_name=None) -> dict:
+                 note="", csv_name=None, average_dupes=False) -> dict:
     """Parse the CSV and emit the lookup params. Drops the DataTables filter junk row
-    (the one whose qty cell is a concatenation, not a plain integer)."""
+    (the one whose qty cell is a concatenation, not a plain integer).
+    average_dupes=True: when the same axis-key+qty appears more than once (hidden option
+    in the CSV), average the prices instead of last-write-wins (halves the expected error)."""
     f = PL / (csv_name or f"{tag}.csv")
     rows = list(csv.DictReader(f.open(encoding="utf-8-sig")))
-    curves: dict = {}
+    acc: dict = {}   # key -> {qty -> [prices]} for accumulation
     qcol = next((c for c in rows[0] if c.strip().lower().startswith(qty_col.lower())), qty_col)
     pcol = next((c for c in rows[0] if c.strip() == price_col), price_col)
     used_axes = [next((c for c in rows[0] if c.strip() == a), a) for a in axis_cols]
@@ -79,7 +81,13 @@ def build_params(tag: str, axis_cols, qty_col="Quantity", price_col="WM Price",
         if price <= 0:
             continue
         key = "|".join((r.get(c) or "").strip() for c in used_axes)
-        curves.setdefault(key, {})[q] = price
+        acc.setdefault(key, {}).setdefault(q, []).append(price)
+    curves = {}
+    for key, qty_map in acc.items():
+        if average_dupes:
+            curves[key] = {q: round(sum(ps) / len(ps), 2) for q, ps in qty_map.items()}
+        else:
+            curves[key] = {q: ps[-1] for q, ps in qty_map.items()}
     p = {"axis_cols": axis_cols, "qty_col": qty_col, "price_col": price_col,
          "curves": curves, "note": note}
     (OUT / f"{tag}_pl_params.json").write_text(json.dumps(p))

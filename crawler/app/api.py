@@ -622,6 +622,12 @@ FIELD_SCHEMAS = {
                   {"key": "envelope", "label": "Envelope (add-on)", "addon": True, "depends": [], "options": ENVELOPE_OPTS},
                   {"key": "custom_w", "label": "Custom width (mm) — optional, overrides Size", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
                   {"key": "custom_h", "label": "Custom height (mm) — optional", "type": "number", "optional": True, "min": 10, "max": 1000, "depends": []},
+                  {"key": "hot_stamping", "label": "Hot stamping", "addon": True, "depends": [],
+                   "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]},
+                  {"key": "fold", "label": "Folding", "addon": True, "depends": [],
+                   "options": ["None", "1Fa", "2Fa", "2Fb", "2Fc", "3Fa", "3Fb", "4Fa", "4Fb"]},
+                  {"key": "punch", "label": "Hole punching", "addon": True, "depends": [],
+                   "options": ["No", "3mm", "6mm"]},
               ]},
     "loose_digital": {"options": "/api/printoka/options", "quote": "/api/printoka/quote",
               "fields": [
@@ -2463,14 +2469,15 @@ def printoka_quote(size: str = Query(...), paper: str = Query(...),
     env_add = envelope_cost(envelope, qty)   # priced per-piece (sampled), scales with package
     fin = 0.0
     try:
+        from . import loose_finishing as LF
+        fin_add = LF.finishing_cost({"hot_stamping": hot_stamping, "fold": fold, "punch": punch}, qty, size)
         if product == 50:
-            from . import loose_finishing as LF
             base = digital_engine.cash_price(size, paper, colour, qty)
-            fin = LF.finishing_cost({"hot_stamping": hot_stamping, "fold": fold, "punch": punch}, qty, size) + env_add
+            fin = fin_add + env_add
             cash = (base + fin) * mult
             tiers = digital_engine.tiers(cash); wt = digital_engine.weight_kg(size, paper, qty) * mult
         else:
-            fin = env_add
+            fin = fin_add + env_add
             cash = (cost_engine.cash_price(size, paper, colour, qty) + fin) * mult
             tiers = formulation.tiers(cash); wt = formulation.weight_kg(size, paper, qty) * mult
     except Exception as e:
