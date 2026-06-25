@@ -1,5 +1,5 @@
 {
- "scanned_at": "2026-06-19T19:41:45",
+ "scanned_at": "2026-06-25T08:23:30",
  "count": 52,
  "products": [
   {
@@ -16,8 +16,10 @@
    "name": "Wire O Notebook",
    "url": "https://www.excard.com.my/product/Wire-O-Notebook",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Wire-O Notebook Litho (112)"
+   ],
    "is_new": false
   },
   {
@@ -25,8 +27,10 @@
    "name": "Arch File",
    "url": "https://www.excard.com.my/product/arch-file",
    "category": "Misc",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Arch File Digital (119)"
+   ],
    "is_new": false
   },
   {
@@ -34,8 +38,10 @@
    "name": "Banner",
    "url": "https://www.excard.com.my/product/banner",
    "category": "Large Format",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Banner Litho (123)"
+   ],
    "is_new": false
   },
   {
@@ -66,8 +72,10 @@
    "name": "Bookmark",
    "url": "https://www.excard.com.my/product/bookmark",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Bookmark Digital (109)"
+   ],
    "is_new": false
   },
   {
@@ -75,8 +83,10 @@
    "name": "Brochure",
    "url": "https://www.excard.com.my/product/brochure",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Loose Sheet Litho (alias, id 101)"
+   ],
    "is_new": false
   },
   {
@@ -84,8 +94,10 @@
    "name": "Bunting",
    "url": "https://www.excard.com.my/product/bunting",
    "category": "Large Format",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Bunting Litho (124)"
+   ],
    "is_new": false
   },
   {
@@ -104,8 +116,10 @@
    "name": "Button Badge",
    "url": "https://www.excard.com.my/product/button-badge",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Button Badge Digital (132)"
+   ],
    "is_new": false
   },
   {
@@ -113,8 +127,10 @@
    "name": "Canvas Tote Bag",
    "url": "https://www.excard.com.my/product/canvas-tote-bag",
    "category": "Packaging & Boxes",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Canvas Tote Bag Litho (128)"
+   ],
    "is_new": false
   },
   {
@@ -122,8 +138,10 @@
    "name": "Car Sticker",
    "url": "https://www.excard.com.my/product/car-sticker",
    "category": "Stickers & Labels",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Car Sticker Digital (117, = static cling form)"
+   ],
    "is_new": false
   },
   {
@@ -131,8 +149,10 @@
    "name": "Computer Form",
    "url": "https://www.excard.com.my/product/computer-form",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Computer Form Litho NCR (111)"
+   ],
    "is_new": false
   },
   {
@@ -140,8 +160,10 @@
    "name": "Customprint",
    "url": "https://www.excard.com.my/product/customprint",
    "category": "Misc",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Loose Sheet Litho (alias, id 103)"
+   ],
    "is_new": false
   },
   {
@@ -149,8 +171,10 @@
    "name": "Desk Calendar Hard Stand",
    "url": "https://www.excard.com.my/product/desk-calendar-hard-stand",
    "category": "Calendars & Diary",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Desk Calendar Hard Stand Litho (120)"
+   ],
    "is_new": false
   },
   {
@@ -158,8 +182,10 @@
    "name": "Desk Calendar Soft Stand",
    "url": "https://www.excard.com.my/product/desk-calendar-soft-stand",
    "category": "Calendars & Diary",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Desk Calendar Soft Stand Litho (121)"
+   ],
    "is_new": false
   },
   {
@@ -167,8 +193,10 @@
    "name": "Envelope",
    "url": "https://www.excard.com.my/product/envelope",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Envelope Litho (106)"
+   ],
    "is_new": false
   },
   {
@@ -187,8 +215,10 @@
    "name": "Folder",
    "url": "https://www.excard.com.my/product/folder",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Folder Litho \u2014 Presentation Folder (107)"
+   ],
    "is_new": false
   },
   {
@@ -196,8 +226,10 @@
    "name": "Hand Fan",
    "url": "https://www.excard.com.my/product/hand-fan",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Hand Fan Digital (133)"
+   ],
    "is_new": false
   },
   {
@@ -205,8 +237,10 @@
    "name": "Hanger",
    "url": "https://www.excard.com.my/product/hanger",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Hanger Digital (134)"
+   ],
    "is_new": false
   },
   {
@@ -214,8 +248,10 @@
    "name": "Hard Cover Menu",
    "url": "https://www.excard.com.my/product/hard-cover-menu",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Hard Cover Menu Digital (136)"
+   ],
    "is_new": false
   },
   {
@@ -223,8 +259,10 @@
    "name": "Kad Kahwin",
    "url": "https://www.excard.com.my/product/kad-kahwin",
    "category": "Cards",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Kad Kahwin Digital (114)"
+   ],
    "is_new": false
   },
   {
@@ -232,8 +270,10 @@
    "name": "Kad Terima Kasih",
    "url": "https://www.excard.com.my/product/kad-terima-kasih",
    "category": "Cards",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Kad Terima Kasih Digital (115)"
+   ],
    "is_new": false
   },
   {
@@ -252,8 +292,10 @@
    "name": "L Shape Folder",
    "url": "https://www.excard.com.my/product/l-shape-folder",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "L-Shape Plastic Folder Digital (108)"
+   ],
    "is_new": false
   },
   {
@@ -272,8 +314,10 @@
    "name": "Letterhead",
    "url": "https://www.excard.com.my/product/letterhead",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Letterhead Litho (105)"
+   ],
    "is_new": false
   },
   {
@@ -293,8 +337,10 @@
    "name": "Magnet",
    "url": "https://www.excard.com.my/product/magnet",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Magnet Digital (135)"
+   ],
    "is_new": false
   },
   {
@@ -311,8 +357,10 @@
    "name": "Money Packet",
    "url": "https://www.excard.com.my/product/money-packet",
    "category": "Money Packet",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Money Packet Litho (138)"
+   ],
    "is_new": false
   },
   {
@@ -320,8 +368,10 @@
    "name": "Mug",
    "url": "https://www.excard.com.my/product/mug",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Mug Litho (129)"
+   ],
    "is_new": false
   },
   {
@@ -329,8 +379,10 @@
    "name": "Non Woven Bag",
    "url": "https://www.excard.com.my/product/non-woven-bag",
    "category": "Packaging & Boxes",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Non-Woven Bag Litho (139)"
+   ],
    "is_new": false
   },
   {
@@ -338,8 +390,10 @@
    "name": "Notepad",
    "url": "https://www.excard.com.my/product/notepad",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Notepad Litho (104)"
+   ],
    "is_new": false
   },
   {
@@ -356,8 +410,10 @@
    "name": "Paper Bag",
    "url": "https://www.excard.com.my/product/paper-bag",
    "category": "Packaging & Boxes",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Paper Bag Litho (127)"
+   ],
    "is_new": false
   },
   {
@@ -365,8 +421,10 @@
    "name": "Pillow",
    "url": "https://www.excard.com.my/product/pillow",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Pillow Litho (131)"
+   ],
    "is_new": false
   },
   {
@@ -383,8 +441,10 @@
    "name": "Pvc Card",
    "url": "https://www.excard.com.my/product/pvc-card",
    "category": "Cards",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "PVC Card Digital (113)"
+   ],
    "is_new": false
   },
   {
@@ -403,8 +463,10 @@
    "name": "Roll Up Stand",
    "url": "https://www.excard.com.my/product/roll-up-stand",
    "category": "Large Format",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Roll-Up Stand Litho (125)"
+   ],
    "is_new": false
   },
   {
@@ -421,8 +483,10 @@
    "name": "Standing Pouch",
    "url": "https://www.excard.com.my/product/standing-pouch",
    "category": "Packaging & Boxes",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Standing Pouch Litho (137)"
+   ],
    "is_new": false
   },
   {
@@ -430,8 +494,10 @@
    "name": "Static Cling Window Sticker",
    "url": "https://www.excard.com.my/product/static-cling-window-sticker",
    "category": "Stickers & Labels",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Static Cling Window Sticker Digital (116)"
+   ],
    "is_new": false
   },
   {
@@ -457,8 +523,10 @@
    "name": "Voucher",
    "url": "https://www.excard.com.my/product/voucher",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Voucher Litho (110)"
+   ],
    "is_new": false
   },
   {
@@ -466,8 +534,10 @@
    "name": "Wall Calendar",
    "url": "https://www.excard.com.my/product/wall-calendar",
    "category": "Calendars & Diary",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Wall Calendar Litho (118)"
+   ],
    "is_new": false
   },
   {
@@ -475,8 +545,10 @@
    "name": "Wire O Wall Calendar",
    "url": "https://www.excard.com.my/product/wire-o-wall-calendar",
    "category": "Calendars & Diary",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Wire-O Wall Calendar Litho (122)"
+   ],
    "is_new": false
   },
   {
@@ -484,8 +556,10 @@
    "name": "Wobbler",
    "url": "https://www.excard.com.my/product/wobbler",
    "category": "Large Format",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Wobbler Digital (126)"
+   ],
    "is_new": false
   }
  ]

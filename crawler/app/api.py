@@ -341,7 +341,8 @@ PRODUCTS_UI = [{"id": 1, "name": "Business Card"},
                {"id": 135, "name": "Magnet — Digital"},
                {"id": 136, "name": "Hard Cover Menu — Digital"},
                {"id": 137, "name": "Standing Pouch — Litho"},
-               {"id": 138, "name": "Money Packet — Litho"}]
+               {"id": 138, "name": "Money Packet — Litho"},
+               {"id": 139, "name": "Non-Woven Bag — Litho"}]
 SC_SIZES = ["54mm x 89mm", "75mm x 75mm", "100mm x 100mm", "110mm x 90mm", "115mm x 120mm",
             "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]
 KAD_LAMS = ["Matte Lamination (Front)", "Matte Lamination (Both)",
@@ -462,7 +463,8 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               135: 1.0,  # magnet: per-shape qty curve LOO median 0.97%
               136: 2.2,  # hard cover menu: per-(order x add-content) qty curve LOO median 2.2%
               137: 9.6,  # standing pouch (Metalised): qty curve LOO median 9.6% (non-smooth curve)
-              138: 0.0}  # money packet: EXACT v4 price-list lookup (model x package x paper x finishing)
+              138: 0.0,  # money packet: EXACT v4 price-list lookup (model x package x paper x finishing)
+              139: 0.0}  # non-woven bag: EXACT v4 price-list lookup (model x print colour)
 
 
 def _accuracy(product_id: int):
@@ -926,6 +928,23 @@ FIELD_SCHEMAS = {
                     {"key": "packing", "label": "Packing method (price-neutral; for info)", "addon": True, "depends": [], "options": [
                         "5pcs / Pack", "6pcs / Pack", "8pcs / Pack", "10pcs / Pack"]},
                 ]},
+    "non_woven_bag": {"options": "/api/printoka/non_woven_bag/options", "quote": "/api/printoka/non_woven_bag/quote",
+                "fields": [
+                    {"key": "model", "label": "Model (determines size · WN-B5=200x230x80mm · WS-A4=280x330x80mm · WS-A3P=350x350x100mm · WS-A3L=420x320x100mm · WH-A4=280x330x80mm)", "addon": True, "depends": [], "options": [
+                        "WN-B5", "WS-A4", "WS-A3P", "WS-A3L", "WH-A4"]},
+                    {"key": "print_colour", "label": "Print Colour (WN/WS=1C only · WH=4C only)", "addon": True, "depends": [], "options": [
+                        "1C (Front)", "1C (Both)", "4C (Front)", "4C (Both)"]},
+                    {"key": "bag_colour", "label": "Bag Colour (price-neutral; for info)", "addon": True, "depends": [], "options": [
+                        "Black", "White", "Beige", "Yellow", "Orange", "Dark Orange", "Magenta", "Red",
+                        "Maroon", "Green", "Milo Green", "Dark Green", "Turquoise", "Cyan",
+                        "Royal Blue", "Navy Blue", "Dark Purple", "Light Brown", "Dark Brown", "Grey"]},
+                    {"key": "handle_length", "label": "Handle Length (price-neutral; for info)", "addon": True, "depends": [], "options": [
+                        "300mm", "440mm", "500mm"]},
+                    {"key": "handle_colour", "label": "Handle Colour (price-neutral; for info)", "addon": True, "depends": [], "options": [
+                        "Same as bag colour", "Black", "White", "Beige", "Orange", "Dark Orange", "Magenta",
+                        "Red", "Maroon", "Green", "Milo Green", "Dark Green", "Turquoise", "Cyan",
+                        "Royal Blue", "Navy Blue", "Dark Purple", "Light Brown", "Dark Brown", "Grey"]},
+                ]},
     "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
                 "fields": [
                     {"key": "orientation", "label": "Orientation", "optionsKey": "orientations", "depends": []},
@@ -1049,6 +1068,8 @@ def _family(product_id: int) -> str:
         return "pouch"
     if product_id == 138:
         return "money_packet"
+    if product_id == 139:
+        return "non_woven_bag"
     return "loose"
 
 
@@ -1839,6 +1860,37 @@ def money_packet_quote(product: int = Query(138), qty: int = Query(...),
                        "paper": paper, "finishing": finishing, "packing": packing, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
             "tiers": PE.tiers(cash), "weight_kg": wt}
+
+
+# ---------- Non-Woven Bag (Litho, id 139) — exact v4 price-list lookup ----------
+@app.get("/api/printoka/non_woven_bag/options")
+def non_woven_bag_options(product: int = Query(139)):
+    return {}  # all fields are inline addon fields in the schema
+
+
+@app.get("/api/printoka/non_woven_bag/quote")
+def non_woven_bag_quote(product: int = Query(139), qty: int = Query(...),
+                        model: str = Query("WN-B5"),
+                        print_colour: str = Query("1C (Front)"),
+                        bag_colour: str = Query("Black"),
+                        handle_length: str = Query("300mm"),
+                        handle_colour: str = Query("Same as bag colour")):
+    from . import pricelist_engine as PE
+    p = _pl_params("non_woven_bag")
+    cfg = {"Model": model, "Print Colour": print_colour}
+    try:
+        cash = PE.cash_price(p, cfg, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price for this model/print colour combination"}, status_code=400)
+    note = ("Non-Woven Bag (exact v4 price-list lookup). Model determines size. "
+            "Bag Colour, Handle Length, Handle Colour are price-neutral. qty = pcs.")
+    return {"config": {"product": product, "model": model, "print_colour": print_colour,
+                       "bag_colour": bag_colour, "handle_length": handle_length,
+                       "handle_colour": handle_colour, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
+            "tiers": PE.tiers(cash)}
 
 
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------

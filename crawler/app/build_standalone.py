@@ -235,6 +235,22 @@ def build_data():
         {"key": "packing", "label": "Packing method (price-neutral; for info)", "addon": True, "depends": [],
          "options": ["5pcs / Pack", "6pcs / Pack", "8pcs / Pack", "10pcs / Pack"]},
     ]
+    NON_WOVEN_BAG_FIELDS = [
+        {"key": "model", "label": "Model (determines size · WN-B5=200x230x80mm · WS-A4=280x330x80mm · WS-A3P=350x350x100mm · WS-A3L=420x320x100mm · WH-A4=280x330x80mm)", "addon": True, "depends": [],
+         "options": ["WN-B5", "WS-A4", "WS-A3P", "WS-A3L", "WH-A4"]},
+        {"key": "print_colour", "label": "Print Colour (WN/WS=1C only · WH=4C only)", "addon": True, "depends": [],
+         "options": ["1C (Front)", "1C (Both)", "4C (Front)", "4C (Both)"]},
+        {"key": "bag_colour", "label": "Bag Colour (price-neutral; for info)", "addon": True, "depends": [],
+         "options": ["Black", "White", "Beige", "Yellow", "Orange", "Dark Orange", "Magenta", "Red",
+                     "Maroon", "Green", "Milo Green", "Dark Green", "Turquoise", "Cyan",
+                     "Royal Blue", "Navy Blue", "Dark Purple", "Light Brown", "Dark Brown", "Grey"]},
+        {"key": "handle_length", "label": "Handle Length (price-neutral; for info)", "addon": True, "depends": [],
+         "options": ["300mm", "440mm", "500mm"]},
+        {"key": "handle_colour", "label": "Handle Colour (price-neutral; for info)", "addon": True, "depends": [],
+         "options": ["Same as bag colour", "Black", "White", "Beige", "Orange", "Dark Orange", "Magenta",
+                     "Red", "Maroon", "Green", "Milo Green", "Dark Green", "Turquoise", "Cyan",
+                     "Royal Blue", "Navy Blue", "Dark Purple", "Light Brown", "Dark Brown", "Grey"]},
+    ]
     ENVELOPE_MODELS = [
         "OE4496NW — 114x248mm (Best Seller)", "OE4496W — 114x248mm (window)",
         "OE9013NW — 229x324mm", "EV4090NW — 102x229mm", "EV4090W — 102x229mm (window)",
@@ -385,6 +401,9 @@ def build_data():
         {"id": 138, "name": "Money Packet — Litho", "engine": "pricelist", "paramKey": "money_packet",
          "axisFields": ["model", "package", "paper", "finishing"], "optsrc": "none",
          "accuracy": 0.0, "fields": MONEY_PACKET_FIELDS},
+        {"id": 139, "name": "Non-Woven Bag — Litho", "engine": "pricelist", "paramKey": "non_woven_bag",
+         "axisFields": ["model", "print_colour"], "optsrc": "none",
+         "accuracy": 0.0, "fields": NON_WOVEN_BAG_FIELDS},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -544,6 +563,7 @@ def build_data():
             "hardmenu": _load("hardmenu_params.json", {"curves": {}, "variant_field": ["order", "addcontent"], "unit_wt": 0.30}),
             "pouch": _load("pouch_params.json", {"curves": {}, "variant_field": "paper", "unit_wt": 0.015}),
             "money_packet": _load("money_packet_pl_params.json", {"axis_cols": [], "curves": {}, "unit_wt": 0.006}),
+            "non_woven_bag": _load("non_woven_bag_pl_params.json", {"axis_cols": [], "curves": {}}),
         },
         "curves": {
             "booklet19": _load("booklet_curve_19.json", {}),
@@ -577,7 +597,7 @@ def build_data():
                             127: "paperbag", 128: "canvastote", 129: "mug",
                             130: "papankopi", 131: "pillow", 132: "buttonbadge", 133: "handfan",
                             134: "hanger", 135: "magnet", 136: "hardmenu", 137: "pouch",
-                            138: "money_packet"},
+                            138: "money_packet", 139: "non_woven_bag"},
     }
 
 

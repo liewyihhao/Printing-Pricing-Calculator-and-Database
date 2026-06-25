@@ -1,7 +1,7 @@
 {
- "scanned_at": "2026-06-22T18:21:22",
+ "scanned_at": "2026-06-25T08:23:30",
  "total": 52,
- "built": 24,
+ "built": 45,
  "new_since_last": [],
  "removed_since_last": [],
  "products": [
@@ -19,8 +19,10 @@
    "name": "Button Badge",
    "url": "https://www.excard.com.my/product/button-badge",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Button Badge Digital (132)"
+   ],
    "is_new": false
   },
   {
@@ -28,8 +30,10 @@
    "name": "Hand Fan",
    "url": "https://www.excard.com.my/product/hand-fan",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Hand Fan Digital (133)"
+   ],
    "is_new": false
   },
   {
@@ -37,8 +41,10 @@
    "name": "Hanger",
    "url": "https://www.excard.com.my/product/hanger",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Hanger Digital (134)"
+   ],
    "is_new": false
   },
   {
@@ -46,8 +52,10 @@
    "name": "Hard Cover Menu",
    "url": "https://www.excard.com.my/product/hard-cover-menu",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Hard Cover Menu Digital (136)"
+   ],
    "is_new": false
   },
   {
@@ -55,8 +63,10 @@
    "name": "Magnet",
    "url": "https://www.excard.com.my/product/magnet",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Magnet Digital (135)"
+   ],
    "is_new": false
   },
   {
@@ -73,8 +83,10 @@
    "name": "Mug",
    "url": "https://www.excard.com.my/product/mug",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Mug Litho (129)"
+   ],
    "is_new": false
   },
   {
@@ -82,8 +94,10 @@
    "name": "Pillow",
    "url": "https://www.excard.com.my/product/pillow",
    "category": "Apparel & Gifts",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Pillow Litho (131)"
+   ],
    "is_new": false
   },
   {
@@ -109,8 +123,10 @@
    "name": "Wire O Notebook",
    "url": "https://www.excard.com.my/product/Wire-O-Notebook",
    "category": "Books & Stationery",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Wire-O Notebook Litho (112)"
+   ],
    "is_new": false
   },
   {
@@ -263,8 +279,10 @@
    "name": "Desk Calendar Hard Stand",
    "url": "https://www.excard.com.my/product/desk-calendar-hard-stand",
    "category": "Calendars & Diary",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Desk Calendar Hard Stand Litho (120)"
+   ],
    "is_new": false
   },
   {
@@ -272,8 +290,10 @@
    "name": "Desk Calendar Soft Stand",
    "url": "https://www.excard.com.my/product/desk-calendar-soft-stand",
    "category": "Calendars & Diary",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Desk Calendar Soft Stand Litho (121)"
+   ],
    "is_new": false
   },
   {
@@ -292,8 +312,10 @@
    "name": "Wire O Wall Calendar",
    "url": "https://www.excard.com.my/product/wire-o-wall-calendar",
    "category": "Calendars & Diary",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Wire-O Wall Calendar Litho (122)"
+   ],
    "is_new": false
   },
   {
@@ -354,8 +376,10 @@
    "name": "Banner",
    "url": "https://www.excard.com.my/product/banner",
    "category": "Large Format",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Banner Litho (123)"
+   ],
    "is_new": false
   },
   {
@@ -363,8 +387,10 @@
    "name": "Bunting",
    "url": "https://www.excard.com.my/product/bunting",
    "category": "Large Format",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Bunting Litho (124)"
+   ],
    "is_new": false
   },
   {
@@ -372,8 +398,10 @@
    "name": "Roll Up Stand",
    "url": "https://www.excard.com.my/product/roll-up-stand",
    "category": "Large Format",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Roll-Up Stand Litho (125)"
+   ],
    "is_new": false
   },
   {
@@ -381,8 +409,10 @@
    "name": "Wobbler",
    "url": "https://www.excard.com.my/product/wobbler",
    "category": "Large Format",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Wobbler Digital (126)"
+   ],
    "is_new": false
   },
   {
@@ -390,8 +420,10 @@
    "name": "Arch File",
    "url": "https://www.excard.com.my/product/arch-file",
    "category": "Misc",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Arch File Digital (119)"
+   ],
    "is_new": false
   },
   {
@@ -419,8 +451,10 @@
    "name": "Money Packet",
    "url": "https://www.excard.com.my/product/money-packet",
    "category": "Money Packet",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Money Packet Litho (138)"
+   ],
    "is_new": false
   },
   {
@@ -428,8 +462,10 @@
    "name": "Canvas Tote Bag",
    "url": "https://www.excard.com.my/product/canvas-tote-bag",
    "category": "Packaging & Boxes",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Canvas Tote Bag Litho (128)"
+   ],
    "is_new": false
   },
   {
@@ -448,8 +484,10 @@
    "name": "Non Woven Bag",
    "url": "https://www.excard.com.my/product/non-woven-bag",
    "category": "Packaging & Boxes",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Non-Woven Bag Litho (139)"
+   ],
    "is_new": false
   },
   {
@@ -457,8 +495,10 @@
    "name": "Paper Bag",
    "url": "https://www.excard.com.my/product/paper-bag",
    "category": "Packaging & Boxes",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Paper Bag Litho (127)"
+   ],
    "is_new": false
   },
   {
@@ -475,8 +515,10 @@
    "name": "Standing Pouch",
    "url": "https://www.excard.com.my/product/standing-pouch",
    "category": "Packaging & Boxes",
-   "built": false,
-   "built_as": [],
+   "built": true,
+   "built_as": [
+    "Standing Pouch Litho (137)"
+   ],
    "is_new": false
   },
   {

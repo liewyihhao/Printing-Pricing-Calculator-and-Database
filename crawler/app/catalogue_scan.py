@@ -59,6 +59,7 @@ BUILT = {
     "hard-cover-menu": ["Hard Cover Menu Digital (136)"],
     "standing-pouch": ["Standing Pouch Litho (137)"],
     "money-packet": ["Money Packet Litho (138)"],
+    "non-woven-bag": ["Non-Woven Bag Litho (139)"],
     "booklet": ["Booklet Litho (19)", "Booklet Digital (37)"],
     "bill-book": ["Bill-Book Litho (24)"],
     "label-sticker-with-hot-stamping": ["Label Sticker Letterpress (61)"],
