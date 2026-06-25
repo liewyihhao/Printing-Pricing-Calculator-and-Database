@@ -4,6 +4,16 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **WEIGHT FIXES + STALE NOTE CORRECTED (2026-06-25).** folder_quote, letterhead_quote, and
+  pvccard_quote were returning `weight_kg: 0.0` — now fixed with proper estimates:
+  - **Folder** ~40g/piece (A4 folder open area × 250gsm + lamination)
+  - **Letterhead** uses actual A4 gsm from paper name (`0.210×0.297×gsm×qty`)
+  - **PVC Card** 5.6g/card (CR80 standard)
+  - unit_wt added to folder_pl_params, letterhead_pl_params, pvccard_pl_params so the standalone also
+    computes correct weights via the pricelist engine branch.
+  - Stale notepad API note fixed: "Spot UV does not change price" → "Spot UV adds a cost delta" (the
+    delta was added in the CONTINUE_REBUILD fix but the note was not updated).
+  - Chrome extension still wedged — navigate hangs; no new CSVs could be downloaded this session.
 - **EXACT REBUILD FROM v4 PRICE-LISTS IN PROGRESS — see `CONTINUE_REBUILD.md`.** An audit found the
   original www-form sampling had **silent option-select failures**, so several priced options were
   wrongly modelled as "no price change" (root cause). We now rebuild affected products EXACTLY from the
@@ -11,7 +21,9 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   `"pricelist"` standalone JS branch do exact config-lookup with qty interpolation. **Notepad (104)
   fixed** (Spot UV is priced) and **Folder (107) fully rebuilt exact** (all mould groups + print colour
   + 8 laminations + protective layer; 692 config curves). CSVs live in `output/v4_pricelists/`. Next:
-  Letterhead (Pad packing), then re-verify every "neutral/quoted-separately" claim across products.
+  re-verify every remaining "neutral/quoted-separately" claim across products by downloading more v4
+  CSVs (needs working browser). Products rebuilt so far: Notepad (delta), Folder, Letterhead, PVC Card,
+  Money Packet Standard, Non-Woven Bag, Papan Kopi, Tent Card, Stamp Chop (flat unit prices).
   Chrome extension paired; user logged into v4 (acct 142059498); downloads enabled for v4.excard.com.my.
 - **43/52 BUILT.** Added **Bunting (124)** and **Wobbler (126)** by fixing what blocked them
   (found via new `app/autoconfig_probe.py`, which auto-configures every control and reports
