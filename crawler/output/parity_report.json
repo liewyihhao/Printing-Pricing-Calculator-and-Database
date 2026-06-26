@@ -1205,6 +1205,33 @@
     ]
    },
    {
+    "control": "ddlCoverLamination",
+    "options": [
+     "Matte Lamination (Front)",
+     "Matte Lamination (Both)",
+     "Matte Lamination (Front) + Spot UV (Front)",
+     "Matte Lamination (Both) + Spot UV (Front)",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)",
+     "Gloss Waterbase Varnish (Front)",
+     "Gloss Waterbase Varnish (Both)"
+    ]
+   },
+   {
+    "control": "ddl_embossing",
+    "options": [
+     "90mm x 30mm",
+     "90mm x 70mm",
+     "95mm x 206mm",
+     "101mm x 144mm",
+     "144mm x 206mm",
+     "194mm x 206mm",
+     "206mm x 294mm"
+    ]
+   },
+   {
     "control": "ddlCoverHSColourNum",
     "options": [
      "1C (Front)",
@@ -1232,6 +1259,28 @@
      "Green",
      "Red",
      "Silver"
+    ]
+   },
+   {
+    "control": "ddlContentPaper",
+    "options": [
+     "Simili 80gsm",
+     "Simili 100gsm",
+     "Gloss Art Paper 80gsm",
+     "Gloss Art Paper 100gsm",
+     "Gloss Art Paper 128gsm",
+     "Gloss Art Paper 150gsm",
+     "Matte Art Paper 100gsm",
+     "Matte Art Paper 130gsm",
+     "Matte Art Paper 150gsm",
+     "Gloss Art Card 230gsm (2 side coated)"
+    ]
+   },
+   {
+    "control": "ddlContentPrintColour",
+    "options": [
+     "1C (Both)",
+     "4C (Both)"
     ]
    },
    {
@@ -1854,6 +1903,18 @@
   },
   "gaps": []
  },
+ "deskcal_soft": {
+  "family": "deskcal_soft",
+  "excard_controls": [],
+  "our_fields": {},
+  "gaps": []
+ },
+ "wireow": {
+  "family": "wireow",
+  "excard_controls": [],
+  "our_fields": {},
+  "gaps": []
+ },
  "buttonbadge": {
   "family": "buttonbadge",
   "excard_controls": [
@@ -2022,6 +2083,65 @@
     "Soft Touch Laminate (Front)"
    ]
   },
+  "gaps": []
+ },
+ "mug": {
+  "family": "mug",
+  "excard_controls": [],
+  "our_fields": {},
+  "gaps": []
+ },
+ "pillow": {
+  "family": "pillow",
+  "excard_controls": [],
+  "our_fields": {},
+  "gaps": []
+ },
+ "stamp_chop": {
+  "family": "stamp_chop",
+  "excard_controls": [
+   {
+    "control": "ddlColour",
+    "options": [
+     "Red",
+     "Black",
+     "Blue",
+     "Violet",
+     "Green",
+     "Brown",
+     "Pink",
+     "Orange",
+     "Yellow",
+     "Sky Blue",
+     "Red",
+     "Black",
+     "Blue"
+    ]
+   }
+  ],
+  "our_fields": {
+   "stamp_type": [],
+   "category": [],
+   "model_key": [],
+   "ink_colour": [
+    "Red",
+    "Black",
+    "Blue",
+    "Violet",
+    "Green",
+    "Brown",
+    "Pink",
+    "Orange",
+    "Yellow",
+    "Sky Blue"
+   ]
+  },
+  "gaps": []
+ },
+ "archfile": {
+  "family": "archfile",
+  "excard_controls": [],
+  "our_fields": {},
   "gaps": []
  },
  "paperbag": {

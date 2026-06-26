@@ -4,6 +4,17 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **52/52 BUILT. PARITY CHECKER EXPANDED TO 43 FAMILIES: 1 REAL GAP (2026-06-27).**
+  Parity checker now covers 43 families (was 37). 2 real gaps found and closed:
+  - **Stamp Chop ink colour** — `ddlColour` (Red/Black/Blue/Violet/Green/Brown/Pink/Orange/
+    Yellow/Sky Blue) was not in FIELD_SCHEMAS. Ink colour is price-neutral for stamps.
+    Added as a selectable "Ink Colour (no price change)" field in api.py, build_standalone.py.
+  - **Wire-O Wall Calendar rblPunchHole** — single-option "Not Required" display artifact
+    (hole punch is compulsory/included in the fixed spec); suppressed in `FAMILY_IGNORE["wireow"]`.
+  New families added to FAMILY_URL: `deskcal_soft`, `wireow`, `mug`, `pillow`, `archfile`,
+  `stamp_chop`. mask_keeper and sublimation_shirt skipped (quote-only, no headless form).
+  parity_report.json updated. Standalone rebuilt with ink_colour for stamp_chop.
+  papan_kopi shows a page.evaluate crash (known headless nav issue) — not a real gap.
 - **52/52 BUILT. PARITY CHECKER EXPANDED TO 37 FAMILIES: 1 REAL GAP (2026-06-26 run 2).**
   Parity checker now covers 37 families (was 20). 5 real gaps found and closed:
   - **Bunting Synthetic Paper 180micron** — added to paper options in FIELD_SCHEMAS, api.py,

@@ -959,6 +959,8 @@ FIELD_SCHEMAS = {
                     {"key": "stamp_type", "label": "Stamp Type", "optionsKey": "stamp_types", "depends": []},
                     {"key": "category", "label": "Category", "optionsKey": "categories", "depends": ["stamp_type"]},
                     {"key": "model_key", "label": "Model", "optionsKey": "model_keys", "depends": ["stamp_type", "category"]},
+                    {"key": "ink_colour", "label": "Ink Colour (no price change)", "addon": True, "depends": [],
+                     "options": ["Red", "Black", "Blue", "Violet", "Green", "Brown", "Pink", "Orange", "Yellow", "Sky Blue"]},
                 ]},
     "non_woven_bag": {"options": "/api/printoka/non_woven_bag/options", "quote": "/api/printoka/non_woven_bag/quote",
                 "fields": [

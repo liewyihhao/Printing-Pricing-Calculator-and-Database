@@ -417,6 +417,8 @@ def build_data():
              {"key": "stamp_type", "label": "Stamp Type", "optionsKey": "stamp_types", "depends": []},
              {"key": "category", "label": "Category", "optionsKey": "categories", "depends": ["stamp_type"]},
              {"key": "model_key", "label": "Model", "optionsKey": "model_keys", "depends": ["stamp_type", "category"]},
+             {"key": "ink_colour", "label": "Ink Colour (no price change)", "addon": True, "depends": [],
+              "options": ["Red", "Black", "Blue", "Violet", "Green", "Brown", "Pink", "Orange", "Yellow", "Sky Blue"]},
          ]},
         {"id": 142, "name": "Mask Keeper — Litho", "engine": "contact", "optsrc": "none",
          "accuracy": None, "fields": [],

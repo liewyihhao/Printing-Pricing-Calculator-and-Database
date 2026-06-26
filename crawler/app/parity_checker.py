@@ -47,12 +47,18 @@ FAMILY_URL = {
     "rollup": "https://www.excard.com.my/spec/Litho/Roll_Up_Stand",
     # Calendars
     "deskcal_hard": "https://www.excard.com.my/spec/Litho/Desk_Calendar_(Hard_Stand)",
+    "deskcal_soft": "https://www.excard.com.my/spec/Litho/Desk_Calendar_(Soft_Stand)",
+    "wireow": "https://www.excard.com.my/spec/Litho/Wire-O_Wall_Calendar",
     # Gifts
     "buttonbadge": "https://www.excard.com.my/spec/Digital/button_badge",
     "handfan": "https://www.excard.com.my/spec/Digital/Hand_Fan",
     "hanger": "https://www.excard.com.my/spec/Digital/Hanger",
     "hardmenu": "https://www.excard.com.my/spec/Digital/Hard_Cover_Menu",
     "magnet": "https://www.excard.com.my/spec/Digital/Magnet",
+    "mug": "https://www.excard.com.my/spec/Litho/Mug",
+    "pillow": "https://www.excard.com.my/spec/Litho/Pillow",
+    "stamp_chop": "https://www.excard.com.my/spec/Litho/Stamp_Chop",
+    "archfile": "https://www.excard.com.my/spec/Digital/Arch_File",
     # Bags & packaging
     "paperbag": "https://www.excard.com.my/spec/Litho/Paper_Bag",
     "canvastote": "https://www.excard.com.my/spec/Litho/Canvas_Tote_Bag",
@@ -171,6 +177,9 @@ KEYWORD_FIELDS = {"laminat": ("lamination", "surface", "finishing"), "punch": ("
 FAMILY_IGNORE: dict[str, tuple[str, ...]] = {
     # rdType="Magnet" is a form-navigation constant (not a user dim); magnet has no type split
     "magnet": ("rdtype",),
+    # Wire-O Wall Calendar: rblPunchHole shows only "Not Required" — hole punching is already
+    # compulsory/included in the fixed spec; the single option is a display artifact, not a choice.
+    "wireow": ("punchhole",),
 }
 
 
