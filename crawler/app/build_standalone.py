@@ -461,6 +461,7 @@ def build_data():
         {"id": 113, "name": "PVC Card — Digital", "engine": "pricelist", "paramKey": "pvccard",
          "axisFields": ["colour", "hole_punch", "vdp"], "optsrc": "none",
          "accuracy": 0.0, "fields": [
+            {"key": "orientation", "label": "Orientation (no online price change)", "addon": True, "depends": [], "options": ["Portrait", "Landscape"]},
             {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
             {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [],
              "options": ["Not Required", "Hole Punching (6mm)"]},

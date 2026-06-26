@@ -118,7 +118,11 @@ KEYWORD_FIELDS = {"laminat": ("lamination", "surface", "finishing"), "punch": ("
                   "vdp": ("vdp",), "size": ("size",), "paper": ("paper",), "colour": ("colour", "color"),
                   # Excard's binding control is the misspelled "rdbidning"; our booklet field is the
                   # dynamic `binding` cascade (options fetched at runtime, so they read empty here).
-                  "binding": ("binding",), "bidning": ("binding",)}
+                  "binding": ("binding",), "bidning": ("binding",),
+                  # rblMouldGroup is a grouping radio (Presentation/Document/Key/CD Jacket) that
+                  # filters which individual mould models appear. Our flat `model` field lists all
+                  # moulds across groups — it covers the group implicitly via model selection.
+                  "mould": ("model", "mould"), "orient": ("orientation",)}
 
 
 def _diff(family, excard):

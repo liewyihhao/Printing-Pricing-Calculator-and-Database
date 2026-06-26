@@ -67,6 +67,10 @@
     "2C (Front)",
     "4C (Front)",
     "4C (Both)"
+   ],
+   "packing": [
+    "Loose",
+    "Pad (100 pcs per pad)"
    ]
   },
   "gaps": []
@@ -144,27 +148,46 @@
    }
   ],
   "our_fields": {
-   "mould": [
-    "FPF 001 — 350x510mm",
-    "FPF 004 — 371x534mm",
-    "FPF 005 — 410x614mm",
-    "FPF 014 — 326x613mm",
-    "FPF 015 — 324x635mm",
-    "FPF 016 — 631x478mm"
+   "model": [
+    "FPF 001",
+    "FPF 004",
+    "FPF 005",
+    "FPF 014",
+    "FPF 015",
+    "FPF 016",
+    "FDF 001",
+    "FDF 002",
+    "FKF 001",
+    "FKF 002",
+    "FCD 004"
    ],
    "paper": [
+    "Gloss Art Card 210gsm (1 side coated)",
     "Gloss Art Card 250gsm (1 side coated)",
+    "Gloss Art Card 260gsm (1 side coated)",
     "Gloss Art Card 300gsm (1 side coated)",
+    "Gloss Art Card 230gsm (2 side coated)",
     "Gloss Art Card 250gsm (2 side coated)",
     "Gloss Art Card 310gsm (2 side coated)",
     "Gloss Art Card 360gsm (2 side coated)"
    ],
+   "colour": [
+    "4C (Front)",
+    "4C (Both)"
+   ],
    "lamination": [
-    "Not Required",
     "Gloss Lamination (Front)",
     "Matte Lamination (Front)",
     "Matte Lamination (Front) + Spot UV (Front)",
-    "Gloss Waterbase Varnish (Front)"
+    "Gloss Waterbase Varnish (Front)",
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Both)",
+    "Matte Lamination (Both) + Spot UV (Front)",
+    "Gloss Waterbase Varnish (Both)"
+   ],
+   "protective": [
+    "N/A",
+    "Gloss Waterbase Varnish (Back)"
    ]
   },
   "gaps": []
@@ -552,8 +575,7 @@
      "Exclusive Leather Cover"
     ]
    }
-  ],
-  "note": "Exclusive Leather Cover deferred: cfg_fails headless (lamination dropdown unreadable), like Tent Card"
+  ]
  },
  "pvccard": {
   "family": "pvccard",
@@ -595,17 +617,15 @@
     "4C (Front)",
     "4C (Both)"
    ],
-   "vdp": [
-    "Not Required",
-    "Variable Data Printing (Front)"
-   ],
-   "round_corner": [
-    "Not Required",
-    "Round Corner"
-   ],
    "hole_punch": [
     "Not Required",
-    "Required (6mm)"
+    "Hole Punching (6mm)"
+   ],
+   "vdp": [
+    "Not Required",
+    "Variable Data Printing (Front)",
+    "Variable Data Printing (Back)",
+    "Variable Data Printing (Both)"
    ]
   },
   "gaps": []
@@ -978,7 +998,30 @@
     "215mm x 114mm - Pink DL"
    ],
    "custom_w": [],
-   "custom_h": []
+   "custom_h": [],
+   "hot_stamping": [
+    "Not Required",
+    "1C (Front)",
+    "1C (Back)",
+    "2C (Front)",
+    "2C (Back)"
+   ],
+   "fold": [
+    "None",
+    "1Fa",
+    "2Fa",
+    "2Fb",
+    "2Fc",
+    "3Fa",
+    "3Fb",
+    "4Fa",
+    "4Fb"
+   ],
+   "punch": [
+    "No",
+    "3mm",
+    "6mm"
+   ]
   },
   "gaps": []
  },
@@ -1162,6 +1205,33 @@
     ]
    },
    {
+    "control": "ddlCoverLamination",
+    "options": [
+     "Matte Lamination (Front)",
+     "Matte Lamination (Both)",
+     "Matte Lamination (Front) + Spot UV (Front)",
+     "Matte Lamination (Both) + Spot UV (Front)",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)",
+     "Gloss Waterbase Varnish (Front)",
+     "Gloss Waterbase Varnish (Both)"
+    ]
+   },
+   {
+    "control": "ddl_embossing",
+    "options": [
+     "90mm x 30mm",
+     "90mm x 70mm",
+     "95mm x 206mm",
+     "101mm x 144mm",
+     "144mm x 206mm",
+     "194mm x 206mm",
+     "206mm x 294mm"
+    ]
+   },
+   {
     "control": "ddlCoverHSColourNum",
     "options": [
      "1C (Front)",
@@ -1189,6 +1259,28 @@
      "Green",
      "Red",
      "Silver"
+    ]
+   },
+   {
+    "control": "ddlContentPaper",
+    "options": [
+     "Simili 80gsm",
+     "Simili 100gsm",
+     "Gloss Art Paper 80gsm",
+     "Gloss Art Paper 100gsm",
+     "Gloss Art Paper 128gsm",
+     "Gloss Art Paper 150gsm",
+     "Matte Art Paper 100gsm",
+     "Matte Art Paper 130gsm",
+     "Matte Art Paper 150gsm",
+     "Gloss Art Card 230gsm (2 side coated)"
+    ]
+   },
+   {
+    "control": "ddlContentPrintColour",
+    "options": [
+     "1C (Both)",
+     "4C (Both)"
     ]
    },
    {
@@ -1277,8 +1369,7 @@
     "Yes"
    ]
   },
-  "gaps": [],
-  "note": "binding handled by dynamic cascade field; Excard control mislabeled rdbidning (checker false positive, now suppressed)"
+  "gaps": []
  },
  "billbook": {
   "family": "billbook",

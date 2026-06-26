@@ -845,6 +845,7 @@ FIELD_SCHEMAS = {
                 ]},
     "pvccard": {"options": "/api/printoka/pvccard/options", "quote": "/api/printoka/pvccard/quote",
                 "fields": [
+                    {"key": "orientation", "label": "Orientation (no online price change)", "addon": True, "depends": [], "options": ["Portrait", "Landscape"]},
                     {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
                     {"key": "hole_punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["Not Required", "Hole Punching (6mm)"]},
                     {"key": "vdp", "label": "Variable Data Printing", "addon": True, "depends": [], "options": ["Not Required", "Variable Data Printing (Front)", "Variable Data Printing (Back)", "Variable Data Printing (Both)"]},
