@@ -644,17 +644,32 @@ def _attach_images(data):
                 fld["images"] = imgs[fam][fld["key"]]
 
 
-# captured /ordering/<slug> -> our product id (output/v4_options/<slug>_options.json)
-_EXCARD_SLUG2ID = {
-    "folder": 107, "envelope": 106, "notepad": 104, "kad-kahwin": 114,
-    "kad-terima-kasih": 115, "pvc-card": 113, "bunting": 124, "banner": 123,
-    "mug": 129, "bookmark": 109, "voucher-pad": 110, "wobbler": 126,
-    "hand-fan": 133, "button-badge": 132, "paper-bag": 127,
-    "hard-cover-menu": 136, "canvas-tote-bag": 128,
+# our product id -> captured Excard ordering slug (output/v4_options/<slug>_options.json)
+_EXCARD_ID2SLUG = {
+    107: "folder", 106: "envelope", 104: "notepad", 114: "kad-kahwin",
+    115: "kad-terima-kasih", 113: "pvc-card", 124: "bunting", 123: "banner",
+    129: "mug", 109: "bookmark", 110: "voucher-pad", 126: "wobbler",
+    133: "hand-fan", 132: "button-badge", 127: "paper-bag",
+    136: "hard-cover-menu", 128: "canvas-tote-bag",
+    108: "l-shape-plastic-folder", 118: "wall-calendar", 119: "arch-file",
+    120: "hard-stand-desk-calendar", 121: "soft-stand-desk-calendar",
+    122: "wire-o-wall-calendar", 125: "roll-up-stand",
+    112: "hard-cover-wire-o-notebook", 137: "standing-pouch",
+    116: "car-sticker", 117: "car-sticker", 138: "money-packet",
+    139: "non-woven-bag", 140: "tent-card", 134: "Hanger",
+    105: "letterhead", 130: "papan-kopi",
 }
 # Excard metric columns that are not user-selectable options
 _EXCARD_SKIP = ("price", "weight", "print method", "process day", "fee",
                 "delivery", "shipment", "compulsory")
+
+
+def _is_skip_col(dim):
+    import re
+    low = dim.lower()
+    if low.startswith("quantity") or re.match(r"^column\s*\d+$", low):
+        return True
+    return any(s in low for s in _EXCARD_SKIP)
 
 
 def _norm(s):
@@ -678,7 +693,7 @@ def _attach_excard_parity(data):
     import re
     by_id = {p["id"]: p for p in data["products"]}
     added = {}
-    for slug, pid in _EXCARD_SLUG2ID.items():
+    for pid, slug in _EXCARD_ID2SLUG.items():
         prod = by_id.get(pid)
         f = OUT / "v4_options" / f"{slug}_options.json"
         if not prod or not f.exists():
@@ -699,8 +714,7 @@ def _attach_excard_parity(data):
             return None
         newcount = 0
         for dim in ex["optionCols"]:
-            low = dim.lower()
-            if low.startswith("quantity") or any(s in low for s in _EXCARD_SKIP):
+            if _is_skip_col(dim):
                 continue
             vals = ex["distinct"].get(dim, [])
             if len(vals) < 1:
