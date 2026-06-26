@@ -644,10 +644,95 @@ def _attach_images(data):
                 fld["images"] = imgs[fam][fld["key"]]
 
 
+# captured /ordering/<slug> -> our product id (output/v4_options/<slug>_options.json)
+_EXCARD_SLUG2ID = {
+    "folder": 107, "envelope": 106, "notepad": 104, "kad-kahwin": 114,
+    "kad-terima-kasih": 115, "pvc-card": 113, "bunting": 124, "banner": 123,
+    "mug": 129, "bookmark": 109, "voucher-pad": 110, "wobbler": 126,
+    "hand-fan": 133, "button-badge": 132, "paper-bag": 127,
+    "hard-cover-menu": 136, "canvas-tote-bag": 128,
+}
+# Excard metric columns that are not user-selectable options
+_EXCARD_SKIP = ("price", "weight", "print method", "process day", "fee",
+                "delivery", "shipment", "compulsory")
+
+
+def _norm(s):
+    import re
+    return re.sub(r"[^a-z0-9]", "", str(s).lower())
+
+
+def _img_for(opt, imgmap):
+    """Match a calculator option label to an Excard diagram URL (exact, then by code prefix)."""
+    if opt in imgmap:
+        return imgmap[opt]
+    code = opt.split(" — ")[0].split(" (")[0].strip()
+    return imgmap.get(code)
+
+
+def _attach_excard_parity(data):
+    """KPI 1 — option parity. For every product we captured from Excard's ordering page,
+    ensure EVERY Excard option dimension (priced or not) is selectable in the calculator,
+    with Excard's exact values and option images. Existing pricing fields are left untouched
+    (new dimensions are added as addon fields the engine ignores)."""
+    import re
+    by_id = {p["id"]: p for p in data["products"]}
+    added = {}
+    for slug, pid in _EXCARD_SLUG2ID.items():
+        prod = by_id.get(pid)
+        f = OUT / "v4_options" / f"{slug}_options.json"
+        if not prod or not f.exists():
+            continue
+        ex = json.loads(f.read_text(encoding="utf-8"))
+        imgfield = ex.get("imageField")
+        imgmap = ex.get("imageOptions") or {}
+        # normalized text of our existing fields (keys + labels) to detect coverage
+        def covered_by(dim):
+            nd = _norm(dim)
+            toks = [t for t in re.findall(r"[a-z]+", dim.lower()) if len(t) > 3]
+            for fld in prod["fields"]:
+                blob = _norm(fld.get("key", "") + " " + fld.get("label", ""))
+                if nd and nd in blob:
+                    return fld
+                if toks and all(t in blob for t in toks):
+                    return fld
+            return None
+        newcount = 0
+        for dim in ex["optionCols"]:
+            low = dim.lower()
+            if low.startswith("quantity") or any(s in low for s in _EXCARD_SKIP):
+                continue
+            vals = ex["distinct"].get(dim, [])
+            if len(vals) < 1:
+                continue
+            is_img = (dim == imgfield) and bool(imgmap)
+            fld = covered_by(dim)
+            if fld:
+                # already selectable — just enrich with Excard images if it's the image axis
+                if is_img and "images" not in fld:
+                    opts = fld.get("options") or vals
+                    images = {o: _img_for(o, imgmap) for o in opts if _img_for(o, imgmap)}
+                    if images:
+                        fld["images"] = images
+                continue
+            # missing dimension -> add it (Excard exact values, images if it's the image axis)
+            newf = {"key": "ex_" + _norm(dim), "label": dim + " (Excard option)",
+                    "addon": True, "depends": [], "options": vals}
+            if is_img:
+                newf["images"] = {v: imgmap[v] for v in vals if v in imgmap}
+            prod["fields"].append(newf)
+            newcount += 1
+        if newcount:
+            added[slug] = newcount
+    if added:
+        print("  [excard parity] added option dimensions:", added)
+
+
 def main():
     data = build_data()
     _drop_unsampled(data)
     _attach_images(data)
+    _attach_excard_parity(data)
     tmpl = (UI / "_standalone_template.html").read_text(encoding="utf-8")
     html = tmpl.replace("/*__DATA__*/", json.dumps(data, ensure_ascii=False))
     (UI / "calculator_standalone.html").write_text(html, encoding="utf-8")
