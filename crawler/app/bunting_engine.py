@@ -61,7 +61,7 @@ def cash_price(size: str, paper: str, qty: int) -> float:
     curves = _curves()
     curve = curves.get((size, paper))
     if curve is None:
-        curve = curves.get((SIZES[0], PAPERS[0]), {})
+        return 0.0  # unsampled combination (e.g. Synthetic Paper — headless deferred)
     return _interp_ll(curve, qty)
 
 

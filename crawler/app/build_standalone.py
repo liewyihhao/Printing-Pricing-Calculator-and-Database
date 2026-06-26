@@ -325,7 +325,8 @@ def build_data():
          "optsrc": "none", "accuracy": acc.get(124), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
                 "2ft x 5ft", "2ft x 6ft", "2.5ft x 6ft"]},
-            {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": ["Tarpaulin 300gsm"]},
+            {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": [
+                "Tarpaulin 300gsm", "Synthetic Paper 180micron"]},
             {"key": "protective", "label": "Fitting", "addon": True, "depends": [], "options": [
                 "Wood", "PVC Pipe", "Wood+Wire"]}]},
         {"id": 125, "name": "Roll-Up Stand — Litho", "engine": "rollup", "optsrc": "none",
@@ -345,7 +346,11 @@ def build_data():
         {"id": 127, "name": "Paper Bag — Litho", "engine": "paperbag", "optsrc": "none",
          "accuracy": acc.get(127), "fields": [
             {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
-                "Gloss Art Paper 157gsm", "Gloss Art Card 190gsm (1 side coated)"]}]},
+                "Gloss Art Paper 157gsm", "Gloss Art Card 190gsm (1 side coated)"]},
+            {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [],
+             "options": ["Gloss Lamination (Front)", "Matte Lamination (Front)"]},
+            {"key": "rope_colour", "label": "Rope Colour (no online price change)", "addon": True, "depends": [],
+             "options": ["Black", "Blue", "Red", "White", "Gold"]}]},
         {"id": 128, "name": "Canvas Tote Bag — Litho", "engine": "canvastote", "optsrc": "none",
          "accuracy": acc.get(128), "fields": [
             {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": [
@@ -381,7 +386,7 @@ def build_data():
         {"id": 135, "name": "Magnet — Digital", "engine": "simpleqty", "paramKey": "magnet",
          "optsrc": "none", "accuracy": acc.get(135), "fields": [
             {"key": "shape", "label": "Shape", "addon": True, "depends": [],
-             "options": ["Rectangle/Square", "Round", "Custom Die-Cut"]},
+             "options": ["Rectangle/Square", "Round", "Custom Die-Cut (with round corner)", "Multiple Dieline"]},
             {"key": "finishing", "label": "Finishing (Soft Touch ~+RM4)", "addon": True, "depends": [],
              "options": ["Matte Laminate (Front)", "Gloss Laminate (Front)", "Soft Touch Laminate (Front)"]}]},
         {"id": 136, "name": "Hard Cover Menu — Digital", "engine": "simpleqty", "paramKey": "hardmenu",
@@ -395,7 +400,7 @@ def build_data():
         {"id": 137, "name": "Standing Pouch — Litho", "engine": "simpleqty", "paramKey": "pouch",
          "optsrc": "none", "accuracy": acc.get(137), "fields": [
             {"key": "paper", "label": "Material", "addon": True, "depends": [],
-             "options": ["Metalised Pet Film"]},
+             "options": ["Metalised Pet Film", "Transparent Pet Film"]},
             {"key": "lamination", "label": "Lamination (price-neutral)", "addon": True, "depends": [],
              "options": ["Matte Lamination", "Gloss Lamination"]}]},
         {"id": 138, "name": "Money Packet — Litho", "engine": "pricelist", "paramKey": "money_packet",

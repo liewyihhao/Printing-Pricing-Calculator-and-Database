@@ -742,7 +742,7 @@ FIELD_SCHEMAS = {
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
                         "2ft x 5ft", "2ft x 6ft", "2.5ft x 6ft"]},
-                    {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": ["Tarpaulin 300gsm"]},
+                    {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": ["Tarpaulin 300gsm", "Synthetic Paper 180micron"]},
                     {"key": "protective", "label": "Fitting", "addon": True, "depends": [], "options": [
                         "Wood", "PVC Pipe", "Wood+Wire"]},
                 ]},
@@ -766,6 +766,10 @@ FIELD_SCHEMAS = {
                 "fields": [
                     {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
                         "Gloss Art Paper 157gsm", "Gloss Art Card 190gsm (1 side coated)"]},
+                    {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [],
+                     "options": ["Gloss Lamination (Front)", "Matte Lamination (Front)"]},
+                    {"key": "rope_colour", "label": "Rope Colour (no online price change)", "addon": True, "depends": [],
+                     "options": ["Black", "Blue", "Red", "White", "Gold"]},
                 ]},
     "canvastote": {"options": "/api/printoka/canvastote/options", "quote": "/api/printoka/canvastote/quote",
                 "fields": [
@@ -802,7 +806,7 @@ FIELD_SCHEMAS = {
     "magnet": {"options": "/api/printoka/magnet/options", "quote": "/api/printoka/magnet/quote",
                 "fields": [
                     {"key": "shape", "label": "Shape", "addon": True, "depends": [],
-                     "options": ["Rectangle/Square", "Round", "Custom Die-Cut"]},
+                     "options": ["Rectangle/Square", "Round", "Custom Die-Cut (with round corner)", "Multiple Dieline"]},
                     {"key": "finishing", "label": "Finishing (Soft Touch ~+RM4)", "addon": True, "depends": [],
                      "options": ["Matte Laminate (Front)", "Gloss Laminate (Front)", "Soft Touch Laminate (Front)"]}]},
     "hardmenu": {"options": "/api/printoka/hardmenu/options", "quote": "/api/printoka/hardmenu/quote",
@@ -816,7 +820,7 @@ FIELD_SCHEMAS = {
     "pouch": {"options": "/api/printoka/pouch/options", "quote": "/api/printoka/pouch/quote",
                 "fields": [
                     {"key": "paper", "label": "Material", "addon": True, "depends": [],
-                     "options": ["Metalised Pet Film"]},
+                     "options": ["Metalised Pet Film", "Transparent Pet Film"]},
                     {"key": "lamination", "label": "Lamination (price-neutral)", "addon": True, "depends": [],
                      "options": ["Matte Lamination", "Gloss Lamination"]}]},
     "staticcling": {"options": "/api/printoka/staticcling/options", "quote": "/api/printoka/staticcling/quote",
@@ -1545,8 +1549,11 @@ def bunting_quote(product: int = Query(124), size: str = Query("2ft x 5ft"),
                   qty: int = Query(...)):
     from . import simpleqty_engine as SQ
     p = _simpleqty_params("bunting")
+    variant = f"{size}|{paper}|{protective}"
+    if variant not in p.get("curves", {}):
+        return JSONResponse({"error": f"{paper} ({size}, {protective}) is not yet priced — contact us for a quote"}, status_code=400)
     try:
-        cash = SQ.cash_price(p, f"{size}|{paper}|{protective}", qty); wt = SQ.weight_kg(p, qty)
+        cash = SQ.cash_price(p, variant, qty); wt = SQ.weight_kg(p, qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
@@ -1611,7 +1618,9 @@ def paperbag_options(product: int = Query(127)):
 
 
 @app.get("/api/printoka/paperbag/quote")
-def paperbag_quote(product: int = Query(127), paper: str = Query("Gloss Art Paper 157gsm"), qty: int = Query(...)):
+def paperbag_quote(product: int = Query(127), paper: str = Query("Gloss Art Paper 157gsm"),
+                   lamination: str = Query("Gloss Lamination (Front)"),
+                   rope_colour: str = Query("Black"), qty: int = Query(...)):
     from . import paperbag_engine as PB
     try:
         cash = PB.cash_price(paper, qty); wt = PB.weight_kg(paper, qty)
@@ -1619,8 +1628,8 @@ def paperbag_quote(product: int = Query(127), paper: str = Query("Gloss Art Pape
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = f"Paper Bag: {paper}. Folding + Gluing + Hole Punching compulsory. qty = bags."
-    return {"config": {"product": product, "paper": paper, "qty": qty},
+    note = f"Paper Bag: {paper}. Folding + Gluing + Hole Punching compulsory. Lamination and rope colour do not change the online price. qty = bags."
+    return {"config": {"product": product, "paper": paper, "lamination": lamination, "rope_colour": rope_colour, "qty": qty},
             "printoka_cash": round(cash, 2), "method": "formula (per-paper qty curve)",
             "note": note, "tiers": PB.tiers(cash), "weight_kg": round(wt, 3)}
 
@@ -1816,8 +1825,13 @@ def magnet_quote(product: int = Query(135), qty: int = Query(...),
                  finishing: str = Query("Matte Laminate (Front)")):
     from . import simpleqty_engine as SQ
     p = _simpleqty_params("magnet")
+    # "Custom Die-Cut (with round corner)" is Excard's exact name for what we sampled as "Custom Die-Cut"
+    _SHAPE_ALIAS = {"Custom Die-Cut (with round corner)": "Custom Die-Cut"}
+    shape_key = _SHAPE_ALIAS.get(shape, shape)
+    if shape == "Multiple Dieline":
+        return JSONResponse({"error": "Multiple Dieline magnets are not yet priced — contact us for a quote"}, status_code=400)
     try:
-        cash = SQ.cash_price(p, shape, qty); wt = SQ.weight_kg(p, qty)
+        cash = SQ.cash_price(p, shape_key, qty); wt = SQ.weight_kg(p, qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
@@ -1863,6 +1877,8 @@ def pouch_quote(product: int = Query(137), qty: int = Query(...),
                 lamination: str = Query("Matte Lamination")):
     from . import simpleqty_engine as SQ
     p = _simpleqty_params("pouch")
+    if paper not in p.get("curves", {}):
+        return JSONResponse({"error": f"{paper} is not yet priced — contact us for a quote"}, status_code=400)
     try:
         cash = SQ.cash_price(p, paper, qty); wt = SQ.weight_kg(p, qty)
     except Exception as e:  # noqa: BLE001

@@ -1205,33 +1205,6 @@
     ]
    },
    {
-    "control": "ddlCoverLamination",
-    "options": [
-     "Matte Lamination (Front)",
-     "Matte Lamination (Both)",
-     "Matte Lamination (Front) + Spot UV (Front)",
-     "Matte Lamination (Both) + Spot UV (Front)",
-     "Gloss Lamination (Front)",
-     "Gloss Lamination (Both)",
-     "UV Varnish (Front)",
-     "UV Varnish (Both)",
-     "Gloss Waterbase Varnish (Front)",
-     "Gloss Waterbase Varnish (Both)"
-    ]
-   },
-   {
-    "control": "ddl_embossing",
-    "options": [
-     "90mm x 30mm",
-     "90mm x 70mm",
-     "95mm x 206mm",
-     "101mm x 144mm",
-     "144mm x 206mm",
-     "194mm x 206mm",
-     "206mm x 294mm"
-    ]
-   },
-   {
     "control": "ddlCoverHSColourNum",
     "options": [
      "1C (Front)",
@@ -1259,28 +1232,6 @@
      "Green",
      "Red",
      "Silver"
-    ]
-   },
-   {
-    "control": "ddlContentPaper",
-    "options": [
-     "Simili 80gsm",
-     "Simili 100gsm",
-     "Gloss Art Paper 80gsm",
-     "Gloss Art Paper 100gsm",
-     "Gloss Art Paper 128gsm",
-     "Gloss Art Paper 150gsm",
-     "Matte Art Paper 100gsm",
-     "Matte Art Paper 130gsm",
-     "Matte Art Paper 150gsm",
-     "Gloss Art Card 230gsm (2 side coated)"
-    ]
-   },
-   {
-    "control": "ddlContentPrintColour",
-    "options": [
-     "1C (Both)",
-     "4C (Both)"
     ]
    },
    {
@@ -1728,5 +1679,574 @@
    "diameter": []
   },
   "gaps": []
+ },
+ "banner": {
+  "family": "banner",
+  "excard_controls": [
+   {
+    "control": "ddlSize",
+    "options": [
+     "3ft x 2ft",
+     "4ft x 2ft",
+     "6ft x 2ft",
+     "4ft x 3ft",
+     "8ft x 3ft",
+     "10ft x 3ft",
+     "18ft x 3ft",
+     "8ft x 4ft",
+     "10ft x 4ft",
+     "20ft x 4ft"
+    ]
+   }
+  ],
+  "our_fields": {
+   "size": [
+    "3ft x 2ft",
+    "4ft x 2ft",
+    "6ft x 2ft",
+    "4ft x 3ft",
+    "8ft x 3ft",
+    "10ft x 3ft",
+    "18ft x 3ft",
+    "8ft x 4ft",
+    "10ft x 4ft",
+    "20ft x 4ft"
+   ]
+  },
+  "gaps": []
+ },
+ "bunting": {
+  "family": "bunting",
+  "excard_controls": [
+   {
+    "control": "ddlSize",
+    "options": [
+     "2ft x 5ft",
+     "2ft x 6ft",
+     "2.5ft x 6ft"
+    ]
+   },
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Tarpaulin 300gsm",
+     "Synthetic Paper 180micron"
+    ]
+   },
+   {
+    "control": "ddlColourProtective",
+    "options": [
+     "Come With Wood Only",
+     "Come With PVC Pipe",
+     "Come With Wood and Pre-Installed Wire (#18)"
+    ]
+   }
+  ],
+  "our_fields": {
+   "size": [
+    "2ft x 5ft",
+    "2ft x 6ft",
+    "2.5ft x 6ft"
+   ],
+   "paper": [
+    "Tarpaulin 300gsm",
+    "Synthetic Paper 180micron"
+   ],
+   "protective": [
+    "Wood",
+    "PVC Pipe",
+    "Wood+Wire"
+   ]
+  },
+  "gaps": []
+ },
+ "wobbler": {
+  "family": "wobbler",
+  "excard_controls": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Gloss Art Card 250gsm",
+     "Gloss Art Card 310gsm"
+    ]
+   },
+   {
+    "control": "rblLaminationSide",
+    "options": [
+     "Matte Lamination (Front)",
+     "Gloss Lamination (Front)"
+    ]
+   },
+   {
+    "control": "rblMouldGroup",
+    "options": [
+     "Portrait",
+     "Landscape"
+    ]
+   },
+   {
+    "control": "rblRoundCorner",
+    "options": [
+     "Not Required",
+     "Round Corner",
+     "Custom Die-Cut"
+    ]
+   }
+  ],
+  "our_fields": {
+   "orient": [
+    "Portrait",
+    "Landscape"
+   ],
+   "paper": [
+    "Gloss Art Card 250gsm",
+    "Gloss Art Card 310gsm"
+   ],
+   "lam": [
+    "Matte Lamination (Front)",
+    "Gloss Lamination (Front)"
+   ],
+   "finishing": [
+    "-",
+    "Round Cornering (R6),4,1",
+    "Digital Die-cutting,0,0"
+   ]
+  },
+  "gaps": []
+ },
+ "rollup": {
+  "family": "rollup",
+  "excard_controls": [
+   {
+    "control": "rblLaminationSide",
+    "options": [
+     "Matte Lamination",
+     "Gloss Lamination"
+    ]
+   }
+  ],
+  "our_fields": {
+   "lam": [
+    "Matte Lamination",
+    "Gloss Lamination"
+   ]
+  },
+  "gaps": []
+ },
+ "deskcal_hard": {
+  "family": "deskcal_hard",
+  "excard_controls": [
+   {
+    "control": "rdCategory",
+    "options": [
+     "WDCH 001 (Portrait)",
+     "WDCH 002 (Landscape)",
+     "DCHS 001 (Hot Stamping - Portrait)"
+    ]
+   }
+  ],
+  "our_fields": {
+   "cat": [
+    "WDCH 001 (Portrait)",
+    "WDCH 002 (Landscape)",
+    "DCHS 001 (Hot Stamping - Portrait)"
+   ]
+  },
+  "gaps": []
+ },
+ "buttonbadge": {
+  "family": "buttonbadge",
+  "excard_controls": [
+   {
+    "control": "rblLaminationSide",
+    "options": [
+     "Gloss",
+     "Soft Touch"
+    ]
+   }
+  ],
+  "our_fields": {
+   "lamination": [
+    "Gloss",
+    "Soft Touch"
+   ]
+  },
+  "gaps": []
+ },
+ "handfan": {
+  "family": "handfan",
+  "excard_controls": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Gloss Art Card 310gsm",
+     "Gloss Art Card 360gsm"
+    ]
+   },
+   {
+    "control": "rblLaminationSide",
+    "options": [
+     "Matte Lamination (Both)",
+     "Gloss Lamination (Both)"
+    ]
+   }
+  ],
+  "our_fields": {
+   "paper": [
+    "Gloss Art Card 310gsm",
+    "Gloss Art Card 360gsm"
+   ],
+   "lamination": [
+    "Matte Lamination (Both)",
+    "Gloss Lamination (Both)"
+   ]
+  },
+  "gaps": []
+ },
+ "hanger": {
+  "family": "hanger",
+  "excard_controls": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Gloss Art Card 310gsm (2 sides coated)",
+     "Gloss Art Card 360gsm (2 sides coated)"
+    ]
+   },
+   {
+    "control": "rblPrintColourSide",
+    "options": [
+     "4C (Front)",
+     "4C (Both)"
+    ]
+   },
+   {
+    "control": "rblLaminationSide",
+    "options": [
+     "Matte Lamination (Both)",
+     "Gloss Lamination (Both)"
+    ]
+   }
+  ],
+  "our_fields": {
+   "paper": [
+    "Gloss Art Card 310gsm (2 sides coated)",
+    "Gloss Art Card 360gsm (2 sides coated)"
+   ],
+   "colour": [
+    "4C (Front)",
+    "4C (Both)"
+   ],
+   "lamination": [
+    "Matte Lamination (Both)",
+    "Gloss Lamination (Both)"
+   ]
+  },
+  "gaps": []
+ },
+ "hardmenu": {
+  "family": "hardmenu",
+  "excard_controls": [
+   {
+    "control": "ddlLamination",
+    "options": [
+     "Gloss Lamination (Both)",
+     "Matte Lamination (Both)"
+    ]
+   },
+   {
+    "control": "ddlAddContent",
+    "options": [
+     "12",
+     "16"
+    ]
+   },
+   {
+    "control": "rblOrderDesc",
+    "options": [
+     "Cover + Content",
+     "Cover only",
+     "Content only"
+    ]
+   }
+  ],
+  "our_fields": {
+   "order": [
+    "Cover + Content",
+    "Cover only",
+    "Content only"
+   ],
+   "addcontent": [
+    "12",
+    "16",
+    "-"
+   ],
+   "lamination": [
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Both)"
+   ]
+  },
+  "gaps": []
+ },
+ "magnet": {
+  "family": "magnet",
+  "excard_controls": [
+   {
+    "control": "ddlfinishing",
+    "options": [
+     "Matte Laminate (Front)",
+     "Gloss Laminate (Front)",
+     "Soft Touch Laminate (Front)"
+    ]
+   },
+   {
+    "control": "rdCategory",
+    "options": [
+     "Custom Die-Cut (with round corner)",
+     "Rectangle/Square",
+     "Round",
+     "Multiple Dieline"
+    ]
+   }
+  ],
+  "our_fields": {
+   "shape": [
+    "Rectangle/Square",
+    "Round",
+    "Custom Die-Cut (with round corner)",
+    "Multiple Dieline"
+   ],
+   "finishing": [
+    "Matte Laminate (Front)",
+    "Gloss Laminate (Front)",
+    "Soft Touch Laminate (Front)"
+   ]
+  },
+  "gaps": []
+ },
+ "paperbag": {
+  "family": "paperbag",
+  "excard_controls": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Gloss Art Paper 157gsm",
+     "Gloss Art Card 190gsm (1 side coated)"
+    ]
+   },
+   {
+    "control": "rblLaminationSide",
+    "options": [
+     "Gloss Lamination (Front)",
+     "Matte Lamination (Front)"
+    ]
+   },
+   {
+    "control": "rblRopeColour",
+    "options": [
+     "Black",
+     "Blue",
+     "Red",
+     "White",
+     "Gold"
+    ]
+   }
+  ],
+  "our_fields": {
+   "paper": [
+    "Gloss Art Paper 157gsm",
+    "Gloss Art Card 190gsm (1 side coated)"
+   ],
+   "lamination": [
+    "Gloss Lamination (Front)",
+    "Matte Lamination (Front)"
+   ],
+   "rope_colour": [
+    "Black",
+    "Blue",
+    "Red",
+    "White",
+    "Gold"
+   ]
+  },
+  "gaps": []
+ },
+ "canvastote": {
+  "family": "canvastote",
+  "excard_controls": [
+   {
+    "control": "rblPrintColourSide",
+    "options": [
+     "1C (Front)",
+     "1C (Both)"
+    ]
+   }
+  ],
+  "our_fields": {
+   "colour": [
+    "1C (Front)",
+    "1C (Both)"
+   ]
+  },
+  "gaps": []
+ },
+ "pouch": {
+  "family": "pouch",
+  "excard_controls": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Metalised Pet Film",
+     "Transparent Pet Film"
+    ]
+   },
+   {
+    "control": "rblLaminationSide",
+    "options": [
+     "Matte Lamination",
+     "Gloss Lamination"
+    ]
+   }
+  ],
+  "our_fields": {
+   "paper": [
+    "Metalised Pet Film",
+    "Transparent Pet Film"
+   ],
+   "lamination": [
+    "Matte Lamination",
+    "Gloss Lamination"
+   ]
+  },
+  "gaps": []
+ },
+ "tent_card": {
+  "family": "tent_card",
+  "excard_controls": [
+   {
+    "control": "rblLaminationSide",
+    "options": [
+     "Matte Lamination (Both)",
+     "Matte Lamination (Both) + Spot UV (Front)"
+    ]
+   }
+  ],
+  "our_fields": {
+   "model": [
+    "TC 003",
+    "TC 004"
+   ],
+   "lamination": [
+    "Matte Lamination (Both)",
+    "Matte Lamination (Both) + Spot UV (Front)"
+   ]
+  },
+  "gaps": []
+ },
+ "money_packet": {
+  "family": "money_packet",
+  "excard_controls": [],
+  "our_fields": {
+   "model": [
+    "MP 101",
+    "MP 103",
+    "MP 104"
+   ],
+   "package": [
+    "Normal",
+    "Dual Design",
+    "5 Design",
+    "6 Design"
+   ],
+   "paper": [
+    "Gloss Art Paper 130gsm",
+    "Linen 140gsm",
+    "Art Paper 157gsm"
+   ],
+   "finishing": [
+    "N/A",
+    "Matte Lamination",
+    "Soft Touch Lamination"
+   ],
+   "packing": [
+    "5pcs / Pack",
+    "6pcs / Pack",
+    "8pcs / Pack",
+    "10pcs / Pack"
+   ]
+  },
+  "gaps": []
+ },
+ "non_woven_bag": {
+  "family": "non_woven_bag",
+  "excard_controls": [],
+  "our_fields": {
+   "model": [
+    "WN-B5",
+    "WS-A4",
+    "WS-A3P",
+    "WS-A3L",
+    "WH-A4"
+   ],
+   "print_colour": [
+    "1C (Front)",
+    "1C (Both)",
+    "4C (Front)",
+    "4C (Both)"
+   ],
+   "bag_colour": [
+    "Black",
+    "White",
+    "Beige",
+    "Yellow",
+    "Orange",
+    "Dark Orange",
+    "Magenta",
+    "Red",
+    "Maroon",
+    "Green",
+    "Milo Green",
+    "Dark Green",
+    "Turquoise",
+    "Cyan",
+    "Royal Blue",
+    "Navy Blue",
+    "Dark Purple",
+    "Light Brown",
+    "Dark Brown",
+    "Grey"
+   ],
+   "handle_length": [
+    "300mm",
+    "440mm",
+    "500mm"
+   ],
+   "handle_colour": [
+    "Same as bag colour",
+    "Black",
+    "White",
+    "Beige",
+    "Orange",
+    "Dark Orange",
+    "Magenta",
+    "Red",
+    "Maroon",
+    "Green",
+    "Milo Green",
+    "Dark Green",
+    "Turquoise",
+    "Cyan",
+    "Royal Blue",
+    "Navy Blue",
+    "Dark Purple",
+    "Light Brown",
+    "Dark Brown",
+    "Grey"
+   ]
+  },
+  "gaps": []
+ },
+ "papan_kopi": {
+  "error": "Page.evaluate: Execution context was destroyed, most likely because of a navigation"
  }
 }

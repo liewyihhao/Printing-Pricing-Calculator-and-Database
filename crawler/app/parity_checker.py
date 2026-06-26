@@ -40,6 +40,28 @@ FAMILY_URL = {
     "billbook": "https://www.excard.com.my/spec/Litho/Bill-Book",
     "sticker_digital": "https://www.excard.com.my/spec/Digital/Label_Sticker",
     "sticker_letterpress": "https://www.excard.com.my/spec/Letterpress/Label_Sticker_with_Hot_Stamping",
+    # Large-format
+    "banner": "https://www.excard.com.my/spec/Litho/Banner",
+    "bunting": "https://www.excard.com.my/spec/Litho/Bunting",
+    "wobbler": "https://www.excard.com.my/spec/Digital/Wobbler",
+    "rollup": "https://www.excard.com.my/spec/Litho/Roll_Up_Stand",
+    # Calendars
+    "deskcal_hard": "https://www.excard.com.my/spec/Litho/Desk_Calendar_(Hard_Stand)",
+    # Gifts
+    "buttonbadge": "https://www.excard.com.my/spec/Digital/button_badge",
+    "handfan": "https://www.excard.com.my/spec/Digital/Hand_Fan",
+    "hanger": "https://www.excard.com.my/spec/Digital/Hanger",
+    "hardmenu": "https://www.excard.com.my/spec/Digital/Hard_Cover_Menu",
+    "magnet": "https://www.excard.com.my/spec/Digital/Magnet",
+    # Bags & packaging
+    "paperbag": "https://www.excard.com.my/spec/Litho/Paper_Bag",
+    "canvastote": "https://www.excard.com.my/spec/Litho/Canvas_Tote_Bag",
+    "pouch": "https://www.excard.com.my/spec/Litho/Standing_Pouch",
+    # Misc
+    "tent_card": "https://www.excard.com.my/spec/Litho/Tent_Card",
+    "money_packet": "https://www.excard.com.my/spec/Litho/Money_Packet",
+    "non_woven_bag": "https://www.excard.com.my/spec/Litho/Non_Woven_Bag",
+    "papan_kopi": "https://www.excard.com.my/spec/Litho/Papan_Kopi",
 }
 # control name substrings to ignore (not product spec drivers)
 IGNORE = ("country", "courier", "comboqty", "ddlqty", "qty", "track", "review-filter",
@@ -112,7 +134,7 @@ def _schema_options(family):
 
 # control-name keyword -> our schema field-key keyword (so rblPunchHole matches hole_punch, etc.)
 KEYWORD_FIELDS = {"laminat": ("lamination", "surface", "finishing"), "punch": ("punch", "hole"),
-                  "hole": ("punch", "hole"), "corner": ("corner",), "fold": ("fold",),
+                  "hole": ("punch", "hole"), "corner": ("corner", "finishing"), "fold": ("fold",),
                   "emboss": ("emboss",), "stamp": ("hot_stamping", "stamp"),
                   "envelope": ("envelope",), "round": ("round_corner", "corner"),
                   "vdp": ("vdp",), "size": ("size",), "paper": ("paper",), "colour": ("colour", "color"),
@@ -122,19 +144,48 @@ KEYWORD_FIELDS = {"laminat": ("lamination", "surface", "finishing"), "punch": ("
                   # rblMouldGroup is a grouping radio (Presentation/Document/Key/CD Jacket) that
                   # filters which individual mould models appear. Our flat `model` field lists all
                   # moulds across groups — it covers the group implicitly via model selection.
-                  "mould": ("model", "mould"), "orient": ("orientation",)}
+                  "mould": ("model", "mould"), "orient": ("orientation",),
+                  # Bunting ddlColourProtective = fitting (Wood/PVC Pipe/Wood+Wire) → our `protective`
+                  "protective": ("protective",),
+                  # Wobbler rblRoundCorner (Round Corner / Custom Die-Cut) — we cover both in `finishing`
+                  "diecut": ("finishing",),
+                  # Money Packet / bags packaging controls
+                  "packing": ("packing", "package"), "package": ("packing", "package"),
+                  # Banner/large-format controls
+                  "banner": ("size",), "material": ("paper", "material"),
+                  # Gifts finishing
+                  "finishing": ("finishing",), "shape": ("shape",),
+                  # addcontent for Hard Cover Menu
+                  "addcontent": ("addcontent",), "content": ("addcontent", "content"),
+                  # Bag colour / handle
+                  "handle": ("handle_length", "handle_colour", "handle"),
+                  "bagcolour": ("bag_colour",),
+                  # Category radio for desk calendar
+                  "category": ("cat", "category"),
+                  # Tent Card model
+                  "model": ("model",),
+                  }
+
+
+# Per-family control names to ignore (constants that aren't user-selectable dimensions)
+FAMILY_IGNORE: dict[str, tuple[str, ...]] = {
+    # rdType="Magnet" is a form-navigation constant (not a user dim); magnet has no type split
+    "magnet": ("rdtype",),
+}
 
 
 def _diff(family, excard):
     ours = _schema_options(family)
     our_all_norm = {_norm(o) for opts in ours.values() for o in opts}
     our_keys = [k.lower() for k in ours]
+    fam_ign = FAMILY_IGNORE.get(family, ())
     gaps = []
     controls = []
     items = [(s["name"], s["options"]) for s in excard["selects"]]
     items += [(name, vals) for name, vals in excard["radios"].items()]
     for name, opts in items:
-        if name == "" or any(k and k in name.lower() for k in IGNORE):
+        if name == "" or any(k and k in name.lower() for k in IGNORE) or \
+                any(k in name.lower() for k in fam_ign):
             continue
         # drop placeholder + noise options (out of stock, custom-size escape, % discount labels)
         opts = [o for o in opts if o and not re.match(r"^-|please select", o, re.I)

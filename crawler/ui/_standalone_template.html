@@ -546,7 +546,12 @@ function localQuote(prod, V, qty){
     let key;
     if(Array.isArray(vf)) key=vf.map(f=>V[f]).join("|");
     else key=(vf&&V[vf])?V[vf]:null;
-    if(!(key in cv)) key=Object.keys(cv)[0];
+    // Magnet: "Custom Die-Cut (with round corner)" sampled as "Custom Die-Cut"
+    if(prod.paramKey==="magnet" && V.shape==="Multiple Dieline")
+      throw new Error("Multiple Dieline magnets are not yet priced — contact us for a quote.");
+    if(prod.paramKey==="magnet" && key==="Multiple Dieline") key="Custom Die-Cut";
+    if(prod.paramKey==="magnet" && V.shape==="Custom Die-Cut (with round corner)") key="Custom Die-Cut";
+    if(!(key in cv)) throw new Error("This option is not yet priced — contact us for a quote.");
     cash=interpLogPts(Object.keys(cv[key]||{}).map(k=>[+k,cv[key][k]]),qty);
     wt=Math.round((P2.unit_wt||0.05)*qty*WF*1000)/1000;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt,
