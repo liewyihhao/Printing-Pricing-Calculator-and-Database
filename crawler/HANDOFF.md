@@ -4,7 +4,28 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
-- **52/52 BUILT. PARITY CHECKER: 1 REAL GAP (2026-06-26 scheduled run).** Two minor gaps found and closed:
+- **52/52 BUILT. PARITY CHECKER EXPANDED TO 37 FAMILIES: 1 REAL GAP (2026-06-26 run 2).**
+  Parity checker now covers 37 families (was 20). 5 real gaps found and closed:
+  - **Bunting Synthetic Paper 180micron** — added to paper options in FIELD_SCHEMAS, api.py,
+    build_standalone.py. `bunting_engine.cash_price` now returns 0.0 (not wrong fallback) for
+    unsampled materials; `bunting_quote` returns "not yet priced" error for Synthetic Paper.
+  - **Magnet shape rename + Multiple Dieline** — "Custom Die-Cut" renamed to "Custom Die-Cut
+    (with round corner)" (Excard's exact label). "Multiple Dieline" added as shape option that
+    returns "not yet priced". Alias map in `magnet_quote` + standalone JS handles translation.
+  - **Paper Bag lamination + rope colour** — `rblLaminationSide` (Gloss/Matte Front) and
+    `rblRopeColour` (Black/Blue/Red/White/Gold) added to FIELD_SCHEMAS. Both are no-online-
+    price-change per sampler notes; quote endpoint accepts them as pass-through params.
+  - **Standing Pouch Transparent Pet Film** — added to paper options; `pouch_quote` returns
+    "not yet priced" for unsampled materials.
+  - **Wobbler rblRoundCorner** — false positive (Round Corner + Custom Die-Cut already in
+    our `finishing` field); fixed KEYWORD_FIELDS `"corner" → ("corner", "finishing")`.
+  - **Magnet rdType=Magnet** — false positive (constant form-nav radio); suppressed via
+    `FAMILY_IGNORE["magnet"] = ("rdtype",)` in parity_checker.py.
+  - **Standalone simpleqty JS**: now throws "not yet priced" instead of silently falling back
+    to first curve when selected variant has no sampled data.
+  - All 37 checked families now at 0 real gaps. Wire-O Exclusive Leather Cover remains the
+    1 known deferred gap (cfg_fails headless). parity_report.json updated.
+- **52/52 BUILT. PARITY CHECKER: 1 REAL GAP (2026-06-26 run 1).** Two minor gaps found and closed:
   - **PVC Card orientation** — `ddlSizeOrientation` (Portrait/Landscape) was missing from FIELD_SCHEMAS.
     Orientation is price-neutral (already verified in pvccard_sampler). Added as a selectable field with
     "no online price change" label in api.py, build_standalone.py; standalone rebuilt.
