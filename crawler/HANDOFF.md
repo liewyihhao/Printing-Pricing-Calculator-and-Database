@@ -4,6 +4,16 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **52/52 BUILT. PARITY CHECKER: 1 REAL GAP (2026-06-26 scheduled run).** Two minor gaps found and closed:
+  - **PVC Card orientation** — `ddlSizeOrientation` (Portrait/Landscape) was missing from FIELD_SCHEMAS.
+    Orientation is price-neutral (already verified in pvccard_sampler). Added as a selectable field with
+    "no online price change" label in api.py, build_standalone.py; standalone rebuilt.
+  - **Folder mould group** — `rblMouldGroup` (Presentation/Document/Key/CD Jacket grouping radio) not
+    in FIELD_SCHEMAS. Our flat `model` field covers all individual moulds across all groups, so this is
+    a parity-checker false positive. Fixed by adding "mould" → ("model",) to KEYWORD_FIELDS in
+    parity_checker.py. Also added "orient" → ("orientation",) for future orientation controls.
+  - parity_report.json updated: **1 total gap** (Wire-O Exclusive Leather Cover, known headless-deferred).
+    All other 20 checked families at 0 gaps.
 - **52/52 BUILT. PARITY CHECKER SHOWS 0 REAL GAPS (2026-06-25 session 2).** All 52 Excard catalogue
   products are built and verified. Improvements this session (all committed + pushed):
   - **Loose Sheet Litho finishing consistency** — api.py now applies hot_stamping/fold/punch finishing
