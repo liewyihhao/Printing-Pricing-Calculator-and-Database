@@ -2368,5 +2368,180 @@
  },
  "papan_kopi": {
   "error": "Page.evaluate: Execution context was destroyed, most likely because of a navigation"
+ },
+ "booklet_digital": {
+  "family": "booklet_digital",
+  "excard_controls": [
+   {
+    "control": "ddlSize",
+    "options": [
+     "A4 (210mm x 297mm)",
+     "A5 (148mm x 210mm)",
+     "B5 (176mm x 250mm)",
+     "A6 (105mm x 148mm)",
+     "B5+ (190mm x 266mm)"
+    ]
+   },
+   {
+    "control": "ddlPage",
+    "options": [
+     "8",
+     "12",
+     "16",
+     "20",
+     "24",
+     "28",
+     "32",
+     "36",
+     "40",
+     "44",
+     "48",
+     "52",
+     "56",
+     "60",
+     "64",
+     "68",
+     "72",
+     "76",
+     "80"
+    ]
+   },
+   {
+    "control": "ddlCoverPaper",
+    "options": [
+     "Gloss Art Card 230gsm (2 sides coated)",
+     "Gloss Art Card 250gsm (2 sides coated)",
+     "Gloss Art Card 310gsm (2 sides coated)",
+     "Gloss Art Paper 100gsm",
+     "Gloss Art Paper 128gsm",
+     "Gloss Art Paper 150gsm",
+     "Linen 240gsm",
+     "Matte Art Paper 100gsm",
+     "Matte Art Paper 130gsm",
+     "Matte Art Paper 150gsm",
+     "Metal Ice 250gsm",
+     "Simili 100gsm",
+     "Simili 140gsm",
+     "Simili 80gsm",
+     "Super White 240gsm"
+    ]
+   },
+   {
+    "control": "ddlCoverHSColourNum",
+    "options": [
+     "1C (Front)",
+     "2C (Front)"
+    ]
+   },
+   {
+    "control": "ddlCoverHSSize1",
+    "options": [
+     "90mm x 30mm",
+     "90mm x 70mm",
+     "95mm x 206mm",
+     "101mm x 144mm",
+     "144mm x 206mm",
+     "194mm x 206mm",
+     "206mm x 294mm"
+    ]
+   },
+   {
+    "control": "ddlCoverHSColour1",
+    "options": [
+     "Black",
+     "Blue",
+     "Gold",
+     "Green",
+     "Red",
+     "Silver"
+    ]
+   },
+   {
+    "control": "rblOrientation",
+    "options": [
+     "Portrait",
+     "Landscape"
+    ]
+   },
+   {
+    "control": "rdbOrderType",
+    "options": [
+     "Soft Cover",
+     "Hard Cover"
+    ]
+   },
+   {
+    "control": "rdbidning",
+    "options": [
+     "Saddle Stitch",
+     "Perfect Binding"
+    ]
+   },
+   {
+    "control": "rbOuterInner",
+    "options": [
+     "4C: 4 Colour Outer Only",
+     "4C: 4 Colour Outer & 4 Colour Inner"
+    ]
+   },
+   {
+    "control": "rblJawiContent",
+    "options": [
+     "1",
+     "0"
+    ]
+   }
+  ],
+  "our_fields": {
+   "orientation": [],
+   "size": [],
+   "ordertype": [],
+   "binding": [],
+   "page": [],
+   "cover": [],
+   "content": [],
+   "colour": [],
+   "outer_inner": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ],
+   "cover_lamination": [
+    "Not Required",
+    "Matte Lamination (Front)",
+    "Matte Lamination (Both)",
+    "Matte Lamination (Front) + Spot UV (Front)",
+    "Matte Lamination (Both) + Spot UV (Front)",
+    "Gloss Lamination (Front)",
+    "Gloss Lamination (Both)",
+    "UV Varnish (Front)",
+    "UV Varnish (Both)",
+    "Gloss Waterbase Varnish (Front)",
+    "Gloss Waterbase Varnish (Both)"
+   ],
+   "cover_embossing": [
+    "Not Required",
+    "90mm x 30mm",
+    "90mm x 70mm",
+    "95mm x 206mm",
+    "101mm x 144mm",
+    "144mm x 206mm",
+    "194mm x 206mm",
+    "206mm x 294mm"
+   ],
+   "hot_stamping": [
+    "Not Required",
+    "1C (Front)",
+    "2C (Front)"
+   ],
+   "jawi": [
+    "No",
+    "Yes"
+   ],
+   "extra_books": [
+    "No",
+    "Yes"
+   ]
+  },
+  "gaps": []
  }
 }

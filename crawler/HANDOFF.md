@@ -4,6 +4,13 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **52/52 BUILT. PARITY CHECKER EXPANDED TO 44 FAMILIES: 1 REAL GAP (2026-06-27 run 2).**
+  Added `booklet_digital` (https://www.excard.com.my/spec/Digital/Booklet) to FAMILY_URL
+  in parity_checker.py. Digital Booklet uses the same FIELD_SCHEMAS family as Litho Booklet;
+  handled via new `FAMILY_ALIAS` dict in parity_checker.py. Result: 0 gaps — Digital booklet
+  form is fully covered by existing schema. Parity checker now also merges subset results into
+  the existing report (no longer overwrites the full report when running a single family).
+  parity_report.json updated: 44 families, 1 real gap (Wire-O Exclusive Leather Cover, deferred).
 - **52/52 BUILT. PARITY CHECKER EXPANDED TO 43 FAMILIES: 1 REAL GAP (2026-06-27).**
   Parity checker now covers 43 families (was 37). 2 real gaps found and closed:
   - **Stamp Chop ink colour** — `ddlColour` (Red/Black/Blue/Violet/Green/Brown/Pink/Orange/

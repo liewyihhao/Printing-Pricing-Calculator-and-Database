@@ -68,6 +68,12 @@ FAMILY_URL = {
     "money_packet": "https://www.excard.com.my/spec/Litho/Money_Packet",
     "non_woven_bag": "https://www.excard.com.my/spec/Litho/Non_Woven_Bag",
     "papan_kopi": "https://www.excard.com.my/spec/Litho/Papan_Kopi",
+    # Digital Booklet uses a different URL but shares the same FIELD_SCHEMAS family
+    "booklet_digital": "https://www.excard.com.my/spec/Digital/Booklet",
+}
+# Some families share a FIELD_SCHEMAS key (e.g. digital/litho booklet share "booklet")
+FAMILY_ALIAS: dict[str, str] = {
+    "booklet_digital": "booklet",
 }
 # control name substrings to ignore (not product spec drivers)
 IGNORE = ("country", "courier", "comboqty", "ddlqty", "qty", "track", "review-filter",
@@ -184,7 +190,7 @@ FAMILY_IGNORE: dict[str, tuple[str, ...]] = {
 
 
 def _diff(family, excard):
-    ours = _schema_options(family)
+    ours = _schema_options(FAMILY_ALIAS.get(family, family))
     our_all_norm = {_norm(o) for opts in ours.values() for o in opts}
     our_keys = [k.lower() for k in ours]
     fam_ign = FAMILY_IGNORE.get(family, ())
@@ -220,7 +226,16 @@ def _diff(family, excard):
 
 async def check(families, account_id=1):
     a = accounts.get(account_id)
+    # When running a subset, merge into the existing report so we don't lose other families
+    rpt_path = OUT / "parity_report.json"
+    all_fams = list(FAMILY_URL.keys())
+    running_subset = set(families) != set(all_fams)
     report = {}
+    if running_subset and rpt_path.exists():
+        try:
+            report = json.loads(rpt_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
     async with async_playwright() as pw:
         b = await launch(pw); ctx = await b.new_context(viewport={"width": 1440, "height": 1600})
         page = await ctx.new_page(); await login(page, username=a.username, password=a.password)
@@ -248,8 +263,8 @@ async def check(families, account_id=1):
                 print(f"=== {fam}: ERROR {str(e)[:80]}")
         try: await b.close()
         except Exception: pass
-    (OUT / "parity_report.json").write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
-    total = sum(len(r.get("gaps", [])) for r in report.values())
+    rpt_path.write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
+    total = sum(len(r.get("gaps", [])) for r in report.values() if isinstance(r, dict))
     print(f"\nTOTAL gaps across {len(report)} families: {total}. Report -> output/parity_report.json")
     return report
 
