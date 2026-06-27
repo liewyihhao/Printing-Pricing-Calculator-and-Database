@@ -858,11 +858,27 @@ function renderImageGrid(f){
       class="imgcard rounded-lg border ${active?'border-indigo-500 ring-2 ring-indigo-200':'hairline'} bg-white p-1.5 text-left">
       ${img?`<img src="${img}" loading="lazy" class="w-full h-16 object-contain mb-1" alt="${cap}">`:''}
       <div class="text-[10.5px] text-slate-600 truncate">${cap}</div></button>`; }).join("");
-  grid.querySelectorAll(".imgcard").forEach(b=>b.onclick=()=>{ S.values[f.key]=b.dataset.val; renderImageGrid(f); quote(); });
+  grid.querySelectorAll(".imgcard").forEach(b=>b.onclick=()=>{ S.values[f.key]=b.dataset.val; renderImageGrid(f); enforceValidity(); quote(); });
+}
+// Enforce Excard's valid-combination constraints: restrict each dependent dropdown to the
+// values allowed for the current primary selection (e.g. only papers/sizes valid for a model).
+function enforceValidity(){
+  const V=S.prod&&S.prod.validity; if(!V) return;
+  const pv=S.values[V.primary], rule=pv?V.rules[pv]:null;
+  for(const f of S.fields){
+    if(!V.fields.includes(f.key) || f.images || f.type==="number") continue;
+    const sel=$(`f_${f.key}`); if(!sel) continue;
+    const base=f.options||[];
+    let allow = rule&&rule[f.key] ? base.filter(o=>rule[f.key].includes(o)) : base;
+    if(!allow.length) allow=base;
+    const cur=S.values[f.key];
+    sel.innerHTML=allow.map(o=>`<option>${o.replace(/</g,"&lt;")}</option>`).join("");
+    if(allow.includes(cur)){ sel.value=cur; } else { S.values[f.key]=allow[0]; sel.value=allow[0]; }
+  }
 }
 function onChange(idx){ const f=S.fields[idx], v=$(`f_${f.key}`).value;
   if(v)S.values[f.key]=v; else delete S.values[f.key];
-  if(f.addon||f.type==="number"){ quote(); return; }
+  if(f.addon||f.type==="number"){ enforceValidity(); quote(); return; }
   for(let j=idx+1;j<S.fields.length;j++) if(!S.fields[j].addon) delete S.values[S.fields[j].key];
   populateFrom(idx+1); }
 function populateFrom(start){
@@ -877,6 +893,7 @@ function populateFrom(start){
     if(S.values[f.key]&&!opts.includes(S.values[f.key])) delete S.values[f.key];
     if(!S.values[f.key]&&!f.optional&&opts.length) S.values[f.key]=opts.includes("Normal")?"Normal":opts[0];
     if(S.values[f.key]) sel.value=S.values[f.key]; }
+  enforceValidity();
   quote();
 }
 function quote(){

@@ -740,6 +740,7 @@ def _attach_excard_parity(data):
         imgfield = ex.get("imageField")
         imgmap = ex.get("imageOptions") or {}
         n_vals = n_dims = 0
+        dim_field = {}          # Excard dim -> our field dict (for validity wiring)
         for dim in ex["optionCols"]:
             if _is_skip_col(dim):
                 continue
@@ -771,18 +772,65 @@ def _attach_excard_parity(data):
                                 images[o] = u
                     if images:
                         best["images"] = images
+                dim_field[dim] = best
             else:
                 newf = {"key": "ex_" + _norm(dim), "label": dim,
                         "addon": True, "depends": [], "options": list(vals)}
                 if is_img:
                     newf["images"] = {v: imgmap[v] for v in vals if v in imgmap}
                 prod["fields"].append(newf)
+                dim_field[dim] = newf
                 n_dims += 1
                 n_vals += len(vals)
+        _build_validity(prod, ex, dim_field)
         if n_vals or n_dims:
             added[slug] = f"{n_dims} dims +{n_vals} vals"
     if added:
         print("  [excard parity] ", added)
+
+
+def _build_validity(prod, ex, dim_field):
+    """Bake Excard's valid-combination constraints so dependent dropdowns narrow like the
+    real order page. Uses the captured deps map (primary dim value -> valid values per dim).
+    Emits prod['validity'] = {primary: <fieldKey>, fields: [constrained fieldKeys],
+    rules: {<our primary option>: {<fieldKey>: [valid our options]}}}. Values are stored as
+    THIS calculator's option strings so the JS only needs exact set membership."""
+    deps = ex.get("deps") or {}
+    primary = ex.get("primary")
+    if not deps or not primary or primary not in dim_field:
+        return
+    pfield = dim_field[primary]
+    if pfield.get("type") == "number":
+        return
+    popts = pfield.get("options") or list((pfield.get("images") or {}).keys())
+    # which non-primary dims are actually constrained (valid set varies / < full)?
+    constrained = {}
+    for dim, fld in dim_field.items():
+        if dim == primary:
+            continue
+        full = ex["distinct"].get(dim, [])
+        if len(full) <= 1:
+            continue
+        sets = [frozenset(deps[pv].get(dim, [])) for pv in deps]
+        if len(set(sets)) > 1 or any(len(s) < len(full) for s in sets):
+            constrained[dim] = fld
+    if not constrained:
+        return
+    rules = {}
+    for pv, sub in deps.items():
+        our_pv = next((o for o in popts if _val_match(o, pv)), None)
+        if our_pv is None:
+            continue
+        slot = rules.setdefault(our_pv, {})
+        for dim, fld in constrained.items():
+            valid_ex = sub.get(dim, [])
+            fopts = fld.get("options") or []
+            valid_our = [o for o in fopts if any(_val_match(o, ev) for ev in valid_ex)]
+            prev = slot.get(fld["key"], [])
+            slot[fld["key"]] = prev + [o for o in valid_our if o not in prev]
+    prod["validity"] = {"primary": pfield["key"],
+                        "fields": [f["key"] for f in constrained.values()],
+                        "rules": rules}
 
 
 def _embed_images(data):
