@@ -696,12 +696,39 @@ def _img_for(opt, imgmap):
     return imgmap.get(code)
 
 
-def _attach_excard_parity(data):
-    """KPI 1 — option parity. For every product we captured from Excard's ordering page,
-    ensure EVERY Excard option dimension (priced or not) is selectable in the calculator,
-    with Excard's exact values and option images. Existing pricing fields are left untouched
-    (new dimensions are added as addon fields the engine ignores)."""
+_STEM = (("lamination", "lamin"), ("laminate", "lamin"), ("sides", "side"),
+         ("colours", "color"), ("colour", "color"), ("required", "req"))
+
+
+def _val_tokens(v):
+    """Alnum tokens (len>=2) of a value, lightly stemmed so cosmetic label variants
+    ('Laminate (Front)' vs 'Lamination') still match."""
     import re
+    s = str(v).lower()
+    for a, b in _STEM:
+        s = s.replace(a, b)
+    return {t for t in re.findall(r"[a-z0-9]+", s) if len(t) >= 2}
+
+
+def _val_match(a, b):
+    """Two option values are 'the same value' if their token sets overlap strongly."""
+    ta, tb = _val_tokens(a), _val_tokens(b)
+    if not ta or not tb:
+        return False
+    inter = len(ta & tb)
+    if inter == 0:
+        return False
+    # subset (one fully contained) OR Jaccard >= 0.5
+    return inter == min(len(ta), len(tb)) or inter / len(ta | tb) >= 0.5
+
+
+def _attach_excard_parity(data):
+    """KPI 1 — option parity (VALUE-COMPLETE). For every product captured from Excard's
+    ordering page, ensure every Excard option dimension AND every one of its values (priced
+    or not) is selectable in the calculator, with Excard's exact values + option images.
+    Each Excard dimension is matched to the best existing field by value-overlap; any Excard
+    values that field is missing are appended (Excard's exact strings). Dimensions with no
+    matching field are added as a new addon field. Pricing keys are never removed."""
     by_id = {p["id"]: p for p in data["products"]}
     added = {}
     for pid, slug in _EXCARD_ID2SLUG.items():
@@ -712,18 +739,7 @@ def _attach_excard_parity(data):
         ex = json.loads(f.read_text(encoding="utf-8"))
         imgfield = ex.get("imageField")
         imgmap = ex.get("imageOptions") or {}
-        # normalized text of our existing fields (keys + labels) to detect coverage
-        def covered_by(dim):
-            nd = _norm(dim)
-            toks = [t for t in re.findall(r"[a-z]+", dim.lower()) if len(t) > 3]
-            for fld in prod["fields"]:
-                blob = _norm(fld.get("key", "") + " " + fld.get("label", ""))
-                if nd and nd in blob:
-                    return fld
-                if toks and all(t in blob for t in toks):
-                    return fld
-            return None
-        newcount = 0
+        n_vals = n_dims = 0
         for dim in ex["optionCols"]:
             if _is_skip_col(dim):
                 continue
@@ -731,26 +747,42 @@ def _attach_excard_parity(data):
             if len(vals) < 1:
                 continue
             is_img = (dim == imgfield) and bool(imgmap)
-            fld = covered_by(dim)
-            if fld:
-                # already selectable — just enrich with Excard images if it's the image axis
-                if is_img and "images" not in fld:
-                    opts = fld.get("options") or vals
-                    images = {o: _img_for(o, imgmap) for o in opts if _img_for(o, imgmap)}
+            # best existing field: the one matching the most Excard values for this dim
+            best, best_hits = None, 0
+            for fld in prod["fields"]:
+                opts = fld.get("options") or (list(fld["images"].keys()) if fld.get("images") else [])
+                if not opts:
+                    continue
+                hits = sum(1 for v in vals if any(_val_match(v, o) for o in opts))
+                if hits > best_hits:
+                    best, best_hits = fld, hits
+            if best is not None and best_hits >= max(1, 0.5 * len(vals)):
+                # same dimension -> union in any Excard values this field is missing
+                opts = best.setdefault("options", list(best.get("images", {}).keys()))
+                miss = [v for v in vals if not any(_val_match(v, o) for o in opts)]
+                opts.extend(miss)
+                n_vals += len(miss)
+                if is_img:
+                    images = best.get("images", {})
+                    for o in opts:
+                        if o not in images:
+                            u = _img_for(o, imgmap)
+                            if u:
+                                images[o] = u
                     if images:
-                        fld["images"] = images
-                continue
-            # missing dimension -> add it (Excard exact values, images if it's the image axis)
-            newf = {"key": "ex_" + _norm(dim), "label": dim + " (Excard option)",
-                    "addon": True, "depends": [], "options": vals}
-            if is_img:
-                newf["images"] = {v: imgmap[v] for v in vals if v in imgmap}
-            prod["fields"].append(newf)
-            newcount += 1
-        if newcount:
-            added[slug] = newcount
+                        best["images"] = images
+            else:
+                newf = {"key": "ex_" + _norm(dim), "label": dim + " (Excard option)",
+                        "addon": True, "depends": [], "options": list(vals)}
+                if is_img:
+                    newf["images"] = {v: imgmap[v] for v in vals if v in imgmap}
+                prod["fields"].append(newf)
+                n_dims += 1
+                n_vals += len(vals)
+        if n_vals or n_dims:
+            added[slug] = f"{n_dims} dims +{n_vals} vals"
     if added:
-        print("  [excard parity] added option dimensions:", added)
+        print("  [excard parity] ", added)
 
 
 def main():
