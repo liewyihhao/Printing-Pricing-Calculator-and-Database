@@ -668,7 +668,7 @@ _EXCARD_ID2SLUG = {
     112: "hard-cover-wire-o-notebook", 137: "standing-pouch",
     116: "car-sticker", 117: "car-sticker", 138: "money-packet",
     139: "non-woven-bag", 140: "tent-card", 134: "Hanger",
-    105: "letterhead", 130: "papan-kopi",
+    105: "letterhead", 130: "papan-kopi", 135: "magnet", 131: "pillow",
 }
 # Excard metric columns that are not user-selectable options
 _EXCARD_SKIP = ("price", "weight", "print method", "process day", "fee",
