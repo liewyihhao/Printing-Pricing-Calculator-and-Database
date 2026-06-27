@@ -119,6 +119,17 @@ def build_data():
         {"key": "fold", "label": "Folding", "addon": True, "depends": [],
          "options": ["None", "1Fa", "2Fa", "2Fb", "2Fc", "3Fa", "3Fb", "4Fa", "4Fb"]},
         {"key": "punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["No", "3mm", "6mm"]},
+        # Lamination / Round Corner / Perforation — from Excard's Loose Sheet (www /spec/Litho/Loose_Sheet)
+        # spec page (option labels documented there; the form's progressive UI did not expose them to capture).
+        {"key": "lamination", "label": "Lamination / Finishing", "addon": True, "depends": [],
+         "options": ["Not Required", "Gloss Lamination (Front)", "Gloss Lamination (Both)",
+                     "Matte Lamination (Front)", "Matte Lamination (Both)",
+                     "UV Varnish (Front)", "UV Varnish (Both)",
+                     "Gloss Water Based Varnish (Front)", "Gloss Water Based Varnish (Both)"]},
+        {"key": "round_corner", "label": "Round corner", "addon": True, "depends": [],
+         "options": ["Not Required", "Required"]},
+        {"key": "perforation", "label": "Perforation line(s)", "addon": True, "depends": [],
+         "options": ["Not Required", "1 Perforation Line", "2 Perforation Lines"]},
     ]
     LOOSE_LITHO_FIELDS = LOOSE_FIELDS + LOOSE_FINISHING_FIELDS
     LOOSE_DIGITAL_FIELDS = LOOSE_FIELDS + LOOSE_FINISHING_FIELDS
