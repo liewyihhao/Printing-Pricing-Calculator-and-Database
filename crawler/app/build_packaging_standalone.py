@@ -35,6 +35,11 @@ def main():
     html = html.replace(marker, inject + marker, 1)
     html = html.replace("<title>Printoka — Packaging Boxes</title>",
                         "<title>Printoka — Packaging Boxes (offline)</title>")
+    # embed box images as self-contained data URIs (removes external image hosts)
+    cache = _load("img_data_uris.json", {})
+    for url, datauri in cache.items():
+        if url in html:
+            html = html.replace(url, datauri)
     out = UI / "packaging_standalone.html"
     out.write_text(html, encoding="utf-8")
     kb = out.stat().st_size / 1024

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Printoka — Excard Catalogue Coverage</title>
+<title>Printoka — Supplier Catalogue Coverage</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
   body{font-family:Inter,system-ui,sans-serif;background:#f6f8fc;color:#0f172a}
@@ -16,14 +16,14 @@
 <div class="max-w-[1100px] mx-auto px-5 py-6">
   <div class="flex items-center gap-3 mb-5">
     <div class="h-9 w-9 rounded-lg grid place-items-center text-white font-bold" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">P</div>
-    <div><div class="font-semibold text-[15px]">Excard Catalogue Coverage</div>
-      <div class="text-[12px] text-slate-500">Auto check-up of Excard's full product catalogue — what's new and what we've built</div></div>
+    <div><div class="font-semibold text-[15px]">Supplier Catalogue Coverage</div>
+      <div class="text-[12px] text-slate-500">Auto check-up of the full supplier catalogue — what's new and what we've built</div></div>
     <a href="/" class="ml-auto text-[13px] text-indigo-600 hover:underline">← Calculator</a>
     <button id="rescan" class="ml-3 text-[13px] card px-3 py-1.5 hover:bg-slate-50">Re-scan now</button>
   </div>
 
   <div class="grid grid-cols-4 gap-3 mb-5">
-    <div class="card p-4"><div class="text-[12px] text-slate-500">Excard products</div><div id="s_total" class="text-[26px] font-bold">—</div></div>
+    <div class="card p-4"><div class="text-[12px] text-slate-500">catalogue products</div><div id="s_total" class="text-[26px] font-bold">—</div></div>
     <div class="card p-4"><div class="text-[12px] text-slate-500">Built by us</div><div id="s_built" class="text-[26px] font-bold text-emerald-600">—</div></div>
     <div class="card p-4"><div class="text-[12px] text-slate-500">Not yet built</div><div id="s_todo" class="text-[26px] font-bold text-slate-400">—</div></div>
     <div class="card p-4"><div class="text-[12px] text-slate-500">New since last scan</div><div id="s_new" class="text-[26px] font-bold text-amber-500">—</div></div>
@@ -41,7 +41,7 @@ async function load(url){
   $("s_todo").textContent=(c.total-c.built); $("s_new").textContent=(c.new_since_last||[]).length;
   $("scanned").textContent="Last scan: "+(c.scanned_at||"—");
   if((c.new_since_last||[]).length){ $("newbanner").classList.remove("hidden");
-    $("newbanner").textContent="🆕 New on Excard since last scan: "+c.new_since_last.join(", "); }
+    $("newbanner").textContent="🆕 New in catalogue since last scan: "+c.new_since_last.join(", "); }
   else $("newbanner").classList.add("hidden");
   const groups={};
   for(const p of c.products){ (groups[p.category]=groups[p.category]||[]).push(p); }

@@ -146,16 +146,16 @@ views.calculator = async () => {
   const el = document.createElement("div"); el.className="fade max-w-[920px]";
   el.innerHTML = `
     <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Price calculator</h1>
-    <p class="text-slate-500 text-[13.5px] mb-6">Real Excard prices → your suggested selling price.</p>
+    <p class="text-slate-500 text-[13.5px] mb-6">Real market prices → your suggested selling price.</p>
     <div class="grid md:grid-cols-[1fr_350px] gap-5">
       <div class="bg-white rounded-xl border hairline shadow-card p-5 space-y-5">
         ${selField("Size","c_size")}${selField("Paper","c_paper",true)}${selField("Print colour","c_colour",true)}${selField("Package (ganging)","c_package",true)}
         <div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity</label><select id="c_qty" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]" disabled></select></div>
-        <p class="text-[11.5px] text-slate-400">Only valid Excard combinations are selectable — each choice narrows the next, exactly like the order page.</p>
+        <p class="text-[11.5px] text-slate-400">Only valid combinations are selectable — each choice narrows the next, exactly like the order page.</p>
         <div id="c_status" class="text-[12.5px] text-slate-400"></div>
       </div>
       <div class="bg-white rounded-xl border hairline shadow-card p-5 h-fit md:sticky md:top-20">
-        <div class="text-[12.5px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Excard price — by tier <span class="text-[10px] normal-case text-slate-400 font-normal">(product only)</span></div>
+        <div class="text-[12.5px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Market price — by tier <span class="text-[10px] normal-case text-slate-400 font-normal">(product only)</span></div>
         <div class="text-[11px] text-slate-400 mb-3">Cash = exact order-page price · others = Cash −4/−8/−14%</div>
         <div class="text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded-md px-2 py-1 mb-3">Product price — <b>excludes delivery</b>. West/East Malaysia shipping added later.</div>
         <div id="c_tiers" class="space-y-1.5 text-[13px]"><div class="text-slate-400">Configure a job…</div></div>
@@ -177,7 +177,7 @@ function selField(label,id,dis){ return `<div><label class="block text-[13px] fo
 
 async function initCalc(){
   // Cascading options from order data — each level returns only combinations that
-  // actually exist (no empty combos), exactly like Excard's order page.
+  // actually exist (no empty combos), exactly like the standard order page.
   const o = await api("/api/order/options");
   fillSel($("c_size"), o.sizes, "Select size…");
   $("c_buytier").innerHTML=""; TIERS.forEach((t)=>{ const b=document.createElement("button");
@@ -227,7 +227,7 @@ views.formulation = async () => {
   const el=document.createElement("div"); el.className="fade max-w-[920px]";
   el.innerHTML=`
     <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink mb-1">Printoka Formulation</h1>
-    <p class="text-slate-500 text-[13.5px] mb-4">Our own offline pricing formula (first-principles print costing) + physics-based weight. Excard is a reference only.</p>
+    <p class="text-slate-500 text-[13.5px] mb-4">Our own offline pricing formula (first-principles print costing) + physics-based weight. Market price is a reference only.</p>
     <div id="f_kpi" class="mb-5 text-[12.5px] text-slate-400">Select a product…</div>
     <div class="grid md:grid-cols-[1fr_350px] gap-5">
       <div class="bg-white rounded-xl border hairline shadow-card p-5 space-y-4">
@@ -235,12 +235,12 @@ views.formulation = async () => {
         <div id="f_fields" class="space-y-4"></div>
         <div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity (any value)</label>
           <input id="f_qty" type="number" min="1" value="1000" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></div>
-        <p class="text-[11.5px] text-slate-400">Only valid Excard combinations are selectable. Quantity accepts any number — the formula interpolates.</p>
+        <p class="text-[11.5px] text-slate-400">Only valid combinations are selectable. Quantity accepts any number — the formula interpolates.</p>
         <div id="f_status" class="text-[12.5px] text-slate-400"></div>
       </div>
       <div class="bg-white rounded-xl border hairline shadow-card p-5 h-fit md:sticky md:top-20">
         <div class="text-[12.5px] font-semibold text-slate-400 uppercase tracking-wide mb-1">Printoka price — by tier</div>
-        <div class="text-[11px] text-slate-400 mb-3">Our calculation · Cash = est. Excard cash · tiers −4/−8/−14%</div>
+        <div class="text-[11px] text-slate-400 mb-3">Our calculation · Cash = est. market cash · tiers −4/−8/−14%</div>
         <div id="f_out" class="space-y-1.5 text-[13px]"><div class="text-slate-400">Configure a job…</div></div>
       </div>
     </div>`;
@@ -250,7 +250,7 @@ views.formulation = async () => {
 function fpid(){ const n=dv($("f_product")); const p=(window._fprods||[]).find(x=>x.name===n); return p?p.id:null; }
 async function loadKpi(){ const pid=fpid(); if(!pid){ $("f_kpi").textContent="Select a product…"; return; }
   try{ const k=await api(`/api/printoka/kpi?product=${pid}`);
-    if(k.median!=null) $("f_kpi").innerHTML=`<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">Accuracy vs Excard (spot-test): median ${k.median}% · ${k.within_5pct}% within 5% · ${k.within_10pct}% within 10%</span>`;
+    if(k.median!=null) $("f_kpi").innerHTML=`<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">Accuracy vs market (spot-test): median ${k.median}% · ${k.within_5pct}% within 5% · ${k.within_10pct}% within 10%</span>`;
     else $("f_kpi").innerHTML=`<span class="text-amber-600">${k.note||'not calibrated yet'}</span>`;
   }catch(e){ $("f_kpi").textContent="(accuracy unavailable)"; } }
 const BOOKLET=[19,37];
@@ -324,7 +324,7 @@ async function loadForm(){
     $("f_status").textContent="";
     if(q.printoka_cash==null){ $("f_out").innerHTML='<div class="text-amber-600">No basis to price this combo yet.</div>'; return; }
     const t=q.tiers||{};
-    const dev=q.delta_pct==null?'':`<div class="flex items-center justify-between py-1 border-t hairline mt-1 pt-2"><span class="text-slate-400 text-[12px]">vs Excard ref</span><span class="tabular-nums text-[12px] ${Math.abs(q.delta_pct)<=5?'text-emerald-600':'text-amber-600'}">${q.delta_pct>0?'+':''}${q.delta_pct}%</span></div>`;
+    const dev=q.delta_pct==null?'':`<div class="flex items-center justify-between py-1 border-t hairline mt-1 pt-2"><span class="text-slate-400 text-[12px]">vs market ref</span><span class="tabular-nums text-[12px] ${Math.abs(q.delta_pct)<=5?'text-emerald-600':'text-amber-600'}">${q.delta_pct>0?'+':''}${q.delta_pct}%</span></div>`;
     $("f_out").innerHTML=TIERS.map(t2=>`<div class="flex items-center justify-between py-1"><span class="text-slate-500">${t2}</span><span class="tabular-nums font-medium text-ink">${RM(t[t2])}</span></div>`).join("")
       +`<div class="flex items-center justify-between py-1 border-t hairline mt-1 pt-2"><span class="text-slate-400 text-[12px]">Weight (est.)</span><span class="tabular-nums text-slate-500 text-[12px]">${q.weight_kg} kg</span></div>`
       +`<div class="flex items-center justify-between py-1"><span class="text-slate-400 text-[12px]">Method</span><span class="text-slate-500 text-[11px]">${q.method}</span></div>`

@@ -50,7 +50,7 @@ tailwind.config = { theme: { extend: {
 
 <main class="max-w-[1180px] mx-auto px-4 sm:px-8 py-7">
   <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Simulate a quote</h1>
-  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-6">Pick a product, choose options exactly like the Excard ordering page, and get our formula price live — across every membership tier.</p>
+  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-6">Pick a product, choose options exactly like the standard ordering page, and get our formula price live — across every membership tier.</p>
 
   <!-- product picker -->
   <div id="prodgrid" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 mb-7"></div>
@@ -68,12 +68,12 @@ tailwind.config = { theme: { extend: {
         <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity</label>
         <input id="qty" type="number" min="1" value="1000" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">
         <div id="qchips" class="flex flex-wrap gap-1.5 mt-2"></div>
-        <p class="text-[11.5px] text-slate-400 mt-2">Any quantity works — the formula interpolates between Excard's breakpoints.</p>
+        <p class="text-[11.5px] text-slate-400 mt-2">Any quantity works — the formula interpolates between standard breakpoints.</p>
       </div>
       <div class="mt-4">
         <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Delivery destination</label>
         <select id="dest" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></select>
-        <p class="text-[11.5px] text-slate-400 mt-2">Delivery = courier rate per kg × order weight (rounded up), from Excard's reference rates.</p>
+        <p class="text-[11.5px] text-slate-400 mt-2">Delivery = courier rate per kg × order weight (rounded up), from standard courier rates.</p>
       </div>
       <div id="status" class="text-[12.5px] text-slate-400 mt-3"></div>
     </div>
@@ -108,13 +108,13 @@ tailwind.config = { theme: { extend: {
         </div>
         <div id="fb" class="mt-3 pt-3 border-t hairline hidden">
           <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">Feedback on this price</div>
-          <textarea id="fb_text" rows="2" placeholder="e.g. Excard quotes RM X for this — too high/low…" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[12.5px]"></textarea>
+          <textarea id="fb_text" rows="2" placeholder="e.g. the market price is RM X for this — too high/low…" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[12.5px]"></textarea>
           <div class="flex items-center gap-2 mt-1.5">
             <button id="fb_send" class="rounded-lg bg-ink text-white text-[12px] font-medium px-3 py-1.5 hover:opacity-90">Send feedback</button>
             <span id="fb_status" class="text-[11.5px] text-slate-400"></span>
           </div>
         </div>
-        <p class="text-[11px] text-slate-400 mt-3">Tiers: Cash → Silver −4% → Gold −8% → Platinum −14%. Excard is a reference only; this is Printoka's own formula.</p>
+        <p class="text-[11px] text-slate-400 mt-3">Tiers: Cash → Silver −4% → Gold −8% → Platinum −14%. Market price is a reference only; this is Printoka's own formula.</p>
       </div>
     </div>
   </div>
@@ -126,7 +126,7 @@ const enc = encodeURIComponent;
 const RM = v => "RM " + Number(v).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
 const TIERS = ["Platinum","Gold","Silver","Cash"];
 const QCHIPS = [100,250,500,1000,2000,5000,10000];
-// Delivery = courier RM/kg × chargeable weight (ceil to whole kg, min 1), from Excard reference rates.
+// Delivery = courier RM/kg × chargeable weight (ceil to whole kg, min 1), from standard courier rates.
 const DELIVERY = [
   {code:"99", label:"West Malaysia", rate:6},
   {code:"98", label:"East Malaysia", rate:10},
@@ -168,7 +168,7 @@ async function selectProduct(pid){
   $("calc").classList.remove("hidden"); $("calc").classList.add("fade");
   $("cfgtitle").textContent = sch.name;
   $("acc").innerHTML = sch.accuracy!=null
-    ? `<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">±${sch.accuracy}% vs Excard</span>` : "";
+    ? `<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium">±${sch.accuracy}% vs market</span>` : "";
   $("fields").innerHTML = S.fields.map(f=> f.type==="number"
     ? `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
         <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></div>`

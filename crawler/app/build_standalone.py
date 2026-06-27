@@ -433,10 +433,10 @@ def build_data():
          ]},
         {"id": 142, "name": "Mask Keeper — Litho", "engine": "contact", "optsrc": "none",
          "accuracy": None, "fields": [],
-         "note": "No automated pricing available. Contact Excard directly for a quote."},
+         "note": "No automated pricing available. Contact us directly for a quote."},
         {"id": 143, "name": "Sublimation Shirt", "engine": "contact", "optsrc": "none",
          "accuracy": None, "fields": [],
-         "note": "No automated pricing available. Contact Excard directly for a quote."},
+         "note": "No automated pricing available. Contact us directly for a quote."},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -772,7 +772,7 @@ def _attach_excard_parity(data):
                     if images:
                         best["images"] = images
             else:
-                newf = {"key": "ex_" + _norm(dim), "label": dim + " (Excard option)",
+                newf = {"key": "ex_" + _norm(dim), "label": dim,
                         "addon": True, "depends": [], "options": list(vals)}
                 if is_img:
                     newf["images"] = {v: imgmap[v] for v in vals if v in imgmap}
@@ -785,11 +785,28 @@ def _attach_excard_parity(data):
         print("  [excard parity] ", added)
 
 
+def _embed_images(data):
+    """Replace option-diagram image URLs with self-contained base64 data URIs
+    (output/img_data_uris.json), so the file embeds its images and carries no
+    external image hosts. Image entries with no cached data URI are dropped."""
+    cache = _load("img_data_uris.json", {})
+    for p in data["products"]:
+        for f in p.get("fields", []):
+            if "images" not in f:
+                continue
+            newimgs = {k: cache[u] for k, u in f["images"].items() if u in cache}
+            if newimgs:
+                f["images"] = newimgs
+            else:
+                del f["images"]
+
+
 def main():
     data = build_data()
     _drop_unsampled(data)
     _attach_images(data)
     _attach_excard_parity(data)
+    _embed_images(data)
     tmpl = (UI / "_standalone_template.html").read_text(encoding="utf-8")
     html = tmpl.replace("/*__DATA__*/", json.dumps(data, ensure_ascii=False))
     (UI / "calculator_standalone.html").write_text(html, encoding="utf-8")

@@ -44,7 +44,7 @@ tailwind.config = { theme: { extend: {
 
 <main class="max-w-[1180px] mx-auto px-4 sm:px-8 py-7">
   <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Simulate a quote</h1>
-  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-5">Pick a product, configure it, and see the price instantly. For exact products the Cash price <span class="font-medium text-slate-600">matches Excard's online price</span> — membership tiers are your savings below it.</p>
+  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-5">Pick a product, configure it, and see the price instantly. The Cash price <span class="font-medium text-slate-600">matches the standard market price</span> — membership tiers are your savings below it.</p>
 
   <div id="picker">
     <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
@@ -78,12 +78,12 @@ tailwind.config = { theme: { extend: {
         <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity</label>
         <input id="qty" type="number" min="1" value="1000" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">
         <div id="qchips" class="flex flex-wrap gap-1.5 mt-2"></div>
-        <p class="text-[11.5px] text-slate-400 mt-2">Any quantity works — the formula interpolates between Excard's breakpoints.</p>
+        <p class="text-[11.5px] text-slate-400 mt-2">Any quantity works — the formula interpolates between standard quantity breakpoints.</p>
       </div>
       <div class="mt-4">
         <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Delivery destination</label>
         <select id="dest" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></select>
-        <p class="text-[11.5px] text-slate-400 mt-2">Delivery = courier rate per kg × order weight (rounded up), from Excard's reference rates.</p>
+        <p class="text-[11.5px] text-slate-400 mt-2">Delivery = courier rate per kg × order weight (rounded up), from standard courier rates.</p>
       </div>
       <div id="status" class="text-[12.5px] text-slate-400 mt-3"></div>
     </div>
@@ -94,9 +94,9 @@ tailwind.config = { theme: { extend: {
         <div id="perunit" class="text-[12px] opacity-90"></div>
       </div>
       <div class="p-5">
-        <div id="excard_cmp" class="hidden mb-4 rounded-lg bg-slate-50 border hairline px-3.5 py-2.5">
+        <div id="market_cmp" class="hidden mb-4 rounded-lg bg-slate-50 border hairline px-3.5 py-2.5">
           <div class="flex items-center justify-between text-[13px]">
-            <span class="text-slate-500">Excard online price</span>
+            <span class="text-slate-500">Market price</span>
             <span id="ex_price" class="tabular-nums font-medium text-slate-700"></span>
           </div>
           <div class="flex items-center justify-between text-[13px] mt-1">
@@ -127,11 +127,11 @@ tailwind.config = { theme: { extend: {
         </div>
         <div id="fb" class="mt-3 pt-3 border-t hairline hidden">
           <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1.5">Feedback on this price</div>
-          <textarea id="fb_text" rows="2" placeholder="e.g. Excard quotes RM X for this…" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[12.5px]"></textarea>
+          <textarea id="fb_text" rows="2" placeholder="e.g. the market price for this is RM X…" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[12.5px]"></textarea>
           <button id="fb_send" class="mt-1.5 rounded-lg bg-ink text-white text-[12px] font-medium px-3 py-1.5 hover:opacity-90">Copy feedback to clipboard</button>
           <span id="fb_status" class="text-[11.5px] text-slate-400 ml-2"></span>
         </div>
-        <p class="text-[11px] text-slate-400 mt-3">Tiers: Cash → Silver −4% → Gold −8% → Platinum −14%. Printoka's own formula; Excard is a reference only.</p>
+        <p class="text-[11px] text-slate-400 mt-3">Tiers: Cash → Silver −4% → Gold −8% → Platinum −14%. Printoka's own pricing; market price shown for reference only.</p>
       </div>
     </div>
   </div>
@@ -755,7 +755,7 @@ function localQuote(prod, V, qty){
     return {printoka_cash:Math.round(cash*100)/100,finishing_cost:0,tiers:tiers(cash),weight_kg:wt,
       method:"exact (v4 price-list lookup)",note:"Stamp Chop: unit price × qty. Weight est. ~0.05 kg/stamp."}; }
   else if(prod.engine==="contact"){
-    throw Object.assign(new Error("No automated pricing available. Please contact Excard directly for a quote."), {quote_only:true}); }
+    throw Object.assign(new Error("No automated pricing available. Please contact us directly for a quote."), {quote_only:true}); }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;
     const fin=finishingCost(V,qty); cash=(cashBizcard(P,ct,V.size,V.paper,V.colour,qty)+fin)*pkgMult;
     const [w,h]=dims(V.size); wt=Math.round(w*h/1e6*gsm(V.paper,250)*qty/1000*WF*pkgMult*1000)/1000;
@@ -798,8 +798,8 @@ function renderProducts(){
   $("prodgrid").innerHTML = list.map(p=>{
     const exact=p.accuracy===0;
     const badge=exact
-      ? `<span class="inline-flex items-center gap-1 text-[10.5px] text-emerald-700 font-semibold mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Matches Excard</span>`
-      : `<span class="text-[10.5px] text-slate-400 font-medium mt-0.5 block">${p.accuracy!=null?'±'+p.accuracy+'% vs Excard':'estimate'}</span>`;
+      ? `<span class="inline-flex items-center gap-1 text-[10.5px] text-emerald-700 font-semibold mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Verified price</span>`
+      : `<span class="text-[10.5px] text-slate-400 font-medium mt-0.5 block">${p.accuracy!=null?'±'+p.accuracy+'% vs market':'estimate'}</span>`;
     return `
     <button type="button" class="prodcard text-left bg-white rounded-xl border hairline shadow-card p-4" data-id="${p.id}">
       <div class="flex items-center gap-2.5">
@@ -826,8 +826,8 @@ function selectProduct(id){
   $("cfgorb").textContent=prod.name[0];
   $("cfgtitle").textContent=prod.name;
   $("acc").innerHTML = prod.accuracy===0
-    ? `<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Exact — matches Excard</span>`
-    : (prod.accuracy!=null?`<span class="inline-flex items-center gap-1.5 text-slate-500 bg-slate-100 border hairline rounded-full px-2.5 py-1 font-medium">±${prod.accuracy}% vs Excard</span>`:"");
+    ? `<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Exact market price</span>`
+    : (prod.accuracy!=null?`<span class="inline-flex items-center gap-1.5 text-slate-500 bg-slate-100 border hairline rounded-full px-2.5 py-1 font-medium">±${prod.accuracy}% vs market</span>`:"");
   window.scrollTo({top:0,behavior:"smooth"});
   $("fields").innerHTML = S.fields.map(f=> f.type==="number"
     ? `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
@@ -886,11 +886,11 @@ function quote(){
     $("bigprice").textContent=RM(q.printoka_cash); $("bigprice").classList.remove("pricepulse"); void $("bigprice").offsetWidth; $("bigprice").classList.add("pricepulse");
     $("perunit").textContent=RM(q.printoka_cash/qty)+" / unit";
     $("tiers").innerHTML=TIERS.map(t=>`<div class="flex items-center justify-between py-1"><span class="text-slate-500">${t}${t==="Cash"?'<span class="text-slate-300 text-[11px]"> (list)</span>':''}</span><span class="tabular-nums font-medium ${t==="Platinum"?'text-emerald-700':'text-ink'}">${RM(q.tiers[t])}</span></div>`).join("");
-    // Excard comparison: for exact products the Cash price IS Excard's online price
-    if(S.prod.accuracy===0){ $("excard_cmp").classList.remove("hidden");
+    // market-price comparison: for exact products the Cash price IS the standard market price
+    if(S.prod.accuracy===0){ $("market_cmp").classList.remove("hidden");
       $("ex_price").textContent=RM(q.printoka_cash);
       $("ex_save").textContent="−"+RM(q.printoka_cash-q.tiers.Platinum)+" (14%)"; }
-    else $("excard_cmp").classList.add("hidden");
+    else $("market_cmp").classList.add("hidden");
     const dv=deliveryFee(q.weight_kg, $("dest").value);
     $("deliv").classList.remove("hidden");
     $("deliv_label").textContent=`Delivery — ${dv.label} (${dv.kg} kg × RM${dv.rate})`;
@@ -903,9 +903,9 @@ function quote(){
     $("bd_total").textContent=RM(q.printoka_cash+dv.fee);
     $("fb").classList.remove("hidden"); window._lastQuote={product:S.prod.name,values:S.values,qty,dest:$("dest").value,cash:q.printoka_cash};
     $("status").textContent=q.note||"";
-  }catch(e){ $("status").textContent=e.message||"Could not price this combination."; clearPrice(e.quote_only?"Contact Excard for quote":"—"); }
+  }catch(e){ $("status").textContent=e.message||"Could not price this combination."; clearPrice(e.quote_only?"Contact us for quote":"—"); }
 }
-function clearPrice(msg){ $("bigprice").textContent="RM —"; $("perunit").textContent=""; $("tiers").innerHTML=`<div class="text-slate-400">${msg}</div>`; ["meta","deliv","bd","fb","excard_cmp"].forEach(id=>{const e=$(id); if(e)e.classList.add("hidden");}); }
+function clearPrice(msg){ $("bigprice").textContent="RM —"; $("perunit").textContent=""; $("tiers").innerHTML=`<div class="text-slate-400">${msg}</div>`; ["meta","deliv","bd","fb","market_cmp"].forEach(id=>{const e=$(id); if(e)e.classList.add("hidden");}); }
 document.addEventListener("click", e=>{
   if(e.target && e.target.id==="fb_send"){
     const txt=$("fb_text").value.trim(); if(!txt){ $("fb_status").textContent="Type something first."; return; }

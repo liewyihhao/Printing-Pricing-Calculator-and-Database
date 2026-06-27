@@ -2025,7 +2025,7 @@ def mask_keeper_options(product: int = Query(142)):
 
 @app.get("/api/printoka/mask_keeper/quote")
 def mask_keeper_quote(product: int = Query(142), qty: int = Query(...)):
-    return JSONResponse({"error": "Mask Keeper pricing is not available online. Please contact Excard directly for a quote.", "quote_only": True}, status_code=400)
+    return JSONResponse({"error": "Mask Keeper pricing is not available online. Please contact us directly for a quote.", "quote_only": True}, status_code=400)
 
 
 # ---------- Sublimation Shirt (id 143) — quote only, v4 price-list returns 500 ----------
@@ -2036,7 +2036,7 @@ def sublimation_shirt_options(product: int = Query(143)):
 
 @app.get("/api/printoka/sublimation_shirt/quote")
 def sublimation_shirt_quote(product: int = Query(143), qty: int = Query(...)):
-    return JSONResponse({"error": "Sublimation Shirt pricing is not available online. Please contact Excard directly for a quote.", "quote_only": True}, status_code=400)
+    return JSONResponse({"error": "Sublimation Shirt pricing is not available online. Please contact us directly for a quote.", "quote_only": True}, status_code=400)
 
 
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------
