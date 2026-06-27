@@ -833,6 +833,55 @@ def _build_validity(prod, ex, dim_field):
                         "rules": rules}
 
 
+# KPI2: products rebuilt to EXACT price lookups from captured WMPrice curves.
+# id -> (captured slug, params tag). Fields/axes are generated from the captured data.
+_PRICELIST_FROM_OPTIONS = {
+    124: ("bunting", "bunting_pl"), 109: ("bookmark", "bookmark_pl"),
+    132: ("button-badge", "buttonbadge_pl"), 133: ("hand-fan", "handfan_pl"),
+    129: ("mug", "mug_pl"), 125: ("roll-up-stand", "rollup_pl"),
+    121: ("soft-stand-desk-calendar", "softdesk_pl"),
+    122: ("wire-o-wall-calendar", "wireowall_pl"),
+}
+
+
+def _wire_pricelist_products(data):
+    """KPI2: convert each configured product to an exact price-list lookup built from its
+    captured WMPrice curves. Generates the option fields from the captured Excard values
+    (so options stay 100% and pricing is exact), sets engine=pricelist + axisFields, and
+    bakes the params. Cascading validity is re-derived afterwards by _attach_excard_parity."""
+    from . import build_pl_from_options as B
+    by_id = {p["id"]: p for p in data["products"]}
+    done = {}
+    for pid, (slug, tag) in _PRICELIST_FROM_OPTIONS.items():
+        prod = by_id.get(pid)
+        f = OUT / "v4_options" / f"{slug}_options.json"
+        if not prod or not f.exists():
+            continue
+        ex = json.loads(f.read_text(encoding="utf-8"))
+        if not ex.get("priceMeta"):
+            continue
+        params, price_axes, ncol = B.build(slug, tag)
+        imgfield = ex.get("imageField"); imgmap = ex.get("imageOptions") or {}
+        fields = []
+        for dim in price_axes:
+            vals = ex["distinct"].get(dim, [])
+            fld = {"key": _norm(dim), "label": dim, "addon": True, "depends": [], "options": list(vals)}
+            if dim == imgfield and imgmap:
+                im = {v: imgmap[v] for v in vals if v in imgmap}
+                if im:
+                    fld["images"] = im
+            fields.append(fld)
+        prod["engine"] = "pricelist"
+        prod["paramKey"] = tag
+        prod["axisFields"] = [_norm(dim) for dim in price_axes]
+        prod["fields"] = fields
+        prod["accuracy"] = 0.0
+        data["params"][tag] = params
+        done[slug] = f"{len(params['curves'])} curves, {len(price_axes)} axes"
+    if done:
+        print("  [pricelist KPI2]", done)
+
+
 def _embed_images(data):
     """Replace option-diagram image URLs with self-contained base64 data URIs
     (output/img_data_uris.json), so the file embeds its images and carries no
@@ -852,6 +901,7 @@ def _embed_images(data):
 def main():
     data = build_data()
     _drop_unsampled(data)
+    _wire_pricelist_products(data)
     _attach_images(data)
     _attach_excard_parity(data)
     _embed_images(data)
