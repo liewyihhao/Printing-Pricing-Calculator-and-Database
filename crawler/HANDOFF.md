@@ -4,6 +4,20 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **52/52 BUILT. PARITY STABLE: 1 REAL GAP (DEFERRED). PUBLIC API IMPROVED (2026-06-29).**
+  Scheduled-task run. No new parity gaps found (parity_checker --print confirmed 1 deferred:
+  Wire-O Exclusive Leather Cover). Two commits pushed:
+  1. **public_api.py bizcard validity cascade** — `_detail()` now emits a `validity` block
+     for business card: `{"primary":"cardType","fields":["size","paper","colour"],"rules":{…}}`
+     mapping each cardType label to its valid sizes/papers/colours. Also injects dynamic
+     options into bizcard fields that previously had `options:null`. External websites using
+     the public API now get the full cascade without a separate options endpoint call.
+  2. **Web frontend** — committed the pending Printoka.com Next.js pages: home (hero +
+     popular products + how-it-works + testimonials + FAQ + CTA), products listing +
+     per-product configurator, cart/checkout/auth/account stubs, templates, order tracking,
+     SEO files (robots.ts, sitemap.ts, JSON-LD structured data), Footer component, and
+     pricing-api.ts fix for `array vs {products:[]}` response shape. 31 files, 2660 insertions.
+  Both commits pushed to feat/business-card-standalone-calculator.
 - **52/52 BUILT. PARITY CHECKER EXPANDED TO 44 FAMILIES: 1 REAL GAP (2026-06-27 run 2).**
   Added `booklet_digital` (https://www.excard.com.my/spec/Digital/Booklet) to FAMILY_URL
   in parity_checker.py. Digital Booklet uses the same FIELD_SCHEMAS family as Litho Booklet;
