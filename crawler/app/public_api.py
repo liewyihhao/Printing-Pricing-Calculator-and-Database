@@ -30,6 +30,47 @@ CHANGE_REPORT = ROOT / "output" / "change_report.json"
 WHATSNEW_HTML = ROOT / "ui" / "whatsnew.html"
 PRODUCTS = {p["id"]: p for p in DATA["products"]}
 
+# ── Dynamic option resolvers for products that use specialised engines ─────────
+_BC_LABELS = {"Standard Card": "standard", "Thin Fold": "thin_fold",
+              "Fat Fold": "fat_fold", "Custom Die-Cut": "custom_die_cut",
+              "Plastic Card": "plastic_card"}
+_BC_LABELS_INV = {v: k for k, v in _BC_LABELS.items()}
+
+
+def _bizcard_options_for_field(field_key: str, selected: dict) -> list[str] | None:
+    """Return allowed options for a bizcard field given already-selected values."""
+    from .bizcard_sampler import CARDTYPES, PAPERS, PLASTIC_PAPER  # noqa: PLC0415
+    if field_key == "cardType":
+        return list(_BC_LABELS.keys())
+    card_label = selected.get("cardType")
+    if not card_label:
+        return None
+    ct_key = _BC_LABELS.get(card_label, card_label)
+    ct = CARDTYPES.get(ct_key)
+    if not ct:
+        return None
+    _od, sizes, colours, _custom = ct
+    if field_key == "size":
+        return sizes
+    if field_key == "paper":
+        return [PLASTIC_PAPER] if ct_key == "plastic_card" else PAPERS
+    if field_key == "colour":
+        return colours
+    return None
+
+
+def _resolve_bizcard_fields(fields: list, selected: dict | None = None) -> list:
+    """Inject dynamic options into bizcard fields that have depends-based options."""
+    selected = selected or {}
+    result = []
+    for f in fields:
+        if f["options"] is None and f.get("key") in ("cardType", "size", "paper", "colour"):
+            opts = _bizcard_options_for_field(f["key"], selected)
+            result.append({**f, "options": opts})
+        else:
+            result.append(f)
+    return result
+
 _CATS = [
     ("Cards & Stationery", ["business card", "pvc card", "name card", "letterhead", "envelope",
                             "folder", "kad ", "voucher", "computer form", "bookmark", "money packet"]),
@@ -72,9 +113,29 @@ def _detail(p):
             "options": opts, "images": f.get("images") or None,
             "min": f.get("min"), "max": f.get("max"),
         })
+
+    validity = p.get("validity")
+
+    # For bizcard engine: inject dynamic options + build validity cascade rules
+    if p.get("optsrc") == "bizcard" or p.get("engine") == "bizcard":
+        fields = _resolve_bizcard_fields(fields)
+        # Build validity rules: selecting cardType restricts size/paper/colour
+        from .bizcard_sampler import CARDTYPES, PAPERS, PLASTIC_PAPER  # noqa: PLC0415
+        rules: dict = {}
+        for label, key in _BC_LABELS.items():
+            ct = CARDTYPES.get(key)
+            if ct:
+                _od, sizes, colours, _custom = ct
+                rules[label] = {
+                    "size": sizes,
+                    "paper": [PLASTIC_PAPER] if key == "plastic_card" else PAPERS,
+                    "colour": colours,
+                }
+        validity = {"primary": "cardType", "fields": ["size", "paper", "colour"], "rules": rules}
+
     return {"id": p["id"], "name": p["name"], "category": _category(p["name"]),
             "pricing_type": _pricing_type(p), "markup": p.get("markup", 1.0),
-            "fields": fields, "validity": p.get("validity"),
+            "fields": fields, "validity": validity,
             "quantity": {"min": 1, "note": "any positive integer; price interpolates between breakpoints"},
             "tiers": ["Cash", "Silver", "Gold", "Platinum"]}
 
