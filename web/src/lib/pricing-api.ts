@@ -101,10 +101,12 @@ export async function fetchProducts(params?: {
   category?: string;
   pricing_type?: string;
 }): Promise<ProductSummary[]> {
-  const { data } = await pricingApi.get<ProductSummary[]>("/api/v1/products", {
-    params,
-  });
-  return data;
+  const { data } = await pricingApi.get<ProductSummary[] | { products: ProductSummary[] }>(
+    "/api/v1/products",
+    { params }
+  );
+  // API may return either a plain array or { count, products: [...] }
+  return Array.isArray(data) ? data : (data as { products: ProductSummary[] }).products;
 }
 
 export async function fetchProduct(id: number): Promise<ProductDetail> {
@@ -154,7 +156,7 @@ export function useQuote(
 ) {
   const [debouncedOptions, setDebouncedOptions] = useState(options);
   const [debouncedQty, setDebouncedQty] = useState(quantity);
-  const timer = useRef<ReturnType<typeof setTimeout>>();
+  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   useEffect(() => {
     clearTimeout(timer.current);
