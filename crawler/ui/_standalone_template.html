@@ -443,7 +443,7 @@ function localQuote(prod, V, qty){
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:Math.round(fin*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
       note:"Notepad: fixed 80x106mm, 40-sheet Simili content, Wire-O punch + Matte Lam (Both) compulsory. Cover paper is price-neutral; Spot UV (Front Cover) adds a per-run cost. qty = books." }; }
   else if(prod.engine==="pricelist"){
-    // exact lookup from a baked v4 price-list table; log-log qty interpolation
+    // exact lookup from a baked reference price table; log-log qty interpolation
     const P2=DATA.params[prod.paramKey]||{}; const cv=P2.curves||{};
     const af=prod.axisFields||[]; let key=af.map(f=>V[f]==null?"":V[f]).join("|");
     let curve=cv[key];
@@ -452,7 +452,7 @@ function localQuote(prod, V, qty){
     cash=interpLogPts(Object.keys(curve).map(k=>[+k,curve[k]]),qty);
     wt=Math.round((P2.unit_wt||0.05)*qty*WF*1000)/1000;
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt,
-      method:"exact (v4 price-list lookup)", note:P2.note||"" }; }
+      method:"exact (reference price lookup)", note:P2.note||"" }; }
   else if(prod.engine==="wallcal"){
     const c=P.curve||{}; cash=interpLogPts(Object.keys(c).map(k=>[+k,c[k]]),qty);
     const sm=P.size_mm||[260,265];
@@ -753,7 +753,7 @@ function localQuote(prod, V, qty){
     const unitPrice=((SC[V.stamp_type]||{})[V.category]||{})[V.model_key]||0;
     cash=unitPrice*qty; wt=Math.round(0.05*qty*1000)/1000;
     return {printoka_cash:Math.round(cash*100)/100,finishing_cost:0,tiers:tiers(cash),weight_kg:wt,
-      method:"exact (v4 price-list lookup)",note:"Stamp Chop: unit price × qty. Weight est. ~0.05 kg/stamp."}; }
+      method:"exact (reference price lookup)",note:"Stamp Chop: unit price × qty. Weight est. ~0.05 kg/stamp."}; }
   else if(prod.engine==="contact"){
     throw Object.assign(new Error("No automated pricing available. Please contact us directly for a quote."), {quote_only:true}); }
   else if(prod.engine==="bizcard"){ const ct=DATA.options.bizcard[V.cardType].internal;

@@ -911,6 +911,29 @@ def _apply_ref_markup(data):
         p["markup"] = _REF_MARKUP
 
 
+def _emit_api_artifacts(data, tmpl):
+    """Emit the two artifacts the public API serves, from the SAME data + engine the
+    calculator uses (single source of truth):
+      output/calculator_data.json  — full catalog (products, fields, validity, images).
+      output/calculator_engine.cjs — Node-requireable pricing engine (the calculator's exact
+                                      localQuote, with image-stripped data for speed).
+    """
+    import copy
+    (OUT / "calculator_data.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
+    edata = copy.deepcopy(data)
+    for p in edata["products"]:
+        for f in p.get("fields", []):
+            f.pop("images", None)            # pricing never needs images
+    marker = "const DATA = /*__DATA__*/;"
+    s = tmpl.index(marker) + len(marker)
+    e = tmpl.index("// ---------- UI ----------")
+    engine_code = tmpl[s:e]
+    bundle = ("const DATA=" + json.dumps(edata, ensure_ascii=False) + ";\n"
+              + engine_code
+              + "\nmodule.exports={DATA,localQuote,localOptions,tiers};\n")
+    (OUT / "calculator_engine.cjs").write_text(bundle, encoding="utf-8")
+
+
 def main():
     data = build_data()
     _drop_unsampled(data)
@@ -922,6 +945,7 @@ def main():
     tmpl = (UI / "_standalone_template.html").read_text(encoding="utf-8")
     html = tmpl.replace("/*__DATA__*/", json.dumps(data, ensure_ascii=False))
     (UI / "calculator_standalone.html").write_text(html, encoding="utf-8")
+    _emit_api_artifacts(data, tmpl)
     sizes = {k: len(json.dumps(v)) for k, v in data["options"].items()}
     print("wrote ui/calculator_standalone.html")
     print("products:", [p["name"] for p in data["products"]])
