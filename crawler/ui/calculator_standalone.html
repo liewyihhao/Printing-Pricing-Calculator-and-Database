@@ -860,7 +860,7 @@ function renderImageGrid(f){
       <div class="text-[10.5px] text-slate-600 truncate">${cap}</div></button>`; }).join("");
   grid.querySelectorAll(".imgcard").forEach(b=>b.onclick=()=>{ S.values[f.key]=b.dataset.val; renderImageGrid(f); enforceValidity(); quote(); });
 }
-// Enforce Excard's valid-combination constraints: restrict each dependent dropdown to the
+// Enforce valid-combination constraints: restrict each dependent dropdown to the
 // values allowed for the current primary selection (e.g. only papers/sizes valid for a model).
 function enforceValidity(){
   const V=S.prod&&S.prod.validity; if(!V) return;
