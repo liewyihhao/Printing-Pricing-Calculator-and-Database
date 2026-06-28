@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Printoka — Market Watch</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif'],display:['Poppins','sans-serif']},colors:{ink:'#061b31',brand:{500:'#ff5a2e',600:'#e6491c'}}}}};</script>
+<style>body{-webkit-font-smoothing:antialiased}.hairline{border-color:#e3e8ef}.brand-orb{background:conic-gradient(from 210deg,#ff3d2e,#ff8a00,#ffd000,#39c46e,#1fa2ff,#7b5bff,#ff3d2e)}</style>
+</head>
+<body class="font-sans bg-slate-50 text-slate-900">
+<header class="sticky top-0 z-20 h-16 bg-white/85 backdrop-blur border-b hairline flex items-center gap-3 px-4 sm:px-8">
+  <div class="brand-orb h-7 w-7 rounded-full shadow-sm"></div>
+  <span class="font-display font-semibold text-[17px] text-ink">printoka</span>
+  <span class="text-slate-300">/</span>
+  <span class="font-display font-semibold text-[15px] text-slate-600">Market Watch</span>
+  <span id="meta" class="ml-auto text-[12px] text-slate-400"></span>
+</header>
+<main class="max-w-[1100px] mx-auto px-4 sm:px-8 py-7">
+  <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">What changed in the market</h1>
+  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-6">New products, new options, removed options, and price moves since the last snapshot.</p>
+  <div id="summary" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-7"></div>
+  <div id="body"></div>
+  <div id="empty" class="hidden text-center text-slate-400 text-[13px] py-16">No changes detected — the market matches our last snapshot.</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const RM=v=>"RM "+Number(v).toLocaleString("en-MY",{minimumFractionDigits:2,maximumFractionDigits:2});
+function card(n,label,color){return `<div class="bg-white rounded-xl border hairline p-4"><div class="text-[24px] font-display font-semibold ${color}">${n}</div><div class="text-[12px] text-slate-500 mt-0.5">${label}</div></div>`;}
+function chip(t,cls){return `<span class="inline-block ${cls} rounded-md px-2 py-0.5 text-[12px] font-medium mr-1.5 mb-1.5">${t}</span>`;}
+async function load(){
+  let rep; try{ rep=await (await fetch('/api/v1/changes')).json(); }catch(e){ rep=null; }
+  if(!rep||rep.error){ $("body").innerHTML='<div class="text-slate-400 text-[13px]">No change report found. Run a capture, then <code>python -m app.excard_watch &lt;baseline&gt; &lt;fresh&gt; --json output/change_report.json</code>.</div>'; return; }
+  $("meta").textContent = rep.fresh? ("snapshot: "+rep.fresh) : "";
+  const changed=rep.changed||{};
+  let nNew=(rep.new_products||[]).length;
+  let nOpts=0,nPrice=0,nPromo=(rep.new_promotions||[]).length;
+  for(const s in changed){const c=changed[s];
+    nOpts+=Object.values(c.new_values||{}).flat().length+Object.keys(c.new_dimensions||{}).length;
+    nPrice+=(c.price_increases||[]).length;}
+  $("summary").innerHTML=card(nNew,"new products","text-emerald-600")+card(nOpts,"new options","text-blue-600")+card(nPrice,"price increases","text-rose-600")+card(nPromo,"new promotions","text-amber-600");
+  let H="";
+  if((rep.new_products||[]).length) H+=`<section class="mb-6"><h2 class="font-semibold text-ink mb-2">New products</h2><div>${rep.new_products.map(p=>chip(p,"bg-emerald-50 text-emerald-700 border border-emerald-100")).join("")}</div></section>`;
+  if((rep.new_promotions||[]).length) H+=`<section class="mb-6"><h2 class="font-semibold text-ink mb-2">New promotions</h2>${rep.new_promotions.map(p=>`<div class="text-[13px] text-slate-600">&bull; <b>${p.product}</b> &mdash; ${p.promo}</div>`).join("")}</section>`;
+  if((rep.removed_products||[]).length) H+=`<section class="mb-6"><h2 class="font-semibold text-ink mb-2">Removed products</h2><div>${rep.removed_products.map(p=>chip(p,"bg-slate-100 text-slate-500")).join("")}</div></section>`;
+  const keys=Object.keys(changed);
+  if(keys.length){
+    H+=`<h2 class="font-semibold text-ink mb-3">Per-product changes</h2>`;
+    for(const s of keys){const c=changed[s]; let rows="";
+      for(const [d,v] of Object.entries(c.new_dimensions||{})) rows+=`<div class="text-[13px]">+ new option category <b>${d}</b>: ${v.slice(0,8).join(", ")}</div>`;
+      for(const [d,v] of Object.entries(c.removed_dimensions||{})) rows+=`<div class="text-[13px] text-slate-500">- removed option category <b>${d}</b></div>`;
+      for(const [d,v] of Object.entries(c.new_values||{})) rows+=`<div class="text-[13px]">+ new <b>${d}</b>: <span class="text-blue-700">${v.join(", ")}</span></div>`;
+      for(const [d,v] of Object.entries(c.removed_values||{})) rows+=`<div class="text-[13px] text-slate-500">- removed <b>${d}</b>: ${v.join(", ")}</div>`;
+      const ups=(c.price_increases||[]); for(const r of ups.slice(0,8)) rows+=`<div class="text-[13px] text-rose-600">&#9650; +${r.pct}% &nbsp;<span class="text-slate-500">${r.config} @ ${r.qty}</span> &nbsp;${RM(r.old)} &rarr; ${RM(r.new)}</div>`;
+      if(ups.length>8) rows+=`<div class="text-[12px] text-slate-400">&hellip;and ${ups.length-8} more price increases</div>`;
+      for(const r of (c.price_decreases||[]).slice(0,4)) rows+=`<div class="text-[13px] text-emerald-700">&#9660; ${r.pct}% &nbsp;<span class="text-slate-500">${r.config} @ ${r.qty}</span></div>`;
+      H+=`<div class="bg-white rounded-xl border hairline p-4 mb-3"><div class="font-medium text-slate-800 mb-1.5">${s}</div>${rows}</div>`;
+    }
+  }
+  if(!H){ $("empty").classList.remove("hidden"); } else { $("body").innerHTML=H; }
+}
+load();
+</script>
+</body>
+</html>

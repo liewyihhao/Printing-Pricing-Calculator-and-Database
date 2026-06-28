@@ -20,11 +20,14 @@ from pathlib import Path
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = json.loads((ROOT / "output" / "calculator_data.json").read_text(encoding="utf-8"))
 NODE_CLI = str(ROOT / "app" / "calc_quote.cjs")
+CHANGE_REPORT = ROOT / "output" / "change_report.json"
+WHATSNEW_HTML = ROOT / "ui" / "whatsnew.html"
 PRODUCTS = {p["id"]: p for p in DATA["products"]}
 
 _CATS = [
@@ -132,3 +135,17 @@ def quote(req: QuoteRequest):
     if status != 200:
         raise HTTPException(status, res.get("error", "could not price this combination"))
     return res
+
+
+@app.get("/api/v1/changes")
+def changes():
+    """Latest market-change report (from app.excard_watch ... --json output/change_report.json)."""
+    if CHANGE_REPORT.exists():
+        return json.loads(CHANGE_REPORT.read_text(encoding="utf-8"))
+    return {"error": "no change report yet", "new_products": [], "removed_products": [], "changed": {}}
+
+
+@app.get("/whatsnew")
+def whatsnew():
+    """Market Watch dashboard (renders /api/v1/changes)."""
+    return FileResponse(WHATSNEW_HTML)
