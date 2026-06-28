@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Printoka — Market Scan</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Inter:wght@400;450;500;600;700&display=swap" rel="stylesheet" />
+<script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif'],display:['Poppins','sans-serif']},colors:{ink:'#061b31',brand:{500:'#ff5a2e',600:'#e6491c'}}}}};</script>
+<style>body{-webkit-font-smoothing:antialiased}.hairline{border-color:#e3e8ef}.brand-orb{background:conic-gradient(from 210deg,#ff3d2e,#ff8a00,#ffd000,#39c46e,#1fa2ff,#7b5bff,#ff3d2e)}</style>
+</head>
+<body class="font-sans bg-slate-50 text-slate-900">
+<header class="sticky top-0 z-20 h-16 bg-white/85 backdrop-blur border-b hairline flex items-center gap-3 px-4 sm:px-8">
+  <div class="brand-orb h-7 w-7 rounded-full shadow-sm"></div>
+  <span class="font-display font-semibold text-[17px] text-ink">printoka</span>
+  <span class="text-slate-300">/</span>
+  <span class="font-display font-semibold text-[15px] text-slate-600">Market Scan</span>
+</header>
+<main class="max-w-[1000px] mx-auto px-4 sm:px-8 py-7">
+  <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Capture a fresh market snapshot</h1>
+  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-6">Each capture downloads one <code>&lt;product&gt;_options.json</code>. Collect them in a folder, then run the change watcher to see what's new.</p>
+
+  <div class="bg-white rounded-xl border hairline p-5 mb-6">
+    <div class="font-semibold text-ink mb-2">1 · Install the capture button (once)</div>
+    <p class="text-[13px] text-slate-500 mb-3">Drag this to your bookmarks bar. (Browsers block dragging into a frame — if needed, right-click → add bookmark, and paste the link as the URL.)</p>
+    <a id="bm" class="inline-block bg-brand-500 text-white font-medium text-[13px] rounded-lg px-4 py-2 cursor-move">📸 Capture this product</a>
+  </div>
+
+  <div class="bg-white rounded-xl border hairline p-5 mb-6">
+    <div class="font-semibold text-ink mb-2">2 · Open each product and click the button</div>
+    <p class="text-[13px] text-slate-500 mb-3">Open a page (wait for the price panel to load), then click the bookmark. It downloads that product's snapshot. <button id="openall" class="text-brand-600 font-medium underline">Open all in tabs</button> (allow pop-ups).</p>
+    <div id="links" class="grid grid-cols-2 sm:grid-cols-3 gap-x-4 gap-y-1 text-[12.5px]"></div>
+  </div>
+
+  <div class="bg-white rounded-xl border hairline p-5">
+    <div class="font-semibold text-ink mb-2">3 · Diff against the baseline</div>
+    <p class="text-[13px] text-slate-500 mb-2">Move the downloaded files into a folder (e.g. <code>output/v4_options_NEW/</code>), then:</p>
+    <pre class="bg-slate-900 text-slate-100 rounded-lg p-3 text-[12px] overflow-auto">python -m app.excard_watch output/v4_options output/v4_options_NEW --json output/change_report.json</pre>
+    <p class="text-[13px] text-slate-500 mt-2">Review the report on the <a href="/whatsnew" class="text-brand-600 underline">Market Watch</a> page. If the changes are real, replace the baseline folder with the new one.</p>
+  </div>
+</main>
+<script>
+const BASE="https://v4.excard.com.my/ordering/";
+const SLUGS=["folder","envelope","notepad","kad-kahwin","kad-terima-kasih","pvc-card","bunting","banner","mug","bookmark","voucher-pad","wobbler","hand-fan","button-badge","paper-bag","hard-cover-menu","canvas-tote-bag","l-shape-plastic-folder","wall-calendar","arch-file","hard-stand-desk-calendar","soft-stand-desk-calendar","wire-o-wall-calendar","roll-up-stand","hard-cover-wire-o-notebook","standing-pouch","car-sticker","money-packet","non-woven-bag","tent-card","Hanger","letterhead","papan-kopi","business-card","booklet-offset-softcover","booklet-digital-softcover"];
+const links=document.getElementById("links");
+links.innerHTML=SLUGS.map(s=>`<a href="${BASE}${s}" target="_blank" class="text-slate-600 hover:text-brand-600 truncate block">${s}</a>`).join("");
+document.getElementById("openall").onclick=()=>SLUGS.forEach(s=>window.open(BASE+s,"_blank"));
+// The capture bookmarklet: same extractor used to build the baseline (metrics + DOM fallback).
+const CODE=`(async()=>{let t=0;while((!Array.isArray(window.metrics)||!window.metrics.length)&&t<40){await new Promise(r=>setTimeout(r,300));t++;}let m=window.metrics,out;const slug=location.pathname.split('/').filter(Boolean).pop().toLowerCase().replace(/_/g,'-');if(Array.isArray(m)&&m.length){const noise=c=>/price|date|process\\s*day|weight|print\\s*method|fee|delivery|shipment/i.test(c);const allc=Object.keys(m[0]);const cols=allc.filter(c=>!noise(c));const d={};for(const c of cols){const s=new Set();for(const r of m)s.add(r[c]);d[c]=[...s].filter(v=>v!=null);}const opt=cols.filter(c=>d[c].length>1);let base=null;document.querySelectorAll('img').forEach(i=>{const mm=i.src.match(/(.*diagram\\/[^/]+\\/)[^/?]+\\.(jpg|png|jpeg|webp)/i);if(mm&&!base)base={p:mm[1],ext:mm[2]};});const imgs={};const mc=opt.find(c=>/model$/i.test(c))||opt.find(c=>/model/i.test(c));if(base&&mc&&d[mc])for(const v of d[mc])imgs[v]=base.p+encodeURIComponent(v).replace(/%20/g,'+')+'.'+base.ext;const pc=allc.find(c=>/^wm\\s*price$|^wmprice$/i.test(c))||allc.find(c=>/total\\s*price/i.test(c))||allc.find(c=>/nett\\s*price/i.test(c));const qc=allc.find(c=>/^quantity/i.test(c));let pm=null,curves=null;if(pc&&qc){curves={};const ax=opt.filter(c=>c!==qc);for(const r of m){const pv=parseFloat(String(r[pc]).replace(/,/g,''));if(!isFinite(pv)||pv<=0)continue;const q=String(r[qc]).replace(/,/g,'');if(!/^\\d+$/.test(q))continue;(curves[ax.map(c=>r[c]).join('|')]||(curves[ax.map(c=>r[c]).join('|')]={}))[q]=pv;}pm={priceCol:pc,qtyCol:qc,axisCols:ax,nCurves:Object.keys(curves).length};}out={slug,source:'metrics',rows:m.length,optionCols:opt,imageField:Object.keys(imgs).length?mc:null,distinct:Object.fromEntries(opt.map(c=>[c,d[c]])),imageOptions:imgs,priceMeta:pm,curves};}else{const skip=/country|track|^$|quantity|qty/i;const d={},order=[];const col=()=>{for(const s of document.querySelectorAll('select')){if(!s.offsetParent)continue;const id=(s.id.replace(/^.*controller_/,'').replace(/^.*standard_/,'')||s.id).replace(/^ddl/,'');if(skip.test(id))continue;const o=[...s.options].map(x=>x.text.trim()).filter(x=>x&&!/^--.*--$|select|please/i.test(x));if(!o.length)continue;if(!d[id]){d[id]=new Set();order.push(id);}o.forEach(v=>d[id].add(v));}};col();const p=[...document.querySelectorAll('select')].find(s=>s.offsetParent&&!skip.test(s.id)&&[...s.options].filter(o=>!/^--/.test(o.text)).length>1);if(p)for(const o of [...p.options].filter(o=>o.value&&!/^--/.test(o.text))){p.value=o.value;p.dispatchEvent(new Event('change',{bubbles:true}));await new Promise(r=>setTimeout(r,600));col();}out={slug,source:'dom',optionCols:order,distinct:Object.fromEntries(order.map(k=>[k,[...d[k]]]))};}const b=new Blob([JSON.stringify(out)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=slug+'_options.json';document.body.appendChild(a);a.click();a.remove();console.log('captured',slug,out.optionCols);})();`;
+document.getElementById("bm").href="javascript:"+encodeURIComponent(CODE);
+</script>
+</body>
+</html>

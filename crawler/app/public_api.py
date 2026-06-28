@@ -149,3 +149,9 @@ def changes():
 def whatsnew():
     """Market Watch dashboard (renders /api/v1/changes)."""
     return FileResponse(WHATSNEW_HTML)
+
+
+@app.get("/capture")
+def capture():
+    """Market Scan helper: capture bookmarklet + the full product checklist."""
+    return FileResponse(ROOT / "ui" / "capture.html")
