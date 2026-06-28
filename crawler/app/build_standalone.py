@@ -898,12 +898,26 @@ def _embed_images(data):
                 del f["images"]
 
 
+# Reference selling-price markup applied to NON-exact products: where we don't have the
+# exact market price, the calculator quotes ~7.5% above the estimated reference (the safe
+# direction) so we never under-price. Exact products keep matching the reference.
+_REF_MARKUP = 1.075
+
+
+def _apply_ref_markup(data):
+    for p in data["products"]:
+        if p.get("accuracy") == 0 or p.get("engine") == "contact":
+            continue  # exact (matches reference) or contact-only (no auto price)
+        p["markup"] = _REF_MARKUP
+
+
 def main():
     data = build_data()
     _drop_unsampled(data)
     _wire_pricelist_products(data)
     _attach_images(data)
     _attach_excard_parity(data)
+    _apply_ref_markup(data)
     _embed_images(data)
     tmpl = (UI / "_standalone_template.html").read_text(encoding="utf-8")
     html = tmpl.replace("/*__DATA__*/", json.dumps(data, ensure_ascii=False))

@@ -44,7 +44,7 @@ tailwind.config = { theme: { extend: {
 
 <main class="max-w-[1180px] mx-auto px-4 sm:px-8 py-7">
   <h1 class="font-display text-[26px] font-semibold tracking-tight text-ink">Simulate a quote</h1>
-  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-5">Pick a product, configure it, and see the price instantly. The Cash price <span class="font-medium text-slate-600">matches the standard market price</span> — membership tiers are your savings below it.</p>
+  <p class="text-slate-500 text-[13.5px] mt-0.5 mb-5">Pick a product, configure it, and see the price instantly. <span class="font-medium text-slate-600">Exact-priced products match the market price</span>; the rest are quoted ~5–10% above as a reference. Membership tiers are your savings below the Cash price.</p>
 
   <div id="picker">
     <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
@@ -799,7 +799,7 @@ function renderProducts(){
     const exact=p.accuracy===0;
     const badge=exact
       ? `<span class="inline-flex items-center gap-1 text-[10.5px] text-emerald-700 font-semibold mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Verified price</span>`
-      : `<span class="text-[10.5px] text-slate-400 font-medium mt-0.5 block">${p.accuracy!=null?'±'+p.accuracy+'% vs market':'estimate'}</span>`;
+      : `<span class="text-[10.5px] text-slate-400 font-medium mt-0.5 block">≈ +5–10% (reference)</span>`;
     return `
     <button type="button" class="prodcard text-left bg-white rounded-xl border hairline shadow-card p-4" data-id="${p.id}">
       <div class="flex items-center gap-2.5">
@@ -827,7 +827,7 @@ function selectProduct(id){
   $("cfgtitle").textContent=prod.name;
   $("acc").innerHTML = prod.accuracy===0
     ? `<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Exact market price</span>`
-    : (prod.accuracy!=null?`<span class="inline-flex items-center gap-1.5 text-slate-500 bg-slate-100 border hairline rounded-full px-2.5 py-1 font-medium">±${prod.accuracy}% vs market</span>`:"");
+    : `<span class="inline-flex items-center gap-1.5 text-slate-500 bg-slate-100 border hairline rounded-full px-2.5 py-1 font-medium">Reference price + ~5–10%</span>`;
   window.scrollTo({top:0,behavior:"smooth"});
   $("fields").innerHTML = S.fields.map(f=> f.type==="number"
     ? `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
@@ -900,6 +900,8 @@ function quote(){
   const qty=parseInt($("qty").value||"0"), complete=S.fields.every(f=>f.optional||S.values[f.key]);
   if(!complete||!qty){ $("status").textContent=""; clearPrice("Configure a job…"); return; }
   try{ const q=localQuote(S.prod,S.values,qty);
+    const mk=S.prod.markup||1;   // reference selling-price markup for non-exact products
+    if(mk!==1){ q.printoka_cash=Math.round(q.printoka_cash*mk*100)/100; q.tiers=tiers(q.printoka_cash); }
     $("bigprice").textContent=RM(q.printoka_cash); $("bigprice").classList.remove("pricepulse"); void $("bigprice").offsetWidth; $("bigprice").classList.add("pricepulse");
     $("perunit").textContent=RM(q.printoka_cash/qty)+" / unit";
     $("tiers").innerHTML=TIERS.map(t=>`<div class="flex items-center justify-between py-1"><span class="text-slate-500">${t}${t==="Cash"?'<span class="text-slate-300 text-[11px]"> (list)</span>':''}</span><span class="tabular-nums font-medium ${t==="Platinum"?'text-emerald-700':'text-ink'}">${RM(q.tiers[t])}</span></div>`).join("");
