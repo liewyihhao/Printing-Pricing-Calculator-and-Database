@@ -605,6 +605,7 @@ function localQuote(prod, V, qty){
     if(V.vdp==="Variable Data Printing (Front)") ntPvc+=" VDP price not yet sampled — contact us for accurate VDP pricing.";
     return { printoka_cash: Math.round(cash2*100)/100, finishing_cost: Math.round(fin*100)/100, tiers: tiers(cash2), weight_kg: wt, method:"formula (qty curve)", note:ntPvc }; }
   else if(prod.engine==="wireo"){
+    if(V.cover==="Exclusive Leather Cover") throw new Error("Exclusive Leather Cover is a premium specialty item — price quoted separately. Contact us for a custom quote.");
     const P2=P;
     function interpLL(obj,q){const pts=Object.keys(obj).map(k=>[+k,obj[k]]).sort((a,b)=>a[0]-b[0]);if(!pts.length)return 0;const xs=pts.map(p=>Math.log(p[0])),ys=pts.map(p=>Math.log(p[1])),x=Math.log(Math.max(+q,1));if(x<=xs[0])return Math.exp(ys[0]);if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}
     function linpts(pts,x){if(!pts||!pts.length)return 0;pts=pts.slice().sort((a,b)=>a[0]-b[0]);if(x<=pts[0][0])return pts[0][1];if(x>=pts[pts.length-1][0])return pts[pts.length-1][1];for(let i=1;i<pts.length;i++)if(x<=pts[i][0]){const t=(x-pts[i-1][0])/(pts[i][0]-pts[i-1][0]);return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]);}}
@@ -614,7 +615,7 @@ function localQuote(prod, V, qty){
     if(V.addcontent&&!/Not Required|None/.test(V.addcontent)) c+=linpts((P2.addc_delta||{})[V.addcontent]||[],qty);
     c=Math.max(c,0);
     wt=Math.round((P2.cover_wt[V.cover]||0.3)*qty*WF*1000)/1000;
-    let nt="Wire-O Notebook: hole punch + binding compulsory (included). Gloss=Matte lamination; Spot UV adds a delta. Hot stamping quoted separately. Soft/Leather covers pending.";
+    let nt="Wire-O Notebook: hole punch + binding compulsory (included). Gloss=Matte lamination; Spot UV adds a delta. Hot stamping quoted separately.";
     if(V.hot_stamping&&V.hot_stamping!=="Not Required") nt+=" Hot stamping ("+V.hot_stamping+") quoted separately.";
     return { printoka_cash: Math.round(c*100)/100, finishing_cost:0, tiers: tiers(c), weight_kg: wt, method:"formula (per-cover curve + deltas)", note:nt }; }
   else if(prod.engine==="computerform"){

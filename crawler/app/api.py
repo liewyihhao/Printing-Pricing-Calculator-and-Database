@@ -856,7 +856,7 @@ FIELD_SCHEMAS = {
                 ]},
     "wireo": {"options": "/api/printoka/wireo/options", "quote": "/api/printoka/wireo/quote",
                 "fields": [
-                    {"key": "cover", "label": "Cover type", "addon": True, "depends": [], "options": ["Hard Cover", "VDP Hard Cover", "Soft Cover"]},
+                    {"key": "cover", "label": "Cover type", "addon": True, "depends": [], "options": ["Hard Cover", "VDP Hard Cover", "Soft Cover", "Exclusive Leather Cover"]},
                     {"key": "lamination", "label": "Cover lamination (compulsory)", "addon": True, "depends": [], "options": WIREO_LAMS},
                     {"key": "addcontent", "label": "Additional content sheets", "addon": True, "depends": [], "options": ["Not Required", "4 sheets", "8 sheets", "12 sheets"]},
                     {"key": "hot_stamping", "label": "Cover hot stamping (quoted separately)", "addon": True, "depends": [], "options": ["Not Required", "1C (Front Cover)", "2C (Front Cover)", "1C (Front & Back Cover)", "2C (Front & Back Cover)"]},
@@ -2169,6 +2169,9 @@ def wireo_quote(product: int = Query(112), cover: str = Query("Hard Cover"),
                 addcontent: str = Query("Not Required"), qty: int = Query(...),
                 hot_stamping: str = Query("Not Required")):
     from . import wireo_engine as WO
+    if cover == "Exclusive Leather Cover":
+        return JSONResponse({"error": "Exclusive Leather Cover is a premium specialty item — "
+                             "price quoted separately. Contact us for a custom quote."}, status_code=400)
     try:
         cash = WO.cash_price(cover, lamination, addcontent, qty)
         wt = WO.weight_kg(cover, qty)
@@ -2178,8 +2181,7 @@ def wireo_quote(product: int = Query(112), cover: str = Query("Hard Cover"),
         return JSONResponse({"error": "no price"}, status_code=400)
     note = ("Wire-O Notebook: Wire-O hole punch + binding compulsory (included). Gloss=Matte "
             "lamination (same price); Spot UV adds a delta. Hot stamping is quoted separately. "
-            "Soft Cover is priced at its standard lamination (Matte Both); Exclusive Leather "
-            "Cover is still pending. qty = books.")
+            "Soft Cover is priced at its standard lamination (Matte Both). qty = books.")
     if hot_stamping not in ("Not Required", ""):
         note += f" Hot stamping ({hot_stamping}) quoted separately."
     return {"config": {"product": product, "cover": cover, "lamination": lamination,

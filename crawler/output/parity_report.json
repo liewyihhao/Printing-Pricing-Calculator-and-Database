@@ -545,7 +545,8 @@
    "cover": [
     "Hard Cover",
     "VDP Hard Cover",
-    "Soft Cover"
+    "Soft Cover",
+    "Exclusive Leather Cover"
    ],
    "lamination": [
     "Matte Lamination (Front)",
@@ -567,15 +568,7 @@
     "2C (Front & Back Cover)"
    ]
   },
-  "gaps": [
-   {
-    "type": "missing_options",
-    "control": "rblOrderDesc",
-    "missing": [
-     "Exclusive Leather Cover"
-    ]
-   }
-  ]
+  "gaps": []
  },
  "pvccard": {
   "family": "pvccard",

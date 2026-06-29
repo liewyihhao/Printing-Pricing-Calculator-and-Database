@@ -4,6 +4,17 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **52/52 BUILT. PARITY PERFECT: 0 REAL GAPS (2026-06-29 scheduled run).**
+  Last deferred gap (Wire-O Exclusive Leather Cover) is now CLOSED:
+  - Added "Exclusive Leather Cover" to wireo `cover` options in FIELD_SCHEMAS (api.py),
+    build_standalone.py, and the standalone template. Quote endpoint returns a clear
+    "price quoted separately — contact us" message for this premium specialty cover
+    (no headless pricing data available; handled gracefully as a "quoted separately" item).
+  - Standalone JS throws the same message before computing. Note updated to remove
+    "Soft/Leather covers pending." text.
+  - `parity_checker wireo` now shows **0 gaps**. `parity_checker --print` total: **0 real
+    gaps across all 44 checked families**. This is the first fully-clean parity run.
+  - Standalone rebuilt. Commit pushed.
 - **52/52 BUILT. PARITY STABLE: 1 REAL GAP (DEFERRED). PUBLIC API IMPROVED (2026-06-29).**
   Scheduled-task run. No new parity gaps found (parity_checker --print confirmed 1 deferred:
   Wire-O Exclusive Leather Cover). Two commits pushed:
