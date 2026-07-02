@@ -456,6 +456,8 @@ def build_data():
         {"id": 160, "name": "Bunting — Gear X Stand", "engine": "pricelist"},
         {"id": 161, "name": "Bunting — Round Base Stand", "engine": "pricelist"},
         {"id": 162, "name": "Bunting — Tripod Stand", "engine": "pricelist"},
+        {"id": 163, "name": "Exclusive Leather Cover Wire-O Notebook — Litho", "engine": "pricelist"},
+        {"id": 164, "name": "Hard Cover Perfect Bind Notebook — Litho", "engine": "pricelist"},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -695,6 +697,7 @@ _EXCARD_ID2SLUG = {
     154: "foamboard", 155: "foamboard-with-magnet", 156: "foldable-pop-display",
     157: "pop-display", 158: "wind-flag", 159: "economy-roll-up-stand",
     160: "bunting-gear-x-stand", 161: "bunting-round-base-stand", 162: "bunting-tripod-stand",
+    163: "exclusive-leather-cover-wire-o-notebook", 164: "hard-cover-perfect-bind-notebook",
 }
 # Excard metric columns that are not user-selectable options
 _EXCARD_SKIP = ("price", "weight", "print method", "process day", "fee",
@@ -878,6 +881,8 @@ _PRICELIST_FROM_OPTIONS = {
     158: ("wind-flag", "wind_flag_pl"), 159: ("economy-roll-up-stand", "econ_rollup_pl"),
     160: ("bunting-gear-x-stand", "bunting_gear_pl"), 161: ("bunting-round-base-stand", "bunting_round_pl"),
     162: ("bunting-tripod-stand", "bunting_tripod_pl"),
+    163: ("exclusive-leather-cover-wire-o-notebook", "leather_wireo_pl"),
+    164: ("hard-cover-perfect-bind-notebook", "hcperfectbind_pl"),
 }
 
 
