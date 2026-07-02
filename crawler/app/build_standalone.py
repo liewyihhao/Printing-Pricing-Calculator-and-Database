@@ -443,6 +443,10 @@ def build_data():
         {"id": 147, "name": "Laminated Non-Woven Bag — Litho", "engine": "pricelist"},
         {"id": 148, "name": "RPET Non-Woven Bag — Litho", "engine": "pricelist"},
         {"id": 149, "name": "Toast Bag — Litho", "engine": "pricelist"},
+        {"id": 150, "name": "3-Side Seal Packaging — Litho", "engine": "pricelist"},
+        {"id": 151, "name": "Kraft Standing Pouch — Litho", "engine": "pricelist"},
+        {"id": 152, "name": "Standing Pouch with Spout — Litho", "engine": "pricelist"},
+        {"id": 153, "name": "Vacuum Bag Packaging — Litho", "engine": "pricelist"},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -677,6 +681,8 @@ _EXCARD_ID2SLUG = {
     105: "letterhead", 130: "papan-kopi", 135: "magnet", 131: "pillow",
     144: "cooler-bag", 145: "dtf-totebag-with-zip", 146: "heat-transfer-tote-bag",
     147: "laminated-non-woven-bag", 148: "rpet-non-woven-bag", 149: "toast-bag",
+    150: "3-side-seal-packaging", 151: "kraft-standing-pouch",
+    152: "standing-pouch-spout", 153: "vacuum-bag-packaging",
 }
 # Excard metric columns that are not user-selectable options
 _EXCARD_SKIP = ("price", "weight", "print method", "process day", "fee",
@@ -853,6 +859,8 @@ _PRICELIST_FROM_OPTIONS = {
     146: ("heat-transfer-tote-bag", "heat_transfer_tote_pl"),
     147: ("laminated-non-woven-bag", "laminated_nonwoven_pl"),
     148: ("rpet-non-woven-bag", "rpet_nonwoven_pl"), 149: ("toast-bag", "toast_bag_pl"),
+    150: ("3-side-seal-packaging", "sideseal_pl"), 151: ("kraft-standing-pouch", "kraft_pouch_pl"),
+    152: ("standing-pouch-spout", "spout_pouch_pl"), 153: ("vacuum-bag-packaging", "vacuum_bag_pl"),
 }
 
 
