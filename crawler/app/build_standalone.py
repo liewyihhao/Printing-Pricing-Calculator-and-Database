@@ -447,6 +447,15 @@ def build_data():
         {"id": 151, "name": "Kraft Standing Pouch — Litho", "engine": "pricelist"},
         {"id": 152, "name": "Standing Pouch with Spout — Litho", "engine": "pricelist"},
         {"id": 153, "name": "Vacuum Bag Packaging — Litho", "engine": "pricelist"},
+        {"id": 154, "name": "Foamboard — Digital", "engine": "pricelist"},
+        {"id": 155, "name": "Foamboard with Magnet — Digital", "engine": "pricelist"},
+        {"id": 156, "name": "Foldable POP Display — Digital", "engine": "pricelist"},
+        {"id": 157, "name": "POP Display — Digital", "engine": "pricelist"},
+        {"id": 158, "name": "Wind Flag — Digital", "engine": "pricelist"},
+        {"id": 159, "name": "Economy Roll-Up Stand — Digital", "engine": "pricelist"},
+        {"id": 160, "name": "Bunting — Gear X Stand", "engine": "pricelist"},
+        {"id": 161, "name": "Bunting — Round Base Stand", "engine": "pricelist"},
+        {"id": 162, "name": "Bunting — Tripod Stand", "engine": "pricelist"},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -683,6 +692,9 @@ _EXCARD_ID2SLUG = {
     147: "laminated-non-woven-bag", 148: "rpet-non-woven-bag", 149: "toast-bag",
     150: "3-side-seal-packaging", 151: "kraft-standing-pouch",
     152: "standing-pouch-spout", 153: "vacuum-bag-packaging",
+    154: "foamboard", 155: "foamboard-with-magnet", 156: "foldable-pop-display",
+    157: "pop-display", 158: "wind-flag", 159: "economy-roll-up-stand",
+    160: "bunting-gear-x-stand", 161: "bunting-round-base-stand", 162: "bunting-tripod-stand",
 }
 # Excard metric columns that are not user-selectable options
 _EXCARD_SKIP = ("price", "weight", "print method", "process day", "fee",
@@ -861,6 +873,11 @@ _PRICELIST_FROM_OPTIONS = {
     148: ("rpet-non-woven-bag", "rpet_nonwoven_pl"), 149: ("toast-bag", "toast_bag_pl"),
     150: ("3-side-seal-packaging", "sideseal_pl"), 151: ("kraft-standing-pouch", "kraft_pouch_pl"),
     152: ("standing-pouch-spout", "spout_pouch_pl"), 153: ("vacuum-bag-packaging", "vacuum_bag_pl"),
+    154: ("foamboard", "foamboard_pl"), 155: ("foamboard-with-magnet", "foamboard_magnet_pl"),
+    156: ("foldable-pop-display", "foldable_pop_pl"), 157: ("pop-display", "pop_display_pl"),
+    158: ("wind-flag", "wind_flag_pl"), 159: ("economy-roll-up-stand", "econ_rollup_pl"),
+    160: ("bunting-gear-x-stand", "bunting_gear_pl"), 161: ("bunting-round-base-stand", "bunting_round_pl"),
+    162: ("bunting-tripod-stand", "bunting_tripod_pl"),
 }
 
 
