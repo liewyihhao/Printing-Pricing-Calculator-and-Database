@@ -41,7 +41,25 @@
 </main>
 <script>
 const BASE="https://v4.excard.com.my/ordering/";
-const SLUGS=["folder","envelope","notepad","kad-kahwin","kad-terima-kasih","pvc-card","bunting","banner","mug","bookmark","voucher-pad","wobbler","hand-fan","button-badge","paper-bag","hard-cover-menu","canvas-tote-bag","l-shape-plastic-folder","wall-calendar","arch-file","hard-stand-desk-calendar","soft-stand-desk-calendar","wire-o-wall-calendar","roll-up-stand","hard-cover-wire-o-notebook","standing-pouch","car-sticker","money-packet","non-woven-bag","tent-card","Hanger","letterhead","papan-kopi","business-card","booklet-offset-softcover","booklet-digital-softcover"];
+const SLUGS=[
+ // --- already built ---
+ "folder","envelope","notepad","kad-kahwin","kad-terima-kasih","pvc-card","bunting","banner","mug",
+ "bookmark","voucher-pad","wobbler","hand-fan","button-badge","paper-bag","hard-cover-menu",
+ "canvas-tote-bag","l-shape-plastic-folder","wall-calendar","arch-file","hard-stand-desk-calendar",
+ "soft-stand-desk-calendar","wire-o-wall-calendar","roll-up-stand","hard-cover-wire-o-notebook",
+ "standing-pouch","car-sticker","money-packet","non-woven-bag","tent-card","Hanger","letterhead",
+ "papan-kopi","business-card","booklet-offset-softcover","booklet-digital-softcover",
+ // --- NEW products to capture (from the full Excard menu) ---
+ "lanyard","premium-desk-calendar","exclusive-leather-cover-wire-o-notebook",
+ "hard-cover-perfect-bind-notebook","cooler-bag","dtf-totebag-with-zip","heat-transfer-tote-bag",
+ "laminated-non-woven-bag","rpet-non-woven-bag","toast-bag","3-side-seal-packaging",
+ "kraft-standing-pouch","standing-pouch-spout","vacuum-bag-packaging","uv-dtf-sticker",
+ "bunting-gear-x-stand","bunting-round-base-stand","bunting-tripod-stand","economy-roll-up-stand",
+ "foamboard","foamboard-with-magnet","foldable-pop-display","pop-display","wind-flag",
+ "creative-cut-card","greeting-card","food-tray","kraft-paper-bag","premium-money-packet",
+ "hot-stamping-money-packet","envelope-money-packet","kotak-cenderahati"];
+// Shirts / ID Card / X-ccessories: open them from Excard's menu and click the bookmarklet —
+// it auto-names the file from the page URL, so exact slugs aren't needed here.
 const links=document.getElementById("links");
 links.innerHTML=SLUGS.map(s=>`<a href="${BASE}${s}" target="_blank" class="text-slate-600 hover:text-brand-600 truncate block">${s}</a>`).join("");
 document.getElementById("openall").onclick=()=>SLUGS.forEach(s=>window.open(BASE+s,"_blank"));
