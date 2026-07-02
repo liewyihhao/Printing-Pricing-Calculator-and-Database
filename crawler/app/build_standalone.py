@@ -437,6 +437,12 @@ def build_data():
         {"id": 143, "name": "Sublimation Shirt", "engine": "contact", "optsrc": "none",
          "accuracy": None, "fields": [],
          "note": "No automated pricing available. Contact us directly for a quote."},
+        {"id": 144, "name": "Cooler Bag — Litho", "engine": "pricelist"},
+        {"id": 145, "name": "DTF Tote Bag With Zip — Litho", "engine": "pricelist"},
+        {"id": 146, "name": "Heat Transfer Tote Bag — Litho", "engine": "pricelist"},
+        {"id": 147, "name": "Laminated Non-Woven Bag — Litho", "engine": "pricelist"},
+        {"id": 148, "name": "RPET Non-Woven Bag — Litho", "engine": "pricelist"},
+        {"id": 149, "name": "Toast Bag — Litho", "engine": "pricelist"},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -669,6 +675,8 @@ _EXCARD_ID2SLUG = {
     116: "car-sticker", 117: "car-sticker", 138: "money-packet",
     139: "non-woven-bag", 140: "tent-card", 134: "Hanger",
     105: "letterhead", 130: "papan-kopi", 135: "magnet", 131: "pillow",
+    144: "cooler-bag", 145: "dtf-totebag-with-zip", 146: "heat-transfer-tote-bag",
+    147: "laminated-non-woven-bag", 148: "rpet-non-woven-bag", 149: "toast-bag",
 }
 # Excard metric columns that are not user-selectable options
 _EXCARD_SKIP = ("price", "weight", "print method", "process day", "fee",
@@ -841,6 +849,10 @@ _PRICELIST_FROM_OPTIONS = {
     129: ("mug", "mug_pl"), 125: ("roll-up-stand", "rollup_pl"),
     121: ("soft-stand-desk-calendar", "softdesk_pl"),
     122: ("wire-o-wall-calendar", "wireowall_pl"),
+    144: ("cooler-bag", "cooler_bag_pl"), 145: ("dtf-totebag-with-zip", "dtf_totebag_zip_pl"),
+    146: ("heat-transfer-tote-bag", "heat_transfer_tote_pl"),
+    147: ("laminated-non-woven-bag", "laminated_nonwoven_pl"),
+    148: ("rpet-non-woven-bag", "rpet_nonwoven_pl"), 149: ("toast-bag", "toast_bag_pl"),
 }
 
 
