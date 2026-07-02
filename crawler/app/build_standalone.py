@@ -971,6 +971,10 @@ _PRICELIST_FROM_OPTIONS = {
     174: ("lanyard", "lanyard_pl"), 175: ("premium-desk-calendar", "premium_deskcal_pl"),
     176: ("uv-dtf-sticker", "uvdtf_pl"), 177: ("food-tray", "food_tray_pl"),
     178: ("kraft-paper-bag", "kraft_paperbag_pl"), 179: ("kotak-cenderahati", "kotak_pl"),
+    # REFERENCE→EXACT upgrades (compact products; giant/order-form ones stay on ref markup)
+    126: ("wobbler", "wobbler_plx"), 136: ("hard-cover-menu", "hardmenu_plx"),
+    137: ("standing-pouch", "pouch_plx"), 134: ("Hanger", "hanger_plx"),
+    108: ("l-shape-plastic-folder", "lshape_plx"), 119: ("arch-file", "archfile_plx"),
 }
 
 
