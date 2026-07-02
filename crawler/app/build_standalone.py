@@ -463,6 +463,32 @@ def build_data():
         {"id": 167, "name": "Premium Money Packet — Litho", "engine": "pricelist"},
         {"id": 168, "name": "Hot Stamping Money Packet — Litho", "engine": "pricelist"},
         {"id": 169, "name": "Envelope Money Packet — Litho", "engine": "pricelist"},
+        {"id": 170, "name": "ID Card — Digital", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [
+            {"key": "orientation", "label": "Orientation", "addon": True, "depends": [], "options": ["Portrait", "Landscape"]},
+            {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
+            {"key": "quantity_hint", "label": "Available quantities (pcs)", "addon": True, "depends": [],
+             "options": ["20", "40", "60", "80", "100", "120", "140", "160", "180", "200"]}],
+         "note": "No automated pricing available (legacy order-form pricing widget). Contact us directly for a quote."},
+        {"id": 171, "name": "X-ccessories — Litho", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [],
+         "note": "Bulk accessory order builder (mix-and-match small quantities, West/East Malaysia shipping). Contact us directly for a quote."},
+        {"id": 172, "name": "DTF Shirt — Digital", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [
+            {"key": "fabric", "label": "Fabric Type", "addon": True, "depends": [], "options": [
+                "Microfiber Mini Eyelet 150gsm", "CVC Honeycomb 180gsm", "Siro Cotton 190gsm"]}],
+         "note": "No automated pricing available (multi-model order builder). Contact us directly for a quote."},
+        {"id": 173, "name": "Silkscreen Shirt — Digital", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [
+            {"key": "fabric", "label": "Fabric Type", "addon": True, "depends": [], "options": [
+                "Microfiber Mini Eyelet 150gsm", "CVC Honeycomb 180gsm", "Siro Cotton 190gsm"]}],
+         "note": "No automated pricing available (multi-model order builder). Contact us directly for a quote."},
+        {"id": 174, "name": "Lanyard — Litho", "engine": "pricelist"},
+        {"id": 175, "name": "Premium Desk Calendar — Litho", "engine": "pricelist"},
+        {"id": 176, "name": "UV DTF Sticker — Digital", "engine": "pricelist"},
+        {"id": 177, "name": "Food Tray — Litho", "engine": "pricelist"},
+        {"id": 178, "name": "Kraft Paper Bag — Litho", "engine": "pricelist"},
+        {"id": 179, "name": "Kotak Cenderahati — Litho", "engine": "pricelist"},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -705,6 +731,8 @@ _EXCARD_ID2SLUG = {
     163: "exclusive-leather-cover-wire-o-notebook", 164: "hard-cover-perfect-bind-notebook",
     165: "creative-cut-card", 166: "greeting-card",
     167: "premium-money-packet", 168: "hot-stamping-money-packet", 169: "envelope-money-packet",
+    174: "lanyard", 175: "premium-desk-calendar", 176: "uv-dtf-sticker", 177: "food-tray",
+    178: "kraft-paper-bag", 179: "kotak-cenderahati",
 }
 # Excard metric columns that are not user-selectable options
 _EXCARD_SKIP = ("price", "weight", "print method", "process day", "fee",
@@ -893,6 +921,9 @@ _PRICELIST_FROM_OPTIONS = {
     165: ("creative-cut-card", "creative_cut_card_pl"), 166: ("greeting-card", "greeting_card_pl"),
     167: ("premium-money-packet", "premium_mp_pl"), 168: ("hot-stamping-money-packet", "hotstamp_mp_pl"),
     169: ("envelope-money-packet", "envelope_mp_pl"),
+    174: ("lanyard", "lanyard_pl"), 175: ("premium-desk-calendar", "premium_deskcal_pl"),
+    176: ("uv-dtf-sticker", "uvdtf_pl"), 177: ("food-tray", "food_tray_pl"),
+    178: ("kraft-paper-bag", "kraft_paperbag_pl"), 179: ("kotak-cenderahati", "kotak_pl"),
 }
 
 
