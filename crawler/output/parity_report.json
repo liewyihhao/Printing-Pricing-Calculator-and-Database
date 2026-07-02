@@ -1198,33 +1198,6 @@
     ]
    },
    {
-    "control": "ddlCoverLamination",
-    "options": [
-     "Matte Lamination (Front)",
-     "Matte Lamination (Both)",
-     "Matte Lamination (Front) + Spot UV (Front)",
-     "Matte Lamination (Both) + Spot UV (Front)",
-     "Gloss Lamination (Front)",
-     "Gloss Lamination (Both)",
-     "UV Varnish (Front)",
-     "UV Varnish (Both)",
-     "Gloss Waterbase Varnish (Front)",
-     "Gloss Waterbase Varnish (Both)"
-    ]
-   },
-   {
-    "control": "ddl_embossing",
-    "options": [
-     "90mm x 30mm",
-     "90mm x 70mm",
-     "95mm x 206mm",
-     "101mm x 144mm",
-     "144mm x 206mm",
-     "194mm x 206mm",
-     "206mm x 294mm"
-    ]
-   },
-   {
     "control": "ddlCoverHSColourNum",
     "options": [
      "1C (Front)",
@@ -1252,28 +1225,6 @@
      "Green",
      "Red",
      "Silver"
-    ]
-   },
-   {
-    "control": "ddlContentPaper",
-    "options": [
-     "Simili 80gsm",
-     "Simili 100gsm",
-     "Gloss Art Paper 80gsm",
-     "Gloss Art Paper 100gsm",
-     "Gloss Art Paper 128gsm",
-     "Gloss Art Paper 150gsm",
-     "Matte Art Paper 100gsm",
-     "Matte Art Paper 130gsm",
-     "Matte Art Paper 150gsm",
-     "Gloss Art Card 230gsm (2 side coated)"
-    ]
-   },
-   {
-    "control": "ddlContentPrintColour",
-    "options": [
-     "1C (Both)",
-     "4C (Both)"
     ]
    },
    {
@@ -2397,26 +2348,6 @@
      "72",
      "76",
      "80"
-    ]
-   },
-   {
-    "control": "ddlCoverPaper",
-    "options": [
-     "Gloss Art Card 230gsm (2 sides coated)",
-     "Gloss Art Card 250gsm (2 sides coated)",
-     "Gloss Art Card 310gsm (2 sides coated)",
-     "Gloss Art Paper 100gsm",
-     "Gloss Art Paper 128gsm",
-     "Gloss Art Paper 150gsm",
-     "Linen 240gsm",
-     "Matte Art Paper 100gsm",
-     "Matte Art Paper 130gsm",
-     "Matte Art Paper 150gsm",
-     "Metal Ice 250gsm",
-     "Simili 100gsm",
-     "Simili 140gsm",
-     "Simili 80gsm",
-     "Super White 240gsm"
     ]
    },
    {
