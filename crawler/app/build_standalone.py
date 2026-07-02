@@ -519,6 +519,16 @@ def build_data():
             {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
              "options": ["Not Required", "Front", "Back", "Both"]}],
          "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
+        {"id": 184, "name": "Roll Form Sticker — Litho", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [
+            {"key": "shape", "label": "Shape", "addon": True, "depends": [], "options": [
+                "Rectangle/Square", "Round", "Custom Shape"]},
+            {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": [
+                "Mirror Kote", "Transparent OPP", "White PP", "Printing Paper", "Synthetic Paper", "Hologram"]},
+            {"key": "core", "label": "Paper Core", "addon": True, "depends": [], "options": ["25mm", "40mm", "76mm"]},
+            {"key": "quantity_hint", "label": "Available quantities (pcs)", "addon": True, "depends": [],
+             "options": ["1000", "5000", "10000", "20000", "50000", "100000"]}],
+         "note": "No automated pricing available (legacy roll-form order widget). Contact us directly for a quote."},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
