@@ -975,6 +975,8 @@ _PRICELIST_FROM_OPTIONS = {
     126: ("wobbler", "wobbler_plx"), 136: ("hard-cover-menu", "hardmenu_plx"),
     137: ("standing-pouch", "pouch_plx"), 134: ("Hanger", "hanger_plx"),
     108: ("l-shape-plastic-folder", "lshape_plx"), 119: ("arch-file", "archfile_plx"),
+    128: ("canvas-tote-bag", "canvastote_plx"), 120: ("hard-stand-desk-calendar", "harddesk_plx"),
+    118: ("wall-calendar", "wallcal_plx"),
 }
 
 

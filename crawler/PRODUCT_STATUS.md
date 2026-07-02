@@ -21,16 +21,13 @@ _readymade garment builder (Cap, shirts) + www order_spec pages; both resist aut
 - [ ] `185` Cap — DTF
 - [ ] `184` Roll Form Sticker — Litho
 
-### REFERENCE (27) — optional accuracy upgrade
+### REFERENCE (24) — optional accuracy upgrade
 _Remaining ones are giant (Banner 192k, Voucher 123k, Paper Bag 43k, Kad Kahwin 389k rows → bundle bloat) or order-form template (Business Card, Loose Sheet, Booklet, Bill-Book, Label Sticker, Computer Form). Left on safe markup by design._
 - [ ] `1` Business Card
 - [ ] `104` Notepad — Litho
 - [ ] `106` Envelope — Litho
-- [ ] `118` Wall Calendar — Litho
-- [ ] `120` Desk Calendar — Hard Stand (Litho)
 - [ ] `123` Banner — Litho
 - [ ] `127` Paper Bag — Litho
-- [ ] `128` Canvas Tote Bag — Litho
 - [ ] `131` Pillow — Litho
 - [ ] `135` Magnet — Digital
 - [ ] `116` Static Cling Window Sticker — Digital
@@ -51,15 +48,18 @@ _Remaining ones are giant (Banner 192k, Voucher 123k, Paper Bag 43k, Kad Kahwin 
 - [ ] `102` Flyer (= Loose Sheet Litho)
 - [ ] `103` Customprint (= Loose Sheet Litho)
 
-## ✅ EXACT pricing (54)
+## ✅ EXACT pricing (57)
 - [x] `107` Folder — Litho
 - [x] `108` L-Shape Plastic Folder — Digital
+- [x] `118` Wall Calendar — Litho
 - [x] `119` Arch File — Digital
+- [x] `120` Desk Calendar — Hard Stand (Litho)
 - [x] `121` Desk Calendar — Soft Stand (Litho)
 - [x] `122` Wire-O Wall Calendar — Litho
 - [x] `124` Bunting — Litho
 - [x] `125` Roll-Up Stand — Litho
 - [x] `126` Wobbler — Digital
+- [x] `128` Canvas Tote Bag — Litho
 - [x] `129` Mug — Litho
 - [x] `130` Papan Kopi / Sachet Board — Litho
 - [x] `132` Button Badge — Digital
