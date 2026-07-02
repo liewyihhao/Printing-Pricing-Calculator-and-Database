@@ -519,6 +519,13 @@ def build_data():
             {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
              "options": ["Not Required", "Front", "Back", "Both"]}],
          "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
+        {"id": 185, "name": "Cap — DTF", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [
+            {"key": "category", "label": "Category", "addon": True, "depends": [], "options": ["Adult", "Kid"]},
+            {"key": "model", "label": "Model", "addon": True, "depends": [], "options": ["Baseball", "Trucker"]},
+            {"key": "fabric", "label": "Fabric Type", "addon": True, "depends": [], "options": ["Acrylic Twill"]},
+            {"key": "printing", "label": "Printing Position", "addon": True, "depends": [], "options": ["Front", "Side", "Back"]}],
+         "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
         {"id": 184, "name": "Roll Form Sticker — Litho", "engine": "contact", "optsrc": "none",
          "accuracy": None, "fields": [
             {"key": "shape", "label": "Shape", "addon": True, "depends": [], "options": [
