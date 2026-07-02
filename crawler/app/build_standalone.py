@@ -489,6 +489,36 @@ def build_data():
         {"id": 177, "name": "Food Tray — Litho", "engine": "pricelist"},
         {"id": 178, "name": "Kraft Paper Bag — Litho", "engine": "pricelist"},
         {"id": 179, "name": "Kotak Cenderahati — Litho", "engine": "pricelist"},
+        {"id": 180, "name": "Corporate Shirt — Digital", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [
+            {"key": "model", "label": "Model", "addon": True, "depends": [], "options": [
+                "Corporate with Collar", "Corporate with Mandarin Collar", "Corporate Muslimah"]},
+            {"key": "sleeve", "label": "Sleeve", "addon": True, "depends": [], "options": ["Short Sleeve", "Long Sleeve"]},
+            {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
+             "options": ["Not Required", "Front", "Back", "Both"]}],
+         "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
+        {"id": 181, "name": "Jacket — Digital", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [
+            {"key": "model", "label": "Model", "addon": True, "depends": [], "options": [
+                "Jacket", "Wind Breaker", "Wind Breaker with Hoodie"]},
+            {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
+             "options": ["Not Required", "Front", "Back", "Both"]}],
+         "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
+        {"id": 182, "name": "Muslimah Sublimation — Digital", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [
+            {"key": "category", "label": "Category", "addon": True, "depends": [], "options": ["Adult", "Kid"]},
+            {"key": "fabric", "label": "Fabric", "addon": True, "depends": [], "options": [
+                "Micro Fiber Eyelet 160gsm", "Microfiber Super Square 160gsm"]},
+            {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
+             "options": ["Not Required", "Front", "Back", "Both"]}],
+         "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
+        {"id": 183, "name": "Sweatshirt & Hoodies — Digital", "engine": "contact", "optsrc": "none",
+         "accuracy": None, "fields": [
+            {"key": "model", "label": "Model", "addon": True, "depends": [], "options": [
+                "Sweat Shirt", "Hoodie", "Hoodie with Zip"]},
+            {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
+             "options": ["Not Required", "Front", "Back", "Both"]}],
+         "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
         {"id": 116, "name": "Static Cling Window Sticker — Digital", "engine": "staticcling", "optsrc": "none",
          "accuracy": acc.get(116), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
