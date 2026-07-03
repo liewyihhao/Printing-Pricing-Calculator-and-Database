@@ -489,36 +489,18 @@ def build_data():
         {"id": 177, "name": "Food Tray — Litho", "engine": "pricelist"},
         {"id": 178, "name": "Kraft Paper Bag — Litho", "engine": "pricelist"},
         {"id": 179, "name": "Kotak Cenderahati — Litho", "engine": "pricelist"},
-        {"id": 180, "name": "Corporate Shirt — Digital", "engine": "contact", "optsrc": "none",
-         "accuracy": None, "fields": [
-            {"key": "model", "label": "Model", "addon": True, "depends": [], "options": [
-                "Corporate with Collar", "Corporate with Mandarin Collar", "Corporate Muslimah"]},
-            {"key": "sleeve", "label": "Sleeve", "addon": True, "depends": [], "options": ["Short Sleeve", "Long Sleeve"]},
-            {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
-             "options": ["Not Required", "Front", "Back", "Both"]}],
-         "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
-        {"id": 181, "name": "Jacket — Digital", "engine": "contact", "optsrc": "none",
-         "accuracy": None, "fields": [
-            {"key": "model", "label": "Model", "addon": True, "depends": [], "options": [
-                "Jacket", "Wind Breaker", "Wind Breaker with Hoodie"]},
-            {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
-             "options": ["Not Required", "Front", "Back", "Both"]}],
-         "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
-        {"id": 182, "name": "Muslimah Sublimation — Digital", "engine": "contact", "optsrc": "none",
-         "accuracy": None, "fields": [
-            {"key": "category", "label": "Category", "addon": True, "depends": [], "options": ["Adult", "Kid"]},
-            {"key": "fabric", "label": "Fabric", "addon": True, "depends": [], "options": [
-                "Micro Fiber Eyelet 160gsm", "Microfiber Super Square 160gsm"]},
-            {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
-             "options": ["Not Required", "Front", "Back", "Both"]}],
-         "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
-        {"id": 183, "name": "Sweatshirt & Hoodies — Digital", "engine": "contact", "optsrc": "none",
-         "accuracy": None, "fields": [
-            {"key": "model", "label": "Model", "addon": True, "depends": [], "options": [
-                "Sweat Shirt", "Hoodie", "Hoodie with Zip"]},
-            {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
-             "options": ["Not Required", "Front", "Back", "Both"]}],
-         "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
+        {"id": 180, "name": "Corporate Shirt — Digital", "engine": "pricelist",
+         "note": "Polysoft 150gsm, adult, size M, sublimation, no VDP. Exact per model+sleeve "
+                 "curves from the readymade order engine (/Product/CheckPrice). VDP quoted separately."},
+        {"id": 181, "name": "Jacket — Digital", "engine": "pricelist",
+         "note": "Adult, size M, sublimation, no VDP. Exact per-model curves from the readymade "
+                 "order engine (/Product/CheckPrice). VDP quoted separately."},
+        {"id": 182, "name": "Muslimah Sublimation — Digital", "engine": "pricelist",
+         "note": "Adult, size M, no VDP. Exact per category+fabric curves from the readymade "
+                 "order engine (/Product/CheckPrice). VDP quoted separately."},
+        {"id": 183, "name": "Sweatshirt & Hoodies — Digital", "engine": "pricelist",
+         "note": "Adult, size M, no VDP. Exact per-model curves from the readymade order engine "
+                 "(/Product/CheckPrice). VDP quoted separately."},
         {"id": 185, "name": "Cap — DTF", "engine": "pricelist",
          "note": "Acrylic Twill, adult, single front DTF print. Exact per-model curves from the "
                  "readymade order engine (/Product/CheckPrice)."},
@@ -974,6 +956,8 @@ _PRICELIST_FROM_OPTIONS = {
     128: ("canvas-tote-bag", "canvastote_plx"), 120: ("hard-stand-desk-calendar", "harddesk_plx"),
     118: ("wall-calendar", "wallcal_plx"),
     185: ("cap", "cap_plx"),  # readymade garment — exact per-model curves via /Product/CheckPrice
+    180: ("corporate-shirt", "corpshirt_plx"), 181: ("jacket", "jacket_plx"),
+    182: ("muslimah", "muslimah_plx"), 183: ("sweatshirt-hoodies", "sweatshirt_plx"),
 }
 
 

@@ -26,12 +26,20 @@ V4 = "https://v4.excard.com.my/ordering/"
 
 # Per-product enumeration config. `models` are the .shirt-model-card labels; `qtys` the grid.
 # `country`/`courier` are fixed to a West-Malaysia default (product price is delivery-independent).
+QGRID = [10, 20, 30, 50, 75, 100, 150, 200, 300, 500]
+
 CONFIGS = {
     "cap": {
-        "slug": "cap", "name": "Cap", "primaryAxis": "Model",
+        "slug": "cap", "name": "Cap", "variant": "modal", "primaryAxis": "Model",
         "models": ["Baseball", "Trucker"],
         "qtys": [5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 300, 400, 500],
     },
+    # 'shirt' variant: inline shirt_* radios + #shirt_add_size + a size <select>; VDP fixed to
+    # none and size fixed to M (price is per-total-qty, size-neutral for the base garment).
+    "corporate-shirt": {"slug": "corporate-shirt", "name": "Corporate Shirt", "variant": "shirt", "qtys": QGRID},
+    "jacket":          {"slug": "jacket",          "name": "Jacket",          "variant": "shirt", "qtys": QGRID},
+    "muslimah":        {"slug": "muslimah",        "name": "Muslimah Sublimation", "variant": "shirt", "qtys": QGRID},
+    "sweatshirt-hoodies": {"slug": "sweatshirt-hoodies", "name": "Sweatshirt & Hoodies", "variant": "shirt", "qtys": QGRID},
 }
 
 QTY_INPUT = ".shirt-qty-input"
@@ -107,6 +115,93 @@ async def _price_for_qty(page, qty: int, hold: dict) -> float | None:
     return None
 
 
+async def _discover_shirt_axes(page):
+    """Return {radioGroupName: [labels...]} for the shirt_* radio groups + fabric options."""
+    return await page.evaluate("""() => {
+        const groups = {};
+        document.querySelectorAll("input[type=radio]").forEach(r => {
+            if (!r.offsetParent) return;
+            if (!/^shirt_(model|sleeve|category)/.test(r.name)) return;
+            const lbl = (r.closest('label')?.textContent || r.value).trim();
+            (groups[r.name] ||= []).push({value: r.value, label: lbl});
+        });
+        const fab = [...document.querySelectorAll('select')].find(s => /shirt_fabric/i.test(s.id));
+        const fabrics = fab ? [...fab.options].map(o=>o.text.trim()).filter(t=>t && !/select/i.test(t)) : [];
+        return {groups, fabrics};
+    }""")
+
+
+async def enumerate_shirt(cfg: dict):
+    """Driver for the inline shirt_* radio + add-size variant. Enumerates the cartesian product
+    of the present shirt_* radio groups (and fabrics), fixing VDP=none and size=M, over the qty
+    grid. Axis key = the combined option labels."""
+    import itertools
+    async with async_playwright() as pw:
+        b = await B.launch(pw)
+        page = await b.new_page()
+        print("v4 login:", await login_v4(page), file=sys.stderr)
+        hold = {"price": None, "qty": None}
+
+        async def on_resp(resp):
+            if "CheckPrice" in resp.url:
+                try:
+                    body = await resp.json(); req = resp.request.post_data_json
+                    hold["price"] = float(str(body.get("Price")).replace(",", ""))
+                    hold["qty"] = str(req["spec"][0]["TotalQuantity"]) if req else None
+                except Exception:
+                    pass
+        page.on("response", lambda r: asyncio.create_task(on_resp(r)))
+
+        await page.goto(V4 + cfg["slug"], wait_until="networkidle", timeout=30000)
+        await page.wait_for_selector("#shirt_add_size", timeout=20000)
+        await page.wait_for_timeout(800)
+        axinfo = await _discover_shirt_axes(page)
+        groups = axinfo["groups"]; fabrics = axinfo["fabrics"] or [None]
+        gnames = list(groups.keys())
+        combos = list(itertools.product(*[groups[g] for g in gnames])) if gnames else [()]
+
+        curves = {}; axis_label_parts = [g.replace("shirt_", "") for g in gnames]
+        if len(fabrics) > 1:
+            axis_label_parts.append("fabric")
+        for fab in fabrics:
+            for combo in combos:
+                # reset page
+                await page.reload(wait_until="networkidle"); await page.wait_for_selector("#shirt_add_size", timeout=20000)
+                await page.wait_for_timeout(600)
+                if fab:
+                    try: await page.select_option("#shirt_fabric", label=fab)
+                    except Exception: pass
+                    await page.wait_for_timeout(300)
+                for g, opt in zip(gnames, combo):
+                    try:
+                        await page.check(f"input[name='{g}'][value='{opt['value']}']")
+                    except Exception:
+                        # click by label fallback
+                        pass
+                    await page.wait_for_timeout(250)
+                # add a size row, pick M
+                await page.click("#shirt_add_size"); await page.wait_for_timeout(500)
+                try:
+                    sizesel = page.locator("select").filter(has_text="2XL").first
+                    await sizesel.select_option(label="M")
+                except Exception:
+                    pass
+                await page.wait_for_timeout(400)
+                key_parts = [o["label"] for o in combo] + ([fab] if len(fabrics) > 1 else [])
+                key = "|".join(key_parts)
+                mc = {}
+                for qty in cfg["qtys"]:
+                    p = await _price_for_qty(page, qty, hold)
+                    if p and p > 0:
+                        mc[str(qty)] = p; print(f"  {key} qty {qty} -> {p}", file=sys.stderr)
+                    await page.wait_for_timeout(300)
+                if mc:
+                    curves[key] = mc
+        await b.close()
+        cfg["_axisParts"] = axis_label_parts or ["Config"]
+        return curves
+
+
 async def enumerate_product(cfg: dict):
     async with async_playwright() as pw:
         b = await B.launch(pw)
@@ -170,10 +265,50 @@ def _write_capture(cfg: dict, curves: dict):
     print(f"wrote {p} ({len(out_curves)} curves)", file=sys.stderr)
 
 
+def _write_capture_generic(cfg, curves, axis_parts):
+    """Emit a MULTI-axis capture: curve keys are 'label1|label2|...' aligned to axis_parts, so
+    build_pl_from_options splits them correctly (a single combined axis would collapse+average
+    configs that share a leading label — e.g. Collar Short vs Collar Long)."""
+    keys = [k for k in curves if curves[k]]
+    axes = list(axis_parts)
+    # per-axis distinct values (in first-seen order)
+    distinct = {a: [] for a in axes}
+    for k in keys:
+        for a, v in zip(axes, k.split("|")):
+            if v not in distinct[a]:
+                distinct[a].append(v)
+    primary = axes[0]
+    # deps keyed by primary value -> valid sub-values (for cascading validity)
+    deps = {}
+    for k in keys:
+        parts = k.split("|")
+        pv = parts[0]
+        sub = deps.setdefault(pv, {a: [] for a in axes[1:]})
+        for a, v in zip(axes[1:], parts[1:]):
+            if v not in sub[a]:
+                sub[a].append(v)
+    out = {
+        "slug": cfg["slug"], "source": "readymade-checkprice-api",
+        "rows": sum(len(c) for c in curves.values()),
+        "optionCols": axes, "primary": primary, "deps": deps,
+        "imageField": None, "distinct": distinct, "imageOptions": {},
+        "priceMeta": {"priceCol": "Price", "qtyCol": "Quantity", "axisCols": axes,
+                      "nCurves": len(keys)},
+        "curves": {m: curves[m] for m in keys},
+    }
+    p = OUT / "v4_options" / f"{cfg['slug']}_options.json"
+    p.write_text(json.dumps(out), encoding="utf-8")
+    print(f"wrote {p} ({len(keys)} curves, axes={axes})", file=sys.stderr)
+
+
 async def main(slug):
     cfg = CONFIGS[slug]
-    curves = await enumerate_product(cfg)
-    _write_capture(cfg, curves)
+    if cfg.get("variant") == "shirt":
+        curves = await enumerate_shirt(cfg)
+        _write_capture_generic(cfg, curves, cfg.get("_axisParts", ["Config"]))
+    else:
+        curves = await enumerate_product(cfg)
+        _write_capture(cfg, curves)
     for m, c in curves.items():
         print(m, "->", c)
 
