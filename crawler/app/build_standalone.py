@@ -519,13 +519,9 @@ def build_data():
             {"key": "vdp", "label": "Variable Data Printing (name/number)", "addon": True, "depends": [],
              "options": ["Not Required", "Front", "Back", "Both"]}],
          "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
-        {"id": 185, "name": "Cap — DTF", "engine": "contact", "optsrc": "none",
-         "accuracy": None, "fields": [
-            {"key": "category", "label": "Category", "addon": True, "depends": [], "options": ["Adult", "Kid"]},
-            {"key": "model", "label": "Model", "addon": True, "depends": [], "options": ["Baseball", "Trucker"]},
-            {"key": "fabric", "label": "Fabric Type", "addon": True, "depends": [], "options": ["Acrylic Twill"]},
-            {"key": "printing", "label": "Printing Position", "addon": True, "depends": [], "options": ["Front", "Side", "Back"]}],
-         "note": "No automated pricing available (multi-model garment order builder). Contact us directly for a quote."},
+        {"id": 185, "name": "Cap — DTF", "engine": "pricelist",
+         "note": "Acrylic Twill, adult, single front DTF print. Exact per-model curves from the "
+                 "readymade order engine (/Product/CheckPrice)."},
         {"id": 184, "name": "Roll Form Sticker — Litho", "engine": "contact", "optsrc": "none",
          "accuracy": None, "fields": [
             {"key": "shape", "label": "Shape", "addon": True, "depends": [], "options": [
@@ -977,6 +973,7 @@ _PRICELIST_FROM_OPTIONS = {
     108: ("l-shape-plastic-folder", "lshape_plx"), 119: ("arch-file", "archfile_plx"),
     128: ("canvas-tote-bag", "canvastote_plx"), 120: ("hard-stand-desk-calendar", "harddesk_plx"),
     118: ("wall-calendar", "wallcal_plx"),
+    185: ("cap", "cap_plx"),  # readymade garment — exact per-model curves via /Product/CheckPrice
 }
 
 
