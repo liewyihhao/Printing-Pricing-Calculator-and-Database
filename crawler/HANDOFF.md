@@ -4,6 +4,12 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **52/52 BUILT. 65 EXACT / 22 REFERENCE / 6 CONTACT (2026-07-04 scheduled run #6).**
+  Two REFERENCE products upgraded to EXACT via v4 CheckPrice pricelist:
+  1. **Banner (id 123):** 20 sizes × qtys 1–300 = 6,000 API calls. Eyelet delta = `((top-2)+(bot-2))×0.5×qty` RM. Material is price-neutral (300gsm = 380gsm). New `output/banner_plx_params.json`. Engine rewritten with portrait sizes added (10→20 total). JS == Python verified.
+  2. **Paper Bag — Litho (id 127):** 7 models (PBG 001–007) × 2 papers × 3 laminations × 29 qtys = 1,218 API calls, 0 failures. Rope colour + hot stamping confirmed price-neutral. Matte+Spot UV adds a large premium (≈2× at q100); Gloss = Matte. Curve key = `"{model}|{paper}|{lamination}"`. New `output/paperbag_plx_params.json`. New `app/paperbag_engine.py` (rewritten), `app/paperbag_cp_sampler.py`. JS == Python verified.
+  - After these upgrades, probed all remaining 22 REFERENCE products via v4 API — all return RM0.00. No further upgrades possible without bespoke legacy-form cracking.
+  - Git tip: 464612f.
 - **52/52 BUILT. PARITY VERIFIED: 0 REAL GAPS (2026-07-03 scheduled run #5).**
   Sublimation Shirt (id 143) upgraded from "quote only" to EXACT pricelist engine:
   - `subshirt_plx_params.json` built from `output/v4_options/shirt_options.json`
