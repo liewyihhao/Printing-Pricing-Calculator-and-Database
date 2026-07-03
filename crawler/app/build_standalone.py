@@ -362,12 +362,16 @@ def build_data():
                 "-", "Round Cornering (R6),4,1", "Digital Die-cutting,0,0"]}]},
         {"id": 127, "name": "Paper Bag — Litho", "engine": "paperbag", "optsrc": "none",
          "accuracy": acc.get(127), "fields": [
+            {"key": "model", "label": "Model (W x D x H)", "addon": True, "depends": [], "options": [
+                "PBG 001 (180x80x230mm)", "PBG 002 (220x80x230mm)", "PBG 003 (250x95x350mm)",
+                "PBG 004 (200x95x290mm)", "PBG 005 (320x95x230mm)",
+                "PBG 006 (370x120x295mm)", "PBG 007 (320x120x420mm)"]},
             {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
-                "Gloss Art Paper 157gsm", "Gloss Art Card 190gsm (1 side coated)"]},
-            {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [],
-             "options": ["Gloss Lamination (Front)", "Matte Lamination (Front)"]},
-            {"key": "rope_colour", "label": "Rope Colour (no online price change)", "addon": True, "depends": [],
-             "options": ["Black", "Blue", "Red", "White", "Gold"]}]},
+                "Gloss Art Paper 157gsm", "Gloss Art Card 190gsm"]},
+            {"key": "lamination", "label": "Lamination", "addon": True, "depends": [],
+             "options": ["Gloss Lamination", "Matte Lamination", "Matte Lamination + Spot UV"]},
+            {"key": "rope_colour", "label": "Rope Colour (price-neutral)", "addon": True, "depends": [],
+             "options": ["Black", "Blue", "Red", "White", "Gold", "Green", "Silver"]}]},
         {"id": 128, "name": "Canvas Tote Bag — Litho", "engine": "canvastote", "optsrc": "none",
          "accuracy": acc.get(128), "fields": [
             {"key": "colour", "label": "Print colour", "addon": True, "depends": [], "options": [
@@ -668,7 +672,7 @@ def build_data():
             "bunting": _load("bunting_params.json", {"curves": {}, "sizes": [], "papers": [], "paper_gsm": {}}),
             "rollup": _load("rollup_params.json", {"curves": {}, "lams": [], "stand_w_m": 0.85, "stand_h_m": 2.0, "material_gsm": 400}),
             "wobbler": _load("wobbler_params.json", {"curves": {}, "orients": [], "papers": [], "lams": [], "finishings": [], "paper_gsm": {}, "wobbler_w_m": 0.095, "wobbler_h_m": 0.21, "finish_deltas": {}}),
-            "paperbag": _load("paperbag_params.json", {"curves": {}, "papers": [], "paper_gsm": {}, "bag_sheet_m2": 0.16}),
+            "paperbag": _load("paperbag_plx_params.json", {"engine": "paperbag_checkprice", "models": [], "model_size": {}, "papers": [], "laminations": [], "curves": {}}),
             "canvastote": _load("canvastote_params.json", {"curves": {}, "colours": [], "bag_w_m": 0.38, "bag_h_m": 0.42, "canvas_gsm": 250}),
             "mug": _load("mug_params.json", {"curve": {}, "mug_kg": 0.35}),
             "papan_kopi": _load("papan_kopi_pl_params.json", {"axis_cols": [], "curves": {}}),

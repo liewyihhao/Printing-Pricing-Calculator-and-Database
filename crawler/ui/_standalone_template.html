@@ -522,12 +522,24 @@ function localQuote(prod, V, qty){
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-combo qty curve + finishing delta)",
       note:"Wobbler (Digital). qty = pieces." }; }
   else if(prod.engine==="paperbag"){
-    const PB=DATA.params.paperbag||{}; const pbc=(PB.curves||{})[V.paper||"Gloss Art Paper 157gsm"]||{};
-    cash=interpLogPts(Object.keys(pbc).map(k=>[+k,pbc[k]]),qty);
-    const pbgsm=(PB.paper_gsm||{})[V.paper||"Gloss Art Paper 157gsm"]||157;
-    wt=Math.round((PB.bag_sheet_m2||0.16)*pbgsm*qty/1000*WF*1000)/1000;
-    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-paper qty curve)",
-      note:"Paper Bag. Folding + Gluing + Hole Punching compulsory. qty = bags." }; }
+    const PB=DATA.params.paperbag||{};
+    const pbModel=(V.model||"PBG 001 (180x80x230mm)").replace(/ \(.+\)$/,"");
+    const pbPaper=V.paper||"Gloss Art Paper 157gsm";
+    const pbLam=V.lamination||"Gloss Lamination";
+    const pbKey=`${pbModel}|${pbPaper}|${pbLam}`;
+    const pbCurve=(PB.curves||{})[pbKey]||{};
+    if(!Object.keys(pbCurve).length){ return {error:"No price curve for this model/paper/lamination combination"}; }
+    const pbExact=pbCurve[String(qty)];
+    cash=pbExact!==undefined ? pbExact : interpLogPts(Object.keys(pbCurve).map(k=>[+k,pbCurve[k]]),qty);
+    if(!cash||cash<=0){ return {error:"No price for this qty"}; }
+    const pbSize=((PB.model_size||{})[pbModel]||"180mm x 80mm x 230mm");
+    const pbNums=pbSize.match(/\d+/g)||[180,80,230];
+    const pbW=+pbNums[0],pbD=+pbNums[1],pbH=+pbNums[2];
+    const pbArea=(2*(pbW+pbD)*pbH+2*pbD*pbW)/1e6;
+    const pbGsm=pbPaper.includes("190")?190:157;
+    wt=Math.round(pbArea*pbGsm*qty/1000*1.2065*1000)/1000;
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"exact v4 CheckPrice pricelist",
+      note:`Paper Bag ${pbModel}: ${pbPaper}, ${pbLam}. Folding+Gluing+Hole Punching compulsory. Rope colour is price-neutral. qty=bags.` }; }
   else if(prod.engine==="canvastote"){
     const CT=DATA.params.canvastote||{}; const ctc=(CT.curves||{})[V.colour||"1C (Front)"]||{};
     cash=interpLogPts(Object.keys(ctc).map(k=>[+k,ctc[k]]),qty);

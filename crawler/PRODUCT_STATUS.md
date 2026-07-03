@@ -1,6 +1,7 @@
 # Printoka Calculator — Product Status Checklist
 
 _Generated 2026-07-04. 93 products = Excard full-menu parity (incl. Cap)._
+_Last updated 2026-07-04 run #6: Paper Bag upgraded REFERENCE→EXACT (v4 CheckPrice; 7 models × 2 papers × 3 lams × 29 qtys)._
 
 Legend: **EXACT** = cent-accurate captured curves (0% error) · **REFERENCE** = ~+7.5% safe-markup formula · **CONTACT** = options complete, no automated price.
 
@@ -13,12 +14,11 @@ _All on Excard's legacy www ASP.NET `order_spec` engine (Mask Keeper, ID Card, X
 - [ ] `173` Silkscreen Shirt — Digital
 - [ ] `184` Roll Form Sticker — Litho
 
-## 🟡 REFERENCE — safe markup by design (23)
-_Giant (Voucher/Paper Bag/Kad Kahwin — bundle-bloat) or order-form (Business Card/Loose Sheet/Booklet/Bill-Book/Label Sticker/Computer Form). Per user scope: left on safe never-under-price markup._
+## 🟡 REFERENCE — safe markup by design (22)
+_Giant (Voucher/Kad Kahwin — bundle-bloat) or order-form (Business Card/Loose Sheet/Booklet/Bill-Book/Label Sticker/Computer Form). Per user scope: left on safe never-under-price markup._
 - [ ] `1` Business Card
 - [ ] `104` Notepad — Litho
 - [ ] `106` Envelope — Litho
-- [ ] `127` Paper Bag — Litho
 - [ ] `131` Pillow — Litho
 - [ ] `135` Magnet — Digital
 - [ ] `116` Static Cling Window Sticker — Digital
@@ -39,7 +39,8 @@ _Giant (Voucher/Paper Bag/Kad Kahwin — bundle-bloat) or order-form (Business C
 - [ ] `102` Flyer (= Loose Sheet Litho)
 - [ ] `103` Customprint (= Loose Sheet Litho)
 
-## ✅ EXACT pricing (64)
+## ✅ EXACT pricing (65)
+- [x] `127` Paper Bag — Litho  ← upgraded 2026-07-04 via v4 CheckPrice pricelist (7 models × 2 papers × 3 lams × 29 qtys; rope colour + hot stamping neutral)
 - [x] `123` Banner — Litho  ← upgraded 2026-07-04 via v4 CheckPrice pricelist (20 sizes × 300 qtys; eyelet delta RM0.5/banner/extra eyelet)
 - [x] `107` Folder — Litho
 - [x] `108` L-Shape Plastic Folder — Digital

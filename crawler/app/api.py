@@ -456,7 +456,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               124: 2.8,  # bunting (Tarpaulin): per size×fitting qty curve LOO median 2.81%
               125: 0.68,  # rollup: per-lam qty curve LOO median 0.68%
               126: 4.3,  # wobbler: per orient×paper×lam qty curve LOO median ~4.3%
-              127: 17.4,  # paperbag: per-paper qty curve LOO 17% (anomalous q200 dip)
+              127: 0.0,  # paperbag: EXACT v4 CheckPrice pricelist (7 models x 2 papers x 3 lams x 29 qtys)
               128: 0.79,  # canvastote: per-colour qty curve LOO median 0.79%
               129: 0.53,  # mug: qty curve LOO median 0.53%
               130: 0.0,  # papan kopi: EXACT v4 price-list lookup (model)
@@ -770,12 +770,16 @@ FIELD_SCHEMAS = {
                 ]},
     "paperbag": {"options": "/api/printoka/paperbag/options", "quote": "/api/printoka/paperbag/quote",
                 "fields": [
+                    {"key": "model", "label": "Model (W x D x H)", "addon": True, "depends": [], "options": [
+                        "PBG 001 (180x80x230mm)", "PBG 002 (220x80x230mm)", "PBG 003 (250x95x350mm)",
+                        "PBG 004 (200x95x290mm)", "PBG 005 (320x95x230mm)",
+                        "PBG 006 (370x120x295mm)", "PBG 007 (320x120x420mm)"]},
                     {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
-                        "Gloss Art Paper 157gsm", "Gloss Art Card 190gsm (1 side coated)"]},
-                    {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [],
-                     "options": ["Gloss Lamination (Front)", "Matte Lamination (Front)"]},
-                    {"key": "rope_colour", "label": "Rope Colour (no online price change)", "addon": True, "depends": [],
-                     "options": ["Black", "Blue", "Red", "White", "Gold"]},
+                        "Gloss Art Paper 157gsm", "Gloss Art Card 190gsm"]},
+                    {"key": "lamination", "label": "Lamination", "addon": True, "depends": [],
+                     "options": ["Gloss Lamination", "Matte Lamination", "Matte Lamination + Spot UV"]},
+                    {"key": "rope_colour", "label": "Rope Colour (price-neutral)", "addon": True, "depends": [],
+                     "options": ["Black", "Blue", "Red", "White", "Gold", "Green", "Silver"]},
                 ]},
     "canvastote": {"options": "/api/printoka/canvastote/options", "quote": "/api/printoka/canvastote/quote",
                 "fields": [
@@ -1641,23 +1645,28 @@ def wobbler_quote(product: int = Query(126), orient: str = Query("Portrait"),
 @app.get("/api/printoka/paperbag/options")
 def paperbag_options(product: int = Query(127)):
     from . import paperbag_engine as PB
-    return {"papers": PB.PAPERS}
+    return {"models": PB.MODELS, "model_size": PB.MODEL_SIZE, "papers": PB.PAPERS,
+            "laminations": PB.LAMINATIONS, "rope_colours": PB.ROPE_COLOURS}
 
 
 @app.get("/api/printoka/paperbag/quote")
-def paperbag_quote(product: int = Query(127), paper: str = Query("Gloss Art Paper 157gsm"),
-                   lamination: str = Query("Gloss Lamination (Front)"),
+def paperbag_quote(product: int = Query(127), model: str = Query("PBG 001"),
+                   paper: str = Query("Gloss Art Paper 157gsm"),
+                   lamination: str = Query("Gloss Lamination"),
                    rope_colour: str = Query("Black"), qty: int = Query(...)):
     from . import paperbag_engine as PB
     try:
-        cash = PB.cash_price(paper, qty); wt = PB.weight_kg(paper, qty)
+        cash = PB.cash_price(model, paper, lamination, qty)
+        wt = PB.weight_kg(model, paper, qty)
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = f"Paper Bag: {paper}. Folding + Gluing + Hole Punching compulsory. Lamination and rope colour do not change the online price. qty = bags."
-    return {"config": {"product": product, "paper": paper, "lamination": lamination, "rope_colour": rope_colour, "qty": qty},
-            "printoka_cash": round(cash, 2), "method": "formula (per-paper qty curve)",
+    note = (f"Paper Bag {model} ({PB.MODEL_SIZE.get(model,'')}): {paper}, {lamination}. "
+            f"Folding + Gluing + Hole Punching compulsory. Rope colour is price-neutral. qty = bags.")
+    return {"config": {"product": product, "model": model, "paper": paper,
+                       "lamination": lamination, "rope_colour": rope_colour, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "exact v4 CheckPrice pricelist",
             "note": note, "tiers": PB.tiers(cash), "weight_kg": round(wt, 3)}
 
 
