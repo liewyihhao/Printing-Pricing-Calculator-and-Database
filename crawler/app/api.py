@@ -452,7 +452,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               120: 1.1,  # desk calendar hard stand: per-cat qty curve LOO median 1.12% (cat=1)
               121: 0.7,  # desk calendar soft stand: qty curve LOO median 0.67%
               122: 0.8,  # wire-o wall calendar: qty curve LOO median 0.82%
-              123: 0.9,  # banner: per-size qty curve LOO median 0.9%
+              123: 0.0,  # banner: EXACT v4 CheckPrice pricelist (all 20 sizes x qtys 1-300)
               124: 2.8,  # bunting (Tarpaulin): per size×fitting qty curve LOO median 2.81%
               125: 0.68,  # rollup: per-lam qty curve LOO median 0.68%
               126: 4.3,  # wobbler: per orient×paper×lam qty curve LOO median ~4.3%
@@ -736,7 +736,13 @@ FIELD_SCHEMAS = {
                 "fields": [
                     {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
                         "3ft x 2ft", "4ft x 2ft", "6ft x 2ft", "4ft x 3ft", "8ft x 3ft",
-                        "10ft x 3ft", "18ft x 3ft", "8ft x 4ft", "10ft x 4ft", "20ft x 4ft"]},
+                        "10ft x 3ft", "8ft x 4ft", "10ft x 4ft", "18ft x 3ft", "20ft x 4ft",
+                        "2ft x 3ft", "2ft x 4ft", "2ft x 6ft", "3ft x 4ft", "3ft x 8ft",
+                        "3ft x 10ft", "4ft x 8ft", "4ft x 10ft", "3ft x 18ft", "4ft x 20ft"]},
+                    {"key": "material", "label": "Material (no price change)", "addon": True, "depends": [], "options": [
+                        "Tarpaulin 300gsm", "Tarpaulin 380gsm"]},
+                    {"key": "top_eyelet", "label": "Top Eyelet", "addon": True, "depends": [], "options": ["2", "3", "4", "5"]},
+                    {"key": "bot_eyelet", "label": "Bottom Eyelet", "addon": True, "depends": [], "options": ["2", "3", "4", "5"]},
                 ]},
     "bunting": {"options": "/api/printoka/bunting/options", "quote": "/api/printoka/bunting/quote",
                 "fields": [
@@ -1522,8 +1528,12 @@ def wireow_quote(product: int = Query(122), qty: int = Query(...)):
 
 
 # ---------- Banner (Litho, id 123) ----------
-_BANNER_SIZES = ["3ft x 2ft", "4ft x 2ft", "6ft x 2ft", "4ft x 3ft", "8ft x 3ft",
-                 "10ft x 3ft", "18ft x 3ft", "8ft x 4ft", "10ft x 4ft", "20ft x 4ft"]
+_BANNER_SIZES = [
+    "3ft x 2ft", "4ft x 2ft", "6ft x 2ft", "4ft x 3ft", "8ft x 3ft",
+    "10ft x 3ft", "8ft x 4ft", "10ft x 4ft", "18ft x 3ft", "20ft x 4ft",
+    "2ft x 3ft", "2ft x 4ft", "2ft x 6ft", "3ft x 4ft", "3ft x 8ft",
+    "3ft x 10ft", "4ft x 8ft", "4ft x 10ft", "3ft x 18ft", "4ft x 20ft",
+]
 
 
 @app.get("/api/printoka/banner/options")
@@ -1532,17 +1542,25 @@ def banner_options(product: int = Query(123)):
 
 
 @app.get("/api/printoka/banner/quote")
-def banner_quote(product: int = Query(123), size: str = Query("3ft x 2ft"), qty: int = Query(...)):
+def banner_quote(product: int = Query(123), size: str = Query("3ft x 2ft"),
+                 material: str = Query("Tarpaulin 300gsm"),
+                 top_eyelet: int = Query(2), bot_eyelet: int = Query(2),
+                 qty: int = Query(...)):
     from . import banner_engine as BN
     try:
-        cash = BN.cash_price(size, qty); wt = BN.weight_kg(size, qty)
+        cash = BN.cash_price(size, qty, top_eyelet=top_eyelet, bot_eyelet=bot_eyelet)
+        wt = BN.weight_kg(size, qty)
     except Exception as e:
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = "Banner (solvent-print vinyl on tarpaulin). Fixed material 400gsm. qty = pieces."
-    return {"config": {"product": product, "size": size, "qty": qty},
-            "printoka_cash": round(cash, 2), "method": "formula (per-size qty curve)",
+    plx = BN._plx()
+    method = "exact (v4 CheckPrice pricelist)" if plx.get("sizes") else "formula (per-size qty curve)"
+    eyelet_note = (f" Eyelets: Top {top_eyelet}, Bottom {bot_eyelet}." if top_eyelet != 2 or bot_eyelet != 2 else "")
+    note = f"Banner (solvent-print tarpaulin). Material is price-neutral.{eyelet_note} qty = pieces."
+    return {"config": {"product": product, "size": size, "material": material,
+                        "top_eyelet": top_eyelet, "bot_eyelet": bot_eyelet, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": method,
             "note": note, "tiers": BN.tiers(cash), "weight_kg": round(wt, 3)}
 
 

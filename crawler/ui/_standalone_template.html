@@ -481,12 +481,23 @@ function localQuote(prod, V, qty){
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
       note:"Wire-O Wall Calendar: Litho, Wire-O binding + hanger. Hole Punching + Wire-O Binding (White) + Hanger compulsory. qty = calendars." }; }
   else if(prod.engine==="banner"){
-    const BN=DATA.params.banner||{}; const bc=(BN.curves||{})[V.size||"3ft x 2ft"]||{}; cash=interpLogPts(Object.keys(bc).map(k=>[+k,bc[k]]),qty);
-    const bparts=(V.size||"3ft x 2ft").toLowerCase().replace(/ft/g,"").split("x"); const FT=BN.ft_to_m||0.3048;
+    const BN=DATA.params.banner||{};
+    const bsizes=BN.sizes||{}; const bsize=V.size||"3ft x 2ft";
+    const bcurve=bsizes[bsize]||{};
+    if(Object.keys(bcurve).length>0){
+      // Exact pricelist lookup
+      const bbase=bcurve[String(qty)]||0;
+      if(!bbase){ return {error:"No price for this size/qty combination"}; }
+      const bTopE=parseInt(V.top_eyelet||"2"), bBotE=parseInt(V.bot_eyelet||"2");
+      const bEyeletDelta=((bTopE-2)+(bBotE-2))*(BN.eyelet_delta_per_extra||0.5)*qty;
+      cash=bbase+bEyeletDelta;
+    } else {
+      return {error:"Banner pricing not available for this size"}; }
+    const bparts=bsize.toLowerCase().replace(/ft/g,"").split("x"); const FT=BN.ft_to_m||0.3048;
     const bw=parseFloat(bparts[0])*FT, bh=parseFloat(bparts[1])*FT;
     wt=Math.round(bw*bh*(BN.material_gsm||400)*qty/1000*WF*1000)/1000;
-    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-size qty curve)",
-      note:"Banner (solvent-print vinyl tarpaulin). qty = pieces." }; }
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"exact (v4 CheckPrice pricelist)",
+      note:"Banner (solvent-print tarpaulin). Material is price-neutral. Eyelets add RM5 per extra eyelet above 2. qty = pieces." }; }
   else if(prod.engine==="bunting"){
     const BT=DATA.params.bunting||{}; const btkey=(V.size||"2ft x 5ft")+"|"+(V.paper||"Tarpaulin 300gsm");
     const btc=(BT.curves||{})[btkey]||{}; cash=interpLogPts(Object.keys(btc).map(k=>[+k,btc[k]]),qty);

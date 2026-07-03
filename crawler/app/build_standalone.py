@@ -331,7 +331,13 @@ def build_data():
          "accuracy": acc.get(123), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
                 "3ft x 2ft", "4ft x 2ft", "6ft x 2ft", "4ft x 3ft", "8ft x 3ft",
-                "10ft x 3ft", "18ft x 3ft", "8ft x 4ft", "10ft x 4ft", "20ft x 4ft"]}]},
+                "10ft x 3ft", "8ft x 4ft", "10ft x 4ft", "18ft x 3ft", "20ft x 4ft",
+                "2ft x 3ft", "2ft x 4ft", "2ft x 6ft", "3ft x 4ft", "3ft x 8ft",
+                "3ft x 10ft", "4ft x 8ft", "4ft x 10ft", "3ft x 18ft", "4ft x 20ft"]},
+            {"key": "material", "label": "Material (no price change)", "addon": True, "depends": [], "options": [
+                "Tarpaulin 300gsm", "Tarpaulin 380gsm"]},
+            {"key": "top_eyelet", "label": "Top Eyelet", "addon": True, "depends": [], "options": ["2", "3", "4", "5"]},
+            {"key": "bot_eyelet", "label": "Bottom Eyelet", "addon": True, "depends": [], "options": ["2", "3", "4", "5"]}]},
         {"id": 124, "name": "Bunting — Litho", "engine": "simpleqty", "paramKey": "bunting",
          "optsrc": "none", "accuracy": acc.get(124), "fields": [
             {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
@@ -658,7 +664,7 @@ def build_data():
             "archfile": _load("archfile_params.json", {"curve": {}, "unit_wt": 0.42}),
             "deskcal": _load("deskcal_params.json", {"soft_curve": {}, "hard_curves": {}, "hard_unit_kg": 0.35, "soft_unit_kg": 0.25}),
             "wireow": _load("wireow_params.json", {"curve": {}, "unit_kg": 0.30}),
-            "banner": _load("banner_params.json", {"curves": {}, "sizes": [], "material_gsm": 400, "ft_to_m": 0.3048}),
+            "banner": _load("banner_plx_params.json", {"sizes": {}, "eyelet_delta_per_extra": 5.0, "material_gsm": 400, "ft_to_m": 0.3048}),
             "bunting": _load("bunting_params.json", {"curves": {}, "sizes": [], "papers": [], "paper_gsm": {}}),
             "rollup": _load("rollup_params.json", {"curves": {}, "lams": [], "stand_w_m": 0.85, "stand_h_m": 2.0, "material_gsm": 400}),
             "wobbler": _load("wobbler_params.json", {"curves": {}, "orients": [], "papers": [], "lams": [], "finishings": [], "paper_gsm": {}, "wobbler_w_m": 0.095, "wobbler_h_m": 0.21, "finish_deltas": {}}),
