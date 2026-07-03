@@ -11,7 +11,7 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   `output/calculator_engine.cjs` (minor field renames: Banner `bot_eyelet`/`top_eyelet`,
   Paper Bag `model` key). Parity confirmed: **44 families × 0 real gaps** (parity_checker --print).
   Catalogue: **52/52 BUILT, 0 new/removed**. No further v4 upgrades possible for REFERENCE
-  products (all return RM0.00). Git tip: (this commit).
+  products (all return RM0.00). Git tip: 18ee723.
 - **52/52 BUILT. 65 EXACT / 22 REFERENCE / 6 CONTACT (2026-07-04 scheduled run #6).**
   Two REFERENCE products upgraded to EXACT via v4 CheckPrice pricelist:
   1. **Banner (id 123):** 20 sizes × qtys 1–300 = 6,000 API calls. Eyelet delta = `((top-2)+(bot-2))×0.5×qty` RM. Material is price-neutral (300gsm = 380gsm). New `output/banner_plx_params.json`. Engine rewritten with portrait sizes added (10→20 total). JS == Python verified.
