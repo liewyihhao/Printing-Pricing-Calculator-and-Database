@@ -434,9 +434,9 @@ def build_data():
         {"id": 142, "name": "Mask Keeper — Litho", "engine": "contact", "optsrc": "none",
          "accuracy": None, "fields": [],
          "note": "No automated pricing available. Contact us directly for a quote."},
-        {"id": 143, "name": "Sublimation Shirt", "engine": "contact", "optsrc": "none",
-         "accuracy": None, "fields": [],
-         "note": "No automated pricing available. Contact us directly for a quote."},
+        {"id": 143, "name": "Sublimation Shirt", "engine": "pricelist",
+         "note": "Adult, size M, no VDP. Exact curves from the readymade order engine "
+                 "(/Product/CheckPrice). VDP quoted separately."},
         {"id": 144, "name": "Cooler Bag — Litho", "engine": "pricelist"},
         {"id": 145, "name": "DTF Tote Bag With Zip — Litho", "engine": "pricelist"},
         {"id": 146, "name": "Heat Transfer Tote Bag — Litho", "engine": "pricelist"},
@@ -958,6 +958,7 @@ _PRICELIST_FROM_OPTIONS = {
     185: ("cap", "cap_plx"),  # readymade garment — exact per-model curves via /Product/CheckPrice
     180: ("corporate-shirt", "corpshirt_plx"), 181: ("jacket", "jacket_plx"),
     182: ("muslimah", "muslimah_plx"), 183: ("sweatshirt-hoodies", "sweatshirt_plx"),
+    143: ("shirt", "subshirt_plx"),
 }
 
 

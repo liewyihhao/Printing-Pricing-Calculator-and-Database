@@ -40,6 +40,9 @@ CONFIGS = {
     "jacket":          {"slug": "jacket",          "name": "Jacket",          "variant": "shirt", "qtys": QGRID},
     "muslimah":        {"slug": "muslimah",        "name": "Muslimah Sublimation", "variant": "shirt", "qtys": QGRID},
     "sweatshirt-hoodies": {"slug": "sweatshirt-hoodies", "name": "Sweatshirt & Hoodies", "variant": "shirt", "qtys": QGRID},
+    # Sublimation Shirt: 8 models × 3 sleeves × 2 categories (fabric is price-neutral → dropped).
+    "shirt": {"slug": "shirt", "name": "Sublimation Shirt", "variant": "shirt",
+              "qtys": [10, 20, 30, 50, 100, 150, 200, 300, 500], "dropFabric": True, "resilient": True},
 }
 
 QTY_INPUT = ".shirt-qty-input"
@@ -131,74 +134,99 @@ async def _discover_shirt_axes(page):
     }""")
 
 
+async def _mk_page(pw, cfg, hold):
+    b = await B.launch(pw)
+    page = await b.new_page()
+    print("v4 login:", await login_v4(page), file=sys.stderr)
+
+    async def on_resp(resp):
+        if "CheckPrice" in resp.url:
+            try:
+                body = await resp.json(); req = resp.request.post_data_json
+                hold["price"] = float(str(body.get("Price")).replace(",", ""))
+                hold["qty"] = str(req["spec"][0]["TotalQuantity"]) if req else None
+            except Exception:
+                pass
+    page.on("response", lambda r: asyncio.create_task(on_resp(r)))
+    await page.goto(V4 + cfg["slug"], wait_until="networkidle", timeout=30000)
+    await page.wait_for_selector("#shirt_add_size", timeout=20000)
+    await page.wait_for_timeout(800)
+    return b, page
+
+
+async def _price_one_combo(page, cfg, gnames, combo, fab, multi_fab, hold):
+    await page.reload(wait_until="networkidle"); await page.wait_for_selector("#shirt_add_size", timeout=20000)
+    await page.wait_for_timeout(600)
+    if fab:
+        try: await page.select_option("#shirt_fabric", label=fab)
+        except Exception: pass
+        await page.wait_for_timeout(300)
+    for g, opt in zip(gnames, combo):
+        try: await page.check(f"input[name='{g}'][value='{opt['value']}']")
+        except Exception: pass
+        await page.wait_for_timeout(250)
+    await page.click("#shirt_add_size"); await page.wait_for_timeout(500)
+    try:
+        sizesel = page.locator("select").filter(has_text="2XL").first
+        await sizesel.select_option(label="M")
+    except Exception:
+        pass
+    await page.wait_for_timeout(400)
+    mc = {}
+    for qty in cfg["qtys"]:
+        p = await _price_for_qty(page, qty, hold)
+        if p and p > 0:
+            mc[str(qty)] = p
+        await page.wait_for_timeout(300)
+    return mc
+
+
 async def enumerate_shirt(cfg: dict):
     """Driver for the inline shirt_* radio + add-size variant. Enumerates the cartesian product
-    of the present shirt_* radio groups (and fabrics), fixing VDP=none and size=M, over the qty
-    grid. Axis key = the combined option labels."""
+    of the present shirt_* radio groups (× fabrics unless dropFabric), fixing VDP=none and size=M.
+    Resilient: recreates the browser on a tab crash and saves progress incrementally so long runs
+    survive and can resume (existing curves in the output file are reused)."""
     import itertools
+    hold = {"price": None, "qty": None}
     async with async_playwright() as pw:
-        b = await B.launch(pw)
-        page = await b.new_page()
-        print("v4 login:", await login_v4(page), file=sys.stderr)
-        hold = {"price": None, "qty": None}
-
-        async def on_resp(resp):
-            if "CheckPrice" in resp.url:
-                try:
-                    body = await resp.json(); req = resp.request.post_data_json
-                    hold["price"] = float(str(body.get("Price")).replace(",", ""))
-                    hold["qty"] = str(req["spec"][0]["TotalQuantity"]) if req else None
-                except Exception:
-                    pass
-        page.on("response", lambda r: asyncio.create_task(on_resp(r)))
-
-        await page.goto(V4 + cfg["slug"], wait_until="networkidle", timeout=30000)
-        await page.wait_for_selector("#shirt_add_size", timeout=20000)
-        await page.wait_for_timeout(800)
+        b, page = await _mk_page(pw, cfg, hold)
         axinfo = await _discover_shirt_axes(page)
         groups = axinfo["groups"]; fabrics = axinfo["fabrics"] or [None]
+        if cfg.get("dropFabric") and fabrics and fabrics[0]:
+            fabrics = [fabrics[0]]   # fabric is price-neutral for this product
         gnames = list(groups.keys())
         combos = list(itertools.product(*[groups[g] for g in gnames])) if gnames else [()]
-
-        curves = {}; axis_label_parts = [g.replace("shirt_", "") for g in gnames]
-        if len(fabrics) > 1:
-            axis_label_parts.append("fabric")
-        for fab in fabrics:
-            for combo in combos:
-                # reset page
-                await page.reload(wait_until="networkidle"); await page.wait_for_selector("#shirt_add_size", timeout=20000)
-                await page.wait_for_timeout(600)
-                if fab:
-                    try: await page.select_option("#shirt_fabric", label=fab)
-                    except Exception: pass
-                    await page.wait_for_timeout(300)
-                for g, opt in zip(gnames, combo):
-                    try:
-                        await page.check(f"input[name='{g}'][value='{opt['value']}']")
-                    except Exception:
-                        # click by label fallback
-                        pass
-                    await page.wait_for_timeout(250)
-                # add a size row, pick M
-                await page.click("#shirt_add_size"); await page.wait_for_timeout(500)
-                try:
-                    sizesel = page.locator("select").filter(has_text="2XL").first
-                    await sizesel.select_option(label="M")
-                except Exception:
-                    pass
-                await page.wait_for_timeout(400)
-                key_parts = [o["label"] for o in combo] + ([fab] if len(fabrics) > 1 else [])
-                key = "|".join(key_parts)
-                mc = {}
-                for qty in cfg["qtys"]:
-                    p = await _price_for_qty(page, qty, hold)
-                    if p and p > 0:
-                        mc[str(qty)] = p; print(f"  {key} qty {qty} -> {p}", file=sys.stderr)
-                    await page.wait_for_timeout(300)
-                if mc:
-                    curves[key] = mc
-        await b.close()
+        multi_fab = len([f for f in fabrics if f]) > 1
+        axis_label_parts = [g.replace("shirt_", "") for g in gnames] + (["fabric"] if multi_fab else [])
         cfg["_axisParts"] = axis_label_parts or ["Config"]
+
+        # resume from any partial capture
+        outf = OUT / "v4_options" / f"{cfg['slug']}_options.json"
+        curves = {}
+        if cfg.get("resilient") and outf.exists():
+            try: curves = json.loads(outf.read_text()).get("curves", {})
+            except Exception: curves = {}
+
+        tasks = [(fab, combo) for fab in fabrics for combo in combos]
+        for fab, combo in tasks:
+            key = "|".join([o["label"] for o in combo] + ([fab] if multi_fab else []))
+            if key in curves and len(curves[key]) >= len(cfg["qtys"]):
+                continue
+            for attempt in range(2):
+                try:
+                    mc = await _price_one_combo(page, cfg, gnames, combo, fab, multi_fab, hold)
+                    if mc:
+                        curves[key] = mc
+                        print(f"  {key} -> {mc}", file=sys.stderr)
+                        if cfg.get("resilient"):
+                            _write_capture_generic(cfg, curves, cfg["_axisParts"])
+                    break
+                except Exception as e:
+                    print(f"  [crash on {key}: {type(e).__name__}] recreating browser", file=sys.stderr)
+                    try: await b.close()
+                    except Exception: pass
+                    b, page = await _mk_page(pw, cfg, hold)
+        await b.close()
         return curves
 
 

@@ -4,9 +4,19 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **52/52 BUILT. PARITY VERIFIED: 0 REAL GAPS (2026-07-03 scheduled run #5).**
+  Sublimation Shirt (id 143) upgraded from "quote only" to EXACT pricelist engine:
+  - `subshirt_plx_params.json` built from `output/v4_options/shirt_options.json`
+    (41 curves: Adult × 8 models × 3 sleeves; Kid × 6 models × 3 sleeves; fabric is
+    price-neutral per design of the sampler — `dropFabric: True`).
+  - api.py: accuracy changed from None → 0.0; sublimation_shirt options/quote endpoints
+    now use the pricelist engine (category × model × sleeve axes); weight ~0.2 kg/shirt.
+  - Standalone rebuilt: sublimation shirt now has `engine: pricelist, paramKey: subshirt_plx`.
+  - Verified: Adult Round Neck Short Sleeve ×100 → RM1600.00 (exact).
+  - Parity check: all 44 families 0 real gaps. catalogue_scan 52/52 BUILT, 0 new/removed.
 - **52/52 BUILT. PARITY VERIFIED: 0 REAL GAPS (2026-07-03 scheduled run #4).**
   Verification-only pass — no code changes needed. Parity check on all 44 families confirmed
-  0 real gaps. catalogue_scan 52/52 BUILT, 0 new/removed. Git tip: (this commit).
+  0 real gaps. catalogue_scan 52/52 BUILT, 0 new/removed. Git tip: 43391d7.
 - **52/52 BUILT. PARITY VERIFIED: 0 REAL GAPS (2026-07-03 scheduled run #3).**
   Verification-only pass — no code changes needed. Parity check on all 44 families confirmed
   0 real gaps. catalogue_scan 52/52 BUILT, 0 new/removed. Git tip: b62f406.

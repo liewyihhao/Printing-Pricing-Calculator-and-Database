@@ -472,7 +472,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               140: 0.0,  # tent card: EXACT v4 price-list lookup (model x lamination)
               141: 0.0,  # stamp chop: EXACT v4 unit price lookup (type x category x model)
               142: None,  # mask keeper: v4 price-list returns 500, quote only
-              143: None}  # sublimation shirt: v4 price-list returns 500, quote only
+              143: 0.0}   # sublimation shirt: EXACT via captured /Product/CheckPrice curves
 
 
 def _accuracy(product_id: int):
@@ -982,7 +982,14 @@ FIELD_SCHEMAS = {
     "mask_keeper": {"options": "/api/printoka/mask_keeper/options", "quote": "/api/printoka/mask_keeper/quote",
                 "fields": []},
     "sublimation_shirt": {"options": "/api/printoka/sublimation_shirt/options", "quote": "/api/printoka/sublimation_shirt/quote",
-                "fields": []},
+                "fields": [
+                    {"key": "category", "label": "Category", "addon": True, "depends": [], "options": ["Adult", "Kid"]},
+                    {"key": "model", "label": "Model", "addon": True, "depends": [], "options": [
+                        "Round Neck", "V Neck", "Collar with Button", "Mandarin Collar",
+                        "Retro V Collar", "Retro Flat Collar", "Raglan Round Neck", "NFL Oversize"]},
+                    {"key": "sleeve", "label": "Sleeve", "addon": True, "depends": [], "options": [
+                        "Short Sleeve", "Long Sleeve", "Sleeveless"]},
+                ]},
     "booklet": {"options": "/api/printoka/booklet/options", "quote": "/api/printoka/booklet/quote",
                 "fields": [
                     {"key": "orientation", "label": "Orientation", "optionsKey": "orientations", "depends": []},
@@ -2028,15 +2035,37 @@ def mask_keeper_quote(product: int = Query(142), qty: int = Query(...)):
     return JSONResponse({"error": "Mask Keeper pricing is not available online. Please contact us directly for a quote.", "quote_only": True}, status_code=400)
 
 
-# ---------- Sublimation Shirt (id 143) — quote only, v4 price-list returns 500 ----------
+# ---------- Sublimation Shirt (id 143) — exact curves via /Product/CheckPrice ----------
 @app.get("/api/printoka/sublimation_shirt/options")
 def sublimation_shirt_options(product: int = Query(143)):
-    return {}
+    return {}  # all fields are inline addon fields in the schema
 
 
 @app.get("/api/printoka/sublimation_shirt/quote")
-def sublimation_shirt_quote(product: int = Query(143), qty: int = Query(...)):
-    return JSONResponse({"error": "Sublimation Shirt pricing is not available online. Please contact us directly for a quote.", "quote_only": True}, status_code=400)
+def sublimation_shirt_quote(product: int = Query(143), qty: int = Query(...),
+                            category: str = Query("Adult"),
+                            model: str = Query("Round Neck"),
+                            sleeve: str = Query("Short Sleeve")):
+    import json as _json
+    from pathlib import Path as _Path
+    from . import pricelist_engine as PE
+    pf = _Path(__file__).resolve().parent.parent / "output" / "subshirt_plx_params.json"
+    p = _json.loads(pf.read_text()) if pf.exists() else {"axis_cols": [], "curves": {}}
+    cfg = {"category": category, "model": model, "sleeve": sleeve}
+    try:
+        cash = PE.cash_price(p, cfg, qty)
+    except Exception as e:  # noqa: BLE001
+        return JSONResponse({"error": str(e)}, status_code=400)
+    if cash <= 0:
+        return JSONResponse({"error": "no price for this configuration"}, status_code=400)
+    note = ("Sublimation Shirt (exact curves from /Product/CheckPrice). "
+            "Adult/Kid × model × sleeve. Size fixed at M; fabric is price-neutral. "
+            "VDP quoted separately. qty = pcs.")
+    wt = round(0.20 * qty, 3)
+    return {"config": {"product": product, "category": category, "model": model,
+                       "sleeve": sleeve, "qty": qty},
+            "printoka_cash": round(cash, 2), "method": "exact (v4 price-list lookup)", "note": note,
+            "tiers": PE.tiers(cash), "weight_kg": wt}
 
 
 # ---------- Static Cling Window Sticker / Car Sticker (Digital, id 116/117) ----------
