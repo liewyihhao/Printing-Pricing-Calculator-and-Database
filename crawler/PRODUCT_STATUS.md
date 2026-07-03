@@ -1,28 +1,20 @@
 # Printoka Calculator — Product Status Checklist
 
-_Generated 2026-07-02. 93 products = Excard full-menu parity (incl. Cap)._
+_Generated 2026-07-03. 93 products = Excard full-menu parity (incl. Cap)._
 
-Legend: **EXACT** = cent-accurate captured curves (0% error) · **REFERENCE** = ~+7.5% safe-markup formula · **CONTACT** = options complete, no automated price (legacy order-form / readymade builder).
+Legend: **EXACT** = cent-accurate captured curves (0% error) · **REFERENCE** = ~+7.5% safe-markup formula · **CONTACT** = options complete, no automated price.
 
-## 🔴 To update NEXT
-
-### CONTACT (12) — need bespoke legacy-template pricing integration
-_readymade garment builder (Cap, shirts) + www order_spec pages; both resist automated exact pricing. Follow-up task spawned._
+## 🔴 CONTACT — remaining (6)
+_All on Excard's legacy www ASP.NET `order_spec` engine (Mask Keeper, ID Card, X-ccessories, DTF/Silkscreen Shirt, Roll Form Sticker). Their price panel returns RM 0.00 under every automation approach (delivery-toggle recompute, direct field-set); the v4 `/Product/CheckPrice` crack that unlocked Cap + all sublimation/corporate/jacket/muslimah/sweatshirt shirts does not reach them. Needs a bespoke legacy-postback crack or Excard enabling online pricing for these SKUs._
 - [ ] `142` Mask Keeper — Litho
-- [ ] `143` Sublimation Shirt
 - [ ] `170` ID Card — Digital
 - [ ] `171` X-ccessories — Litho
 - [ ] `172` DTF Shirt — Digital
 - [ ] `173` Silkscreen Shirt — Digital
-- [ ] `180` Corporate Shirt — Digital
-- [ ] `181` Jacket — Digital
-- [ ] `182` Muslimah Sublimation — Digital
-- [ ] `183` Sweatshirt & Hoodies — Digital
-- [ ] `185` Cap — DTF
 - [ ] `184` Roll Form Sticker — Litho
 
-### REFERENCE (24) — optional accuracy upgrade
-_Remaining ones are giant (Banner 192k, Voucher 123k, Paper Bag 43k, Kad Kahwin 389k rows → bundle bloat) or order-form template (Business Card, Loose Sheet, Booklet, Bill-Book, Label Sticker, Computer Form). Left on safe markup by design._
+## 🟡 REFERENCE — safe markup by design (24)
+_Giant (Banner/Voucher/Paper Bag/Kad Kahwin — bundle-bloat) or order-form (Business Card/Loose Sheet/Booklet/Bill-Book/Label Sticker/Computer Form). Per user scope: left on safe never-under-price markup._
 - [ ] `1` Business Card
 - [ ] `104` Notepad — Litho
 - [ ] `106` Envelope — Litho
@@ -48,7 +40,7 @@ _Remaining ones are giant (Banner 192k, Voucher 123k, Paper Bag 43k, Kad Kahwin 
 - [ ] `102` Flyer (= Loose Sheet Litho)
 - [ ] `103` Customprint (= Loose Sheet Litho)
 
-## ✅ EXACT pricing (57)
+## ✅ EXACT pricing (63)
 - [x] `107` Folder — Litho
 - [x] `108` L-Shape Plastic Folder — Digital
 - [x] `118` Wall Calendar — Litho
@@ -71,6 +63,7 @@ _Remaining ones are giant (Banner 192k, Voucher 123k, Paper Bag 43k, Kad Kahwin 
 - [x] `139` Non-Woven Bag — Litho
 - [x] `140` Tent Card — Litho
 - [x] `141` Stamp Chop
+- [x] `143` Sublimation Shirt
 - [x] `144` Cooler Bag — Litho
 - [x] `145` DTF Tote Bag With Zip — Litho
 - [x] `146` Heat Transfer Tote Bag — Litho
@@ -103,6 +96,11 @@ _Remaining ones are giant (Banner 192k, Voucher 123k, Paper Bag 43k, Kad Kahwin 
 - [x] `177` Food Tray — Litho
 - [x] `178` Kraft Paper Bag — Litho
 - [x] `179` Kotak Cenderahati — Litho
+- [x] `180` Corporate Shirt — Digital
+- [x] `181` Jacket — Digital
+- [x] `182` Muslimah Sublimation — Digital
+- [x] `183` Sweatshirt & Hoodies — Digital
+- [x] `185` Cap — DTF
 - [x] `113` PVC Card — Digital
 - [x] `109` Bookmark — Digital
 - [x] `105` Letterhead — Litho
