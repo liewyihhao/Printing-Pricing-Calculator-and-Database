@@ -1016,10 +1016,11 @@ def _embed_images(data):
                 del f["images"]
 
 
-# Reference selling-price markup applied to NON-exact products: where we don't have the
-# exact market price, the calculator quotes ~7.5% above the estimated reference (the safe
-# direction) so we never under-price. Exact products keep matching the reference.
-_REF_MARKUP = 1.075
+# Reference markup applied to NON-exact products. Per current directive: MATCH Excard's
+# prices (no selling margin) so every product's displayed price stays within ~5% of Excard;
+# a selling markup will be layered on separately once all products are priced. Set to 1.0
+# (no markup) — formula/reference products then display at their calibrated Excard estimate.
+_REF_MARKUP = 1.0
 
 
 def _apply_ref_markup(data):
