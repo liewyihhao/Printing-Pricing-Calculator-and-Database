@@ -4,6 +4,16 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **52/52 BUILT. 74 EXACT / 13 REFERENCE / 6 CONTACT (2026-07-04 scheduled run #9).**
+  Voucher (id 110) upgraded REFERENCE→EXACT via v4 CheckPrice pricelist:
+  - Sampler completed: 14,112 unique keys × (22 Pad/Book qtys + 12 Loose qtys) = 290,304 total
+    data points, 0 failures. Key format: `"packform|size|paper|colour|sets=N|num=X|perf=Y"`.
+  - `python -m app.voucher_cp_sampler --build` → `output/voucher_plx_params.json` (5.4MB,
+    14,112 curves; git force-added).
+  - JS == Python verified (6 configs, exact at every sampled orderable qty).
+  - `build_standalone.py` accuracy dict updated: `110: 0.0`.
+  - Standalone rebuilt. Parity: 44 families × 0 real gaps (unchanged).
+  Git tip: pending (this run).
 - **52/52 BUILT. 73 EXACT / 14 REFERENCE / 6 CONTACT (2026-07-04 scheduled run #8).**
   Envelope (id 106) upgraded REFERENCE→EXACT via v4 CheckPrice API:
   - All 17 models × all colour options × all orderable qty values sampled = 3264 points, 0 failures.

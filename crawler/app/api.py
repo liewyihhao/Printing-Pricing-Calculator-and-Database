@@ -440,7 +440,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               107: 0.0,  # folder: EXACT v4 price-list lookup (all mould groups + colour + lam + protective)
               108: 2.2,  # l-shape folder: per-paper curve LOO median 2.2%
               109: 2.5,  # bookmark: per-(paper|colour) log-log curve LOO median 2.5%
-              110: 8.0,  # voucher: factor model — single axes exact, ~4% core interp + interactions
+              110: 0.0,  # voucher: EXACT v4 CheckPrice pricelist (all 3 forms x sizes x papers x colours x sets x numbering x perf)
               111: 4.0,  # computer form: factor model — axes exact, core LOO ~4%
               112: 2.3,  # wire-o notebook: per-cover curve LOO median 2.3% (Hard Cover)
               113: 0.0,  # pvc card: EXACT v4 price-list lookup (colour x hole punch x VDP; all priced)
@@ -2285,22 +2285,21 @@ def voucher_quote(product: int = Query(110), packform: str = Query("Book"),
                   size: str = Query("145mm x 210mm"), paper: str = Query("Art Paper 100gsm"),
                   colour: str = Query("4C (Front)"), sets: str = Query("50"), qty: int = Query(...),
                   perforation: str = Query("0"), numbering: str = Query("No")):
-    from . import voucher_engine as VC
+    from . import voucher_engine_plx as VC
     try:
         cash = VC.cash_price(packform, size, paper, colour, sets, qty,
-                             perforation=perforation, numbering=(numbering == "Yes"))
+                             perforation=perforation, numbering=numbering)
         wt = VC.weight_kg(size, paper, sets, qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = ("Voucher (Litho). qty = books/pads (x sets per book). Perforation lines have no "
-            "online price effect; numbering adds a per-run cost. Decomposed factor model: "
-            "single-option axes are exact, combinations are approximated.")
+    note = ("Voucher (Litho). qty = books/pads (x sets per book). EXACT v4 CheckPrice pricelist "
+            "(3 forms x 12 sizes x 14 papers x 2 colours x 3 sets x 2 numberings x 3 perfs).")
     return {"config": {"product": product, "packform": packform, "size": size, "paper": paper,
                        "colour": colour, "sets": sets, "qty": qty, "perforation": perforation,
                        "numbering": numbering},
-            "printoka_cash": round(cash, 2), "method": "formula (reference curve x factors)",
+            "printoka_cash": round(cash, 2), "method": "exact v4 CheckPrice pricelist",
             "note": note, "tiers": VC.tiers(cash), "weight_kg": round(wt, 3)}
 
 

@@ -660,24 +660,24 @@ function localQuote(prod, V, qty){
     return { printoka_cash: Math.round(c*100)/100, finishing_cost:0, tiers: tiers(c), weight_kg: wt, method:"formula (reference curve x factors)",
       note:"Computer Form (NCR), 9.5\"x11\". qty = sets. Per-ply tints price-neutral; copy change no online price effect; numbering quoted separately. Layers apply to Multi Layer only." }; }
   else if(prod.engine==="voucher"){
-    const P2=P; const ref=P2.ref||{};
-    function llinterp(obj,q){const pts=Object.keys(obj).map(k=>[+k,obj[k]]);return interpLogPts(pts,q);} // core log-log
-    function linpts(pts,x){if(!pts||!pts.length)return null;pts=pts.slice().sort((a,b)=>a[0]-b[0]);if(x<=pts[0][0])return pts[0][1];if(x>=pts[pts.length-1][0])return pts[pts.length-1][1];for(let i=1;i<pts.length;i++)if(x<=pts[i][0]){const t=(x-pts[i-1][0])/(pts[i][0]-pts[i-1][0]);return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]);}return pts[pts.length-1][1];}
-    function fac(tbl,key){const v=linpts(tbl[key],qty);return v==null?1:v;}
-    function delta(tbl,key){const v=linpts(tbl[key],qty);return v==null?0:v;}
-    // core uses log-log over qty
-    function interpLL(obj,q){const pts=Object.keys(obj).map(k=>[+k,obj[k]]).sort((a,b)=>a[0]-b[0]);const xs=pts.map(p=>Math.log(p[0])),ys=pts.map(p=>Math.log(p[1])),x=Math.log(Math.max(+q,1));if(x<=xs[0])return Math.exp(ys[0]);if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}
-    let cash2=interpLL(P2.core,qty);
-    cash2*=fac(P2.paper_f,V.paper); cash2*=fac(P2.colour_f,V.colour); cash2*=fac(P2.sets_f,V.sets);
-    cash2*=fac(P2.packform_f,V.packform);
-    cash2*=(P2.size_f[V.size]!=null?P2.size_f[V.size]:1);
-    cash2+=delta(P2.perf_d,String(V.perforation||"0"));
-    cash2+=delta(P2.numbering_d, V.numbering==="Yes"?"True":"False");
-    cash2=Math.max(cash2,0);
-    const mm=(V.size||"").match(/\d+/g)||[145,210]; const g=(/(\d+)\s*gsm/.exec(V.paper||"")||[])[1]||100;
-    const sheets=qty*(+V.sets||50); wt=Math.round(mm[0]*mm[1]/1e6*(+g)*sheets/1000*WF*1000)/1000;
-    return { printoka_cash: Math.round(cash2*100)/100, finishing_cost:0, tiers: tiers(cash2), weight_kg: wt, method:"formula (reference curve x factors)",
-      note:"Voucher (Litho). qty = books/pads (x sets). Perforation has no online price effect; numbering adds a per-run cost. Single-option axes exact; combinations approximated." }; }
+    const VC=P.curves||{};
+    const packform=V.packform||"Book", sz=V.size||"145mm x 210mm";
+    const paper=V.paper||"Art Paper 100gsm", colour=V.colour||"4C (Front)";
+    const setsStr=(packform==="Loose")?"":String(V.sets||"50");
+    const numStr=(V.numbering==="Yes")?"Yes":"No";
+    const perfStr=String(V.perforation||"0");
+    const key=`${packform}|${sz}|${paper}|${colour}|sets=${setsStr}|num=${numStr}|perf=${perfStr}`;
+    let curve=VC[key];
+    if(!curve){const k0=`${packform}|${sz}|${paper}|${colour}|sets=${setsStr}|num=${numStr}|perf=0`;curve=VC[k0];}
+    if(!curve) return {error:"No price curve for this voucher config"};
+    function vcLL(c,q){const pts=Object.keys(c).map(k=>[+k,+c[k]]).filter(p=>p[0]>0&&p[1]>0).sort((a,b)=>a[0]-b[0]);if(!pts.length)return 0;const xs=pts.map(p=>Math.log(p[0])),ys=pts.map(p=>Math.log(p[1])),x=Math.log(Math.max(q,1));if(x<=xs[0])return Math.exp(ys[0]);if(x>=xs[xs.length-1])return Math.exp(ys[xs.length-1]);for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}return Math.exp(ys[ys.length-1]);}
+    const exact=curve[String(qty)];
+    let cash2=exact!==undefined ? +exact : vcLL(curve,qty);
+    cash2=Math.max(Math.round(cash2*100)/100,0);
+    const mm=(sz||"").match(/\d+/g)||[145,210]; const g=(/(\d+)\s*gsm/.exec(paper||"")||[])[1]||100;
+    const setsInt=setsStr?+setsStr:1; wt=Math.round(mm[0]*mm[1]/1e6*(+g)*qty*setsInt/1000*WF*1000)/1000;
+    return { printoka_cash: cash2, finishing_cost:0, tiers: tiers(cash2), weight_kg: wt, method:"exact v4 CheckPrice pricelist",
+      note:"Voucher (Litho). qty = books/pads (x sets per book). EXACT v4 CheckPrice pricelist." }; }
   else if(prod.engine==="bookmark"){
     const cv=P.curves||{}, fd=P.fin_delta||{};
     function interpLogLog(pts,q){pts=pts.slice().sort((a,b)=>a[0]-b[0]);const xs=pts.map(p=>Math.log(p[0])),ys=pts.map(p=>Math.log(p[1])),x=Math.log(Math.max(+q,1));if(x<=xs[0])return Math.exp(ys[0]);if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);for(let i=1;i<xs.length;i++)if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));}}

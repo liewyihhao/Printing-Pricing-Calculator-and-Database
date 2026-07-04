@@ -37,9 +37,12 @@ def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9]", "", str(s).lower())
 
 
-async def _capture(slug: str):
-    """Return (schema_template, type_str, metrics, qty_col, cookie). schema_template is the
-    captured CheckPrice spec[0] dict; we overwrite its option keys per combo."""
+async def _capture(slug: str, price_axes=None):
+    """Return (schema_template, type_str, cols, agg, qty_col, cookie).
+    `agg` = {combo_tuple(over price_axes or all option axes) -> sorted qty list}, computed
+    IN THE BROWSER so huge metrics arrays (e.g. kad-kahwin 388k rows) never cross the bridge.
+    `price_axes` (list of metrics column names) restricts the combo axes to the price-
+    determining ones (drop price-neutral axes like Lamination/Folding to avoid combinatorial blowup)."""
     hold = {}
     async with async_playwright() as pw:
         b = await B.launch(pw); page = await b.new_page()
@@ -53,8 +56,8 @@ async def _capture(slug: str):
 
         await page.goto(V4 + slug, wait_until="networkidle", timeout=40000)
         await page.wait_for_timeout(3000)
-        metrics = await page.evaluate("() => Array.isArray(window.metrics) ? window.metrics : []")
-        if not metrics:
+        cols = await page.evaluate("() => (Array.isArray(window.metrics)&&window.metrics.length)?Object.keys(window.metrics[0]):[]")
+        if not cols:
             await b.close(); raise SystemExit(f"{slug}: no window.metrics")
         # drive one valid combo to trigger a CheckPrice (learn the schema)
         selids = await page.evaluate(

@@ -53,7 +53,8 @@ def loose_cascade():
 def accuracy():
     # MEASURED median % vs Excard (output/audit_report.json). Curve products are
     # exact at Excard's order quantities; this is the custom-quantity interp error.
-    return {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 6.3, 61: 10.5, 24: 2.5}
+    return {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 6.3, 61: 10.5, 24: 2.5,
+            110: 0.0}
 
 
 # engine name (as used in the products list) -> key in the baked params dict
