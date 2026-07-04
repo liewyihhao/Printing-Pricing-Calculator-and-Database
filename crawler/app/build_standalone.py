@@ -534,16 +534,9 @@ def build_data():
                 "130mm x 170mm", "165mm x 90mm", "220mm x 90mm", "104mm x 420mm", "310mm x 445mm"]},
             {"key": "direction", "label": "Print direction", "addon": True, "depends": [], "options": ["Face Out View", "Face In View", "Both Side View"]},
             {"key": "vdp", "label": "Variable Data Printing", "addon": True, "depends": [], "options": ["Not Required", "Variable Data Printing (VDP)"]}]},
-        {"id": 115, "name": "Kad Terima Kasih — Digital", "engine": "kadterima", "optsrc": "none",
-         "accuracy": acc.get(115), "fields": [
-            {"key": "size", "label": "Size", "addon": True, "depends": [], "options": ["52mm x 52mm", "40mm x 86mm", "40mm x 70mm"]},
-            {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
-                "Gloss Art Card 230gsm (2 sides coated)", "Gloss Art Card 260gsm (2 sides coated)",
-                "Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)",
-                "Super White 240gsm", "Metal Ice 250gsm"]},
-            {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
-            {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [], "options": ["Matte Lamination (Front)", "Matte Lamination (Both)", "Gloss Lamination (Front)", "Gloss Lamination (Both)"]},
-            {"key": "hole_punch", "label": "Hole punching (3mm)", "addon": True, "depends": [], "options": ["No", "Yes"]}]},
+        {"id": 115, "name": "Kad Terima Kasih — Digital", "engine": "pricelist",
+         "note": "Exact per size+paper+colour+lamination+hole-punch curves from the v4 order "
+                 "engine (/Product/CheckPrice)."},
         {"id": 114, "name": "Kad Kahwin — Digital", "engine": "kadkahwin", "optsrc": "none",
          "accuracy": acc.get(114), "fields": [
             {"key": "ordertype", "label": "Order type", "addon": True, "depends": [], "options": ["Standard Kad Kahwin", "Custom Die-cut Kad Kahwin"]},
@@ -966,6 +959,7 @@ _PRICELIST_FROM_OPTIONS = {
     182: ("muslimah", "muslimah_plx"), 183: ("sweatshirt-hoodies", "sweatshirt_plx"),
     143: ("shirt", "subshirt_plx"),
     172: ("dtf-shirt", "dtfshirt_plx"), 173: ("silkscreen-shirt", "silkshirt_plx"),
+    115: ("kad-terima-kasih", "kadterima_plx"),
     # REFERENCE→EXACT batch 2 (price-list DataTable captures)
     104: ("notepad", "notepad_plx"), 123: ("banner", "banner_plx"),
     127: ("paper-bag", "paperbag_plx"),
