@@ -538,21 +538,10 @@ def build_data():
         {"id": 115, "name": "Kad Terima Kasih — Digital", "engine": "pricelist",
          "note": "Exact per size+paper+colour+lamination+hole-punch curves from the v4 order "
                  "engine (/Product/CheckPrice)."},
-        {"id": 114, "name": "Kad Kahwin — Digital", "engine": "kadkahwin", "optsrc": "none",
-         "accuracy": acc.get(114), "fields": [
-            {"key": "ordertype", "label": "Order type", "addon": True, "depends": [], "options": ["Standard Kad Kahwin", "Custom Die-cut Kad Kahwin"]},
-            {"key": "size", "label": "Size", "addon": True, "depends": [], "options": [
-                "DL (99mm x 210mm)", "2DL (198mm x 210mm)", "A7 (74mm x 105mm)", "A6 (105mm x 148mm)",
-                "A5 (148mm x 210mm)", "A4 (210mm x 297mm)", "Square (140mm x 280mm)"]},
-            {"key": "paper", "label": "Paper", "addon": True, "depends": [], "options": [
-                "Gloss Art Card 230gsm (2 sides coated)", "Gloss Art Card 260gsm (2 sides coated)",
-                "Gloss Art Card 310gsm (2 sides coated)", "Gloss Art Card 360gsm (2 sides coated)",
-                "Super White 240gsm", "Linen 240gsm", "Suwen 240gsm", "Simili 140gsm",
-                "Metal Ice 250gsm", "Matte Art Paper 150gsm"]},
-            {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ["4C (Front)", "4C (Both)"]},
-            {"key": "lamination", "label": "Lamination (no online price change)", "addon": True, "depends": [], "options": ["Matte Lamination (Front)", "Matte Lamination (Both)", "Gloss Lamination (Front)", "Gloss Lamination (Both)"]},
-            {"key": "envelope", "label": "Envelope (no online price change)", "addon": True, "depends": [], "options": ["Not Required", "White", "Pink"]},
-            {"key": "hot_stamping", "label": "Hot stamping (quoted separately)", "addon": True, "depends": [], "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]}]},
+        {"id": 114, "name": "Kad Kahwin — Digital", "engine": "pricelist",
+         "note": "Standard Kad Kahwin. Exact per size+paper+colour curves from the v4 order "
+                 "engine (/Product/CheckPrice). Lamination/envelope price-neutral; hot stamping "
+                 "& custom die-cut quoted separately."},
         {"id": 113, "name": "PVC Card — Digital", "engine": "pricelist", "paramKey": "pvccard",
          "axisFields": ["colour", "hole_punch", "vdp"], "optsrc": "none",
          "accuracy": 0.0, "fields": [
@@ -960,7 +949,7 @@ _PRICELIST_FROM_OPTIONS = {
     182: ("muslimah", "muslimah_plx"), 183: ("sweatshirt-hoodies", "sweatshirt_plx"),
     143: ("shirt", "subshirt_plx"),
     172: ("dtf-shirt", "dtfshirt_plx"), 173: ("silkscreen-shirt", "silkshirt_plx"),
-    115: ("kad-terima-kasih", "kadterima_plx"),
+    115: ("kad-terima-kasih", "kadterima_plx"), 114: ("kad-kahwin", "kadkahwin_plx"),
     # REFERENCE→EXACT batch 2 (price-list DataTable captures)
     104: ("notepad", "notepad_plx"), 123: ("banner", "banner_plx"),
     127: ("paper-bag", "paperbag_plx"),
