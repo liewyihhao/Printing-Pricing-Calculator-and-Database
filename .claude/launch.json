@@ -6,6 +6,18 @@
       "runtimeExecutable": "C:/Users/User/OneDrive/Desktop/Printoka.com/crawler/.venv/Scripts/python.exe",
       "runtimeArgs": ["-m", "uvicorn", "app.api:app", "--app-dir", "C:/Users/User/OneDrive/Desktop/Printoka.com/crawler", "--port", "8010", "--reload"],
       "port": 8010
+    },
+    {
+      "name": "printoka-public-api",
+      "runtimeExecutable": "C:/Users/User/OneDrive/Desktop/Printoka.com/crawler/.venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "uvicorn", "app.public_api:app", "--app-dir", "C:/Users/User/OneDrive/Desktop/Printoka.com/crawler", "--port", "8020", "--reload"],
+      "port": 8020
+    },
+    {
+      "name": "printoka-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--prefix", "C:/Users/User/OneDrive/Desktop/Printoka.com/web"],
+      "port": 3000
     }
   ]
 }
