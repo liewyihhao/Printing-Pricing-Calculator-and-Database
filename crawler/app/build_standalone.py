@@ -969,6 +969,10 @@ _PRICELIST_FROM_OPTIONS = {
     180: ("corporate-shirt", "corpshirt_plx"), 181: ("jacket", "jacket_plx"),
     182: ("muslimah", "muslimah_plx"), 183: ("sweatshirt-hoodies", "sweatshirt_plx"),
     143: ("shirt", "subshirt_plx"),
+    # REFERENCE→EXACT batch 2 (price-list DataTable captures)
+    104: ("notepad", "notepad_plx"), 123: ("banner", "banner_plx"),
+    127: ("paper-bag", "paperbag_plx"),
+    116: ("car-sticker", "staticcling_plx"), 117: ("car-sticker", "carsticker_plx"),
 }
 
 
