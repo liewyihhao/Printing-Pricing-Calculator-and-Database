@@ -54,29 +54,43 @@ async def _capture(slug: str, price_axes=None):
                 except Exception: pass
         page.on("response", lambda r: asyncio.create_task(on(r)))
 
-        await page.goto(V4 + slug, wait_until="networkidle", timeout=40000)
-        await page.wait_for_timeout(3000)
+        await page.goto(V4 + slug, wait_until="domcontentloaded", timeout=40000)
+        try:
+            await page.wait_for_function("() => Array.isArray(window.metrics) && window.metrics.length>0", timeout=45000)
+        except Exception:
+            pass
+        await page.wait_for_timeout(2000)
         cols = await page.evaluate("() => (Array.isArray(window.metrics)&&window.metrics.length)?Object.keys(window.metrics[0]):[]")
         if not cols:
             await b.close(); raise SystemExit(f"{slug}: no window.metrics")
         # Decide axes + qty column in Python from the column names, then aggregate the (possibly
         # huge) metrics array IN THE BROWSER into {comboKey -> [qtys]} + distinct values.
         qty_col = next((c for c in cols if re.match(r"quantity|qty", c, re.I)), None)
+        # A LOCAL price column (e.g. 'Price (WM)', 'WMPrice', 'WM Price') means the metrics array
+        # already carries exact prices — build curves directly, no CheckPrice API needed.
+        price_col = next((c for c in cols if re.search(r"wm.?price|price.*wm|^price\b", c, re.I)
+                          and "em" not in c.lower()), None)
         if price_axes:
             axes = [c for c in cols if _norm(c) in {_norm(a) for a in price_axes}]
         else:
             axes = [c for c in cols if not _NOISE.search(c) and c != qty_col]
         agg = await page.evaluate(
-            "([axes, qtyCol]) => { const m=window.metrics, combos={}, dist={};"
+            "([axes, qtyCol, priceCol]) => { const m=window.metrics, combos={}, dist={}, curves={};"
             "for (const a of axes) dist[a]=[];"
             "const seen={}; for (const a of axes) seen[a]={};"
             "for (const r of m){ const key=axes.map(a=>r[a]).join('\\u0001');"
             "  for (const a of axes){ const v=r[a]; if(v!=null && !seen[a][v]){seen[a][v]=1;dist[a].push(v);} }"
             "  const q=String(r[qtyCol]).replace(/,/g,''); if(!/^\\d+$/.test(q))continue;"
-            "  (combos[key]||(combos[key]=[])); if(!combos[key].includes(q))combos[key].push(q); }"
-            "return {combos, dist}; }", [axes, qty_col])
+            "  (combos[key]||(combos[key]=[])); if(!combos[key].includes(q))combos[key].push(q);"
+            "  if(priceCol){const pv=parseFloat(String(r[priceCol]).replace(/,/g,''));"
+            "    if(isFinite(pv)&&pv>0){(curves[key]||(curves[key]={}))[q]=pv;}} }"
+            "return {combos, dist, curves}; }", [axes, qty_col, price_col])
         # keep only axes that actually vary (>1 distinct)
         axes = [a for a in axes if len(agg["dist"].get(a, [])) > 1]
+        if price_col and agg.get("curves"):
+            # metrics carried exact prices — no API needed. Return a LOCAL-price marker.
+            await b.close()
+            return None, None, cols, axes, qty_col, agg, None
         # drive one KNOWN-VALID combo (window.metrics[0]) to trigger a CheckPrice (learn schema).
         # Blindly setting every select to index 1 can form an invalid combo that fires no price.
         row0 = await page.evaluate("() => window.metrics[0]")
@@ -130,10 +144,28 @@ def _fetch(type_str, spec, cookie, retries=3):
     return None
 
 
+def _rebuild_key(rawkey, cols, axes, qty_col, price_axes):
+    full_axes = [c for c in cols if (price_axes and _norm(c) in {_norm(a) for a in price_axes})
+                 or (not price_axes and not _NOISE.search(c) and c != qty_col)]
+    keep_idx = [full_axes.index(a) for a in axes]
+    parts = rawkey.split(chr(1))
+    return tuple(parts[i] for i in keep_idx)
+
+
 def enumerate_product(slug: str, max_workers: int = 24, price_axes=None):
     spec_tmpl, type_str, cols, axes, qty_col, agg, cookie = asyncio.run(_capture(slug, price_axes))
     dist = agg["dist"]
     def distinct(c): return dist.get(c, [])
+
+    # FAST PATH: metrics carried a local price column -> curves already built, no API.
+    if spec_tmpl is None and agg.get("curves"):
+        curves = {}
+        for rawkey, qmap in agg["curves"].items():
+            key = _rebuild_key(rawkey, cols, axes, qty_col, price_axes)
+            curves["|".join(map(str, key))] = {q: p for q, p in qmap.items()}
+        print(f"{slug}: LOCAL price column -> {len(curves)} curves (no API)", file=sys.stderr)
+        _write(slug, axes, curves, distinct)
+        return curves
     # map each metrics column -> spec key by normalized name
     col2key = {}
     for c in cols:
@@ -150,7 +182,7 @@ def enumerate_product(slug: str, max_workers: int = 24, price_axes=None):
     keep_idx = [full_axes.index(a) for a in axes]
     combos = {}
     for rawkey, qtys in agg["combos"].items():
-        parts = rawkey.split("")
+        parts = rawkey.split(chr(1))
         key = tuple(parts[i] for i in keep_idx)
         s = combos.setdefault(key, set())
         for q in qtys:
@@ -187,18 +219,23 @@ def enumerate_product(slug: str, max_workers: int = 24, price_axes=None):
             if done % 200 == 0:
                 print(f"  {done}/{len(tasks)} ({fail} failed)", file=sys.stderr)
 
-    # build capture shape
+    print(f"  ({fail} calls failed)", file=sys.stderr)
+    _write(slug, axes, curves, distinct)
+    return curves
+
+
+def _write(slug, axes, curves, distinct):
     primary = axes[0] if axes else None
     deps = {}
     if primary:
-        for key in combos:
-            pv = key[0]
+        for k in curves:
+            parts = k.split("|"); pv = parts[0]
             sub = deps.setdefault(pv, {a: [] for a in axes[1:]})
-            for a, v in zip(axes[1:], key[1:]):
+            for a, v in zip(axes[1:], parts[1:]):
                 if v not in sub[a]:
                     sub[a].append(v)
     out = {
-        "slug": slug, "source": "checkprice-api", "rows": sum(len(c) for c in curves.values()),
+        "slug": slug, "source": "checkprice-enum", "rows": sum(len(c) for c in curves.values()),
         "optionCols": axes, "primary": primary, "deps": deps,
         "imageField": None, "distinct": {c: distinct(c) for c in axes}, "imageOptions": {},
         "priceMeta": {"priceCol": "Price", "qtyCol": "Quantity", "axisCols": axes,
@@ -207,8 +244,7 @@ def enumerate_product(slug: str, max_workers: int = 24, price_axes=None):
     }
     p = OUT / "v4_options" / f"{slug}_options.json"
     p.write_text(json.dumps(out), encoding="utf-8")
-    print(f"wrote {p}: {len(curves)} curves ({fail} failed)", file=sys.stderr)
-    return curves
+    print(f"wrote {p}: {len(curves)} curves", file=sys.stderr)
 
 
 if __name__ == "__main__":

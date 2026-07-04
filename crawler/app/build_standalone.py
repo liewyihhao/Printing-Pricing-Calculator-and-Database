@@ -552,14 +552,9 @@ def build_data():
             {"key": "vdp", "label": "Variable Data Printing", "addon": True, "depends": [],
              "options": ["Not Required", "Variable Data Printing (Front)",
                          "Variable Data Printing (Back)", "Variable Data Printing (Both)"]}]},
-        {"id": 112, "name": "Wire-O Notebook — Litho", "engine": "wireo", "optsrc": "none",
-         "accuracy": acc.get(112), "fields": [
-            {"key": "cover", "label": "Cover type", "addon": True, "depends": [], "options": ["Hard Cover", "VDP Hard Cover", "Soft Cover", "Exclusive Leather Cover"]},
-            {"key": "lamination", "label": "Cover lamination (compulsory)", "addon": True, "depends": [], "options": [
-                "Matte Lamination (Front)", "Gloss Lamination (Front)",
-                "Matte Lamination (Front) + Spot UV (Front Cover)", "Matte Lamination (Front) + Spot UV (Front and Back Cover)"]},
-            {"key": "addcontent", "label": "Additional content sheets", "addon": True, "depends": [], "options": ["Not Required", "4 sheets", "8 sheets", "12 sheets"]},
-            {"key": "hot_stamping", "label": "Cover hot stamping (quoted separately)", "addon": True, "depends": [], "options": ["Not Required", "1C (Front Cover)", "2C (Front Cover)", "1C (Front & Back Cover)", "2C (Front & Back Cover)"]}]},
+        {"id": 112, "name": "Wire-O Notebook — Litho", "engine": "pricelist",
+         "note": "Hard Cover. Exact per lamination+hot-stamping+content+paper curves from the "
+                 "v4 ordering metrics (Price WM). Exclusive Leather Cover is a separate product."},
         {"id": 111, "name": "Computer Form — Litho (NCR)", "engine": "computerform", "optsrc": "none",
          "accuracy": acc.get(111), "fields": [
             {"key": "package", "label": "Package", "addon": True, "depends": [], "options": ["Multi Layer Computer Form", "Single Layer Computer Form", "Pay Slip"]},
@@ -950,6 +945,7 @@ _PRICELIST_FROM_OPTIONS = {
     143: ("shirt", "subshirt_plx"),
     172: ("dtf-shirt", "dtfshirt_plx"), 173: ("silkscreen-shirt", "silkshirt_plx"),
     115: ("kad-terima-kasih", "kadterima_plx"), 114: ("kad-kahwin", "kadkahwin_plx"),
+    112: ("hard-cover-wire-o-notebook", "wireonb_plx"),
     # REFERENCE→EXACT batch 2 (price-list DataTable captures)
     104: ("notepad", "notepad_plx"), 123: ("banner", "banner_plx"),
     127: ("paper-bag", "paperbag_plx"),
