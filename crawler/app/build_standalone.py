@@ -293,7 +293,7 @@ def build_data():
         {"id": 104, "name": "Notepad — Litho", "engine": "notepad", "optsrc": "none",
          "accuracy": acc.get(104), "fields": NOTEPAD_FIELDS},
         {"id": 106, "name": "Envelope — Litho", "engine": "envelope", "optsrc": "none",
-         "accuracy": acc.get(106), "fields": ENVELOPE_FIELDS},
+         "accuracy": 0.0, "fields": ENVELOPE_FIELDS},
         {"id": 107, "name": "Folder — Litho", "engine": "pricelist", "paramKey": "folder",
          "axisFields": ["model", "paper", "colour", "lamination", "protective"], "optsrc": "none",
          "accuracy": 0.0, "fields": [
