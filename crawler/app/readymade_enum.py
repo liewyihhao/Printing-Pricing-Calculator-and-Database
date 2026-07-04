@@ -287,7 +287,9 @@ async def enumerate_shirt_modal(cfg: dict):
                 try:
                     body = await resp.json(); req = resp.request.post_data_json
                     hold["price"] = float(str(body.get("Price")).replace(",", ""))
-                    hold["qty"] = str(req["spec"][0]["TotalQuantity"]) if req else None
+                    sp = req["spec"][0] if req else {}
+                    hold["qty"] = str(sp.get("TotalQuantity"))
+                    hold["fabric"] = sp.get("Fabric") or sp.get("FabricType") or sp.get("Material")
                 except Exception:
                     pass
         page.on("response", lambda r: asyncio.create_task(on_resp(r)))
@@ -306,22 +308,25 @@ async def enumerate_shirt_modal(cfg: dict):
                         continue
                     for attempt in range(2):
                         try:
-                            await page.reload(wait_until="networkidle")
+                            # Fresh page, set fabric FIRST (it rebuilds the +ADD MODEL card list),
+                            # wait for that rebuild to settle, THEN add the model row and price.
+                            await page.goto(V4 + cfg["slug"], wait_until="networkidle", timeout=40000)
                             await page.wait_for_selector("#shirt_add_model", timeout=20000)
-                            await page.wait_for_timeout(500)
+                            await page.wait_for_timeout(700)
+                            try: await page.select_option("#shirt_fabric", label=fab)
+                            except Exception: pass
+                            try: await page.wait_for_load_state("networkidle", timeout=8000)
+                            except Exception: pass
+                            await page.wait_for_timeout(1500)
                             ok = await _add_model_row_cat(page, cat, model)
                             if not ok:
                                 print(f"  {key}: model card not offered — skip", file=sys.stderr)
                                 break
-                            # fabric select lives on the main form; set it AFTER adding the model
-                            # (selecting it before re-renders/filters the modal cards).
-                            try: await page.select_option("#shirt_fabric", label=fab)
-                            except Exception: pass
-                            await page.wait_for_timeout(500)
                             mc = {}
                             for qty in cfg["qtys"]:
                                 p = await _price_for_qty(page, qty, hold)
-                                if p and p > 0:
+                                # verify the engine actually priced the intended fabric
+                                if p and p > 0 and (not hold.get("fabric") or hold["fabric"] == fab):
                                     mc[str(qty)] = p
                                 await page.wait_for_timeout(250)
                             if mc:

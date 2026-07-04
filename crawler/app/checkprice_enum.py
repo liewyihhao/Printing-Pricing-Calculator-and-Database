@@ -59,16 +59,40 @@ async def _capture(slug: str, price_axes=None):
         cols = await page.evaluate("() => (Array.isArray(window.metrics)&&window.metrics.length)?Object.keys(window.metrics[0]):[]")
         if not cols:
             await b.close(); raise SystemExit(f"{slug}: no window.metrics")
-        # drive one valid combo to trigger a CheckPrice (learn the schema)
+        # Decide axes + qty column in Python from the column names, then aggregate the (possibly
+        # huge) metrics array IN THE BROWSER into {comboKey -> [qtys]} + distinct values.
+        qty_col = next((c for c in cols if re.match(r"quantity|qty", c, re.I)), None)
+        if price_axes:
+            axes = [c for c in cols if _norm(c) in {_norm(a) for a in price_axes}]
+        else:
+            axes = [c for c in cols if not _NOISE.search(c) and c != qty_col]
+        agg = await page.evaluate(
+            "([axes, qtyCol]) => { const m=window.metrics, combos={}, dist={};"
+            "for (const a of axes) dist[a]=[];"
+            "const seen={}; for (const a of axes) seen[a]={};"
+            "for (const r of m){ const key=axes.map(a=>r[a]).join('\\u0001');"
+            "  for (const a of axes){ const v=r[a]; if(v!=null && !seen[a][v]){seen[a][v]=1;dist[a].push(v);} }"
+            "  const q=String(r[qtyCol]).replace(/,/g,''); if(!/^\\d+$/.test(q))continue;"
+            "  (combos[key]||(combos[key]=[])); if(!combos[key].includes(q))combos[key].push(q); }"
+            "return {combos, dist}; }", [axes, qty_col])
+        # keep only axes that actually vary (>1 distinct)
+        axes = [a for a in axes if len(agg["dist"].get(a, [])) > 1]
+        # drive one KNOWN-VALID combo (window.metrics[0]) to trigger a CheckPrice (learn schema).
+        # Blindly setting every select to index 1 can form an invalid combo that fires no price.
+        row0 = await page.evaluate("() => window.metrics[0]")
         selids = await page.evaluate(
             "() => [...document.querySelectorAll('select')].filter(s=>s.offsetParent && "
             "!/country|courier|track/i.test(s.id)).map(s=>s.id)")
         for sid in selids:
             try:
+                # match this select to whichever metrics column its option values belong to
                 await page.evaluate(
-                    "(id)=>{const s=document.getElementById(id);"
-                    "if(s&&s.options.length>1){s.selectedIndex=1;"
-                    "s.dispatchEvent(new Event('change',{bubbles:true}));}}", sid)
+                    "([id,row])=>{const s=document.getElementById(id);if(!s||s.options.length<2)return;"
+                    "const texts=[...s.options].map(o=>o.text.trim());"
+                    "for(const k in row){const v=String(row[k]);const i=texts.indexOf(v);"
+                    "if(i>0){s.selectedIndex=i;s.dispatchEvent(new Event('change',{bubbles:true}));return;}}"
+                    "s.selectedIndex=1;s.dispatchEvent(new Event('change',{bubbles:true}));}",
+                    [sid, row0])
                 await page.wait_for_timeout(600)
             except Exception:
                 pass
@@ -85,7 +109,7 @@ async def _capture(slug: str, price_axes=None):
     if "req" not in hold:
         raise SystemExit(f"{slug}: never captured a CheckPrice request (page may not use the API)")
     spec = hold["req"]["spec"][0]
-    return spec, hold["req"]["type"], metrics, cookie
+    return spec, hold["req"]["type"], cols, axes, qty_col, agg, cookie
 
 
 def _fetch(type_str, spec, cookie, retries=3):
@@ -106,31 +130,32 @@ def _fetch(type_str, spec, cookie, retries=3):
     return None
 
 
-def enumerate_product(slug: str, max_workers: int = 24):
-    spec_tmpl, type_str, metrics, cookie = asyncio.run(_capture(slug))
-    cols = list(metrics[0].keys())
-    # option axes = non-noise, multi-valued columns except quantity
-    qty_col = next((c for c in cols if re.match(r"quantity|qty", c, re.I)), None)
-    def distinct(c): return list(dict.fromkeys(r[c] for r in metrics if r.get(c) is not None))
-    opt = [c for c in cols if not _NOISE.search(c) and c != qty_col and len(distinct(c)) > 1]
-    axes = opt  # curve axes (non-qty)
+def enumerate_product(slug: str, max_workers: int = 24, price_axes=None):
+    spec_tmpl, type_str, cols, axes, qty_col, agg, cookie = asyncio.run(_capture(slug, price_axes))
+    dist = agg["dist"]
+    def distinct(c): return dist.get(c, [])
     # map each metrics column -> spec key by normalized name
-    spec_keys = {k: k for k in spec_tmpl}
     col2key = {}
     for c in cols:
-        m = next((k for k in spec_keys if _norm(k) == _norm(c)), None)
+        m = next((k for k in spec_tmpl if _norm(k) == _norm(c)), None)
         if m:
             col2key[c] = m
     print(f"{slug}: type={type_str!r} axes={axes} qty={qty_col} "
           f"mapped={ {c:col2key[c] for c in axes if c in col2key} }", file=sys.stderr)
 
-    # valid combos = distinct tuples over axes (from metrics), with their orderable qtys
+    # combos aggregated in-browser: {'v1\x01v2\x01...': [qtys]}. Restrict tuple to the (kept) axes,
+    # which are a prefix subset of the original axis order used to build the key. Rebuild keys.
+    full_axes = [c for c in cols if (price_axes and _norm(c) in {_norm(a) for a in price_axes})
+                 or (not price_axes and not _NOISE.search(c) and c != qty_col)]
+    keep_idx = [full_axes.index(a) for a in axes]
     combos = {}
-    for r in metrics:
-        key = tuple(r[c] for c in axes)
-        q = str(r.get(qty_col, "")).replace(",", "")
-        if q.isdigit():
-            combos.setdefault(key, set()).add(q)
+    for rawkey, qtys in agg["combos"].items():
+        parts = rawkey.split("")
+        key = tuple(parts[i] for i in keep_idx)
+        s = combos.setdefault(key, set())
+        for q in qtys:
+            if q.isdigit():
+                s.add(q)
 
     tasks = []
     for key, qtys in combos.items():
@@ -163,7 +188,6 @@ def enumerate_product(slug: str, max_workers: int = 24):
                 print(f"  {done}/{len(tasks)} ({fail} failed)", file=sys.stderr)
 
     # build capture shape
-    def distinct2(c): return distinct(c)
     primary = axes[0] if axes else None
     deps = {}
     if primary:
@@ -176,7 +200,7 @@ def enumerate_product(slug: str, max_workers: int = 24):
     out = {
         "slug": slug, "source": "checkprice-api", "rows": sum(len(c) for c in curves.values()),
         "optionCols": axes, "primary": primary, "deps": deps,
-        "imageField": None, "distinct": {c: distinct2(c) for c in axes}, "imageOptions": {},
+        "imageField": None, "distinct": {c: distinct(c) for c in axes}, "imageOptions": {},
         "priceMeta": {"priceCol": "Price", "qtyCol": "Quantity", "axisCols": axes,
                       "nCurves": len(curves)},
         "curves": curves,
@@ -188,4 +212,9 @@ def enumerate_product(slug: str, max_workers: int = 24):
 
 
 if __name__ == "__main__":
-    enumerate_product(sys.argv[1])
+    args = sys.argv[1:]
+    slug = args[0]
+    axes = None
+    if "--axes" in args:
+        axes = args[args.index("--axes") + 1].split(",")
+    enumerate_product(slug, price_axes=axes)
