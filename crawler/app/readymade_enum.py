@@ -43,6 +43,20 @@ CONFIGS = {
     # Sublimation Shirt: 8 models × 3 sleeves × 2 categories (fabric is price-neutral → dropped).
     "shirt": {"slug": "shirt", "name": "Sublimation Shirt", "variant": "shirt",
               "qtys": [10, 20, 30, 50, 100, 150, 200, 300, 500], "dropFabric": True, "resilient": True},
+    # DTF / Silkscreen shirts: +ADD MODEL modal (category × model card) × fabric select.
+    # All three axes move the price (verified), so enumerate the full cartesian product.
+    "dtf-shirt": {"slug": "dtf-shirt", "name": "DTF Shirt", "variant": "shirt_modal",
+                  "categories": ["Adult", "Kid"],
+                  "models": ["Round Neck (Short Sleeve)", "Round Neck (Long Sleeve)",
+                             "Polo (Short Sleeve)", "Polo (Long Sleeve)", "Muslimah"],
+                  "fabrics": ["Microfiber Mini Eyelet 150gsm", "CVC Honeycomb 180gsm", "Siro Cotton 190gsm"],
+                  "qtys": QGRID, "resilient": True},
+    "silkscreen-shirt": {"slug": "silkscreen-shirt", "name": "Silkscreen Shirt", "variant": "shirt_modal",
+                  "categories": ["Adult", "Kid"],
+                  "models": ["Round Neck (Short Sleeve)", "Round Neck (Long Sleeve)",
+                             "Polo (Short Sleeve)", "Polo (Long Sleeve)", "Muslimah"],
+                  "fabrics": ["Microfiber Mini Eyelet 150gsm", "CVC Honeycomb 180gsm", "Siro Cotton 190gsm"],
+                  "qtys": QGRID, "resilient": True},
 }
 
 QTY_INPUT = ".shirt-qty-input"
@@ -230,6 +244,100 @@ async def enumerate_shirt(cfg: dict):
         return curves
 
 
+async def _add_model_row_cat(page, category: str, model_label: str):
+    """+ADD MODEL modal for the DTF/Silkscreen shirts: pick category (Adult/Kid), the model
+    card, confirm. Leaves one order row with a .shirt-qty-input."""
+    await page.click("#shirt_add_model")
+    await page.wait_for_selector(".shirt-model-card", timeout=15000)
+    await page.wait_for_timeout(400)
+    try: await page.check(f"input[name='shirt_popup_category'][value='{category}']")
+    except Exception: pass
+    await page.wait_for_timeout(300)
+    cards = page.locator(".shirt-model-card"); n = await cards.count(); picked = False
+    for i in range(n):
+        t = (await cards.nth(i).inner_text()).strip()
+        if model_label.lower() in t.lower():
+            await cards.nth(i).click(); picked = True; break
+    if not picked:
+        return False
+    await page.wait_for_timeout(400)
+    await page.click(".shirt-popup-footer")
+    await page.wait_for_selector(QTY_INPUT, timeout=15000)
+    await page.wait_for_timeout(500)
+    return True
+
+
+async def enumerate_shirt_modal(cfg: dict):
+    """Driver for DTF/Silkscreen: enumerate category × model × fabric via the +ADD MODEL modal,
+    sweeping the quantity grid per combo. Curve keys are 'category|model|fabric'. Resumable."""
+    hold = {"price": None, "qty": None}
+    axis_parts = ["category", "model", "fabric"]
+    cfg["_axisParts"] = axis_parts
+    outf = OUT / "v4_options" / f"{cfg['slug']}_options.json"
+    curves = {}
+    if outf.exists():
+        try: curves = json.loads(outf.read_text()).get("curves", {})
+        except Exception: curves = {}
+    async def mk(pw):
+        b = await B.launch(pw); page = await b.new_page()
+        print("v4 login:", await login_v4(page), file=sys.stderr)
+
+        async def on_resp(resp):
+            if "CheckPrice" in resp.url:
+                try:
+                    body = await resp.json(); req = resp.request.post_data_json
+                    hold["price"] = float(str(body.get("Price")).replace(",", ""))
+                    hold["qty"] = str(req["spec"][0]["TotalQuantity"]) if req else None
+                except Exception:
+                    pass
+        page.on("response", lambda r: asyncio.create_task(on_resp(r)))
+        await page.goto(V4 + cfg["slug"], wait_until="networkidle", timeout=30000)
+        await page.wait_for_selector("#shirt_add_model", timeout=20000)
+        await page.wait_for_timeout(800)
+        return b, page
+
+    async with async_playwright() as pw:
+        b, page = await mk(pw)
+        for cat in cfg["categories"]:
+            for model in cfg["models"]:
+                for fab in cfg["fabrics"]:
+                    key = f"{cat}|{model}|{fab}"
+                    if key in curves and len(curves[key]) >= len(cfg["qtys"]):
+                        continue
+                    for attempt in range(2):
+                        try:
+                            await page.reload(wait_until="networkidle")
+                            await page.wait_for_selector("#shirt_add_model", timeout=20000)
+                            await page.wait_for_timeout(500)
+                            ok = await _add_model_row_cat(page, cat, model)
+                            if not ok:
+                                print(f"  {key}: model card not offered — skip", file=sys.stderr)
+                                break
+                            # fabric select lives on the main form; set it AFTER adding the model
+                            # (selecting it before re-renders/filters the modal cards).
+                            try: await page.select_option("#shirt_fabric", label=fab)
+                            except Exception: pass
+                            await page.wait_for_timeout(500)
+                            mc = {}
+                            for qty in cfg["qtys"]:
+                                p = await _price_for_qty(page, qty, hold)
+                                if p and p > 0:
+                                    mc[str(qty)] = p
+                                await page.wait_for_timeout(250)
+                            if mc:
+                                curves[key] = mc
+                                print(f"  {key} -> {mc}", file=sys.stderr)
+                                _write_capture_generic(cfg, curves, axis_parts)
+                            break
+                        except Exception as e:
+                            print(f"  [crash {key}: {type(e).__name__}] recreating browser", file=sys.stderr)
+                            try: await b.close()
+                            except Exception: pass
+                            b, page = await mk(pw)
+        await b.close()
+        return curves
+
+
 async def enumerate_product(cfg: dict):
     async with async_playwright() as pw:
         b = await B.launch(pw)
@@ -331,7 +439,10 @@ def _write_capture_generic(cfg, curves, axis_parts):
 
 async def main(slug):
     cfg = CONFIGS[slug]
-    if cfg.get("variant") == "shirt":
+    if cfg.get("variant") == "shirt_modal":
+        curves = await enumerate_shirt_modal(cfg)
+        _write_capture_generic(cfg, curves, cfg.get("_axisParts", ["category", "model", "fabric"]))
+    elif cfg.get("variant") == "shirt":
         curves = await enumerate_shirt(cfg)
         _write_capture_generic(cfg, curves, cfg.get("_axisParts", ["Config"]))
     else:

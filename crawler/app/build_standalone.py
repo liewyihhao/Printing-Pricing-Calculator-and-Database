@@ -483,16 +483,12 @@ def build_data():
         {"id": 171, "name": "X-ccessories — Litho", "engine": "contact", "optsrc": "none",
          "accuracy": None, "fields": [],
          "note": "Bulk accessory order builder (mix-and-match small quantities, West/East Malaysia shipping). Contact us directly for a quote."},
-        {"id": 172, "name": "DTF Shirt — Digital", "engine": "contact", "optsrc": "none",
-         "accuracy": None, "fields": [
-            {"key": "fabric", "label": "Fabric Type", "addon": True, "depends": [], "options": [
-                "Microfiber Mini Eyelet 150gsm", "CVC Honeycomb 180gsm", "Siro Cotton 190gsm"]}],
-         "note": "No automated pricing available (multi-model order builder). Contact us directly for a quote."},
-        {"id": 173, "name": "Silkscreen Shirt — Digital", "engine": "contact", "optsrc": "none",
-         "accuracy": None, "fields": [
-            {"key": "fabric", "label": "Fabric Type", "addon": True, "depends": [], "options": [
-                "Microfiber Mini Eyelet 150gsm", "CVC Honeycomb 180gsm", "Siro Cotton 190gsm"]}],
-         "note": "No automated pricing available (multi-model order builder). Contact us directly for a quote."},
+        {"id": 172, "name": "DTF Shirt — Digital", "engine": "pricelist",
+         "note": "Adult, size M. Exact per category+model+fabric curves from the readymade order "
+                 "engine (/Product/CheckPrice). Printing/VDP quoted separately."},
+        {"id": 173, "name": "Silkscreen Shirt — Digital", "engine": "pricelist",
+         "note": "Adult, size M. Exact per category+model+fabric curves from the readymade order "
+                 "engine (/Product/CheckPrice). Printing/VDP quoted separately."},
         {"id": 174, "name": "Lanyard — Litho", "engine": "pricelist"},
         {"id": 175, "name": "Premium Desk Calendar — Litho", "engine": "pricelist"},
         {"id": 176, "name": "UV DTF Sticker — Digital", "engine": "pricelist"},
@@ -657,7 +653,7 @@ def build_data():
             "folder": _load("folder_pl_params.json", {"axis_cols": [], "curves": {}}),
             "lshape": _load("lshape_params.json", {"curves": {}, "size_mm": [310, 442]}),
             "bookmark": _load("bookmark_params.json", {"curves": {}, "fin_delta": {}, "size_mm": [50, 150]}),
-            "voucher": _load("voucher_params.json", {"core": {}, "paper_f": {}, "colour_f": {}, "sets_f": {}, "packform_f": {}, "size_f": {}, "perf_d": {}, "numbering_d": {}, "ref": {}}),
+            "voucher": _load("voucher_plx_params.json", {"curves": {}, "weight_factor": 1.2065}),
             "computerform": _load("computerform_params.json", {"core": {}, "single": {}, "payslip": {}, "layer_f": {}, "ups_f": {}, "colour_f": {}, "copychange_d": [], "numbering_d": [], "size_mm": [241.3, 279.4], "ncr_gsm": 55}),
             "wireo": _load("wireo_params.json", {"cover_curves": {}, "lam_delta": {}, "addc_delta": {}, "cover_wt": {}, "ref_lam": ""}),
             "pvccard": _load("pvccard_pl_params.json", {"axis_cols": [], "curves": {}}),
@@ -969,6 +965,7 @@ _PRICELIST_FROM_OPTIONS = {
     180: ("corporate-shirt", "corpshirt_plx"), 181: ("jacket", "jacket_plx"),
     182: ("muslimah", "muslimah_plx"), 183: ("sweatshirt-hoodies", "sweatshirt_plx"),
     143: ("shirt", "subshirt_plx"),
+    172: ("dtf-shirt", "dtfshirt_plx"), 173: ("silkscreen-shirt", "silkshirt_plx"),
     # REFERENCE→EXACT batch 2 (price-list DataTable captures)
     104: ("notepad", "notepad_plx"), 123: ("banner", "banner_plx"),
     127: ("paper-bag", "paperbag_plx"),
