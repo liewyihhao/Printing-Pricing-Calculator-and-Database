@@ -292,8 +292,10 @@ def build_data():
         {"key": "colour", "label": "Print colour / side", "addon": True, "depends": [], "options": ENVELOPE_COLOURS},
     ]
     products = [
-        {"id": 1, "name": "Business Card", "engine": "bizcard", "optsrc": "bizcard",
-         "accuracy": acc.get(1), "fields": BIZCARD_FIELDS},
+        {"id": 1, "name": "Business Card", "engine": "pricelist",
+         "note": "Standard Card. Exact per size+paper+colour+lamination+package(ganging) curves "
+                 "from the v4 order engine (/Product/CheckPrice), 2160 combos. Thin/Fat Fold, "
+                 "Custom Die-Cut & Plastic Card variants quoted separately."},
         {"id": 104, "name": "Notepad — Litho", "engine": "notepad", "optsrc": "none",
          "accuracy": acc.get(104), "fields": NOTEPAD_FIELDS},
         {"id": 106, "name": "Envelope — Litho", "engine": "envelope", "optsrc": "none",
@@ -949,7 +951,7 @@ _PRICELIST_FROM_OPTIONS = {
     143: ("shirt", "subshirt_plx"),
     172: ("dtf-shirt", "dtfshirt_plx"), 173: ("silkscreen-shirt", "silkshirt_plx"),
     115: ("kad-terima-kasih", "kadterima_plx"), 114: ("kad-kahwin", "kadkahwin_plx"),
-    112: ("hard-cover-wire-o-notebook", "wireonb_plx"),
+    112: ("hard-cover-wire-o-notebook", "wireonb_plx"), 1: ("business-card", "bizcard_plx"),
     # REFERENCE→EXACT batch 2 (price-list DataTable captures)
     104: ("notepad", "notepad_plx"), 123: ("banner", "banner_plx"),
     127: ("paper-bag", "paperbag_plx"),
