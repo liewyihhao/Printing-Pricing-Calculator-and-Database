@@ -4,6 +4,26 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **93 standalone products. 80 EXACT / 9 REFERENCE / 4 CONTACT (2026-07-04 scheduled run #10).**
+  Post-run-#9 EXACT upgrades (commits 5e56166, 35a9592, d56bbd9, 3fd5149 + this run):
+  - **Wire-O Notebook (112) EXACT** via `checkprice_enum` local-price fast path (420 curves,
+    9 axes — cover × lamination × hot stamping × content). Methodology: v4 metrics products carry
+    a "Price (WM)" column; enumerator now detects it first (no CheckPrice XHR needed).
+  - **Kad Kahwin (114) EXACT** via `/Product/CheckPrice` — 154 Size×Paper×Colour curves × 18 qtys.
+    Value-format transforms: `DL (99mm x 210mm)` → inner paren only; `Paper (2 sides coated)` stripped.
+  - **Envelope (106) markup fix** — was EXACT but `accuracy=None` caused `_apply_ref_markup` to add
+    +7.5% on top of exact prices; fixed in `build_standalone.py`.
+  - **Pillow (131) markup fix** — same bug: `accuracy=None` in `accuracy()` dict → 7.5% markup on
+    an essentially exact product (LOO 0.03%). Fixed by adding `131: 0.0` to `accuracy()`.
+    Also fixed Magnet (135: 1.0) and Computer Form (111: 4.0) which were silently None.
+  - **DTF Shirt Kid Polo Short Sleeve** re-added — `readymade_enum` retry logic improved (4 attempts
+    with progressive waits vs 2 flat) to recover combos lost to transient modal-render races.
+    2 new curves: `Kid|Polo (Short Sleeve)|Microfiber` + `CVC Honeycomb`. Options/params updated.
+  - **Standalone rebuilt**: 93 products, 80 EXACT, 9 REFERENCE (Business Card, Magnet, Computer Form,
+    Bill-Book, Label Sticker Digital/Letterpress, Loose Sheet Digital, Booklet Litho/Digital),
+    4 CONTACT (Mask Keeper, ID Card, X-ccessories, Roll Form Sticker).
+  - Kad Terima Kasih params refreshed (276 curves; same count, data refresh).
+  Git tip: (this commit).
 - **52/52 BUILT. 74 EXACT / 13 REFERENCE / 6 CONTACT (2026-07-04 scheduled run #9).**
   Voucher (id 110) upgraded REFERENCE→EXACT via v4 CheckPrice pricelist:
   - Sampler completed: 14,112 unique keys × (22 Pad/Book qtys + 12 Loose qtys) = 290,304 total

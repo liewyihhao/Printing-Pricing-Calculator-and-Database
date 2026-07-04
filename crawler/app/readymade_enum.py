@@ -306,7 +306,7 @@ async def enumerate_shirt_modal(cfg: dict):
                     key = f"{cat}|{model}|{fab}"
                     if key in curves and len(curves[key]) >= len(cfg["qtys"]):
                         continue
-                    for attempt in range(2):
+                    for attempt in range(4):
                         try:
                             # Fresh page, set fabric FIRST (it rebuilds the +ADD MODEL card list),
                             # wait for that rebuild to settle, THEN add the model row and price.
@@ -317,9 +317,14 @@ async def enumerate_shirt_modal(cfg: dict):
                             except Exception: pass
                             try: await page.wait_for_load_state("networkidle", timeout=8000)
                             except Exception: pass
-                            await page.wait_for_timeout(1500)
+                            await page.wait_for_timeout(1500 + attempt * 1200)
                             ok = await _add_model_row_cat(page, cat, model)
                             if not ok:
+                                # transient modal-render race (cards not yet populated) — retry a
+                                # few times with longer waits before accepting it as unavailable.
+                                if attempt < 3:
+                                    print(f"  {key}: card not found (attempt {attempt+1}) — retry", file=sys.stderr)
+                                    continue
                                 print(f"  {key}: model card not offered — skip", file=sys.stderr)
                                 break
                             mc = {}
