@@ -432,7 +432,7 @@ def printoka_products():
 # accuracy = MEASURED median % vs Excard (output/audit_report.json). Curve-based
 # products are exact at Excard's order quantities; this median is the held-out /
 # custom-quantity interpolation error.
-FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24: 2.5,
+FORMULATED = {1: 0.0, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24: 2.5,
               101: 1.7, 102: 1.7, 103: 1.7,  # aliases reuse loose-litho accuracy
               104: 5.2,  # notepad: exact at order qtys; 5.2 = held-out interp median
               105: 0.0,  # letterhead: EXACT v4 price-list lookup (paper x colour x packing Loose/Pad)
@@ -442,9 +442,9 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               109: 2.5,  # bookmark: per-(paper|colour) log-log curve LOO median 2.5%
               110: 0.0,  # voucher: EXACT v4 CheckPrice pricelist (all 3 forms x sizes x papers x colours x sets x numbering x perf)
               111: 4.0,  # computer form: factor model — axes exact, core LOO ~4%
-              112: 2.3,  # wire-o notebook: per-cover curve LOO median 2.3% (Hard Cover)
+              112: 0.0,  # wire-o notebook: EXACT v4 metrics Price(WM) pricelist (420 curves, 9 axes)
               113: 0.0,  # pvc card: EXACT v4 price-list lookup (colour x hole punch x VDP; all priced)
-              114: 5.0,  # kad kahwin: factor model — axes exact, core LOO ~3%
+              114: 0.0,  # kad kahwin: EXACT v4 CheckPrice pricelist (154 Size×Paper×Colour curves)
               115: 4.0,  # kad terima kasih: factor model — axes exact, core LOO ~4%
               116: 5.9, 117: 5.9,  # static cling / car sticker: factor model, core LOO ~5.9%
               118: 1.7,  # wall calendar: qty curve LOO median 1.7%
@@ -1154,6 +1154,25 @@ _BC_LABELS = {"Standard Card": "standard", "Thin Fold": "thin_fold",
               "Fat Fold": "fat_fold", "Custom Die-Cut": "custom_die_cut",
               "Plastic Card": "plastic_card"}
 
+# Surface label → lamination key in bizcard_plx_params (Standard card only).
+# "None" maps to the free default WBV finish. Soft Touch and Spot UV are not
+# in the plx (not sampled); those fall back to the formula engine.
+_BC_SURF_TO_LAM = {
+    "None": "Gloss Water Based Varnish (Both)",
+    "Gloss Lamination (Both)": "Gloss Lamination (Both)",
+    "Matte Lamination (Both)": "Matte Lamination (Both)",
+    "Gloss Water Based Varnish (Both)": "Gloss Water Based Varnish (Both)",
+}
+_BC_PLX_CACHE: dict = {}
+
+
+def _bc_plx():
+    if not _BC_PLX_CACHE:
+        pf = _Path(__file__).resolve().parent.parent / "output" / "bizcard_plx_params.json"
+        if pf.exists():
+            _BC_PLX_CACHE.update(_json.loads(pf.read_text(encoding="utf-8")))
+    return _BC_PLX_CACHE
+
 
 @app.get("/api/printoka/bizcard/options")
 def bizcard_options(product: int = Query(1), cardType: str | None = None):
@@ -1181,10 +1200,39 @@ def bizcard_quote(product: int = Query(1), cardType: str = Query(...),
                   custom_h: float = Query(0), custom_w: float = Query(0)):
     from . import bizcard_engine as BE
     from . import bizcard_finishing as BF
+    from . import pricelist_engine as PE
     key = _BC_LABELS.get(cardType, cardType)
     mult = package_multiplier(package)
     if custom_h and custom_w:
         size = f"{int(custom_w)}mm x {int(custom_h)}mm"
+    note = None
+    if hot_stamping not in ("", "No Hot Stamping") or embossing not in ("", "Not Required"):
+        note = "Hot stamping / embossing block charge is quoted separately by Excard."
+    # Exact pricelist path: Standard card + supported lam only.
+    # Lamination is baked into the plx key; round_corner/hole_punch are additive deltas.
+    lam = _BC_SURF_TO_LAM.get(surface) if key == "standard" else None
+    if lam:
+        plx = _bc_plx()
+        if plx.get("curves"):
+            cfg = {"Size": size, "Paper": paper, "Print Colour": colour,
+                   "Lamination": lam, "Package": package}
+            try:
+                base = PE.cash_price(plx, cfg, qty)
+                fin = BF.finishing_cost({"surface": "None", "round_corner": round_corner,
+                                         "hole_punch": hole_punch}, qty) * mult
+                cash = base + fin
+                wt = BE.weight_kg(size, paper, qty) * mult
+            except Exception as e:  # noqa: BLE001
+                return JSONResponse({"error": str(e)}, status_code=400)
+            return {"config": {"product": product, "cardType": cardType, "size": size,
+                               "paper": paper, "colour": colour, "qty": qty, "package": package,
+                               "surface": surface, "round_corner": round_corner,
+                               "hole_punch": hole_punch, "hot_stamping": hot_stamping,
+                               "embossing": embossing},
+                    "printoka_cash": round(cash, 2), "finishing_cost": round(fin, 2),
+                    "method": "exact (v4 CheckPrice pricelist)", "note": note,
+                    "tiers": PE.tiers(cash), "weight_kg": round(wt, 3)}
+    # Formula fallback (non-Standard, Soft Touch, Spot UV, or plx not loaded)
     try:
         base = BE.cash_price(key, size, paper, colour, qty)
         fin = BF.finishing_cost({"surface": surface, "round_corner": round_corner,
@@ -1193,9 +1241,6 @@ def bizcard_quote(product: int = Query(1), cardType: str = Query(...),
         wt = BE.weight_kg(size, paper, qty) * mult
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
-    note = None
-    if hot_stamping not in ("", "No Hot Stamping") or embossing not in ("", "Not Required"):
-        note = "Hot stamping / embossing block charge is quoted separately by Excard."
     return {"config": {"product": product, "cardType": cardType, "size": size,
                        "paper": paper, "colour": colour, "qty": qty, "package": package,
                        "surface": surface, "round_corner": round_corner, "hole_punch": hole_punch,
@@ -2165,23 +2210,27 @@ def kadkahwin_quote(product: int = Query(114), ordertype: str = Query("Standard 
                     lamination: str = Query("Matte Lamination (Front)"),
                     envelope: str = Query("Not Required")):
     from . import kadkahwin_engine as KK
-    ot = _KK_OT.get(ordertype, ordertype)
+    from . import pricelist_engine as PE
+    pf = _Path(__file__).resolve().parent.parent / "output" / "kadkahwin_plx_params.json"
     try:
-        cash = KK.cash_price(ot, size, paper, colour, qty)
+        plx = _json.loads(pf.read_text(encoding="utf-8"))
+        cfg = {"Size": size, "Paper": paper, "Print Colour": colour}
+        cash = PE.cash_price(plx, cfg, qty)
         wt = KK.weight_kg(size, paper, qty)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    note = ("Kad Kahwin (wedding card). Lamination & envelope colour do not change the online "
-            "price; folding code & hot stamping are quoted separately. qty = cards.")
+    note = ("Kad Kahwin (wedding card). Exact v4 CheckPrice pricelist (154 Size×Paper×Colour "
+            "curves). Lamination & envelope colour do not change the online price; "
+            "folding code & hot stamping are quoted separately. qty = cards.")
     if hot_stamping not in ("Not Required", ""):
         note += f" Hot stamping ({hot_stamping}) quoted separately."
     return {"config": {"product": product, "ordertype": ordertype, "size": size, "paper": paper,
                        "colour": colour, "qty": qty, "hot_stamping": hot_stamping,
                        "lamination": lamination, "envelope": envelope},
-            "printoka_cash": round(cash, 2), "method": "formula (reference curve x factors)",
-            "note": note, "tiers": KK.tiers(cash), "weight_kg": round(wt, 3)}
+            "printoka_cash": round(cash, 2), "method": "exact (v4 CheckPrice pricelist)",
+            "note": note, "tiers": PE.tiers(cash), "weight_kg": round(wt, 3)}
 
 
 # ---------- PVC Card (Digital, id 113) ----------

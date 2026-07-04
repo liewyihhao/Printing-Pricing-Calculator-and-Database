@@ -53,9 +53,11 @@ def loose_cascade():
 def accuracy():
     # MEASURED median % vs Excard (output/audit_report.json). Curve products are
     # exact at Excard's order quantities; this is the custom-quantity interp error.
-    return {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 6.3, 61: 10.5, 24: 2.5,
+    return {1: 0.0,    # bizcard Standard: EXACT v4 CheckPrice pricelist (2160 curves)
+            21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 6.3, 61: 10.5, 24: 2.5,
             110: 0.0,
             111: 4.0,   # computer form: factor model, LOO ~4%
+            114: 0.0,   # kad kahwin: EXACT v4 CheckPrice pricelist (154 curves)
             131: 0.0,   # pillow: LOO 0.03% (effectively exact, no markup)
             135: 1.0,   # magnet: per-shape curve LOO median ~1%
             }
