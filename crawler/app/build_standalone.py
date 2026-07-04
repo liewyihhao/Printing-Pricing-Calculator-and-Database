@@ -973,6 +973,9 @@ _PRICELIST_FROM_OPTIONS = {
     104: ("notepad", "notepad_plx"), 123: ("banner", "banner_plx"),
     127: ("paper-bag", "paperbag_plx"),
     116: ("car-sticker", "staticcling_plx"), 117: ("car-sticker", "carsticker_plx"),
+    # Loose Sheet Litho + aliases — exact from the 159k-row crawl CSV
+    21: ("loose-sheet-litho", "loosesheet_plx"), 101: ("loose-sheet-litho", "loosesheet_plx"),
+    102: ("loose-sheet-litho", "loosesheet_plx"), 103: ("loose-sheet-litho", "loosesheet_plx"),
 }
 
 
