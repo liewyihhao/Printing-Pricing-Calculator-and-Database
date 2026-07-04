@@ -4,6 +4,19 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **52/52 BUILT. 73 EXACT / 14 REFERENCE / 6 CONTACT (2026-07-04 scheduled run #8).**
+  Envelope (id 106) upgraded REFERENCE→EXACT via v4 CheckPrice API:
+  - All 17 models × all colour options × all orderable qty values sampled = 3264 points, 0 failures.
+  - Size format fix: `(Fit DL Size)` parenthetical must be stripped before CheckPrice call.
+  - New `app/envelope_cp_sampler.py`, `output/envelope_cp_samples.json`, `output/envelope_plx_params.json` (171 curves).
+  - `envelope_engine.py` rewritten to use exact pricelist (log-log interp between orderable qtys).
+  - `api.py` accuracy updated to 0.0. `build_standalone.py` + template updated. JS == Python verified (8 configs).
+  - Parity confirmed: **44 families × 0 real gaps** (parity_checker --print). Catalogue: **52/52 BUILT**.
+  - No other REFERENCE products support CheckPrice (all return RM0.00 or error). Git tip: pending.
+- **52/52 BUILT. 72 EXACT / 15 REFERENCE / 6 CONTACT (2026-07-04 post-run upgrades).**
+  Loose Sheet Litho (21) + Brochure/Flyer/Customprint (101/102/103) upgraded EXACT from 159k-row CSV.
+  Notepad, Banner, Paper Bag, Static Cling, Car Sticker upgraded via v4 pricelist_capture.py.
+  Git tip: b914626.
 - **52/52 BUILT. 65 EXACT / 22 REFERENCE / 6 CONTACT (2026-07-04 scheduled run #7).**
   Maintenance pass — no new products or parity changes. Previous run (#6) had correctly
   committed `calculator_standalone.html` (with Banner/Paper Bag EXACT upgrades) but left

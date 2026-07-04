@@ -653,7 +653,7 @@ def build_data():
             "billbook": _load("billbook_params.json", {"curves": {}, "size_factors": {}, "size_mm": {}}),
             "notepad": _load("notepad_params.json", {"curve": {}, "size_mm": [80, 106], "content_sheets": 40, "content_gsm": 80}),
             "letterhead": _load("letterhead_pl_params.json", {"axis_cols": [], "curves": {}}),
-            "envelope": _load("envelope_params.json", {"base_curves": {}, "sizes": {}, "colour_delta": {}, "env_gsm": 100}),
+            "envelope": _load("envelope_plx_params.json", {"curves": {}, "model_meta": {}, "env_gsm": 100}),
             "folder": _load("folder_pl_params.json", {"axis_cols": [], "curves": {}}),
             "lshape": _load("lshape_params.json", {"curves": {}, "size_mm": [310, 442]}),
             "bookmark": _load("bookmark_params.json", {"curves": {}, "fin_delta": {}, "size_mm": [50, 150]}),

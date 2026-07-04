@@ -436,7 +436,7 @@ FORMULATED = {1: 2.1, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               101: 1.7, 102: 1.7, 103: 1.7,  # aliases reuse loose-litho accuracy
               104: 5.2,  # notepad: exact at order qtys; 5.2 = held-out interp median
               105: 0.0,  # letterhead: EXACT v4 price-list lookup (paper x colour x packing Loose/Pad)
-              106: 4.1,  # envelope: base LOO ~2%; held-out colour (additive) median 4.1%
+              106: 0.0,  # envelope: EXACT v4 CheckPrice pricelist (17 models x colours x qtys)
               107: 0.0,  # folder: EXACT v4 price-list lookup (all mould groups + colour + lam + protective)
               108: 2.2,  # l-shape folder: per-paper curve LOO median 2.2%
               109: 2.5,  # bookmark: per-(paper|colour) log-log curve LOO median 2.5%

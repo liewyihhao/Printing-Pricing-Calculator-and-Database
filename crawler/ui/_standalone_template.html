@@ -714,20 +714,21 @@ function localQuote(prod, V, qty){
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-mould curve + paper delta)",
       note:"Folder: Presentation Folder group. Die-cutting + creasing compulsory (included). Paper = additive cost vs 250gsm 1-side. DF/KF/CF groups pending. qty = pieces." }; }
   else if(prod.engine==="envelope"){
-    const bc=P.base_curves||{}, sz=P.sizes||{}, cd=P.colour_delta||{};
-    const code=(V.model||"").trim().split(/[\s—(-]/)[0];
-    let m=code;
-    if(!bc[m]){ const m4=(code.match(/\d{4}/)||[])[0];
-      m=(m4&&Object.keys(bc).find(k=>k.includes(m4)))||Object.keys(bc)[0]; }
-    const c=bc[m]||{}; let base=interpLogPts(Object.keys(c).map(k=>[+k,c[k]]),qty);
-    // additive colour plate delta vs 4C(Front), linear-interp over qty
-    function lin(pts,x){pts=pts.slice().sort((a,b)=>a[0]-b[0]);if(!pts.length)return 0;if(x<=pts[0][0])return pts[0][1];if(x>=pts[pts.length-1][0])return pts[pts.length-1][1];for(let i=1;i<pts.length;i++)if(x<=pts[i][0]){const t=(x-pts[i-1][0])/(pts[i][0]-pts[i-1][0]);return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]);}return pts[pts.length-1][1];}
-    const delta=(V.colour==="4C (Front)")?0:lin(cd[V.colour]||[[0,0]],qty);
-    cash=Math.max(base+delta,0);
-    const s=sz[m]||"110x220"; const mm=(s.match(/\d+/g)||[110,220]).map(Number);
+    const EC=P.curves||{}, MM=P.model_meta||{};
+    const code=(V.model||"").trim().split(/[\s—\-(]/)[0];
+    const colour=V.colour||"4C (Front)";
+    let key=code+"|"+colour;
+    let curve=EC[key];
+    if(!curve){ key=code+"|4C (Front)"; curve=EC[key]; }
+    if(!curve){ return {error:"No price curve for this model/colour"}; }
+    const exact=curve[String(qty)];
+    cash=exact!==undefined ? exact : interpLogPts(Object.keys(curve).map(k=>[+k,curve[k]]),qty);
+    cash=Math.max(Math.round(cash*100)/100,0);
+    const meta=MM[code]||{}; const s=meta.size||"110mm x 220mm";
+    const mm=(s.match(/\d+/g)||[110,220]).map(Number);
     wt=Math.round(mm[0]*mm[1]/1e6*2*(P.env_gsm||100)*qty/1000*WF*1000)/1000;
-    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"formula (per-model curve + colour plate delta)",
-      note:"Envelope: Die-Cutting, Folding + Gluing compulsory (included). Print colour = additive plate cost vs 4C(Front). OE 'Best Seller' moulds map to the same-size EV mould. qty = pieces." }; }
+    return { printoka_cash: cash, finishing_cost:0, tiers: tiers(cash), weight_kg: wt, method:"exact v4 CheckPrice pricelist",
+      note:"Envelope: Die-Cutting, Folding + Gluing compulsory (included). qty = pieces." }; }
   else if(prod.engine==="letterhead"){
     const cv=P.curves||{}; const np=/Conqueror/.test(V.paper||"")?"Conqueror":V.paper;
     let key=np+"|"+V.colour;

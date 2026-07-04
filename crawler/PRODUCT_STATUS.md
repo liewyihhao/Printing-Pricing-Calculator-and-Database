@@ -2,7 +2,7 @@
 
 _Generated 2026-07-04. 93 products._
 
-## ✅ EXACT — cent-accurate (72)
+## ✅ EXACT — cent-accurate (73)
 - [x] `104` Notepad — Litho
 - [x] `107` Folder — Litho
 - [x] `108` L-Shape Plastic Folder — Digital
@@ -69,6 +69,7 @@ _Generated 2026-07-04. 93 products._
 - [x] `116` Static Cling Window Sticker — Digital
 - [x] `117` Car Sticker — Digital (= Static Cling form)
 - [x] `113` PVC Card — Digital
+- [x] `106` Envelope — Litho
 - [x] `109` Bookmark — Digital
 - [x] `105` Letterhead — Litho
 - [x] `21` Loose Sheet — Litho (Offset)
@@ -76,10 +77,9 @@ _Generated 2026-07-04. 93 products._
 - [x] `102` Flyer (= Loose Sheet Litho)
 - [x] `103` Customprint (= Loose Sheet Litho)
 
-## 🟡 REFERENCE — calibrated formula, need exact data (15)
+## 🟡 REFERENCE — calibrated formula, need exact data (14)
 _These use fitted formulas whose accuracy varies by config (some >5% off). Getting them exact needs crawling each (like the 159k-row Loose Sheet crawl) or driving their per-config /Product/CheckPrice; voucher (123k) & kad-kahwin (389k) combos are impractically large._
 - [ ] `1` Business Card
-- [ ] `106` Envelope — Litho
 - [ ] `131` Pillow — Litho
 - [ ] `135` Magnet — Digital
 - [ ] `115` Kad Terima Kasih — Digital
