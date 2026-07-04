@@ -23,7 +23,7 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
     Bill-Book, Label Sticker Digital/Letterpress, Loose Sheet Digital, Booklet Litho/Digital),
     4 CONTACT (Mask Keeper, ID Card, X-ccessories, Roll Form Sticker).
   - Kad Terima Kasih params refreshed (276 curves; same count, data refresh).
-  Git tip: (this commit).
+  Git tip: ad4b997 (this run) + 3fd5149 (Wire-O), 35a9592 (Kad Kahwin), d56bbd9 (Envelope fix).
 - **52/52 BUILT. 74 EXACT / 13 REFERENCE / 6 CONTACT (2026-07-04 scheduled run #9).**
   Voucher (id 110) upgraded REFERENCE→EXACT via v4 CheckPrice pricelist:
   - Sampler completed: 14,112 unique keys × (22 Pad/Book qtys + 12 Loose qtys) = 290,304 total
