@@ -13,7 +13,7 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
   - JS == Python verified (6 configs, exact at every sampled orderable qty).
   - `build_standalone.py` accuracy dict updated: `110: 0.0`.
   - Standalone rebuilt. Parity: 44 families × 0 real gaps (unchanged).
-  Git tip: pending (this run).
+  Git tip: 49b0ab4.
 - **52/52 BUILT. 73 EXACT / 14 REFERENCE / 6 CONTACT (2026-07-04 scheduled run #8).**
   Envelope (id 106) upgraded REFERENCE→EXACT via v4 CheckPrice API:
   - All 17 models × all colour options × all orderable qty values sampled = 3264 points, 0 failures.
