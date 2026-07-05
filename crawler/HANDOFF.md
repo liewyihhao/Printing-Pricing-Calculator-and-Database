@@ -4,6 +4,25 @@ _For continuing in a new Claude Code chat. Read this first._
 _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calculator-and-Database/main/crawler/HANDOFF.md_
 
 ## ⭐ LATEST STATE (most recent first)
+- **93 standalone products. 81 EXACT / 8 REFERENCE / 4 CONTACT (2026-07-05 scheduled run #11 cont.).**
+  Continued REFERENCE upgrades after prior run:
+  - **Magnet (135) EXACT** via CheckPrice: 7 Rectangle/Square preset sizes × 15 qtys + Round (size-neutral).
+    New `size` dropdown in standalone. Custom Die-Cut uses same price as Rectangle/Square (confirmed).
+    Multiple Dieline returns CONTACT. `magnet_cp_sampler.py`, `output/magnet_cp_params.json` added.
+    Commit 023ada6.
+  - **Label Sticker Digital (60) recalibrated** against 1,728 CheckPrice data points
+    (16 sizes × 12 papers × 9 qtys, all 4C Rectangle/Square). Formula params refitted via
+    differential evolution; fitted press sheets (431×696, 638×595) match Excard's actual hardware.
+    Median LOO improved 7.4% → 4.9%; 77% of quotes within 10%. `sticker_cp_recal.py` added.
+    Commit 2fce12d.
+  - **Remaining REFERENCE (6)** — all investigated, none upgradeable via CheckPrice:
+    - Bill-Book (24, 2.5%): CheckPrice API non-deterministic (same spec returns 405 then 514 RM);
+      keep formula engine.
+    - Computer Form (111, 4.0%): CheckPrice returns empty for this product type.
+    - Booklet Litho (19, 0.5%), Booklet Digital (37, 1.6%): CheckPrice returns empty.
+    - Loose Sheet Digital (50, 1.3%): CheckPrice returns empty.
+    - Label Sticker Letterpress (61, 10.5%): CheckPrice returns Price: 0.00 for all variants.
+  Git tip: 2fce12d (sticker recal), 023ada6 (magnet), 5563c6c (bizcard/kadkahwin EXACT)
 - **93 standalone products. 81 EXACT / 8 REFERENCE / 4 CONTACT (2026-07-05 scheduled run #11).**
   API accuracy upgrades (no new standalone products — those were done in prior runs):
   - **Business Card (1) API → EXACT** for Standard type: `bizcard_quote` now uses
@@ -19,14 +38,6 @@ _Raw link: https://raw.githubusercontent.com/liewyihhao/Printing-Pricing-Calcula
     `wireonb_plx_params.json`; FORMULATED was stale — corrected). API endpoint still uses old
     wireo_engine (9-axis plx key not yet wired to API — complex, deferred).
   - **Parity confirmed**: 44 families × 0 real gaps (parity_checker --print).
-  - **Remaining REFERENCE (8)**: Magnet (135, 1.0%), Computer Form (111, 4.0%),
-    Bill-Book (24, 2.5%), Label Sticker Digital (60, 6.3%), Label Sticker Letterpress (61, 10.5%),
-    Loose Sheet Digital (50, 1.3%), Booklet Litho (19, 0.5%), Booklet Digital (37, 1.6%).
-    Next action: build CheckPrice samplers for these — commit 142527e confirmed the
-    devv2 direct-call approach works for order-form products (no browser session needed once
-    the spec schema is known). Slugs to discover: `booklet-litho`, `booklet-digital`,
-    `bill-book`, `label-sticker-digital`, `label-sticker-letterpress`, `loose-sheet-digital`,
-    `magnet`, `computer-form`. Use `checkprice_enum` or a bespoke sampler per product.
   Git tip: (this run — see commit after HANDOFF update)
 - **93 standalone products. 80 EXACT / 9 REFERENCE / 4 CONTACT (2026-07-04 scheduled run #10).**
   Post-run-#9 EXACT upgrades (commits 5e56166, 35a9592, d56bbd9, 3fd5149 + this run):
