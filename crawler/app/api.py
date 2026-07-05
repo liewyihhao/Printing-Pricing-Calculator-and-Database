@@ -432,7 +432,7 @@ def printoka_products():
 # accuracy = MEASURED median % vs Excard (output/audit_report.json). Curve-based
 # products are exact at Excard's order quantities; this median is the held-out /
 # custom-quantity interpolation error.
-FORMULATED = {1: 0.0, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24: 2.5,
+FORMULATED = {1: 0.0, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 4.9, 61: 10.5, 24: 2.5,
               101: 1.7, 102: 1.7, 103: 1.7,  # aliases reuse loose-litho accuracy
               104: 5.2,  # notepad: exact at order qtys; 5.2 = held-out interp median
               105: 0.0,  # letterhead: EXACT v4 price-list lookup (paper x colour x packing Loose/Pad)
