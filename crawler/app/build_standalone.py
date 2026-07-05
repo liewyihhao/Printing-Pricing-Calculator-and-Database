@@ -417,7 +417,10 @@ def build_data():
          "optsrc": "none", "accuracy": acc.get(135), "fields": [
             {"key": "shape", "label": "Shape", "addon": True, "depends": [],
              "options": ["Rectangle/Square", "Round", "Custom Die-Cut (with round corner)", "Multiple Dieline"]},
-            {"key": "finishing", "label": "Finishing (Soft Touch ~+RM4)", "addon": True, "depends": [],
+            {"key": "size", "label": "Size (Rectangle / Custom Die-Cut)", "addon": True, "depends": [],
+             "options": ["50mm × 35mm", "70mm × 45mm", "90mm × 54mm", "90mm × 90mm",
+                         "100mm × 70mm", "120mm × 80mm", "148mm × 105mm"]},
+            {"key": "finishing", "label": "Finishing (price-neutral)", "addon": True, "depends": [],
              "options": ["Matte Laminate (Front)", "Gloss Laminate (Front)", "Soft Touch Laminate (Front)"]}]},
         {"id": 136, "name": "Hard Cover Menu — Digital", "engine": "simpleqty", "paramKey": "hardmenu",
          "optsrc": "none", "accuracy": acc.get(136), "fields": [

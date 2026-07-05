@@ -464,7 +464,7 @@ FORMULATED = {1: 0.0, 21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 7.4, 61: 10.5, 24:
               132: 3.3,  # button badge: qty curve LOO median 3.27%; lamination price-neutral
               133: 3.3,  # hand fan: per-paper qty curve LOO median 3.27%
               134: 2.5,  # hanger: per-(paper x colour) qty curve LOO median 2.49%
-              135: 1.0,  # magnet: per-shape qty curve LOO median 0.97%
+              135: 0.0,  # magnet: EXACT via CheckPrice (size × qty curves)
               136: 2.2,  # hard cover menu: per-(order x add-content) qty curve LOO median 2.2%
               137: 9.6,  # standing pouch (Metalised): qty curve LOO median 9.6% (non-smooth curve)
               138: 0.0,  # money packet: EXACT v4 price-list lookup (model x package x paper x finishing)
@@ -1894,32 +1894,47 @@ def hanger_quote(product: int = Query(134), qty: int = Query(...),
             "note": p.get("note", ""), "tiers": SQ.tiers(cash), "weight_kg": round(wt, 3)}
 
 
-# ---------- Magnet (Digital, id 135) — generic simpleqty engine, per shape ----------
+# ---------- Magnet (Digital, id 135) — EXACT via CheckPrice (size × qty) ----------
 @app.get("/api/printoka/magnet/options")
 def magnet_options(product: int = Query(135)):
-    return {}
+    import json as _json
+    from pathlib import Path as _Path
+    f = _Path(__file__).resolve().parent.parent / "output" / "magnet_cp_params.json"
+    p = _json.loads(f.read_text()) if f.exists() else {}
+    return {"rect_sizes": p.get("rect_sizes", [])}
 
 
 @app.get("/api/printoka/magnet/quote")
 def magnet_quote(product: int = Query(135), qty: int = Query(...),
                  shape: str = Query("Rectangle/Square"),
+                 size: str = Query("90mm × 54mm"),
                  finishing: str = Query("Matte Laminate (Front)")):
     from . import simpleqty_engine as SQ
-    p = _simpleqty_params("magnet")
-    # "Custom Die-Cut (with round corner)" is Excard's exact name for what we sampled as "Custom Die-Cut"
-    _SHAPE_ALIAS = {"Custom Die-Cut (with round corner)": "Custom Die-Cut"}
-    shape_key = _SHAPE_ALIAS.get(shape, shape)
+    import json as _json
+    from pathlib import Path as _Path
     if shape == "Multiple Dieline":
         return JSONResponse({"error": "Multiple Dieline magnets are not yet priced — contact us for a quote"}, status_code=400)
+    f = _Path(__file__).resolve().parent.parent / "output" / "magnet_cp_params.json"
+    if not f.exists():
+        return JSONResponse({"error": "magnet params not found"}, status_code=500)
+    p = _json.loads(f.read_text())
+    _RECT_SHAPES = {"Rectangle/Square", "Custom Die-Cut (with round corner)"}
     try:
-        cash = SQ.cash_price(p, shape_key, qty); wt = SQ.weight_kg(p, qty)
+        if shape in _RECT_SHAPES:
+            curve = p["rect_curves"].get(size)
+            if curve is None:
+                return JSONResponse({"error": f"Size '{size}' not available"}, status_code=400)
+        else:  # Round
+            curve = p["round_curve"]
+        cash = SQ._interp_ll(curve, qty)
+        wt = round(qty * p.get("weight_factor", 1.2065) * 0.012, 3)
     except Exception as e:  # noqa: BLE001
         return JSONResponse({"error": str(e)}, status_code=400)
     if cash <= 0:
         return JSONResponse({"error": "no price"}, status_code=400)
-    return {"config": {"product": product, "qty": qty, "shape": shape, "finishing": finishing},
-            "printoka_cash": round(cash, 2), "method": "formula (per-shape qty curve)",
-            "note": p.get("note", ""), "tiers": SQ.tiers(cash), "weight_kg": round(wt, 3)}
+    return {"config": {"product": product, "qty": qty, "shape": shape, "size": size, "finishing": finishing},
+            "printoka_cash": round(cash, 2), "method": "checkprice-exact",
+            "tiers": SQ.tiers(cash), "weight_kg": wt}
 
 
 # ---------- Hard Cover Menu (Digital, id 136) — generic simpleqty engine ----------
