@@ -74,7 +74,7 @@ def _fetch(model: str, size: str, colour: str, qty: str, retries: int = 3) -> fl
     return None
 
 
-def run(max_workers: int = 12) -> dict:
+def run(max_workers: int = 2) -> dict:  # CheckPrice not concurrency-safe: workers<=2
     configs = _load_options()
     # Load existing samples
     existing: dict[str, dict[str, dict[str, float]]] = {}

@@ -83,7 +83,7 @@ def _fetch(size: str, orientation: str, qty: int, retries: int = 3) -> float | N
     return None
 
 
-def run(max_workers: int = 12):
+def run(max_workers: int = 2):  # CheckPrice not concurrency-safe: workers<=2
     # Load existing samples for resume
     existing: dict[str, dict[str, float]] = {}
     if SAMPLES_FILE.exists():

@@ -29,7 +29,7 @@ async def _axes_and_cookie():
         await b.close()
         return combos, cookie
 
-def run(max_workers=24):
+def run(max_workers=2):  # CheckPrice not concurrency-safe: workers<=2
     combos, cookie = asyncio.run(_axes_and_cookie())
     print(f"kad-kahwin: {len(combos)} Size×Paper×Colour combos", file=sys.stderr)
     tasks=[]

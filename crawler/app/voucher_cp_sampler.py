@@ -153,7 +153,7 @@ def _build_tasks() -> list[tuple]:
     return tasks
 
 
-def run(max_workers: int = 30) -> dict:
+def run(max_workers: int = 2) -> dict:  # CheckPrice not concurrency-safe: workers<=2
     # Ensure session cookie is available
     cookie = _get_session_cookie()
     if not cookie:

@@ -30,7 +30,7 @@ def spec_for(size,paper,colour,lam,pkg,qty):
             "HotStamping":"","HotStampingColour":"","HotStampingBlock":"","RoundCorner":"","HolePunch":"",
             "Embossing":"","Folding":"","FoldCode":"","Country":"99","Courier":"DEFAULT","CountryZone":"West Malaysia"}
 
-def run(max_workers=30):
+def run(max_workers=2):  # CheckPrice not concurrency-safe: workers<=2 (see memory)
     cookie=V._get_session_cookie()
     tasks=[]
     for size in SIZES:

@@ -70,7 +70,7 @@ def _fetch(cat, api_size, qty, cookie, retries=3):
     return None
 
 
-def run(max_workers: int = 25) -> dict:
+def run(max_workers: int = 2) -> dict:  # CheckPrice not concurrency-safe: workers<=2
     cookie = _get_session_cookie()
     if not cookie:
         raise SystemExit("Failed to get session cookie")

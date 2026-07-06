@@ -19,29 +19,10 @@ SLUGS = sys.argv[1:] if len(sys.argv) > 1 else ["mask-keeper"]
 
 
 async def v4_login(page):
-    await page.goto("https://v4.excard.com.my/", wait_until="networkidle")
-    await asyncio.sleep(3)
-    for sel in ["text=/^LOGIN$/", "text=/^Login$/", "a:has-text('LOGIN')", "button:has-text('LOGIN')"]:
-        loc = page.locator(sel).first
-        if await loc.count():
-            try: await loc.click(timeout=4000); break
-            except Exception: pass
-    await asyncio.sleep(2)
-    try:
-        await page.fill("input[name$='txtusername']", config.USERNAME, timeout=6000)
-        await page.fill("input[name$='txtpassword']", config.PASSWORD, timeout=6000)
-        try:
-            async with page.expect_navigation(wait_until="domcontentloaded", timeout=15000):
-                await page.press("input[name$='txtpassword']", "Enter")
-        except Exception:
-            pass
-        try: await page.wait_for_load_state("networkidle", timeout=15000)
-        except Exception: pass
-    except Exception as e:
-        print("login fill err", str(e)[:80])
-    has_login = await page.evaluate(r"()=>/\bLOGIN\b/.test(document.body.innerText)")
-    print("after login url:", page.url, "| still shows LOGIN:", has_login)
-    return not has_login
+    from app.readymade_enum import login_v4
+    ok = await login_v4(page)
+    print("after login url:", page.url, "| ok:", ok)
+    return ok
 
 
 async def read_table(page):

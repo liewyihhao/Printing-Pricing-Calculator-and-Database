@@ -152,7 +152,9 @@ def _rebuild_key(rawkey, cols, axes, qty_col, price_axes):
     return tuple(parts[i] for i in keep_idx)
 
 
-def enumerate_product(slug: str, max_workers: int = 24, price_axes=None):
+def enumerate_product(slug: str, max_workers: int = 2, price_axes=None):
+    # CheckPrice is NOT concurrency-safe (server keeps one order-session per account cookie);
+    # >=4 concurrent calls corrupt prices ~0.787x. See memory checkprice-concurrency-corruption.
     spec_tmpl, type_str, cols, axes, qty_col, agg, cookie = asyncio.run(_capture(slug, price_axes))
     dist = agg["dist"]
     def distinct(c): return dist.get(c, [])

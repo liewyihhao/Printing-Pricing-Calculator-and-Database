@@ -72,7 +72,7 @@ def _fetch(model: str, paper: str, lam: str, qty: int, retries: int = 3) -> floa
     return None
 
 
-def run(max_workers: int = 8):
+def run(max_workers: int = 2):  # CheckPrice not concurrency-safe: workers<=2
     existing: dict = {}
     if SAMPLES_FILE.exists():
         existing = json.loads(SAMPLES_FILE.read_text())
