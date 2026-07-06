@@ -958,6 +958,7 @@ _PRICELIST_FROM_OPTIONS = {
     115: ("kad-terima-kasih", "kadterima_plx"), 114: ("kad-kahwin", "kadkahwin_plx"),
     112: ("hard-cover-wire-o-notebook", "wireonb_plx"), 1: ("business-card", "bizcard_plx"),
     24: ("bill-book", "billbook_plx"),  # NCR bill book — exact via workers<=2 CheckPrice sample
+    135: ("magnet", "magnet_plx"),  # Digital magnet — exact CheckPrice (Custom Die-Cut=Rect; Round size-neutral)
     # REFERENCE→EXACT batch 2 (price-list DataTable captures)
     104: ("notepad", "notepad_plx"), 123: ("banner", "banner_plx"),
     127: ("paper-bag", "paperbag_plx"),
