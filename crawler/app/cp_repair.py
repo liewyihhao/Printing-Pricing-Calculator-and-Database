@@ -27,8 +27,18 @@ def _bizcard_spec(parts, qty):
             "CountryZone": "West Malaysia"}
 
 
+def _kadkahwin_spec(parts, qty):
+    from app import kadkahwin_sampler as KK
+    size, paper, colour = parts
+    return {"Product": "Kad Kahwin", "Size": KK._size(size), "Paper": KK._paper(paper), "OrderDesc": "Standard",
+            "PrintColour": colour, "Quantity": str(qty), "Lamination": "", "FoldCode": "", "HotStamping": "",
+            "HotStampingSize1": "N/A", "HotStampingSize2": "N/A", "Envelope": "", "Country": "99",
+            "Courier": "DEFAULT", "CountryZone": "West Malaysia"}
+
+
 REG = {
     "business-card": {"type": "Business Card", "spec": _bizcard_spec},
+    "kad-kahwin": {"type": "Kad Kahwin", "spec": _kadkahwin_spec},
 }
 
 
