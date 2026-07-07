@@ -77,27 +77,38 @@ _Generated 2026-07-04. 93 products._
 - [x] `102` Flyer (= Loose Sheet Litho)
 - [x] `103` Customprint (= Loose Sheet Litho)
 
-## 🟡 REFERENCE — calibrated formula, need exact data (14)
-_These use fitted formulas whose accuracy varies by config (some >5% off). Getting them exact needs crawling each (like the 159k-row Loose Sheet crawl) or driving their per-config /Product/CheckPrice; voucher (123k) & kad-kahwin (389k) combos are impractically large._
-- [ ] `1` Business Card
-- [ ] `131` Pillow — Litho
-- [ ] `135` Magnet — Digital
-- [ ] `115` Kad Terima Kasih — Digital
-- [ ] `114` Kad Kahwin — Digital
-- [ ] `112` Wire-O Notebook — Litho
-- [ ] `111` Computer Form — Litho (NCR)
-- [ ] `110` Voucher — Litho
-- [ ] `24` Bill-Book — Litho (NCR Carbonless)
-- [ ] `60` Label Sticker — Digital
-- [ ] `61` Label Sticker — Letterpress (Hot Stamping)
-- [ ] `50` Loose Sheet — Digital
-- [ ] `19` Booklet — Litho (Offset)
-- [ ] `37` Booklet — Digital
+## ✅ EXACT — completed this session (2026-07-06/07)
+- [x] `24` Bill-Book — Litho (NCR) — EXACT via CheckPrice (2662 curves, workers=2 + repair)
+- [x] `135` Magnet — Digital — EXACT via CheckPrice (Shape×Size; Custom Die-Cut=Rect, Round size-neutral)
+- [x] `1`  Business Card — **corrected**: was ~58% underpriced (workers=30 corruption); re-sampled clean
+- [x] `114` Kad Kahwin — **corrected**: re-sampled workers=1 + repair
+- [x] `115` Kad Terima Kasih — **corrected**: re-enumerated workers=2, merged max-of-two-passes
 
-## 🔴 CONTACT — legacy www order_spec, no online price (6)
-- [ ] `142` Mask Keeper — Litho
-- [ ] `170` ID Card — Digital
-- [ ] `171` X-ccessories — Litho
-- [ ] `172` DTF Shirt — Digital
-- [ ] `173` Silkscreen Shirt — Digital
-- [ ] `184` Roll Form Sticker — Litho
+> ⚠️ **CheckPrice concurrency bug (fixed):** devv2 /Product/CheckPrice keeps ONE order-session
+> per account cookie, so concurrent calls underprice (~0.787×). All samplers lowered to
+> workers≤2 + Theil-Sen repair. banner/paper-bag (pricelist-DataTable), the readymade
+> shirts/cap (UI-driven), and wire-o-notebook (local price column) were verified NOT affected.
+
+## 🟡 REFERENCE — calibrated formula (<5% for most); cent-exact currently BLOCKED
+_v4 `/ordering` + `/price-list` pages return HTTP 500 (booklet, loose-sheet, magnet-pricelist)
+or a JS error (computer-form); the legacy www `/spec` forms price server-side (no CheckPrice),
+so the fast API is unavailable and a full exact www crawl is impractical (tens of thousands of
+~1.5s ASP.NET postbacks). Direct-API `type`/spec could not be reverse-engineered blind. These
+keep their calibrated formulas at the accuracy shown._
+- [ ] `19` Booklet — Litho (Offset)  · formula ~0.5%
+- [ ] `37` Booklet — Digital          · formula ~1.6%
+- [ ] `50` Loose Sheet — Digital      · formula ~1.3%
+- [ ] `111` Computer Form — Litho (NCR) · formula ~4.0%
+- [ ] `131` Pillow — Litho             · formula (acc≈0)
+
+## 🟡 FORMULA — continuous label size (imposition); cent-exact impractical by design
+_Priced by arbitrary label W×H → imposition formula. Recalibrated on clean workers=2 CheckPrice
+data; fit caps at the model's error (not the data's)._
+- [ ] `60` Label Sticker — Digital     · imposition formula ~6% (median 4.2%)
+- [ ] `61` Label Sticker — Letterpress · imposition formula ~10%
+
+## 🔴 CONTACT — no online auto price
+- [ ] `142` Mask Keeper — Litho        · no v4 price engine
+- [ ] `170` ID Card — Digital          · needs a VDP template chosen to price
+- [ ] `171` X-ccessories — Litho       · bulk multi-item builder (non-enumerable)
+- [ ] `184` Roll Form Sticker — Litho  · v4 page works (type='Roll Form Sticker') but continuous size → would need a new imposition engine
