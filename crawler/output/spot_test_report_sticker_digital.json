@@ -1,9 +1,9 @@
 {
  "product": "label_sticker_digital",
  "sample_points": 1728,
- "median": 4.91,
- "within_5pct": 51,
- "within_10pct": 77,
- "mape": 8.08,
+ "median": 4.24,
+ "within_5pct": 52,
+ "within_10pct": 73,
+ "mape": 9.73,
  "method": "imposition formula (sticker)"
 }
