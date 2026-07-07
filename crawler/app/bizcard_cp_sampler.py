@@ -30,8 +30,17 @@ def spec_for(size,paper,colour,lam,pkg,qty):
             "HotStamping":"","HotStampingColour":"","HotStampingBlock":"","RoundCorner":"","HolePunch":"",
             "Embossing":"","Folding":"","FoldCode":"","Country":"99","Courier":"DEFAULT","CountryZone":"West Malaysia"}
 
+CKPT = OUT / "bizcard_cp_samples.json"
+
+
 def run(max_workers=2):  # CheckPrice not concurrency-safe: workers<=2 (see memory)
     cookie=V._get_session_cookie()
+    curves={}
+    if CKPT.exists():
+        try:
+            curves=json.loads(CKPT.read_text(encoding="utf-8"))
+            print(f"resumed {sum(len(v) for v in curves.values())} pts", file=sys.stderr)
+        except Exception: pass
     tasks=[]
     for size in SIZES:
       for paper in PAPERS:
@@ -40,9 +49,10 @@ def run(max_workers=2):  # CheckPrice not concurrency-safe: workers<=2 (see memo
             for pkg in PKGS:
               key=f"{_size(size)}|{_paper(paper)}|{colour}|{_lam(lam)}|{_pkg(pkg)}"
               for q in QTYS:
-                tasks.append((key,q,spec_for(size,paper,colour,lam,pkg,q)))
-    print(f"business-card: {len(tasks)} CheckPrice calls", file=sys.stderr)
-    curves={}; done=fail=0
+                if q not in curves.get(key,{}):
+                    tasks.append((key,q,spec_for(size,paper,colour,lam,pkg,q)))
+    print(f"business-card: {len(tasks)} CheckPrice calls pending", file=sys.stderr)
+    done=fail=0
     with ThreadPoolExecutor(max_workers=max_workers) as ex:
         futs={ex.submit(C._fetch,"Business Card",s,cookie):(k,q) for k,q,s in tasks}
         for fu in as_completed(futs):
@@ -50,7 +60,10 @@ def run(max_workers=2):  # CheckPrice not concurrency-safe: workers<=2 (see memo
             if p: curves.setdefault(k,{})[q]=p
             else: fail+=1
             done+=1
-            if done%2000==0: print(f"  {done}/{len(tasks)} ({fail} none)", file=sys.stderr)
+            if done%2000==0:
+                CKPT.write_text(json.dumps(curves))
+                print(f"  {done}/{len(tasks)} ({fail} none)", file=sys.stderr)
+    CKPT.write_text(json.dumps(curves))
     curves={k:v for k,v in curves.items() if v}
     axes=["Size","Paper","Print Colour","Lamination","Package"]
     dist={a:list(dict.fromkeys(k.split("|")[i] for k in curves)) for i,a in enumerate(axes)}
