@@ -1,0 +1,1406 @@
+{
+ "slug": "non-woven-bag",
+ "url": "https://v4.excard.com.my/ordering/non-woven-bag",
+ "error": null,
+ "controls": [
+  {
+   "section": "(top)",
+   "type": "select",
+   "label": "",
+   "name": "",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "review-filter",
+   "name": "review-filter",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "Relevance",
+    "Newest",
+    "Oldest",
+    "Highest Rate"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "WN-B5",
+   "name": "rblModel",
+   "visible": false,
+   "options": [
+    "WN-B5",
+    "WS-A4",
+    "WS-A3P",
+    "WS-A3L",
+    "WH-A4"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "200mm x 230mm x 80mm",
+   "name": "rblSize",
+   "visible": false,
+   "options": [
+    "200mm x 230mm x 80mm"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlSize",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "txtCustomSizeInSizeH",
+   "name": "txtCustomSizeInSizeH",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "txtCustomSizeInSizeW",
+   "name": "txtCustomSizeInSizeW",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "txtCustomSizeW",
+   "name": "txtCustomSizeW",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "txtCustomSizeH",
+   "name": "txtCustomSizeH",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlPackage",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlPaper",
+   "visible": false,
+   "n": 1,
+   "options": [
+    "Non Woven 100gsm"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlBinding",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlBagColour",
+   "visible": true,
+   "n": 7,
+   "options": [
+    "- Please Select -",
+    "Black",
+    "White",
+    "Yellow",
+    "Red",
+    "Green",
+    "Royal Blue"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlPaperContent",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlHandleColour",
+   "visible": false,
+   "n": 1,
+   "options": [
+    "Same as bag colour"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "300mm",
+   "name": "rblHandleLength",
+   "visible": false,
+   "options": [
+    "300mm"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlPillowCase",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlPrintColour",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "1C (Front)",
+    "1C (Both)"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "spotcolour_front_k100",
+   "name": "spotcolour_front_k100",
+   "visible": false,
+   "options": [
+    "Black (K100)",
+    "White (CMYK=0)",
+    "Cool Gray 7 C",
+    "Cool Gray 8 C",
+    "Cool Gray 10 C",
+    "Cool Gray 11 C",
+    "4655 C",
+    "7589 C",
+    "7533 C",
+    "7518 C",
+    "498 C",
+    "2111 C",
+    "2380 C",
+    "648 C",
+    "2141 C",
+    "629 C",
+    "2382 C",
+    "2145 C",
+    "326 C",
+    "360 C",
+    "361 C",
+    "2291 C",
+    "7741 C",
+    "7732 C",
+    "7735 C",
+    "YELLOW C",
+    "YELLOW 012 C",
+    "137 C",
+    "1645 C",
+    "185 C",
+    "1795 C",
+    "1797 C",
+    "230 C",
+    "231 C",
+    "232 C",
+    "7647 C",
+    "2046 C",
+    "2072 C",
+    "2665 C",
+    "N/A"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlFrontK100",
+   "name": "ddlFrontK100",
+   "visible": false,
+   "n": 40,
+   "options": [
+    "- Please Select -",
+    "Black (K100)",
+    "White (CMYK=0)",
+    "Cool Gray 7 C",
+    "Cool Gray 8 C",
+    "Cool Gray 10 C",
+    "Cool Gray 11 C",
+    "4655 C",
+    "7589 C",
+    "7533 C",
+    "7518 C",
+    "498 C",
+    "2111 C",
+    "2380 C",
+    "648 C",
+    "2141 C",
+    "629 C",
+    "2382 C",
+    "2145 C",
+    "326 C",
+    "360 C",
+    "361 C",
+    "2291 C",
+    "7741 C",
+    "7732 C",
+    "7735 C",
+    "YELLOW C",
+    "YELLOW 012 C",
+    "137 C",
+    "1645 C",
+    "185 C",
+    "1795 C",
+    "1797 C",
+    "230 C",
+    "231 C",
+    "232 C",
+    "7647 C",
+    "2046 C",
+    "2072 C",
+    "2665 C"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlBackK100",
+   "name": "ddlBackK100",
+   "visible": false,
+   "n": 2,
+   "options": [
+    "- Please Select -",
+    "N/A"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlFrontM100",
+   "name": "ddlFrontM100",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlBackM100",
+   "name": "ddlBackM100",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlTopEyelet",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlBottomEyelet",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlLamination",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlFinishing",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "Ultrasonic",
+   "name": "rblCompulsory",
+   "visible": false,
+   "options": [
+    "Ultrasonic"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlHS",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlQuantity",
+   "visible": true,
+   "n": 30,
+   "options": [
+    "- Please Select -",
+    "100",
+    "200",
+    "300",
+    "400",
+    "500",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1000",
+    "2000",
+    "3000",
+    "4000",
+    "5000",
+    "6000",
+    "7000",
+    "8000",
+    "9000",
+    "10000",
+    "11000",
+    "12000",
+    "13000",
+    "14000",
+    "15000",
+    "16000",
+    "17000",
+    "18000",
+    "19000",
+    "20000"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtCustomQuantity",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlQuantityVoucher",
+   "name": "ddlQuantityVoucher",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlSheetQuantity",
+   "name": "ddlSheetQuantity",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "txtCustomQuantityVoucher",
+   "name": "txtCustomQuantityVoucher",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlNumbering",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "txtNumberFr",
+   "name": "txtNumberFr",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "txtNumberTo",
+   "name": "txtNumberTo",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlRopeColour",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlFirstPanelNumbering",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlPerforationLine",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlHeaderPaper",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlHeaderSize",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlCoverPaper",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlCoverLamination",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlCoverHotStampingColour",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlCoverVDPType",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlCoverVDP",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlDeBoss",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlDeBossSizeH",
+   "name": "ddlDeBossSizeH",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlDeBossSizeW",
+   "name": "ddlDeBossSizeW",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlUVDTF",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlUVDTFSize",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlFrontCoverHSSize1",
+   "name": "ddlFrontCoverHSSize1",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlFrontCoverHSColour1",
+   "name": "ddlFrontCoverHSColour1",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlFrontCoverHSSize2",
+   "name": "ddlFrontCoverHSSize2",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlFrontCoverHSColour2",
+   "name": "ddlFrontCoverHSColour2",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlBackCoverHSSize1",
+   "name": "ddlBackCoverHSSize1",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlBackCoverHSColour1",
+   "name": "ddlBackCoverHSColour1",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlBackCoverHSSize2",
+   "name": "ddlBackCoverHSSize2",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlBackCoverHSColour2",
+   "name": "ddlBackCoverHSColour2",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPPrintSide1",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPType1",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFont1",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPStyle1",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPSize1",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFontAlignment1",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPC1",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPM1",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPY1",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPK1",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPPrintSide2",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPType2",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFont2",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPStyle2",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPSize2",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFontAlignment2",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPC2",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPM2",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPY2",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPK2",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPPrintSide3",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPType3",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFont3",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPStyle3",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPSize3",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFontAlignment3",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPC3",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPM3",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPY3",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPK3",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPPrintSide4",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPType4",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFont4",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPStyle4",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPSize4",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFontAlignment4",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPC4",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPM4",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPY4",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPK4",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPPrintSide5",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPType5",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFont5",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPStyle5",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPSize5",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFontAlignment5",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPC5",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPM5",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPY5",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPK5",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPPrintSide6",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPType6",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFont6",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPStyle6",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPSize6",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlVDPFontAlignment6",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPC6",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPM6",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPY6",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtVDPK6",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlFrontContentPaper",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlInnerContentPaper",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlContentPaper",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlContentPage",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlContentPrintColour",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlCustomDesignContent",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlCustomDesignPaper1To4",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlCustomDesignPaper5To8",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlCustomDesignPaper9To12",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlCustomDesignPrintColour",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlStandLamination",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlEnvelope",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "checkbox",
+   "label": "Yes, contains of ayat suci Al-Quran content.",
+   "name": "chkIsAlQuran",
+   "visible": false
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlQuantityLast",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "txtCustomQuantityLast",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "Rush Order Terms & Conditions apply",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "West Malaysia",
+   "name": "rblOrderCountryCode",
+   "visible": true,
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Others Countries",
+   "name": "rblOtherOrderCountryCode",
+   "visible": false,
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "select",
+   "label": "Others Countries",
+   "name": "ddlOtherCountryCode",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Appointed Courier (Fee applies)",
+   "name": "rblCourier",
+   "visible": true,
+   "options": [
+    "Appointed Courier (Fee applies)",
+    "Skynet (Fee applies)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "input",
+   "label": "txtFavouriteName",
+   "name": "txtFavouriteName",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "ABOUT EXCARD",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "WHAT WE DO",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "SUPPORT",
+   "name": "",
+   "visible": false
+  }
+ ]
+}

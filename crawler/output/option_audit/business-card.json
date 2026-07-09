@@ -1,0 +1,499 @@
+{
+ "slug": "business-card",
+ "url": "https://v4.excard.com.my/ordering/business-card",
+ "error": null,
+ "controls": [
+  {
+   "section": "(top)",
+   "type": "select",
+   "label": "",
+   "name": "",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "review-filter",
+   "name": "review-filter",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "Relevance",
+    "Newest",
+    "Oldest",
+    "Highest Rate"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "Category *",
+   "name": "cardType",
+   "visible": true,
+   "options": [
+    "standard",
+    "thin_fold",
+    "fat_fold",
+    "custom_die_cut",
+    "plastic_card"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "Size *",
+   "name": "cardSize",
+   "visible": true,
+   "n": 6,
+   "options": [
+    "-- Select Size --",
+    "54mm \u00d7 89mm",
+    "52mm \u00d7 86mm",
+    "50mm \u00d7 89mm",
+    "54mm \u00d7 86mm",
+    "Other (Custom Size)"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "customHeight",
+   "name": "customHeight",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "customWidth",
+   "name": "customWidth",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "customHeightThin",
+   "name": "customHeightThin",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "customWidthThin",
+   "name": "customWidthThin",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "customHeightFat",
+   "name": "customHeightFat",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "customWidthFat",
+   "name": "customWidthFat",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "Creasing *",
+   "name": "creasing",
+   "visible": false,
+   "options": [
+    "standard_creasing",
+    "customised_creasing"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "creasingWidth",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "creasingWidthPreview_remaining",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "",
+   "name": "creasingWidthPreview_total",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "Orientation *",
+   "name": "orientation",
+   "visible": true,
+   "options": [
+    "landscape",
+    "portrait"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "Paper *",
+   "name": "paperType",
+   "visible": true,
+   "n": 10,
+   "options": [
+    "-- Select Paper --",
+    "Gloss Art Card 250gsm (2 side coated)",
+    "Gloss Art Card 310gsm (2 side coated)",
+    "Gloss Art Card 360gsm (2 side coated)",
+    "Matte Art Card 250gsm",
+    "Linen 240gsm",
+    "Metal Ice 250gsm",
+    "Synthetic Paper 180micron (0.18mm)",
+    "Super White 250gsm",
+    "Suwen 240gsm"
+   ]
+  },
+  {
+   "section": "Print Colour * 4C (Both) 4C (Front)",
+   "type": "select",
+   "label": "Print Colour *",
+   "name": "printColour",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "4C (Both)",
+    "4C (Front)"
+   ]
+  },
+  {
+   "section": "Print Colour * 4C (Both) 4C (Front)",
+   "type": "select",
+   "label": "Paper Lamination *",
+   "name": "cardLamination",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "-- Select Paper Lamination --",
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Both)",
+    "Gloss Water Based Varnish (Both)(Free)"
+   ]
+  },
+  {
+   "section": "Print Colour * 4C (Both) 4C (Front)",
+   "type": "select",
+   "label": "Silkscreen Spot UV *",
+   "name": "silkscreenSpotUV",
+   "visible": true,
+   "n": 1,
+   "options": [
+    "No Required"
+   ]
+  },
+  {
+   "section": "Print Colour * 4C (Both) 4C (Front)",
+   "type": "select",
+   "label": "Quantity *",
+   "name": "quantity",
+   "visible": true,
+   "n": 21,
+   "options": [
+    "-- Select Quantity --",
+    "50",
+    "100",
+    "200",
+    "300 \u2014 Best Seller",
+    "400",
+    "500 \u2014 Best Seller",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1,000 \u2014 Best Seller",
+    "2,000",
+    "3,000",
+    "4,000",
+    "5,000",
+    "6,000",
+    "7,000",
+    "8,000",
+    "9,000",
+    "10,000"
+   ]
+  },
+  {
+   "section": "Print Colour * 4C (Both) 4C (Front)",
+   "type": "select",
+   "label": "Package *",
+   "name": "package",
+   "visible": true,
+   "n": 10,
+   "options": [
+    "Normal (1 Design)",
+    "2 In 1 (2 Designs)",
+    "3 In 1 (3 Designs)",
+    "4 In 1 (4 Designs)",
+    "5 In 1 (5 Designs)",
+    "6 In 1 (6 Designs)",
+    "7 In 1 (7 Designs)",
+    "8 In 1 (8 Designs)",
+    "9 In 1 (9 Designs)",
+    "10 In 1 (10 Designs)"
+   ]
+  },
+  {
+   "section": "Optional Finishing",
+   "type": "select",
+   "label": "Hot Stamping",
+   "name": "hotStampingEnable",
+   "visible": true,
+   "n": 5,
+   "options": [
+    "No Hot Stamping",
+    "1C (Front)",
+    "1C (Back)",
+    "2C (Front)",
+    "2C (Back)"
+   ]
+  },
+  {
+   "section": "Optional Finishing",
+   "type": "radio",
+   "label": "Gold",
+   "name": "hotStampingFrontColour1",
+   "visible": false,
+   "options": [
+    "Gold",
+    "Silver",
+    "Green",
+    "Blue",
+    "Black",
+    "Red"
+   ]
+  },
+  {
+   "section": "Optional Finishing",
+   "type": "radio",
+   "label": "Gold",
+   "name": "hotStampingFrontColour2",
+   "visible": false,
+   "options": [
+    "Gold",
+    "Silver",
+    "Green",
+    "Blue",
+    "Black",
+    "Red"
+   ]
+  },
+  {
+   "section": "Optional Finishing",
+   "type": "radio",
+   "label": "Gold",
+   "name": "hotStampingBackColour1",
+   "visible": false,
+   "options": [
+    "Gold",
+    "Silver",
+    "Green",
+    "Blue",
+    "Black",
+    "Red"
+   ]
+  },
+  {
+   "section": "Optional Finishing",
+   "type": "radio",
+   "label": "Gold",
+   "name": "hotStampingBackColour2",
+   "visible": false,
+   "options": [
+    "Gold",
+    "Silver",
+    "Green",
+    "Blue",
+    "Black",
+    "Red"
+   ]
+  },
+  {
+   "section": "Optional Finishing",
+   "type": "radio",
+   "label": "Hot Stamping Block",
+   "name": "hotStampingBlock",
+   "visible": false,
+   "options": [
+    "none",
+    "same_block"
+   ]
+  },
+  {
+   "section": "Optional Finishing",
+   "type": "radio",
+   "label": "Round Corner",
+   "name": "roundCornerEnable",
+   "visible": true,
+   "options": [
+    "no",
+    "required"
+   ]
+  },
+  {
+   "section": "Optional Finishing",
+   "type": "radio",
+   "label": "Hole Punching",
+   "name": "holePunching",
+   "visible": true,
+   "options": [
+    "no",
+    "3mm",
+    "5mm"
+   ]
+  },
+  {
+   "section": "Optional Finishing",
+   "type": "select",
+   "label": "Embossing",
+   "name": "embossing",
+   "visible": false,
+   "n": 3,
+   "options": [
+    "Not Required",
+    "Embossing Front",
+    "Embossing Back"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "Rush Order Terms & Conditions apply",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "West Malaysia",
+   "name": "rblOrderCountryCode",
+   "visible": true,
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Others Countries",
+   "name": "rblOtherOrderCountryCode",
+   "visible": true,
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "select",
+   "label": "Others Countries",
+   "name": "ddlOtherCountryCode",
+   "visible": true,
+   "n": 32,
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Appointed Courier (Fee applies)",
+   "name": "rblCourier",
+   "visible": true,
+   "options": [
+    "Appointed Courier (Fee applies)",
+    "Skynet (Fee applies)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "input",
+   "label": "txtFavouriteName",
+   "name": "txtFavouriteName",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "ABOUT EXCARD",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "WHAT WE DO",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "SUPPORT",
+   "name": "",
+   "visible": false
+  }
+ ]
+}

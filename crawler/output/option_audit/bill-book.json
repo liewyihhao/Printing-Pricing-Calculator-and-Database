@@ -1,0 +1,602 @@
+{
+ "slug": "bill-book",
+ "url": "https://v4.excard.com.my/ordering/bill-book",
+ "error": null,
+ "controls": [
+  {
+   "section": "(top)",
+   "type": "select",
+   "label": "",
+   "name": "",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "review-filter",
+   "name": "review-filter",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "Relevance",
+    "Newest",
+    "Oldest",
+    "Highest Rate"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "Size *",
+   "name": "billbookSize",
+   "visible": true,
+   "n": 39,
+   "options": [
+    "-- Select Size --",
+    "145mm \u00d7 210mm",
+    "(A4) 210mm \u00d7 297mm",
+    "(B5) 176mm \u00d7 250mm",
+    "(B4) 250mm \u00d7 353mm",
+    "90mm \u00d7 140mm",
+    "90mm \u00d7 177mm",
+    "95mm \u00d7 210mm",
+    "95mm \u00d7 225mm",
+    "105mm \u00d7 145mm",
+    "105mm \u00d7 175mm",
+    "107mm \u00d7 190mm",
+    "110mm \u00d7 210mm",
+    "120mm \u00d7 210mm",
+    "120mm \u00d7 230mm",
+    "125mm \u00d7 175mm",
+    "135mm \u00d7 210mm",
+    "145mm \u00d7 148mm",
+    "145mm \u00d7 190mm",
+    "148mm \u00d7 190mm",
+    "148mm \u00d7 291mm",
+    "160mm \u00d7 240mm",
+    "165mm \u00d7 210mm",
+    "170mm \u00d7 190mm",
+    "173mm \u00d7 206mm",
+    "180mm \u00d7 280mm",
+    "190mm \u00d7 210mm",
+    "190mm \u00d7 270mm",
+    "190mm \u00d7 290mm",
+    "190mm \u00d7 297mm",
+    "192mm \u00d7 268mm",
+    "194mm \u00d7 205mm",
+    "206mm \u00d7 240mm",
+    "206mm \u00d7 330mm",
+    "210mm \u00d7 270mm",
+    "210mm \u00d7 291mm",
+    "291mm \u00d7 420mm",
+    "(F3) 330mm \u00d7 420mm",
+    "Other (Custom Size)"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "customBillbookHeight",
+   "name": "customBillbookHeight",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "customBillbookWidth",
+   "name": "customBillbookWidth",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "Binding Type * Book Pad",
+   "type": "radio",
+   "label": "Binding Type *",
+   "name": "bindingType",
+   "visible": true,
+   "options": [
+    "book",
+    "pad"
+   ]
+  },
+  {
+   "section": "Binding Type * Book Pad",
+   "type": "radio",
+   "label": "Orientation *",
+   "name": "orientation",
+   "visible": true,
+   "options": [
+    "landscape",
+    "portrait"
+   ]
+  },
+  {
+   "section": "Binding Type * Book Pad",
+   "type": "radio",
+   "label": "Binding Location *",
+   "name": "bindingLocation",
+   "visible": true,
+   "options": [
+    "left",
+    "top"
+   ]
+  },
+  {
+   "section": "Layers Configuration",
+   "type": "radio",
+   "label": "Paper Materials *",
+   "name": "paperMaterials",
+   "visible": true,
+   "options": [
+    "ncr",
+    "normal"
+   ]
+  },
+  {
+   "section": "Layers Configuration",
+   "type": "select",
+   "label": "Paper Material + Layers *",
+   "name": "layers",
+   "visible": true,
+   "n": 6,
+   "options": [
+    "-- Select Paper Material + Layers --",
+    "NCR - 2 Layers",
+    "NCR - 3 Layers",
+    "NCR - 4 Layers",
+    "NCR - 5 Layers",
+    "NCR - 6 Layers"
+   ]
+  },
+  {
+   "section": "Layers Configuration",
+   "type": "radio",
+   "label": "Last Layer Perforation *",
+   "name": "isLastLayerPerforation",
+   "visible": true,
+   "options": [
+    "no",
+    "yes"
+   ]
+  },
+  {
+   "section": "Layers Configuration",
+   "type": "radio",
+   "label": "Different Artwork per Layer *",
+   "name": "isDifferentArtwork",
+   "visible": false,
+   "options": [
+    "no",
+    "yes"
+   ]
+  },
+  {
+   "section": "Layers Configuration",
+   "type": "radio",
+   "label": "Font Size",
+   "name": "isCopyChange",
+   "visible": false,
+   "options": [
+    "no",
+    "yes"
+   ]
+  },
+  {
+   "section": "Layers Configuration",
+   "type": "radio",
+   "label": "Font Size",
+   "name": "copyChangeFontSize",
+   "visible": false,
+   "options": [
+    "8",
+    "10",
+    "12"
+   ]
+  },
+  {
+   "section": "Layers Configuration",
+   "type": "select",
+   "label": "paperLayer1",
+   "name": "paperLayer1",
+   "visible": true,
+   "n": 6,
+   "options": [
+    "- Please Select -",
+    "NCR White 50gsm",
+    "NCR Green 50gsm",
+    "NCR Blue 50gsm",
+    "NCR Yellow 50gsm",
+    "NCR Pink 50gsm"
+   ]
+  },
+  {
+   "section": "Layers Configuration",
+   "type": "input",
+   "label": "copyChangeText1",
+   "name": "copyChangeText1",
+   "visible": false,
+   "placeholder": "e.g. Layer 1 copy"
+  },
+  {
+   "section": "Print Color",
+   "type": "select",
+   "label": "Print Colour *",
+   "name": "printColour",
+   "visible": true,
+   "n": 7,
+   "options": [
+    "-- Select Print Colour --",
+    "1C (Front)",
+    "2C (Front)",
+    "4C (Front)",
+    "1C (Both)",
+    "2C (Front) / 1C (Back)",
+    "4C (Front) / 1C (Back)"
+   ]
+  },
+  {
+   "section": "Print Color",
+   "type": "radio",
+   "label": "No Colour",
+   "name": "printColourFront1",
+   "visible": false,
+   "options": [
+    "No Colour",
+    "EX BLK 01",
+    "EX BLU 01",
+    "EX BLU 02",
+    "EX BLU 03",
+    "EX BLU 04",
+    "EX BRW 01",
+    "EX CYN 01",
+    "EX GRN 04",
+    "EX GRN 05",
+    "EX MAG 01",
+    "EX MAR 01",
+    "EX ORG 01",
+    "EX RED 01",
+    "EX RED 03",
+    "EX VIO 01"
+   ]
+  },
+  {
+   "section": "Print Color",
+   "type": "radio",
+   "label": "No Colour",
+   "name": "printColourFront2",
+   "visible": false,
+   "options": [
+    "No Colour",
+    "EX BLU 01",
+    "EX BLU 02",
+    "EX BLU 03",
+    "EX BLU 04",
+    "EX BRW 01",
+    "EX CYN 01",
+    "EX GRN 04",
+    "EX GRN 05",
+    "EX MAG 01",
+    "EX MAR 01",
+    "EX ORG 01",
+    "EX RED 01",
+    "EX RED 03",
+    "EX VIO 01"
+   ]
+  },
+  {
+   "section": "Print Color",
+   "type": "radio",
+   "label": "No Colour",
+   "name": "printColourBack",
+   "visible": false,
+   "options": [
+    "No Colour",
+    "EX BLK 01",
+    "EX BLU 01",
+    "EX BLU 02",
+    "EX BLU 03",
+    "EX BLU 04",
+    "EX BRW 01",
+    "EX CYN 01",
+    "EX GRN 04",
+    "EX GRN 05",
+    "EX MAG 01",
+    "EX MAR 01",
+    "EX ORG 01",
+    "EX RED 01",
+    "EX RED 03",
+    "EX VIO 01"
+   ]
+  },
+  {
+   "section": "Print Color",
+   "type": "select",
+   "label": "Back Print \u2014 Apply to *",
+   "name": "backPrintLayer",
+   "visible": false,
+   "n": 2,
+   "options": [
+    "First Layer Only",
+    "All Layers"
+   ]
+  },
+  {
+   "section": "Quantity",
+   "type": "select",
+   "label": "Quantity (Books / Pads) *",
+   "name": "quantity",
+   "visible": true,
+   "n": 101,
+   "options": [
+    "-- Select Quantity --",
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "260",
+    "270",
+    "280",
+    "290",
+    "300",
+    "310",
+    "320",
+    "330",
+    "340",
+    "350",
+    "360",
+    "370",
+    "380",
+    "390",
+    "400",
+    "410",
+    "420",
+    "430",
+    "440",
+    "450",
+    "460",
+    "470",
+    "480",
+    "490",
+    "500",
+    "510",
+    "520",
+    "530",
+    "540",
+    "550",
+    "560",
+    "570",
+    "580",
+    "590",
+    "600",
+    "610",
+    "620",
+    "630",
+    "640",
+    "650",
+    "660",
+    "670",
+    "680",
+    "690",
+    "700",
+    "710",
+    "720",
+    "730",
+    "740",
+    "750",
+    "760",
+    "770",
+    "780",
+    "790",
+    "800",
+    "810",
+    "820",
+    "830",
+    "840",
+    "850",
+    "860",
+    "870",
+    "880",
+    "890",
+    "900",
+    "910",
+    "920",
+    "930",
+    "940",
+    "950",
+    "960",
+    "970",
+    "980",
+    "990",
+    "1,000"
+   ]
+  },
+  {
+   "section": "Quantity",
+   "type": "select",
+   "label": "Sets per Book/Pad *",
+   "name": "sets",
+   "visible": true,
+   "n": 1,
+   "options": [
+    "50 Sets"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "radio",
+   "label": "Number From",
+   "name": "isNumbering",
+   "visible": true,
+   "options": [
+    "no",
+    "yes"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "input",
+   "label": "Number From",
+   "name": "numberFrom",
+   "visible": true,
+   "placeholder": "e.g. 0001 (last digit must be 1)"
+  },
+  {
+   "section": "Finishing",
+   "type": "input",
+   "label": "Number To",
+   "name": "numberTo",
+   "visible": true,
+   "placeholder": "Auto-calculated"
+  },
+  {
+   "section": "Finishing",
+   "type": "radio",
+   "label": "Hole Punching",
+   "name": "holePunch",
+   "visible": true,
+   "options": [
+    "no",
+    "yes"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "Rush Order Terms & Conditions apply",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "West Malaysia",
+   "name": "rblOrderCountryCode",
+   "visible": true,
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Others Countries",
+   "name": "rblOtherOrderCountryCode",
+   "visible": true,
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "select",
+   "label": "Others Countries",
+   "name": "ddlOtherCountryCode",
+   "visible": true,
+   "n": 32,
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Appointed Courier (Fee applies)",
+   "name": "rblCourier",
+   "visible": true,
+   "options": [
+    "Appointed Courier (Fee applies)",
+    "Skynet (Fee applies)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "input",
+   "label": "txtFavouriteName",
+   "name": "txtFavouriteName",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "ABOUT EXCARD",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "WHAT WE DO",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "SUPPORT",
+   "name": "",
+   "visible": false
+  }
+ ]
+}

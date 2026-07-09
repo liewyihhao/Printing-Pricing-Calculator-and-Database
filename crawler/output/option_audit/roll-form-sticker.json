@@ -1,0 +1,343 @@
+{
+ "slug": "roll-form-sticker",
+ "url": "https://v4.excard.com.my/ordering/roll-form-sticker",
+ "error": null,
+ "controls": [
+  {
+   "section": "(top)",
+   "type": "select",
+   "label": "",
+   "name": "",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "review-filter",
+   "name": "review-filter",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "Relevance",
+    "Newest",
+    "Oldest",
+    "Highest Rate"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "Sample Proof (2pcs)",
+   "name": "sampleProof",
+   "visible": true,
+   "options": [
+    "no",
+    "yes"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "Category *",
+   "name": "category",
+   "visible": true,
+   "options": [
+    "rectangle_square",
+    "round",
+    "custom_shape"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "height",
+   "name": "height",
+   "visible": true,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "width",
+   "name": "width",
+   "visible": true,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "Size *",
+   "name": "stickerDiameter",
+   "visible": false,
+   "placeholder": "Diameter"
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "Paper *",
+   "name": "paperType",
+   "visible": true,
+   "n": 6,
+   "options": [
+    "White PP",
+    "Transparent OPP",
+    "Mirror Kote",
+    "Printing Paper",
+    "Synthetic Paper",
+    "Hologram"
+   ]
+  },
+  {
+   "section": "Print Colour * 4C",
+   "type": "select",
+   "label": "Print Colour *",
+   "name": "printColour",
+   "visible": true,
+   "n": 1,
+   "options": [
+    "4C"
+   ]
+  },
+  {
+   "section": "Print Colour * 4C",
+   "type": "radio",
+   "label": "EX BLK 01",
+   "name": "spotColour",
+   "visible": false,
+   "options": [
+    "EX BLK 01",
+    "EX CYN 01",
+    "EX MAG 01",
+    "EX WHT 01"
+   ]
+  },
+  {
+   "section": "Print Colour * 4C",
+   "type": "select",
+   "label": "Lamination / Finishing *",
+   "name": "lamination",
+   "visible": true,
+   "n": 4,
+   "options": [
+    "Not Required",
+    "Matte Lamination",
+    "Gloss Lamination",
+    "UV Varnish"
+   ]
+  },
+  {
+   "section": "Print Colour * 4C",
+   "type": "select",
+   "label": "Hot Stamping Colour",
+   "name": "hotStamping",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "Not Required",
+    "1C (Front)"
+   ]
+  },
+  {
+   "section": "Print Colour * 4C",
+   "type": "select",
+   "label": "Hot Stamping Front Colour 1",
+   "name": "hotStampingColour1",
+   "visible": false,
+   "n": 3,
+   "options": [
+    "-- Select --",
+    "Gold",
+    "Silver"
+   ]
+  },
+  {
+   "section": "Paper Core * 25mm 40mm 76mm",
+   "type": "select",
+   "label": "Paper Core *",
+   "name": "paperCore",
+   "visible": true,
+   "n": 3,
+   "options": [
+    "25mm",
+    "40mm",
+    "76mm"
+   ]
+  },
+  {
+   "section": "Paper Core * 25mm 40mm 76mm",
+   "type": "select",
+   "label": "Quantity (pcs) *",
+   "name": "quantity",
+   "visible": true,
+   "n": 32,
+   "options": [
+    "-- Select Quantity --",
+    "1,000",
+    "2,000",
+    "3,000",
+    "4,000",
+    "5,000",
+    "6,000",
+    "7,000",
+    "8,000",
+    "9,000",
+    "10,000",
+    "11,000",
+    "12,000",
+    "13,000",
+    "14,000",
+    "15,000",
+    "16,000",
+    "17,000",
+    "18,000",
+    "19,000",
+    "20,000",
+    "25,000",
+    "30,000",
+    "35,000",
+    "40,000",
+    "45,000",
+    "50,000",
+    "60,000",
+    "70,000",
+    "80,000",
+    "90,000",
+    "100,000"
+   ]
+  },
+  {
+   "section": "Paper Core * 25mm 40mm 76mm",
+   "type": "select",
+   "label": "Pcs / Roll *",
+   "name": "pcsPerRoll",
+   "visible": true,
+   "n": 7,
+   "options": [
+    "-- Select Pcs / Roll --",
+    "500",
+    "1,000",
+    "2,000",
+    "2,500",
+    "5,000",
+    "10,000"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "Rush Order Terms & Conditions apply",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "West Malaysia",
+   "name": "rblOrderCountryCode",
+   "visible": true,
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Others Countries",
+   "name": "rblOtherOrderCountryCode",
+   "visible": true,
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "select",
+   "label": "Others Countries",
+   "name": "ddlOtherCountryCode",
+   "visible": true,
+   "n": 32,
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Appointed Courier (Fee applies)",
+   "name": "rblCourier",
+   "visible": true,
+   "options": [
+    "Appointed Courier (Fee applies)",
+    "Skynet (Fee applies)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "input",
+   "label": "txtFavouriteName",
+   "name": "txtFavouriteName",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "ABOUT EXCARD",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "WHAT WE DO",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "SUPPORT",
+   "name": "",
+   "visible": false
+  }
+ ]
+}
