@@ -247,6 +247,9 @@ function interpLogPts(pts,qty){ if(!pts||!pts.length)return 0; pts=pts.slice().s
   const xs=pts.map(p=>p[0]),ys=pts.map(p=>Math.log(p[1])),x=+qty;
   if(x<=xs[0])return Math.exp(ys[0]); if(x>=xs[xs.length-1])return Math.exp(ys[ys.length-1]);
   for(let i=1;i<xs.length;i++) if(x<=xs[i]){const t=(x-xs[i-1])/(xs[i]-xs[i-1]);return Math.exp(ys[i-1]+t*(ys[i]-ys[i-1]));} return Math.exp(ys[ys.length-1]); }
+function interpLin(pts,qty){ if(!pts||!pts.length)return 0; pts=pts.slice().sort((a,b)=>a[0]-b[0]);
+  const x=+qty; if(x<=pts[0][0])return pts[0][1]; if(x>=pts[pts.length-1][0])return pts[pts.length-1][1];
+  for(let i=1;i<pts.length;i++) if(x<=pts[i][0]){const t=(x-pts[i-1][0])/(pts[i][0]-pts[i-1][0]);return pts[i-1][1]+t*(pts[i][1]-pts[i-1][1]);} return pts[pts.length-1][1]; }
 function stickerLaminationCost(opt,h,w,qty){
   if(!opt||opt==="Not Required")return 0;
   const by=(DATA.sticker_finishing||{})[opt]; if(!by)return 0;
@@ -454,8 +457,19 @@ function localQuote(prod, V, qty){
     if(!curve){const pref=key.split("|")[0];for(const k in cv){if(k.indexOf(pref)===0){curve=cv[k];break;}}}
     if(!curve)curve=cv[Object.keys(cv)[0]]||{};
     cash=interpLogPts(Object.keys(curve).map(k=>[+k,curve[k]]),qty);
+    // exact additive finishing deltas (e.g. hole punching) sampled independently of the
+    // price axes and scaled by qty (and package ganging where applicable).
+    let addFin=0;
+    for(const ad of (prod.addonDeltas||[])){
+      if((ad.whenValues||[]).indexOf(V[ad.field])>=0 && ad.curve){
+        let d=interpLin(Object.keys(ad.curve).map(k=>[+k,ad.curve[k]]),qty);
+        if(ad.scaleByPackage) d*=pkgMult;
+        addFin+=d;
+      }
+    }
+    cash+=addFin;
     wt=Math.round((P2.unit_wt||0.05)*qty*WF*1000)/1000;
-    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:0, tiers: tiers(cash), weight_kg: wt,
+    return { printoka_cash: Math.round(cash*100)/100, finishing_cost:Math.round(addFin*100)/100, tiers: tiers(cash), weight_kg: wt,
       method:"exact (reference price lookup)", note:P2.note||"" }; }
   else if(prod.engine==="wallcal"){
     const c=P.curve||{}; cash=interpLogPts(Object.keys(c).map(k=>[+k,c[k]]),qty);

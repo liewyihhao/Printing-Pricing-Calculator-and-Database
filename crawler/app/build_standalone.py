@@ -988,12 +988,41 @@ _NEUTRAL_FIELDS = {
     ],
 }
 
+_NEUTRAL_FIELDS[1] = [  # Business Card: verified price-neutral / quoted-separately controls
+    {"key": "category", "label": "Category", "neutral": False,
+     "options": ["Standard", "Thin Fold", "Fat Fold", "Custom Die Cut", "Plastic Card"],
+     "note": "Standard is priced exactly. Thin/Fat Fold, Custom Die Cut and Plastic Card are "
+             "separate products — quoted on request."},
+    {"key": "orientation", "label": "Orientation", "options": ["Landscape", "Portrait"],
+     "note": "Orientation is price-neutral for business cards."},
+    {"key": "hot_stamping", "label": "Hot Stamping", "options":
+     ["No Hot Stamping", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"],
+     "note": "Hot-stamping block is quoted separately; the printing price shown excludes it."},
+    {"key": "round_corner", "label": "Round Corner", "options": ["No", "Required"],
+     "note": "Round corner is price-neutral."},
+    {"key": "silkscreen_spot_uv", "label": "Silkscreen Spot UV", "options": ["No Required", "Required"],
+     "note": "Spot UV block is quoted separately."},
+    # Hole punching DOES add cost (qty×package-scaled) — driven via addonDeltas, not an axis:
+    {"key": "holepunching", "label": "Hole Punching", "neutral": False,
+     "options": ["No Hole Punching", "3mm", "5mm"],
+     "note": "Adds a per-piece punching cost (3mm and 5mm priced the same)."},
+]
+
 # Configs exposed in the UI for option parity but outside the exact sampled axes
-# (combinatorial sub-options) → priced "on request". field key uses the _norm'd field key.
+# (combinatorial sub-options / different sub-products) → priced "on request".
 _CONTACT_WHEN = {
     24: [{"field": "papermaterials", "values": ["Normal Paper"],
           "note": "Normal (non-carbonless) paper — each layer's paper is chosen independently, "
                   "so this is quoted on request. Please contact us for a quote."}],
+    1: [{"field": "category", "values": ["Thin Fold", "Fat Fold", "Custom Die Cut", "Plastic Card"],
+         "note": "Folded / die-cut / plastic business cards are separate products — quoted on request."}],
+}
+
+# Exact additive finishing deltas (sampled independently of the price axes, scaled by qty
+# and — where noted — by package ganging). Attached to the pricelist engine.
+_ADDON_DELTAS = {
+    1: [{"key": "holepunch", "field": "holepunching", "whenValues": ["3mm", "5mm"],
+         "scaleByPackage": True, "curveFile": "bizcard_holepunch_delta.json"}],
 }
 
 
@@ -1024,11 +1053,12 @@ def _wire_pricelist_products(data):
                 if im:
                     fld["images"] = im
             fields.append(fld)
-        # Append price-NEUTRAL UI-only fields (verified not to change price) so the calculator
-        # mirrors Excard's full order form. These are not in axisFields → ignored by pricing.
+        # Append extra UI fields so the calculator mirrors Excard's full order form. Fields
+        # marked neutral (default) don't affect price; non-neutral extra fields drive addon
+        # deltas (below) but are not price axes. None are in axisFields.
         for nf in _NEUTRAL_FIELDS.get(pid, []):
             fields.append({"key": nf["key"], "label": nf["label"], "addon": True,
-                           "depends": nf.get("depends", []), "neutral": True,
+                           "depends": nf.get("depends", []), "neutral": nf.get("neutral", True),
                            "options": list(nf["options"]), "note": nf.get("note", "")})
         prod["engine"] = "pricelist"
         prod["paramKey"] = tag
@@ -1036,6 +1066,13 @@ def _wire_pricelist_products(data):
         prod["fields"] = fields
         if pid in _CONTACT_WHEN:
             prod["contactWhen"] = _CONTACT_WHEN[pid]
+        if pid in _ADDON_DELTAS:
+            ads = []
+            for ad in _ADDON_DELTAS[pid]:
+                curve = json.loads((OUT / ad["curveFile"]).read_text(encoding="utf-8"))
+                ads.append({"field": _norm(ad["field"]), "whenValues": ad["whenValues"],
+                            "scaleByPackage": ad.get("scaleByPackage", False), "curve": curve})
+            prod["addonDeltas"] = ads
         prod["accuracy"] = 0.0
         data["params"][tag] = params
         done[slug] = f"{len(params['curves'])} curves, {len(price_axes)} axes"
