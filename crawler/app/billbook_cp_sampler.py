@@ -81,10 +81,17 @@ _COLOUR_MAP = {
 
 PACKFORMS = ["Book", "Pad"]
 SIZES     = list(_SIZE_MAP.keys())
-# Default orientation per packform. Orientation is price-affecting but the Printoka
-# UI currently treats it as neutral (matching the old engine). We price at the default
-# so the upgrade covers the main price axes (packform × size × layers × colour × sets).
-DEFAULT_ORIENT = {
+# Orientation × Binding Location is a REAL price axis (~19% swing): the four Excard UI
+# combos collapse to exactly TWO price groups by which edge is bound (verified across
+# sizes): Landscape+Left == Portrait+Top (long-edge), Landscape+Top == Portrait+Left
+# (short-edge). We sample the two representatives; the UI maps its 4 combos onto them.
+ORIENTS = [
+    ("LL", "Landscape - Left side binding"),   # group also covers Portrait+Top
+    ("LT", "Landscape - Top side binding"),     # group also covers Portrait+Left
+]
+# Hole Punching (6mm) is price-affecting (~RM0.38/book, jitters by config) → sampled axis.
+HOLEPUNCH = [("hpN", "No"), ("hpY", "Yes")]
+DEFAULT_ORIENT = {  # kept for validate() back-compat
     "Book": "Landscape - Left side binding",
     "Pad":  "Landscape - Left side binding",
 }
@@ -102,7 +109,7 @@ def _paper_str(num_layers: int) -> str:
     return ",".join([NCR_PAPER] * num_layers)
 
 
-def _spec(packform, api_size, orientation, layers_n, api_colour, sets_val, qty):
+def _spec(packform, api_size, orientation, layers_n, api_colour, sets_val, qty, holepunch="No"):
     return {
         "Product": "BILL BOOK",
         "Size": api_size,
@@ -119,7 +126,7 @@ def _spec(packform, api_size, orientation, layers_n, api_colour, sets_val, qty):
         "Quantity": str(qty),
         "Sets": sets_val,
         "IsNumbering": "yes",
-        "HolePunch": "No",
+        "HolePunch": holepunch,
         "IsCopyChange": "false",
         "IsDifferentArtwork": "false",
         "Ccs": "", "CcsFontSize": "", "InkColour": "",
@@ -149,25 +156,26 @@ def _fetch(spec, cookie, retries=3):
     return None
 
 
-def _make_key(packform, size_label, layers_n, colour_label, sets_val):
-    return f"{packform}|{size_label}|{layers_n}L|{colour_label}|sets={sets_val}"
+def _make_key(packform, size_label, orient_tag, layers_n, colour_label, sets_val, hp_tag):
+    return f"{packform}|{size_label}|{orient_tag}|{layers_n}L|{colour_label}|sets={sets_val}|{hp_tag}"
 
 
 def _build_tasks() -> list[tuple]:
     tasks = []
     for packform in PACKFORMS:
-        orient = DEFAULT_ORIENT[packform]
         for size_label in SIZES:
             api_size = _SIZE_MAP[size_label]
-            for ln in LAYERS:
-                layers_n = int(ln)
-                for colour_label in COLOURS:
-                    api_colour = _COLOUR_MAP[colour_label]
-                    sets_options = ["50", "100"] if layers_n == 2 else ["50"]
-                    for sets_val in sets_options:
-                        key = _make_key(packform, size_label, layers_n, colour_label, sets_val)
-                        for qty in QTYS:
-                            tasks.append((key, qty, packform, api_size, orient, layers_n, api_colour, sets_val))
+            for orient_tag, orient in ORIENTS:
+                for ln in LAYERS:
+                    layers_n = int(ln)
+                    for colour_label in COLOURS:
+                        api_colour = _COLOUR_MAP[colour_label]
+                        sets_options = ["50", "100"] if layers_n == 2 else ["50"]
+                        for sets_val in sets_options:
+                            for hp_tag, hp in HOLEPUNCH:
+                                key = _make_key(packform, size_label, orient_tag, layers_n, colour_label, sets_val, hp_tag)
+                                for qty in QTYS:
+                                    tasks.append((key, qty, packform, api_size, orient, layers_n, api_colour, sets_val, hp))
     return tasks
 
 
@@ -190,8 +198,7 @@ def run(max_workers: int = 2) -> dict:
 
     tasks = _build_tasks()
     # Filter out already-sampled (key, qty) pairs
-    pending = [(k, q, pf, sz, ort, ln, cl, sv) for (k, q, pf, sz, ort, ln, cl, sv) in tasks
-               if q not in curves.get(k, {})]
+    pending = [t for t in tasks if t[1] not in curves.get(t[0], {})]
     print(f"billbook CP: {len(tasks)} total, {len(pending)} pending", file=sys.stderr)
     if not pending:
         print("Already complete.", file=sys.stderr)
@@ -200,8 +207,8 @@ def run(max_workers: int = 2) -> dict:
     done = fail = 0
     with ThreadPoolExecutor(max_workers=max_workers) as ex:
         futs = {
-            ex.submit(_fetch, _spec(pf, sz, ort, ln, cl, sv, q), cookie): (k, q)
-            for (k, q, pf, sz, ort, ln, cl, sv) in pending
+            ex.submit(_fetch, _spec(pf, sz, ort, ln, cl, sv, q, hp), cookie): (k, q)
+            for (k, q, pf, sz, ort, ln, cl, sv, hp) in pending
         }
         for fu in as_completed(futs):
             k, q = futs[fu]
@@ -229,31 +236,25 @@ def build_params(curves: dict | None = None) -> dict:
     valid = {k: v for k, v in curves.items() if v}
     print(f"build_params: {len(valid)} valid curves from {len(curves)} total", file=sys.stderr)
 
-    # Key format: "packform|size|NL|colour|sets=N"
-    axes = ["packform", "size", "layers", "colour", "sets"]
+    # Clean key keeps compact tags: "packform|size|orient|layers|colour|sets|hp"
+    # orient∈{LL,LT} (binding-edge price group), hp∈{hpN,hpY}. write_options() expands
+    # orient into the 4 Orientation×BindingLocation UI combos. UI-neutral fields
+    # (numbering/perforation/per-layer tints) are not in the key.
+    axes = ["packform", "size", "binding_edge", "layers", "colour", "sets", "hole_punch"]
     dist: dict[str, list] = {a: [] for a in axes}
-    for k in valid:
-        parts = k.split("|")
-        if len(parts) < 5:
-            continue
-        packform, size_label, layers_str, colour_label, sets_str = parts[:5]
-        layers_n = layers_str.replace("L", "")
-        sets_val = sets_str.replace("sets=", "")
-        vals = [packform, size_label, layers_n, colour_label, sets_val]
-        for a, v in zip(axes, vals):
-            if v not in dist[a]:
-                dist[a].append(v)
-
-    # Restructure curves with cleaned keys: "packform|size|layers|colour|sets"
     clean: dict[str, dict[str, float]] = {}
     for k, qmap in valid.items():
         parts = k.split("|")
-        if len(parts) < 5:
-            continue
-        packform, size_label, layers_str, colour_label, sets_str = parts[:5]
+        if len(parts) != 7:
+            continue  # skip any stray old-format keys
+        packform, size_label, ori, layers_str, colour_label, sets_str, hp = parts
         layers_n = layers_str.replace("L", "")
         sets_val = sets_str.replace("sets=", "")
-        clean_key = f"{packform}|{size_label}|{layers_n}|{colour_label}|{sets_val}"
+        vals = [packform, size_label, ori, layers_n, colour_label, sets_val, hp]
+        for a, v in zip(axes, vals):
+            if v not in dist[a]:
+                dist[a].append(v)
+        clean_key = "|".join(vals)
         clean[clean_key] = {str(q): p for q, p in qmap.items()}
 
     params = {
@@ -303,21 +304,39 @@ def validate(params: dict | None = None, n_samples: int = 10):
     return errors
 
 
+# Each binding-edge price group (LL/LT) maps to two Orientation×BindingLocation UI combos.
+_ORIENT_UI = {  # tag -> list of (Orientation, Binding Location) UI pairs sharing that price
+    "LL": [("Landscape", "Left side binding"), ("Portrait", "Top side binding")],
+    "LT": [("Landscape", "Top side binding"), ("Portrait", "Left side binding")],
+}
+_HP_UI = {"hpN": "No Hole Punching", "hpY": "Yes — Hole Punching (6mm)"}
+
+
 def write_options(params: dict | None = None):
     """Convert billbook_plx_params.json -> output/v4_options/bill-book_options.json in the
-    standard capture shape consumed by build_standalone._wire_pricelist_products."""
+    standard capture shape. Expands the binding-edge price group into the four
+    Orientation×BindingLocation UI combos (duplicating curves) so the UI mirrors Excard's
+    separate Orientation + Binding Location controls, and exposes Hole Punching as an axis."""
     if params is None:
         params = json.loads(PARAMS_FILE.read_text(encoding="utf-8"))
-    clean = {k: v for k, v in params["curves"].items() if v}
-    axes = ["Binding", "Size", "Layers", "Print Colour", "Sets"]
+    raw = {k: v for k, v in params["curves"].items() if v}
+    # raw key: packform|size|orient(LL/LT)|layers|colour|sets|hp(hpN/hpY)
+    axes = ["Binding", "Size", "Orientation", "Binding Location", "Layers", "Print Colour", "Sets", "Hole Punching"]
+    clean: dict[str, dict[str, float]] = {}
+    for k, qmap in raw.items():
+        pf, size, ori, layers, colour, sets_v, hp = k.split("|")
+        hp_ui = _HP_UI[hp]
+        for orient, binding_loc in _ORIENT_UI[ori]:
+            nk = "|".join([pf, size, orient, binding_loc, layers, colour, sets_v, hp_ui])
+            clean[nk] = {str(q): p for q, p in qmap.items()}
     dist = {a: [] for a in axes}
-    for k in clean:
-        for a, v in zip(axes, k.split("|")):
-            if v not in dist[a]:
-                dist[a].append(v)
     deps = {}
     for k in clean:
-        parts = k.split("|"); sub = deps.setdefault(parts[0], {a: [] for a in axes[1:]})
+        parts = k.split("|")
+        for a, v in zip(axes, parts):
+            if v not in dist[a]:
+                dist[a].append(v)
+        sub = deps.setdefault(parts[0], {a: [] for a in axes[1:]})
         for a, v in zip(axes[1:], parts[1:]):
             if v not in sub[a]:
                 sub[a].append(v)
@@ -327,7 +346,7 @@ def write_options(params: dict | None = None):
            "priceMeta": {"priceCol": "Price", "qtyCol": "Quantity", "axisCols": axes,
                          "nCurves": len(clean)}, "curves": clean}
     (OUT / "v4_options" / "bill-book_options.json").write_text(json.dumps(out))
-    print(f"wrote v4_options/bill-book_options.json: {len(clean)} curves", file=sys.stderr)
+    print(f"wrote v4_options/bill-book_options.json: {len(clean)} curves ({len(axes)} axes)", file=sys.stderr)
     return out
 
 
@@ -336,18 +355,18 @@ def validate_random(n_samples=60):
     only LOWERS price, so any config whose lone sequential fetch is HIGHER than stored was
     corrupted during sampling. Returns list of (key, qty, stored, live)."""
     import random
-    params = json.loads(PARAMS_FILE.read_text(encoding="utf-8"))
+    # operate on the RAW samples (tag keys parseable by _parse_raw_key), not the clean params
+    curves = {k: v for k, v in json.loads(SAMPLES_FILE.read_text(encoding="utf-8")).items() if v}
     cookie = _get_session_cookie()
-    curves = {k: v for k, v in params["curves"].items() if v}
     keys = random.sample(list(curves), min(n_samples, len(curves)))
     bad = []
     for k in keys:
-        packform, size_label, layers_n, colour_label, sets_val = k.split("|")[:5]
+        pf, size_label, orient, layers_n, colour_label, sets_val, hp = _parse_raw_key(k)
         api_size = _SIZE_MAP.get(size_label, size_label)
         api_colour = _COLOUR_MAP.get(colour_label, colour_label)
         qtys = sorted(curves[k], key=int); qty = qtys[len(qtys) // 2]
         stored = curves[k][qty]
-        got = _fetch(_spec(packform, api_size, DEFAULT_ORIENT[packform], int(layers_n), api_colour, sets_val, qty), cookie)
+        got = _fetch(_spec(pf, api_size, orient, int(layers_n), api_colour, sets_val, qty, hp), cookie)
         if got and abs(got - stored) / stored > 0.005:
             bad.append((k, qty, stored, got))
             print(f"  CORRUPT {k} q={qty}: stored={stored} live={got} ({got/stored:.4f}x)", file=sys.stderr)
@@ -373,9 +392,16 @@ def _interp_excl(curve: dict, target_q: str) -> float | None:
     return None
 
 
+_ORIENT_BY_TAG = {"LL": "Landscape - Left side binding", "LT": "Landscape - Top side binding"}
+_HP_BY_TAG = {"hpN": "No", "hpY": "Yes"}
+
+
 def _parse_raw_key(k):
-    packform, size_label, layers_str, colour_label, sets_str = k.split("|")[:5]
-    return (packform, size_label, layers_str.replace("L", ""), colour_label, sets_str.replace("sets=", ""))
+    """7-part raw key: packform|size|orient_tag|NL|colour|sets=N|hp_tag →
+    (packform, size, orientation, layers, colour, sets, holepunch)."""
+    packform, size_label, orient_tag, layers_str, colour_label, sets_str, hp_tag = k.split("|")
+    return (packform, size_label, _ORIENT_BY_TAG[orient_tag], layers_str.replace("L", ""),
+            colour_label, sets_str.replace("sets=", ""), _HP_BY_TAG[hp_tag])
 
 
 def _theilsen_suspects(curve: dict, thresh: float = 0.90):
@@ -417,10 +443,10 @@ def repair(passes: int = 6):
         print(f"repair pass {it}: {len(suspects)} suspects, re-fetching sequentially...", file=sys.stderr)
         fixed = 0
         for k, q in suspects:
-            pf, size_label, layers_n, colour_label, sets_val = _parse_raw_key(k)
+            pf, size_label, orient, layers_n, colour_label, sets_val, hp = _parse_raw_key(k)
             api_size = _SIZE_MAP.get(size_label, size_label)
             api_colour = _COLOUR_MAP.get(colour_label, colour_label)
-            got = _fetch(_spec(pf, api_size, DEFAULT_ORIENT[pf], int(layers_n), api_colour, sets_val, q), cookie)
+            got = _fetch(_spec(pf, api_size, orient, int(layers_n), api_colour, sets_val, q, hp), cookie)
             if got and got > curves[k][q]:
                 curves[k][q] = got; fixed += 1
         total_fixed += fixed

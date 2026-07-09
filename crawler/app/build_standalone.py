@@ -969,6 +969,19 @@ _PRICELIST_FROM_OPTIONS = {
 }
 
 
+# Price-NEUTRAL options present on Excard's order form that must appear in our UI for option
+# parity (verified via CheckPrice to NOT change price). Keyed by product id; appended to the
+# generated pricelist fields but excluded from axisFields (so they never affect the price).
+_NEUTRAL_FIELDS = {
+    24: [  # Bill-Book: numbering & perforation are free (verified 0.0% delta)
+        {"key": "numbering", "label": "Numbering", "options": ["No Numbering", "Yes — Add Numbering"],
+         "note": "Numbering is free. 4–7 digit sequential numbering in red; enter the start number on the order."},
+        {"key": "last_layer_perforation", "label": "Last Layer Perforation",
+         "options": ["No", "Yes"], "note": "Compulsory perforation for one layer in Book type; price-neutral."},
+    ],
+}
+
+
 def _wire_pricelist_products(data):
     """KPI2: convert each configured product to an exact price-list lookup built from its
     captured WMPrice curves. Generates the option fields from the captured Excard values
@@ -996,6 +1009,12 @@ def _wire_pricelist_products(data):
                 if im:
                     fld["images"] = im
             fields.append(fld)
+        # Append price-NEUTRAL UI-only fields (verified not to change price) so the calculator
+        # mirrors Excard's full order form. These are not in axisFields → ignored by pricing.
+        for nf in _NEUTRAL_FIELDS.get(pid, []):
+            fields.append({"key": nf["key"], "label": nf["label"], "addon": True,
+                           "depends": nf.get("depends", []), "neutral": True,
+                           "options": list(nf["options"]), "note": nf.get("note", "")})
         prod["engine"] = "pricelist"
         prod["paramKey"] = tag
         prod["axisFields"] = [_norm(dim) for dim in price_axes]
