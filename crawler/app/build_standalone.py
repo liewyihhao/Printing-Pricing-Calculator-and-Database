@@ -974,11 +974,26 @@ _PRICELIST_FROM_OPTIONS = {
 # generated pricelist fields but excluded from axisFields (so they never affect the price).
 _NEUTRAL_FIELDS = {
     24: [  # Bill-Book: numbering & perforation are free (verified 0.0% delta)
+        {"key": "papermaterials", "label": "Paper Materials",
+         "options": ["NCR (Carbonize Paper)", "Normal Paper"],
+         "note": "NCR (carbonless) is priced exactly. Normal (plain) paper is quoted on request."},
+        {"key": "paper_tint", "label": "Paper (per layer)",
+         "options": ["NCR White 50gsm", "NCR Green 50gsm", "NCR Blue 50gsm",
+                     "NCR Yellow 50gsm", "NCR Pink 50gsm"],
+         "note": "Each layer's tint is selectable free of charge (price-neutral); standard sequence is White, Green, Blue, Yellow, Pink."},
         {"key": "numbering", "label": "Numbering", "options": ["No Numbering", "Yes — Add Numbering"],
          "note": "Numbering is free. 4–7 digit sequential numbering in red; enter the start number on the order."},
         {"key": "last_layer_perforation", "label": "Last Layer Perforation",
          "options": ["No", "Yes"], "note": "Compulsory perforation for one layer in Book type; price-neutral."},
     ],
+}
+
+# Configs exposed in the UI for option parity but outside the exact sampled axes
+# (combinatorial sub-options) → priced "on request". field key uses the _norm'd field key.
+_CONTACT_WHEN = {
+    24: [{"field": "papermaterials", "values": ["Normal Paper"],
+          "note": "Normal (non-carbonless) paper — each layer's paper is chosen independently, "
+                  "so this is quoted on request. Please contact us for a quote."}],
 }
 
 
@@ -1019,6 +1034,8 @@ def _wire_pricelist_products(data):
         prod["paramKey"] = tag
         prod["axisFields"] = [_norm(dim) for dim in price_axes]
         prod["fields"] = fields
+        if pid in _CONTACT_WHEN:
+            prod["contactWhen"] = _CONTACT_WHEN[pid]
         prod["accuracy"] = 0.0
         data["params"][tag] = params
         done[slug] = f"{len(params['curves'])} curves, {len(price_axes)} axes"

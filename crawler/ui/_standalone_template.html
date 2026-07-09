@@ -443,7 +443,11 @@ function localQuote(prod, V, qty){
     return { printoka_cash: Math.round(cash*100)/100, finishing_cost:Math.round(fin*100)/100, tiers: tiers(cash), weight_kg: wt, method:"formula (qty curve)",
       note:"Notepad: fixed 80x106mm, 40-sheet Simili content, Wire-O punch + Matte Lam (Both) compulsory. Cover paper is price-neutral; Spot UV (Front Cover) adds a per-run cost. qty = books." }; }
   else if(prod.engine==="pricelist"){
-    // exact lookup from a baked reference price table; log-log qty interpolation
+    // exact lookup from a baked reference price table; log-log qty interpolation.
+    // contactWhen: some UI options are exposed for parity but fall outside the exact
+    // sampled axes (combinatorial sub-options) — those return a "price on request".
+    for(const r of (prod.contactWhen||[])){ if((r.values||[]).indexOf(V[r.field])>=0)
+      throw Object.assign(new Error(r.note||"This configuration is quoted on request. Please contact us for a quote."), {quote_only:true}); }
     const P2=DATA.params[prod.paramKey]||{}; const cv=P2.curves||{};
     const af=prod.axisFields||[]; let key=af.map(f=>V[f]==null?"":V[f]).join("|");
     let curve=cv[key];
