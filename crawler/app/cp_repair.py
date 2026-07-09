@@ -29,9 +29,11 @@ def _bizcard_spec(parts, qty):
 
 def _kadkahwin_spec(parts, qty):
     from app import kadkahwin_sampler as KK
-    size, paper, colour = parts
+    size, paper, colour = parts[0], parts[1], parts[2]
+    lam_label = parts[3] if len(parts) > 3 else "Not Required"
+    lam_api = "" if lam_label == "Not Required" else lam_label
     return {"Product": "Kad Kahwin", "Size": KK._size(size), "Paper": KK._paper(paper), "OrderDesc": "Standard",
-            "PrintColour": colour, "Quantity": str(qty), "Lamination": "", "FoldCode": "", "HotStamping": "",
+            "PrintColour": colour, "Quantity": str(qty), "Lamination": lam_api, "FoldCode": "", "HotStamping": "",
             "HotStampingSize1": "N/A", "HotStampingSize2": "N/A", "Envelope": "", "Country": "99",
             "Courier": "DEFAULT", "CountryZone": "West Malaysia"}
 

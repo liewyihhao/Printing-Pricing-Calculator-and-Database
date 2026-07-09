@@ -12,6 +12,12 @@ from app import browser as B
 
 OUT = Path(__file__).resolve().parent.parent / "output"
 QTYS = ["10","20","30","40","50","60","70","80","90","100","150","200","250","300","400","500","700","1000"]
+# Lamination is a real price axis (Front ~+8%, Both ~+16%; 0 on non-laminatable papers like
+# Linen; Gloss==Matte at equal coverage). Sample all 5 so no mapping assumption is made.
+LAMS=[("Not Required",""),("Gloss Lamination (Front)","Gloss Lamination (Front)"),
+      ("Gloss Lamination (Both)","Gloss Lamination (Both)"),
+      ("Matte Lamination (Front)","Matte Lamination (Front)"),
+      ("Matte Lamination (Both)","Matte Lamination (Both)")]
 
 def _size(v): 
     m = re.search(r"\(([^)]+)\)", v); return m.group(1) if m else v
@@ -35,12 +41,13 @@ def run(max_workers=2):  # CheckPrice not concurrency-safe: workers<=2
     tasks=[]
     for ck in combos:
         size,paper,colour = ck.split("")
-        for q in QTYS:
-            spec={"Product":"Kad Kahwin","Size":_size(size),"Paper":_paper(paper),"OrderDesc":"Standard",
-                  "PrintColour":colour,"Quantity":q,"Lamination":"","FoldCode":"","HotStamping":"",
-                  "HotStampingSize1":"N/A","HotStampingSize2":"N/A","Envelope":"",
-                  "Country":"99","Courier":"DEFAULT","CountryZone":"West Malaysia"}
-            tasks.append((f"{size}|{paper}|{colour}", q, spec))
+        for lam_label,lam_api in LAMS:
+            for q in QTYS:
+                spec={"Product":"Kad Kahwin","Size":_size(size),"Paper":_paper(paper),"OrderDesc":"Standard",
+                      "PrintColour":colour,"Quantity":q,"Lamination":lam_api,"FoldCode":"","HotStamping":"",
+                      "HotStampingSize1":"N/A","HotStampingSize2":"N/A","Envelope":"",
+                      "Country":"99","Courier":"DEFAULT","CountryZone":"West Malaysia"}
+                tasks.append((f"{size}|{paper}|{colour}|{lam_label}", q, spec))
     curves={}; done=fail=0
     with ThreadPoolExecutor(max_workers=max_workers) as ex:
         futs={ex.submit(C._fetch,"Kad Kahwin",s,cookie):(k,q) for k,q,s in tasks}
@@ -49,12 +56,12 @@ def run(max_workers=2):  # CheckPrice not concurrency-safe: workers<=2
             if p: curves.setdefault(k,{})[q]=p
             else: fail+=1
             done+=1
-            if done%200==0: print(f"  {done}/{len(tasks)} ({fail} failed)", file=sys.stderr)
-    axes=["Size","Paper","Print Colour"]
+            if done%500==0: print(f"  {done}/{len(tasks)} ({fail} failed)", file=sys.stderr)
+    axes=["Size","Paper","Print Colour","Lamination"]
     dist={a:list(dict.fromkeys(k.split("|")[i] for k in curves)) for i,a in enumerate(axes)}
     deps={}
     for k in curves:
-        pv=k.split("|")[0]; sub=deps.setdefault(pv,{"Paper":[],"Print Colour":[]})
+        pv=k.split("|")[0]; sub=deps.setdefault(pv,{"Paper":[],"Print Colour":[],"Lamination":[]})
         for a,v in zip(axes[1:],k.split("|")[1:]):
             if v not in sub[a]: sub[a].append(v)
     out={"slug":"kad-kahwin","source":"checkprice-api","rows":sum(len(c) for c in curves.values()),

@@ -1008,6 +1008,18 @@ _NEUTRAL_FIELDS[1] = [  # Business Card: verified price-neutral / quoted-separat
      "note": "Adds a per-piece punching cost (3mm and 5mm priced the same)."},
 ]
 
+_NEUTRAL_FIELDS[114] = [  # Kad Kahwin: category drives contact; hot-stamping/envelope quoted separately
+    {"key": "category", "label": "Category", "neutral": False,
+     "options": ["Standard Kad Kahwin", "Custom Die Cut Kad Kahwin"],
+     "note": "Standard is priced exactly; Custom Die Cut is a separate product — quoted on request."},
+    {"key": "hot_stamping", "label": "Hot Stamping", "options":
+     ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"],
+     "note": "Hot-stamping block is quoted separately."},
+    {"key": "envelope", "label": "Envelope", "options":
+     ["Not Required", "White (DL)", "White (A5)", "White (A6)", "Pink (DL)", "Pink (A5)", "Pink (A6)"],
+     "note": "Envelopes are quoted separately from the card printing price."},
+]
+
 # Configs exposed in the UI for option parity but outside the exact sampled axes
 # (combinatorial sub-options / different sub-products) → priced "on request".
 _CONTACT_WHEN = {
@@ -1016,6 +1028,8 @@ _CONTACT_WHEN = {
                   "so this is quoted on request. Please contact us for a quote."}],
     1: [{"field": "category", "values": ["Thin Fold", "Fat Fold", "Custom Die Cut", "Plastic Card"],
          "note": "Folded / die-cut / plastic business cards are separate products — quoted on request."}],
+    114: [{"field": "category", "values": ["Custom Die Cut Kad Kahwin"],
+           "note": "Custom Die Cut Kad Kahwin is a separate product — quoted on request."}],
 }
 
 # Exact additive finishing deltas (sampled independently of the price axes, scaled by qty
