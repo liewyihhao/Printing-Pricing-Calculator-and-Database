@@ -1008,6 +1008,18 @@ _NEUTRAL_FIELDS[1] = [  # Business Card: verified price-neutral / quoted-separat
      "note": "Adds a per-piece punching cost (3mm and 5mm priced the same)."},
 ]
 
+_NEUTRAL_FIELDS[123] = [  # Banner: expose Standard/Custom size type (custom → on request)
+    {"key": "size_type", "label": "Size Type", "neutral": False,
+     "options": ["Standard Size", "Custom Size"],
+     "note": "Standard sizes are priced exactly; custom-size banners are quoted on request."},
+]
+
+_NEUTRAL_FIELDS[127] = [  # Paper Bag: rope colour is price-neutral (verified)
+    {"key": "rope_colour", "label": "Rope Colour",
+     "options": ["Black", "Blue", "Gold", "Green", "Red", "Silver", "White"],
+     "note": "Rope/handle colour is selectable free of charge (price-neutral)."},
+]
+
 _NEUTRAL_FIELDS[114] = [  # Kad Kahwin: category drives contact; hot-stamping/envelope quoted separately
     {"key": "category", "label": "Category", "neutral": False,
      "options": ["Standard Kad Kahwin", "Custom Die Cut Kad Kahwin"],
@@ -1030,6 +1042,8 @@ _CONTACT_WHEN = {
          "note": "Folded / die-cut / plastic business cards are separate products — quoted on request."}],
     114: [{"field": "category", "values": ["Custom Die Cut Kad Kahwin"],
            "note": "Custom Die Cut Kad Kahwin is a separate product — quoted on request."}],
+    123: [{"field": "size_type", "values": ["Custom Size"],
+           "note": "Custom-size banners are quoted on request."}],
 }
 
 # Exact additive finishing deltas (sampled independently of the price axes, scaled by qty
