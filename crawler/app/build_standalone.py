@@ -1008,6 +1008,21 @@ _NEUTRAL_FIELDS[1] = [  # Business Card: verified price-neutral / quoted-separat
      "note": "Adds a per-piece punching cost (3mm and 5mm priced the same)."},
 ]
 
+_LOOSE_PKG = ["Normal", "2in1", "3in1", "4in1", "5in1", "6in1", "7in1", "8in1", "9in1", "10in1"]
+_LOOSE_ENV = ["- Not Required -", "108mm x 159mm - Pink A6", "110mm x 220mm - White DL",
+              "133mm x 102mm - Cream A7", "162mm x 114mm - White A6", "162mm x 229mm - Pink A5",
+              "162mm x 229mm - White A5", "215mm x 114mm - Pink DL"]
+# Loose Sheet Litho (21) + brochure/flyer/customprint aliases came from a www price-list crawl
+# (size×paper×lamination×colour) with no CheckPrice API. Package ganging and Envelope are on
+# the Excard form but weren't in the crawl and can't be API-verified → expose + price on request.
+for _lsid in (21, 101, 102, 103):
+    _NEUTRAL_FIELDS[_lsid] = [
+        {"key": "package", "label": "Package (ganging)", "neutral": False, "options": list(_LOOSE_PKG),
+         "note": "Normal is priced exactly; ganged (N-in-1) runs are quoted on request."},
+        {"key": "envelope", "label": "Envelope", "neutral": False, "options": list(_LOOSE_ENV),
+         "note": "Envelopes are quoted separately/on request."},
+    ]
+
 _NEUTRAL_FIELDS[123] = [  # Banner: expose Standard/Custom size type (custom → on request)
     {"key": "size_type", "label": "Size Type", "neutral": False,
      "options": ["Standard Size", "Custom Size"],
@@ -1044,6 +1059,11 @@ _CONTACT_WHEN = {
            "note": "Custom Die Cut Kad Kahwin is a separate product — quoted on request."}],
     123: [{"field": "size_type", "values": ["Custom Size"],
            "note": "Custom-size banners are quoted on request."}],
+    **{_lsid: [{"field": "package", "values": _LOOSE_PKG[1:],
+               "note": "Ganged (N-in-1) loose-sheet runs are quoted on request."},
+              {"field": "envelope", "values": _LOOSE_ENV[1:],
+               "note": "Loose-sheet with envelopes is quoted on request."}]
+       for _lsid in (21, 101, 102, 103)},
 }
 
 # Exact additive finishing deltas (sampled independently of the price axes, scaled by qty
