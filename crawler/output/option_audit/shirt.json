@@ -1,0 +1,267 @@
+{
+ "slug": "shirt",
+ "url": "https://v4.excard.com.my/ordering/shirt",
+ "error": null,
+ "controls": [
+  {
+   "section": "(top)",
+   "type": "select",
+   "label": "",
+   "name": "",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "review-filter",
+   "name": "review-filter",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "Relevance",
+    "Newest",
+    "Oldest",
+    "Highest Rate"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "checkbox",
+   "label": "Sample Proof",
+   "name": "",
+   "visible": true
+  },
+  {
+   "section": "GENERAL",
+   "type": "radio",
+   "label": "Category",
+   "name": "shirt_category",
+   "visible": true,
+   "options": [
+    "Adult",
+    "Kid"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "radio",
+   "label": "Model",
+   "name": "shirt_model",
+   "visible": true,
+   "options": [
+    "rn",
+    "vn",
+    "cwb",
+    "mc",
+    "rvc",
+    "rfc",
+    "rrn",
+    "nflo"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "radio",
+   "label": "Sleeve Type",
+   "name": "shirt_sleeve",
+   "visible": true,
+   "options": [
+    "Short Sleeve",
+    "Long Sleeve",
+    "Sleeveless"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "select",
+   "label": "Pants",
+   "name": "shirt_pant",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "- Not Required -",
+    "Soccer Pants"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "select",
+   "label": "Fabric",
+   "name": "shirt_fabric",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "Micro Fiber Eyelet 160gsm",
+    "Microfiber Super Square 160gsm"
+   ]
+  },
+  {
+   "section": "Print Colour 4C+4C",
+   "type": "select",
+   "label": "Position",
+   "name": "shirt_vdp",
+   "visible": true,
+   "n": 4,
+   "options": [
+    "- Not Required -",
+    "Front",
+    "Back",
+    "Both"
+   ]
+  },
+  {
+   "section": "Print Colour 4C+4C",
+   "type": "select",
+   "label": "Front",
+   "name": "shirt_vdp_front",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "- Please Select -",
+    "Numbering",
+    "Text",
+    "Numbering + Text"
+   ]
+  },
+  {
+   "section": "Print Colour 4C+4C",
+   "type": "select",
+   "label": "Back",
+   "name": "shirt_vdp_back",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "- Please Select -",
+    "Numbering",
+    "Text",
+    "Numbering + Text"
+   ]
+  },
+  {
+   "section": "Print Colour 4C+4C",
+   "type": "select",
+   "label": "Position",
+   "name": "pant_vdp",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "- Not Required -",
+    "Left",
+    "Right",
+    "Both"
+   ]
+  },
+  {
+   "section": "Print Colour 4C+4C",
+   "type": "select",
+   "label": "Left",
+   "name": "pant_vdp_left",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "- Please Select -",
+    "Numbering",
+    "Text",
+    "Numbering + Text"
+   ]
+  },
+  {
+   "section": "Print Colour 4C+4C",
+   "type": "select",
+   "label": "Right",
+   "name": "pant_vdp_right",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "- Please Select -",
+    "Numbering",
+    "Text",
+    "Numbering + Text"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "Rush Order Terms & Conditions apply",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "West Malaysia",
+   "name": "rblOrderCountryCode",
+   "visible": true,
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Others Countries",
+   "name": "rblOtherOrderCountryCode",
+   "visible": false,
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "select",
+   "label": "Others Countries",
+   "name": "ddlOtherCountryCode",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Appointed Courier (Fee applies)",
+   "name": "rblCourier",
+   "visible": true,
+   "options": [
+    "Appointed Courier (Fee applies)",
+    "Skynet (Fee applies)"
+   ]
+  },
+  {
+   "section": "Size & Quantity",
+   "type": "input",
+   "label": "txtFavouriteName",
+   "name": "txtFavouriteName",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "Size & Quantity",
+   "type": "checkbox",
+   "label": "ABOUT EXCARD",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "Size & Quantity",
+   "type": "checkbox",
+   "label": "WHAT WE DO",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "Size & Quantity",
+   "type": "checkbox",
+   "label": "SUPPORT",
+   "name": "",
+   "visible": false
+  }
+ ]
+}

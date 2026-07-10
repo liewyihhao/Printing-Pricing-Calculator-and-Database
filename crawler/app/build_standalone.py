@@ -1029,6 +1029,11 @@ _NEUTRAL_FIELDS[123] = [  # Banner: expose Standard/Custom size type (custom →
      "note": "Standard sizes are priced exactly; custom-size banners are quoted on request."},
 ]
 
+_NEUTRAL_FIELDS[60] = [  # Label Sticker Digital: sample proof is a workflow/quoted-separately option
+    {"key": "sample_proof", "label": "Sample Proof (2 pcs)", "options": ["No", "Yes"],
+     "note": "Optional pre-production sample proof; quoted separately."},
+]
+
 _NEUTRAL_FIELDS[127] = [  # Paper Bag: rope colour is price-neutral (verified)
     {"key": "rope_colour", "label": "Rope Colour",
      "options": ["Black", "Blue", "Gold", "Green", "Red", "Silver", "White"],
