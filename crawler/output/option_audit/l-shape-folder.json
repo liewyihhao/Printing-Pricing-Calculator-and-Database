@@ -1,6 +1,252 @@
 {
  "slug": "l-shape-folder",
- "url": "https://v4.excard.com.my/ordering/l-shape-folder",
- "error": "v4 page 500 (Runtime Error) \u2014 use www /spec form for this product",
- "controls": []
+ "url": "https://www.excard.com.my/spec/Digital/L_Shape_Plastic_Folder",
+ "error": null,
+ "controls": [
+  {
+   "section": "(top)",
+   "type": "select",
+   "label": "",
+   "name": "",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "review-filter",
+   "name": "review-filter",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "Relevance",
+    "Newest",
+    "Oldest",
+    "Highest Rate"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlProduct",
+   "name": "ddlProduct",
+   "visible": false,
+   "n": 79,
+   "options": [
+    "3 Side Seal Packaging",
+    "Arch File",
+    "Banner",
+    "Bill-Book",
+    "Booklet",
+    "Booklet",
+    "Bookmark",
+    "Bunting",
+    "Bunting (Gear X Stand)",
+    "Bunting (Round Base Stand)",
+    "Bunting (Tripod Stand)",
+    "Business Card",
+    "Business Card",
+    "Button Badge",
+    "Canvas Tote Bag",
+    "Computer Form",
+    "Corporate Shirt",
+    "Desk Calendar (Hard Stand)",
+    "Desk Calendar (Soft Stand)",
+    "DTF Shirt",
+    "Envelope",
+    "Foamboard",
+    "Folder",
+    "Greeting Card",
+    "Hand Fan",
+    "Hanger",
+    "Hard Cover Menu",
+    "ID Card",
+    "Jacket",
+    "Kad Kahwin",
+    "Kad Terima Kasih",
+    "Kotak Cenderahati",
+    "L Shape Plastic Folder",
+    "Label Sticker",
+    "Label Sticker with Hot Stamping",
+    "Lanyard",
+    "Letterhead",
+    "Loose Sheet",
+    "Loose Sheet",
+    "Magnet",
+    "Mask Keeper",
+    "Memo Box",
+    "Money Packet",
+    "Mug",
+    "Multipurpose-Sticker",
+    "Muslimah",
+    "Non-Woven Bag",
+    "Notepad",
+    "Papan Kopi",
+    "Paper Bag",
+    "Perfect Bind Notebook",
+    "Pillow",
+    "POP Display",
+    "Premium Desk Calendar",
+    "PVC Card",
+    "Roll Form Sticker",
+    "Roll Up Stand",
+    "rPET Non-Woven Bag",
+    "Shirt",
+    "Short Run Packaging",
+    "Silkscreen Shirt",
+    "Stamp Chop",
+    "Standing Pouch",
+    "Standing Pouch with Spout",
+    "Static Cling Window Sticker",
+    "Sweatshirt Hoodies",
+    "Tent Card",
+    "Tissue Box",
+    "Tong Seng Calendar",
+    "UV DTF Sticker",
+    "Vacuum Bag Packaging",
+    "Voucher",
+    "Wall Calendar",
+    "Wind Flag",
+    "Wire-O Notebook",
+    "Wire-O Wall Calendar",
+    "Wobbler",
+    "X-ccessories",
+    "X-ccessories"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlPrintMethod",
+   "name": "ddlPrintMethod",
+   "visible": false,
+   "n": 1,
+   "options": [
+    "Digital"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "",
+   "name": "ddlPaper",
+   "visible": true,
+   "n": 3,
+   "options": [
+    "- Please Select -",
+    "Synthetic Paper 180micron",
+    "Frosted Plastic 200 micron (0.2mm)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "West Malaysia",
+   "name": "rblOrderCountryCode",
+   "visible": true,
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Others Countries",
+   "name": "rblOtherOrderCountryCode",
+   "visible": true,
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "select",
+   "label": "Others Countries",
+   "name": "ddlOtherCountryCode",
+   "visible": true,
+   "n": 32,
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Appointed Courier (Fees Applied) RM 10 2day(s) shipping",
+   "name": "rblCourier",
+   "visible": true,
+   "options": [
+    "Appointed Courier (Fees Applied) RM 10 2day(s) shipping",
+    "SKYNET (Fee applies) RM 19.72 2day(s) shipping"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "input",
+   "label": "txtFavouriteName",
+   "name": "txtFavouriteName",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "ABOUT EXCARD",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "WHAT WE DO",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "SUPPORT",
+   "name": "",
+   "visible": false
+  }
+ ],
+ "source": "www"
 }

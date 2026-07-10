@@ -1,6 +1,418 @@
 {
  "slug": "voucher",
- "url": "https://v4.excard.com.my/ordering/voucher",
- "error": "v4 page 500 (Runtime Error) \u2014 use www /spec form for this product",
- "controls": []
+ "url": "https://www.excard.com.my/spec/Litho/Voucher",
+ "error": null,
+ "controls": [
+  {
+   "section": "(top)",
+   "type": "select",
+   "label": "",
+   "name": "",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "review-filter",
+   "name": "review-filter",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "Relevance",
+    "Newest",
+    "Oldest",
+    "Highest Rate"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlProduct",
+   "name": "ddlProduct",
+   "visible": false,
+   "n": 79,
+   "options": [
+    "3 Side Seal Packaging",
+    "Arch File",
+    "Banner",
+    "Bill-Book",
+    "Booklet",
+    "Booklet",
+    "Bookmark",
+    "Bunting",
+    "Bunting (Gear X Stand)",
+    "Bunting (Round Base Stand)",
+    "Bunting (Tripod Stand)",
+    "Business Card",
+    "Business Card",
+    "Button Badge",
+    "Canvas Tote Bag",
+    "Computer Form",
+    "Corporate Shirt",
+    "Desk Calendar (Hard Stand)",
+    "Desk Calendar (Soft Stand)",
+    "DTF Shirt",
+    "Envelope",
+    "Foamboard",
+    "Folder",
+    "Greeting Card",
+    "Hand Fan",
+    "Hanger",
+    "Hard Cover Menu",
+    "ID Card",
+    "Jacket",
+    "Kad Kahwin",
+    "Kad Terima Kasih",
+    "Kotak Cenderahati",
+    "L Shape Plastic Folder",
+    "Label Sticker",
+    "Label Sticker with Hot Stamping",
+    "Lanyard",
+    "Letterhead",
+    "Loose Sheet",
+    "Loose Sheet",
+    "Magnet",
+    "Mask Keeper",
+    "Memo Box",
+    "Money Packet",
+    "Mug",
+    "Multipurpose-Sticker",
+    "Muslimah",
+    "Non-Woven Bag",
+    "Notepad",
+    "Papan Kopi",
+    "Paper Bag",
+    "Perfect Bind Notebook",
+    "Pillow",
+    "POP Display",
+    "Premium Desk Calendar",
+    "PVC Card",
+    "Roll Form Sticker",
+    "Roll Up Stand",
+    "rPET Non-Woven Bag",
+    "Shirt",
+    "Short Run Packaging",
+    "Silkscreen Shirt",
+    "Stamp Chop",
+    "Standing Pouch",
+    "Standing Pouch with Spout",
+    "Static Cling Window Sticker",
+    "Sweatshirt Hoodies",
+    "Tent Card",
+    "Tissue Box",
+    "Tong Seng Calendar",
+    "UV DTF Sticker",
+    "Vacuum Bag Packaging",
+    "Voucher",
+    "Wall Calendar",
+    "Wind Flag",
+    "Wire-O Notebook",
+    "Wire-O Wall Calendar",
+    "Wobbler",
+    "X-ccessories",
+    "X-ccessories"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlPrintMethod",
+   "name": "ddlPrintMethod",
+   "visible": false,
+   "n": 1,
+   "options": [
+    "Litho"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "Pad",
+   "name": "ddlSize",
+   "visible": true,
+   "n": 12,
+   "options": [
+    "90mm x 140mm",
+    "105mm x 145mm",
+    "145mm x 145mm",
+    "125mm x 175mm",
+    "90mm x 190mm",
+    "107mm x 190mm",
+    "60mm x 210mm",
+    "145mm x 210mm",
+    "55mm x 213mm",
+    "95mm x 225mm",
+    "120mm x 230mm",
+    "105mm x 300mm"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "Pad",
+   "name": "rblPackForm",
+   "visible": true,
+   "options": [
+    "Pad",
+    "Book",
+    "Loose"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "Pad",
+   "name": "ddlContentPaper",
+   "visible": true,
+   "n": 14,
+   "options": [
+    "Art Paper 100gsm",
+    "Art Paper 130gsm",
+    "Art Paper 150gsm",
+    "Matte Art Paper 150gsm",
+    "Colour Paper Buff 75gsm",
+    "Colour Paper Blue 75gsm",
+    "Colour Paper Green 75gsm",
+    "Colour Paper Pink 75gsm",
+    "Colour Paper Purple 75gsm",
+    "Colour Paper Yellow 75gsm",
+    "Simili 80gsm",
+    "Simili 100gsm",
+    "Art Card 230gsm (2 sides coated)",
+    "Art Card 260gsm (2 sides coated)"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "comboQty",
+   "name": "comboQty",
+   "visible": true,
+   "n": 23,
+   "options": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "150",
+    "200",
+    "250",
+    "300",
+    "350",
+    "400",
+    "500",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1000",
+    "Other"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "txtCustomQty",
+   "name": "txtCustomQty",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlSets",
+   "name": "ddlSets",
+   "visible": true,
+   "n": 3,
+   "options": [
+    "10",
+    "25",
+    "50"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "Pad",
+   "name": "ddlContentColor",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "4C (Front)",
+    "4C (Both)"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "radio",
+   "label": "Not required",
+   "name": "rblNumbering",
+   "visible": true,
+   "options": [
+    "Not required",
+    "Required (All Panels)"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "Pad",
+   "name": "ddlPerforation",
+   "visible": true,
+   "n": 3,
+   "options": [
+    "0",
+    "1",
+    "2"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "txtTotalA",
+   "name": "txtTotalA",
+   "visible": true,
+   "placeholder": ""
+  },
+  {
+   "section": "General",
+   "type": "input",
+   "label": "txtTotalAll",
+   "name": "txtTotalAll",
+   "visible": true,
+   "placeholder": ""
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "Rush Order Terms & Conditions apply",
+   "name": "chkRushOrder",
+   "visible": true
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "West Malaysia",
+   "name": "rblOrderCountryCode",
+   "visible": true,
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Others Countries",
+   "name": "rblOtherOrderCountryCode",
+   "visible": true,
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "select",
+   "label": "Others Countries",
+   "name": "ddlOtherCountryCode",
+   "visible": true,
+   "n": 32,
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Appointed Courier (Fees Applied) RM 10 2day(s) shipping",
+   "name": "rblCourier",
+   "visible": true,
+   "options": [
+    "Appointed Courier (Fees Applied) RM 10 2day(s) shipping",
+    "SKYNET (Fee applies) RM 19.72 2day(s) shipping"
+   ]
+  },
+  {
+   "section": "Delivery Fee(RM):",
+   "type": "input",
+   "label": "",
+   "name": "hNumbering",
+   "visible": true,
+   "placeholder": ""
+  },
+  {
+   "section": "GENERAL",
+   "type": "input",
+   "label": "txtFavouriteName",
+   "name": "txtFavouriteName",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "GENERAL",
+   "type": "checkbox",
+   "label": "ABOUT EXCARD",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "GENERAL",
+   "type": "checkbox",
+   "label": "WHAT WE DO",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "GENERAL",
+   "type": "checkbox",
+   "label": "SUPPORT",
+   "name": "",
+   "visible": false
+  }
+ ],
+ "source": "www"
 }

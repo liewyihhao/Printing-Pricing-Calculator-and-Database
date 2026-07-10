@@ -1,6 +1,511 @@
 {
  "slug": "booklet",
- "url": "https://v4.excard.com.my/ordering/booklet",
- "error": "v4 page 500 (Runtime Error) \u2014 use www /spec form for this product",
- "controls": []
+ "url": "https://www.excard.com.my/spec/Litho/Booklet",
+ "error": null,
+ "controls": [
+  {
+   "section": "(top)",
+   "type": "select",
+   "label": "",
+   "name": "",
+   "visible": true,
+   "n": 2,
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "review-filter",
+   "name": "review-filter",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "Relevance",
+    "Newest",
+    "Oldest",
+    "Highest Rate"
+   ]
+  },
+  {
+   "section": "General",
+   "type": "select",
+   "label": "ddlProduct",
+   "name": "ddlProduct",
+   "visible": false,
+   "n": 79,
+   "options": [
+    "3 Side Seal Packaging",
+    "Arch File",
+    "Banner",
+    "Bill-Book",
+    "Booklet",
+    "Booklet",
+    "Bookmark",
+    "Bunting",
+    "Bunting (Gear X Stand)",
+    "Bunting (Round Base Stand)",
+    "Bunting (Tripod Stand)",
+    "Business Card",
+    "Business Card",
+    "Button Badge",
+    "Canvas Tote Bag",
+    "Computer Form",
+    "Corporate Shirt",
+    "Desk Calendar (Hard Stand)",
+    "Desk Calendar (Soft Stand)",
+    "DTF Shirt",
+    "Envelope",
+    "Foamboard",
+    "Folder",
+    "Greeting Card",
+    "Hand Fan",
+    "Hanger",
+    "Hard Cover Menu",
+    "ID Card",
+    "Jacket",
+    "Kad Kahwin",
+    "Kad Terima Kasih",
+    "Kotak Cenderahati",
+    "L Shape Plastic Folder",
+    "Label Sticker",
+    "Label Sticker with Hot Stamping",
+    "Lanyard",
+    "Letterhead",
+    "Loose Sheet",
+    "Loose Sheet",
+    "Magnet",
+    "Mask Keeper",
+    "Memo Box",
+    "Money Packet",
+    "Mug",
+    "Multipurpose-Sticker",
+    "Muslimah",
+    "Non-Woven Bag",
+    "Notepad",
+    "Papan Kopi",
+    "Paper Bag",
+    "Perfect Bind Notebook",
+    "Pillow",
+    "POP Display",
+    "Premium Desk Calendar",
+    "PVC Card",
+    "Roll Form Sticker",
+    "Roll Up Stand",
+    "rPET Non-Woven Bag",
+    "Shirt",
+    "Short Run Packaging",
+    "Silkscreen Shirt",
+    "Stamp Chop",
+    "Standing Pouch",
+    "Standing Pouch with Spout",
+    "Static Cling Window Sticker",
+    "Sweatshirt Hoodies",
+    "Tent Card",
+    "Tissue Box",
+    "Tong Seng Calendar",
+    "UV DTF Sticker",
+    "Vacuum Bag Packaging",
+    "Voucher",
+    "Wall Calendar",
+    "Wind Flag",
+    "Wire-O Notebook",
+    "Wire-O Wall Calendar",
+    "Wobbler",
+    "X-ccessories",
+    "X-ccessories"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "radio",
+   "label": "Portrait",
+   "name": "rblOrientation",
+   "visible": true,
+   "options": [
+    "Portrait",
+    "Landscape"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "select",
+   "label": "Portrait",
+   "name": "ddlSize",
+   "visible": true,
+   "n": 6,
+   "options": [
+    "- Please Select -",
+    "A4 (210mm x 297mm)",
+    "A5 (148mm x 210mm)",
+    "B5 (176mm x 250mm)",
+    "A6 (105mm x 148mm)",
+    "B5+ (190mm x 266mm)"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "radio",
+   "label": "Soft Cover",
+   "name": "rdbOrderType",
+   "visible": true,
+   "options": [
+    "Soft Cover",
+    "Hard Cover"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "radio",
+   "label": "Saddle Stitch",
+   "name": "rdbidning",
+   "visible": true,
+   "options": [
+    "Saddle Stitch",
+    "Perfect Binding"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "select",
+   "label": "Portrait",
+   "name": "ddlPage",
+   "visible": true,
+   "n": 20,
+   "options": [
+    "- Please Select -",
+    "8",
+    "12",
+    "16",
+    "20",
+    "24",
+    "28",
+    "32",
+    "36",
+    "40",
+    "44",
+    "48",
+    "52",
+    "56",
+    "60",
+    "64",
+    "68",
+    "72",
+    "76",
+    "80"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "select",
+   "label": "Portrait",
+   "name": "ddlCoverPaper",
+   "visible": true,
+   "n": 1,
+   "options": [
+    "- Please Select -"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "select",
+   "label": "4C: 4 Colour Outer Only",
+   "name": "ddlCoverPrintColour",
+   "visible": false,
+   "n": 0,
+   "options": []
+  },
+  {
+   "section": "GENERAL",
+   "type": "radio",
+   "label": "4C: 4 Colour Outer Only",
+   "name": "rbOuterInner",
+   "visible": true,
+   "options": [
+    "4C: 4 Colour Outer Only",
+    "4C: 4 Colour Outer & 4 Colour Inner"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "select",
+   "label": "",
+   "name": "ddlCoverHSColourNum",
+   "visible": true,
+   "n": 3,
+   "options": [
+    "- Not Required -",
+    "1C (Front)",
+    "2C (Front)"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "select",
+   "label": "Portrait",
+   "name": "ddlContentPaper",
+   "visible": true,
+   "n": 1,
+   "options": [
+    "- Please Select -"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "select",
+   "label": "Portrait",
+   "name": "ddlContentPrintColour",
+   "visible": true,
+   "n": 1,
+   "options": [
+    "- Please Select -"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "select",
+   "label": "Portrait",
+   "name": "ddlContentFrontK",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "- Please Select -",
+    "EX BLK 01",
+    "EX CYN 01",
+    "EX MAG 01"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "select",
+   "label": "Portrait",
+   "name": "ddlContentFrontM",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "- Please Select -",
+    "EX BLK 01",
+    "EX CYN 01",
+    "EX MAG 01"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "select",
+   "label": "Portrait",
+   "name": "ddlContentBackK",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "- Please Select -",
+    "EX BLK 01",
+    "EX CYN 01",
+    "EX MAG 01"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "select",
+   "label": "Portrait",
+   "name": "ddlContentBackM",
+   "visible": false,
+   "n": 4,
+   "options": [
+    "- Please Select -",
+    "EX BLK 01",
+    "EX CYN 01",
+    "EX MAG 01"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "select",
+   "label": "comboQty",
+   "name": "comboQty",
+   "visible": true,
+   "n": 32,
+   "options": [
+    "- Please Select -",
+    "100",
+    "150",
+    "200",
+    "250",
+    "300",
+    "350",
+    "400",
+    "450",
+    "500",
+    "550",
+    "600",
+    "650",
+    "700",
+    "750",
+    "800",
+    "850",
+    "900",
+    "950",
+    "1000",
+    "2000",
+    "3000",
+    "4000",
+    "5000",
+    "6000",
+    "7000",
+    "8000",
+    "9000",
+    "10000",
+    "15000",
+    "20000",
+    "Other"
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "input",
+   "label": "txtCustomQty",
+   "name": "txtCustomQty",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "Finishing",
+   "type": "checkbox",
+   "label": "Yes, add 3 extra books (+RM30)",
+   "name": "chkExtraQty",
+   "visible": true
+  },
+  {
+   "section": "Finishing",
+   "type": "radio",
+   "label": "",
+   "name": "rblJawiContent",
+   "visible": true,
+   "options": [
+    "",
+    ""
+   ]
+  },
+  {
+   "section": "Finishing",
+   "type": "checkbox",
+   "label": "",
+   "name": "chkJawiContents",
+   "visible": false
+  },
+  {
+   "section": "DELIVERY",
+   "type": "checkbox",
+   "label": "Rush Order Terms & Conditions apply",
+   "name": "chkRushOrder",
+   "visible": true
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "West Malaysia",
+   "name": "rblOrderCountryCode",
+   "visible": true,
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Others Countries",
+   "name": "rblOtherOrderCountryCode",
+   "visible": true,
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "select",
+   "label": "Others Countries",
+   "name": "ddlOtherCountryCode",
+   "visible": true,
+   "n": 32,
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "section": "DELIVERY",
+   "type": "radio",
+   "label": "Appointed Courier (Fees Applied) RM 10 2day(s) shipping",
+   "name": "rblCourier",
+   "visible": true,
+   "options": [
+    "Appointed Courier (Fees Applied) RM 10 2day(s) shipping",
+    "SKYNET (Fee applies) RM 19.72 2day(s) shipping"
+   ]
+  },
+  {
+   "section": "GENERAL",
+   "type": "input",
+   "label": "txtFavouriteName",
+   "name": "txtFavouriteName",
+   "visible": false,
+   "placeholder": ""
+  },
+  {
+   "section": "GENERAL",
+   "type": "checkbox",
+   "label": "ABOUT EXCARD",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "GENERAL",
+   "type": "checkbox",
+   "label": "WHAT WE DO",
+   "name": "",
+   "visible": false
+  },
+  {
+   "section": "GENERAL",
+   "type": "checkbox",
+   "label": "SUPPORT",
+   "name": "",
+   "visible": false
+  }
+ ],
+ "source": "www"
 }
