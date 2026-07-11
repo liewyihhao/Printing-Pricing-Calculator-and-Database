@@ -1222,10 +1222,28 @@ def _emit_api_artifacts(data, tmpl):
     (OUT / "calculator_engine.cjs").write_text(bundle, encoding="utf-8")
 
 
+# Products that open a dedicated configurator (separate standalone tool) instead of the
+# simple field form — e.g. Kotak Cenderahati = the full 67-style folding-carton box builder
+# (3D preview, custom dimensions, materials/coatings/add-ons) in packaging_standalone.html.
+_CONFIGURATORS = {
+    179: {"url": "packaging_standalone.html",
+          "note": "Choose from 67 folding-carton box styles in the box configurator."},
+}
+
+
+def _attach_configurators(data):
+    for p in data["products"]:
+        c = _CONFIGURATORS.get(p["id"])
+        if c:
+            p["configuratorUrl"] = c["url"]
+            p["configuratorNote"] = c["note"]
+
+
 def main():
     data = build_data()
     _drop_unsampled(data)
     _wire_pricelist_products(data)
+    _attach_configurators(data)
     _attach_images(data)
     _attach_excard_parity(data)
     _apply_ref_markup(data)

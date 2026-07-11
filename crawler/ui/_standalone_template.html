@@ -74,20 +74,20 @@ tailwind.config = { theme: { extend: {
         <span id="acc" class="text-[12px] shrink-0 ml-2"></span>
       </div>
       <div id="fields" class="space-y-4"></div>
-      <div class="mt-4">
+      <div id="qtywrap" class="mt-4">
         <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity</label>
         <input id="qty" type="number" min="1" value="1000" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">
         <div id="qchips" class="flex flex-wrap gap-1.5 mt-2"></div>
         <p class="text-[11.5px] text-slate-400 mt-2">Any quantity works — the formula interpolates between standard quantity breakpoints.</p>
       </div>
-      <div class="mt-4">
+      <div id="destwrap" class="mt-4">
         <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Delivery destination</label>
         <select id="dest" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></select>
         <p class="text-[11.5px] text-slate-400 mt-2">Delivery = courier rate per kg × order weight (rounded up), from standard courier rates.</p>
       </div>
       <div id="status" class="text-[12.5px] text-slate-400 mt-3"></div>
     </div>
-    <div class="bg-white rounded-xl border hairline shadow-card h-fit md:sticky md:top-20 overflow-hidden">
+    <div id="pricecard" class="bg-white rounded-xl border hairline shadow-card h-fit md:sticky md:top-20 overflow-hidden">
       <div class="brand-gradient px-5 py-4 text-white">
         <div class="text-[11.5px] font-medium opacity-90 uppercase tracking-wide">Estimated price (Cash)</div>
         <div id="bigprice" class="font-display text-[30px] font-semibold tracking-tight mt-0.5">RM —</div>
@@ -872,6 +872,21 @@ function selectProduct(id){
     ? `<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Exact market price</span>`
     : `<span class="inline-flex items-center gap-1.5 text-slate-500 bg-slate-100 border hairline rounded-full px-2.5 py-1 font-medium">Reference price + ~5–10%</span>`;
   window.scrollTo({top:0,behavior:"smooth"});
+  // Products with a dedicated configurator (e.g. the 67-style box builder) open that tool
+  // instead of the simple field form + price panel.
+  const showCfg = !!prod.configuratorUrl;
+  ["qtywrap","destwrap","pricecard"].forEach(k=>{ const e=$(k); if(e) e.classList.toggle("hidden", showCfg); });
+  if(showCfg){
+    $("acc").innerHTML="";
+    $("fields").innerHTML = `<div class="md:col-span-2 text-center py-10">
+      <p class="text-[14px] text-slate-600 mb-1 font-medium">${prod.configuratorNote||"This product has its own configurator."}</p>
+      <p class="text-[12.5px] text-slate-400 mb-5">Custom dimensions, live 3D preview and instant pricing.</p>
+      <a href="${prod.configuratorUrl}" class="inline-flex items-center gap-2 rounded-lg brand-gradient text-white px-5 py-2.5 text-[14px] font-medium shadow-card">
+        Open the configurator
+        <svg class="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>`;
+    $("status").textContent="";
+    return;
+  }
   $("fields").innerHTML = S.fields.map(f=> f.type==="number"
     ? `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
         <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></div>`
