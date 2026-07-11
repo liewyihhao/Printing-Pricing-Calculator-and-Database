@@ -1109,7 +1109,7 @@ def _apply_extra_axis_options(prod, pid):
                     if v not in fld["options"]:
                         fld["options"].append(v)
                 cw.append({"field": fkey, "values": list(vals),
-                           "note": "This option is quoted on request (Excard does not auto-price it online)."})
+                           "note": "This option is quoted on request — please contact us for a price."})
                 break
     prod["contactWhen"] = cw
 
