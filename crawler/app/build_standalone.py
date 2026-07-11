@@ -1079,6 +1079,41 @@ _ADDON_DELTAS = {
 }
 
 
+# Extra option VALUES that exist on Excard's control but aren't in our sampled axis data
+# (e.g. 1C loose-sheet colours the CSV crawl skipped, gang sizes, custom size, Multiple
+# Dieline). Injected into the matching axis field so every Excard combo is selectable; each
+# gets a contactWhen rule (we can't price it exactly) → "price on request".
+_EXTRA_AXIS_OPTIONS = {
+    1:   {"size": ["Other (Custom Size)"]},
+    24:  {"size": ["Other (Custom Size)"]},
+    135: {"shape": ["Multiple Dieline"]},
+    116: {"size": ["Others"]},
+    117: {"size": ["Other"]},
+    **{lsid: {"colour": ["1C (Front)", "1C (Both)"],
+              "size": ["4xA4 (297mm x 840mm)", "4xA5 (210mm x 594mm)", "Other (Custom Size)"]}
+       for lsid in (21, 101, 102, 103)},
+}
+
+
+def _apply_extra_axis_options(prod, pid):
+    """Append Excard option values we don't have price data for to their axis field, and add
+    contactWhen rules so selecting them shows 'price on request'."""
+    extra = _EXTRA_AXIS_OPTIONS.get(pid)
+    if not extra:
+        return
+    cw = prod.get("contactWhen", []) or []
+    for fkey, vals in extra.items():
+        for fld in prod["fields"]:
+            if fld["key"] == fkey:
+                for v in vals:
+                    if v not in fld["options"]:
+                        fld["options"].append(v)
+                cw.append({"field": fkey, "values": list(vals),
+                           "note": "This option isn't in our exact price table yet — quoted on request."})
+                break
+    prod["contactWhen"] = cw
+
+
 def _wire_pricelist_products(data):
     """KPI2: convert each configured product to an exact price-list lookup built from its
     captured WMPrice curves. Generates the option fields from the captured Excard values
@@ -1119,6 +1154,7 @@ def _wire_pricelist_products(data):
         prod["fields"] = fields
         if pid in _CONTACT_WHEN:
             prod["contactWhen"] = _CONTACT_WHEN[pid]
+        _apply_extra_axis_options(prod, pid)
         if pid in _ADDON_DELTAS:
             ads = []
             for ad in _ADDON_DELTAS[pid]:
