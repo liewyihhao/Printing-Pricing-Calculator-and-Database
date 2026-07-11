@@ -1,0 +1,314 @@
+[
+ {
+  "label": "Arch File PROMO",
+  "slug": "arch-file"
+ },
+ {
+  "label": "Bill Book",
+  "slug": "bill-book"
+ },
+ {
+  "label": "Bookmark",
+  "slug": "bookmark"
+ },
+ {
+  "label": "Business Card",
+  "slug": "business-card"
+ },
+ {
+  "label": "Button Badge",
+  "slug": "button-badge"
+ },
+ {
+  "label": "Envelope",
+  "slug": "envelope"
+ },
+ {
+  "label": "Folder",
+  "slug": "folder"
+ },
+ {
+  "label": "Hand Fan",
+  "slug": "hand-fan"
+ },
+ {
+  "label": "Hanger",
+  "slug": "Hanger"
+ },
+ {
+  "label": "Hard Cover Menu",
+  "slug": "hard-cover-menu"
+ },
+ {
+  "label": "L Shape Plastic Folder",
+  "slug": "l-shape-plastic-folder"
+ },
+ {
+  "label": "Lanyard",
+  "slug": "lanyard"
+ },
+ {
+  "label": "Letterhead",
+  "slug": "letterhead"
+ },
+ {
+  "label": "Mug",
+  "slug": "mug"
+ },
+ {
+  "label": "Notepad",
+  "slug": "notepad"
+ },
+ {
+  "label": "Sachet Board (Papan Kopi)",
+  "slug": "papan-kopi"
+ },
+ {
+  "label": "Stamp Chop",
+  "slug": "stamp-chop"
+ },
+ {
+  "label": "Tent Card",
+  "slug": "tent-card"
+ },
+ {
+  "label": "Voucher",
+  "slug": "voucher-pad"
+ },
+ {
+  "label": "Wobbler",
+  "slug": "wobbler"
+ },
+ {
+  "label": "Booklet (Digital)",
+  "slug": "booklet-digital-softcover"
+ },
+ {
+  "label": "Booklet (Offset)",
+  "slug": "booklet-offset-softcover"
+ },
+ {
+  "label": "Desk Calendar (Hard Stand)",
+  "slug": "hard-stand-desk-calendar"
+ },
+ {
+  "label": "Desk Calendar (Soft Stand)",
+  "slug": "soft-stand-desk-calendar"
+ },
+ {
+  "label": "Premium Desk Calendar",
+  "slug": "premium-desk-calendar"
+ },
+ {
+  "label": "Wall Calendar",
+  "slug": "wall-calendar"
+ },
+ {
+  "label": "Wire-O Wall Calendar",
+  "slug": "wire-o-wall-calendar"
+ },
+ {
+  "label": "Cap NEW",
+  "slug": "cap"
+ },
+ {
+  "label": "Leather Wire O Notebook",
+  "slug": "exclusive-leather-cover-wire-o-notebook"
+ },
+ {
+  "label": "Perfect Bind Notebook",
+  "slug": "hard-cover-perfect-bind-notebook"
+ },
+ {
+  "label": "Wire-O Notebook",
+  "slug": "hard-cover-wire-o-notebook"
+ },
+ {
+  "label": "Canvas Tote Bag",
+  "slug": "canvas-tote-bag"
+ },
+ {
+  "label": "Cooler Bag",
+  "slug": "cooler-bag"
+ },
+ {
+  "label": "DTF Totebag with Zip",
+  "slug": "dtf-totebag-with-zip"
+ },
+ {
+  "label": "Heat Transfer Tote Bag",
+  "slug": "heat-transfer-tote-bag"
+ },
+ {
+  "label": "Laminated Non-Woven Bag",
+  "slug": "laminated-non-woven-bag"
+ },
+ {
+  "label": "Non-Woven Bag",
+  "slug": "non-woven-bag"
+ },
+ {
+  "label": "rPET Non-Woven Bag",
+  "slug": "rpet-non-woven-bag"
+ },
+ {
+  "label": "Toast Bag",
+  "slug": "toast-bag"
+ },
+ {
+  "label": "3 Side Seal Packaging",
+  "slug": "3-side-seal-packaging"
+ },
+ {
+  "label": "Kraft Standing Pouch",
+  "slug": "kraft-standing-pouch"
+ },
+ {
+  "label": "Standing Pouch Packaging",
+  "slug": "standing-pouch"
+ },
+ {
+  "label": "Standing Pouch with Spout",
+  "slug": "standing-pouch-spout"
+ },
+ {
+  "label": "Vacuum Bag Packaging",
+  "slug": "vacuum-bag-packaging"
+ },
+ {
+  "label": "Static Cling Window Sticker (Car Sticker)",
+  "slug": "car-sticker"
+ },
+ {
+  "label": "UV DTF Sticker",
+  "slug": "uv-dtf-sticker"
+ },
+ {
+  "label": "Banner",
+  "slug": "banner"
+ },
+ {
+  "label": "Bunting",
+  "slug": "bunting"
+ },
+ {
+  "label": "Bunting (Gear X Stand)",
+  "slug": "bunting-gear-x-stand"
+ },
+ {
+  "label": "Bunting (Round Base Stand)",
+  "slug": "bunting-round-base-stand"
+ },
+ {
+  "label": "Bunting (Tripod Stand)",
+  "slug": "bunting-tripod-stand"
+ },
+ {
+  "label": "Economy Roll-Up Stand",
+  "slug": "economy-roll-up-stand"
+ },
+ {
+  "label": "Foamboard",
+  "slug": "foamboard"
+ },
+ {
+  "label": "Foamboard with Magnet",
+  "slug": "foamboard-with-magnet"
+ },
+ {
+  "label": "Foldable POP Display",
+  "slug": "foldable-pop-display"
+ },
+ {
+  "label": "POP-Display",
+  "slug": "pop-display"
+ },
+ {
+  "label": "Roll Up Stand",
+  "slug": "roll-up-stand"
+ },
+ {
+  "label": "Wind Flag",
+  "slug": "wind-flag"
+ },
+ {
+  "label": "Creative Cut Card",
+  "slug": "creative-cut-card"
+ },
+ {
+  "label": "Greeting Card",
+  "slug": "greeting-card"
+ },
+ {
+  "label": "Money Packet Pouch",
+  "slug": "envelope-money-packet"
+ },
+ {
+  "label": "Money Packet with Hot Stamping",
+  "slug": "hot-stamping-money-packet"
+ },
+ {
+  "label": "Premium Money Packet",
+  "slug": "premium-money-packet"
+ },
+ {
+  "label": "Standard Money Packet",
+  "slug": "money-packet"
+ },
+ {
+  "label": "Food Tray",
+  "slug": "food-tray"
+ },
+ {
+  "label": "Kraft Paper Bag",
+  "slug": "kraft-paper-bag"
+ },
+ {
+  "label": "Paper-Bag",
+  "slug": "paper-bag"
+ },
+ {
+  "label": "PVC CARD",
+  "slug": "pvc-card"
+ },
+ {
+  "label": "DTF Shirt",
+  "slug": "dtf-shirt"
+ },
+ {
+  "label": "Silkscreen Shirt",
+  "slug": "silkscreen-shirt"
+ },
+ {
+  "label": "Corporate Shirt",
+  "slug": "corporate-shirt"
+ },
+ {
+  "label": "Jacket",
+  "slug": "jacket"
+ },
+ {
+  "label": "Muslimah Sublimation",
+  "slug": "muslimah"
+ },
+ {
+  "label": "Sublimation Shirt",
+  "slug": "shirt"
+ },
+ {
+  "label": "Sweatshirt & Hoodies",
+  "slug": "sweatshirt-hoodies"
+ },
+ {
+  "label": "Kad Kahwin",
+  "slug": "kad-kahwin"
+ },
+ {
+  "label": "Kad Terima Kasih",
+  "slug": "kad-terima-kasih"
+ },
+ {
+  "label": "Kotak Cenderahati",
+  "slug": "kotak-cenderahati"
+ }
+]
