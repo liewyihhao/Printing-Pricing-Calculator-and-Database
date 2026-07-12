@@ -998,6 +998,10 @@ _NEUTRAL_FIELDS[1] = [  # Business Card: verified price-neutral / quoted-separat
     {"key": "hot_stamping", "label": "Hot Stamping", "options":
      ["No Hot Stamping", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"],
      "note": "Hot-stamping block is quoted separately; the printing price shown excludes it."},
+    # Embossing IS priced (qty×package-scaled, ~+RM52.50/run min) — driven via addonDeltas:
+    {"key": "embossing", "label": "Embossing", "neutral": False,
+     "options": ["Not Required", "Embossing Front", "Embossing Back"],
+     "note": "Embossing adds a per-run cost (Front and Back priced the same)."},
     {"key": "round_corner", "label": "Round Corner", "options": ["No", "Required"],
      "note": "Round corner is price-neutral."},
     {"key": "silkscreen_spot_uv", "label": "Silkscreen Spot UV", "options": ["No Required", "Required"],
@@ -1075,7 +1079,9 @@ _CONTACT_WHEN = {
 # and — where noted — by package ganging). Attached to the pricelist engine.
 _ADDON_DELTAS = {
     1: [{"key": "holepunch", "field": "holepunching", "whenValues": ["3mm", "5mm"],
-         "scaleByPackage": True, "curveFile": "bizcard_holepunch_delta.json"}],
+         "scaleByPackage": True, "curveFile": "bizcard_holepunch_delta.json"},
+        {"key": "embossing", "field": "embossing", "whenValues": ["Embossing Front", "Embossing Back"],
+         "scaleByPackage": True, "curveFile": "bizcard_embossing_delta.json"}],
 }
 
 
