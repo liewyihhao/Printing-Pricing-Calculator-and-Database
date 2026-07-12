@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Printoka — Tools & Intelligence</title>
+<style>
+  :root{
+    --ink:#0a2540; --muted:#425466; --faint:#697386; --hair:#e6ebf1;
+    --bg:#f6f9fc; --card:#ffffff; --blurple:#635bff; --blurple-d:#4b45c6;
+    --shadow:0 2px 5px rgba(60,66,87,.06), 0 1px 1px rgba(0,0,0,.04);
+    --shadow-lg:0 15px 35px rgba(60,66,87,.10), 0 5px 15px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  html,body{overflow-x:hidden}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;}
+  a{color:inherit;text-decoration:none}
+
+  /* ---- Stripe-style gradient hero with diagonal cut ---- */
+  .hero{position:relative;overflow:hidden;padding:74px 24px 168px;
+    background:linear-gradient(102deg,#3ee0d8 0%,#3b8bff 27%,#635bff 53%,#8b5cf6 73%,#ff5c8a 100%);
+    clip-path:polygon(0 0,100% 0,100% calc(100% - 96px),0 100%);}
+  .hero::before{content:"";position:absolute;inset:0;
+    background:radial-gradient(120% 120% at 12% -10%,rgba(255,255,255,.30),transparent 42%);z-index:0}
+  .hero__bg{display:none}
+  .hero__inner{position:relative;z-index:2;max-width:1080px;margin:0 auto;}
+  .brand{display:flex;align-items:center;gap:12px;margin-bottom:40px}
+  .orb{height:34px;width:34px;border-radius:50%;
+    background:conic-gradient(from 210deg,#42e8e0,#3b8bff,#635bff,#8b5cf6,#ff5c8a,#ffcb57,#42e8e0);
+    box-shadow:0 4px 12px rgba(10,37,64,.25)}
+  .brand b{color:#fff;font-size:19px;letter-spacing:-.02em;font-weight:700}
+  .brand span{color:rgba(255,255,255,.72);font-size:14px;margin-left:2px}
+  .hero h1{margin:0 0 16px;color:#fff;font-size:clamp(34px,4.6vw,54px);line-height:1.05;
+    letter-spacing:-.03em;font-weight:800;max-width:16ch;
+    text-shadow:0 2px 20px rgba(10,37,64,.18)}
+  .hero p{margin:0;color:rgba(255,255,255,.9);font-size:clamp(16px,1.5vw,19px);max-width:60ch;line-height:1.5}
+
+  main{position:relative;z-index:2;max-width:1080px;margin:-64px auto 0;padding:0 24px 80px}
+
+  section{margin-bottom:44px}
+  .sec-label{display:flex;align-items:center;gap:10px;margin:0 4px 16px}
+  .sec-label .tag{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--blurple)}
+  .sec-label .line{flex:1;height:1px;background:var(--hair)}
+  .sec-label .count{font-size:12px;color:var(--faint)}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+  .card{position:relative;display:flex;flex-direction:column;background:var(--card);
+    border:1px solid var(--hair);border-radius:14px;padding:20px 20px 18px;box-shadow:var(--shadow);
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease}
+  .card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg);border-color:#d7dee8}
+  .card__top{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .ico{height:40px;width:40px;border-radius:10px;display:grid;place-items:center;flex:none;
+    font-size:17px;font-weight:800;color:#fff;letter-spacing:-.02em}
+  .card__name{font-size:15.5px;font-weight:700;letter-spacing:-.01em;line-height:1.2}
+  .card__file{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;
+    color:var(--faint);margin-top:2px}
+  .card__desc{color:var(--muted);font-size:13.5px;line-height:1.55;margin:0 0 16px}
+  .card__foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between}
+  .open{display:inline-flex;align-items:center;gap:6px;color:var(--blurple);font-weight:600;font-size:13.5px}
+  .open svg{transition:transform .18s ease}
+  .card:hover .open svg{transform:translateX(3px)}
+  .pill{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;letter-spacing:.01em}
+  .pill.live{color:#0e7c66;background:#dcfaf0}
+  .pill.intel{color:#3b3ba8;background:#e8e7ff}
+  .pill.dev{color:#8a6d1f;background:#fbf1d3}
+
+  /* icon gradients */
+  .g-calc{background:linear-gradient(135deg,#635bff,#8b5cf6)}
+  .g-box{background:linear-gradient(135deg,#3b8bff,#42e8e0)}
+  .g-dash{background:linear-gradient(135deg,#ff5c8a,#8b5cf6)}
+  .g-cov{background:linear-gradient(135deg,#42e8e0,#3b8bff)}
+  .g-new{background:linear-gradient(135deg,#ffcb57,#ff5c8a)}
+  .g-scan{background:linear-gradient(135deg,#8b5cf6,#3b8bff)}
+  .g-dev{background:linear-gradient(135deg,#8792a2,#57647a)}
+
+  footer{max-width:1080px;margin:0 auto;padding:26px 24px 60px;border-top:1px solid var(--hair);
+    color:var(--faint);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  footer code{font-family:ui-monospace,Menlo,Consolas,monospace}
+  @media (max-width:600px){.hero{padding:56px 20px 110px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__bg"></div>
+    <div class="hero__inner">
+      <div class="brand"><span class="orb"></span><b>Printoka</b><span>/ workspace</span></div>
+      <h1>Pricing tools &amp; market intelligence</h1>
+      <p>Everything served from this build — customer-facing quoting tools, internal market dashboards, and the developer sources they’re compiled from.</p>
+    </div>
+  </header>
+
+  <main>
+    <!-- LIVE TOOLS -->
+    <section>
+      <div class="sec-label"><span class="tag">Live tools</span><span class="line"></span><span class="count">customer-facing · offline</span></div>
+      <div class="grid">
+        <a class="card" href="calculator_standalone.html">
+          <div class="card__top"><div class="ico g-calc">₽</div>
+            <div><div class="card__name">Pricing Calculator</div><div class="card__file">calculator_standalone.html</div></div></div>
+          <p class="card__desc">The main quote tool. Self-contained (no server) — all 93 products with full option parity, exact prices matched to the market to the cent, membership-tier savings and delivery estimates.</p>
+          <div class="card__foot"><span class="open">Open<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pill live">Live</span></div>
+        </a>
+        <a class="card" href="packaging_standalone.html">
+          <div class="card__top"><div class="ico g-box">▦</div>
+            <div><div class="card__name">Box Configurator</div><div class="card__file">packaging_standalone.html</div></div></div>
+          <p class="card__desc">Custom folding-carton builder — 67 box styles with a live 3D folded preview and flat die-line, custom L×W×H dimensions, materials, coatings and Spot-UV / hot-stamping / embossing add-ons, with instant pricing.</p>
+          <div class="card__foot"><span class="open">Open<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pill live">Live</span></div>
+        </a>
+      </div>
+    </section>
+
+    <!-- MARKET INTELLIGENCE -->
+    <section>
+      <div class="sec-label"><span class="tag">Market intelligence</span><span class="line"></span><span class="count">internal dashboards</span></div>
+      <div class="grid">
+        <a class="card" href="dashboard.html">
+          <div class="card__top"><div class="ico g-dash">◔</div>
+            <div><div class="card__name">Pricing Intelligence</div><div class="card__file">dashboard.html</div></div></div>
+          <p class="card__desc">Overview dashboard for the pricing programme — product coverage, price-accuracy, and margin/tier positioning across the catalogue at a glance.</p>
+          <div class="card__foot"><span class="open">Open<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pill intel">Internal</span></div>
+        </a>
+        <a class="card" href="coverage.html">
+          <div class="card__top"><div class="ico g-cov">◫</div>
+            <div><div class="card__name">Catalogue Coverage</div><div class="card__file">coverage.html</div></div></div>
+          <p class="card__desc">Which supplier products are covered and priced vs. still outstanding — the parity/coverage checklist behind the calculator.</p>
+          <div class="card__foot"><span class="open">Open<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pill intel">Internal</span></div>
+        </a>
+        <a class="card" href="whatsnew.html">
+          <div class="card__top"><div class="ico g-new">✦</div>
+            <div><div class="card__name">Market Watch</div><div class="card__file">whatsnew.html</div></div></div>
+          <p class="card__desc">What changed in the market — new products, and price or option changes detected by the crawler since the last scan.</p>
+          <div class="card__foot"><span class="open">Open<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pill intel">Internal</span></div>
+        </a>
+        <a class="card" href="capture.html">
+          <div class="card__top"><div class="ico g-scan">◎</div>
+            <div><div class="card__name">Market Scan</div><div class="card__file">capture.html</div></div></div>
+          <p class="card__desc">Kick off a fresh market snapshot — re-crawl the supplier catalogue to capture the latest products, options and prices.</p>
+          <div class="card__foot"><span class="open">Open<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pill intel">Internal</span></div>
+        </a>
+      </div>
+    </section>
+
+    <!-- DEVELOPER SOURCES -->
+    <section>
+      <div class="sec-label"><span class="tag">Developer sources</span><span class="line"></span><span class="count">build inputs</span></div>
+      <div class="grid">
+        <a class="card" href="calculator.html">
+          <div class="card__top"><div class="ico g-dev">&lt;/&gt;</div>
+            <div><div class="card__name">Calculator (server build)</div><div class="card__file">calculator.html</div></div></div>
+          <p class="card__desc">Server-connected version of the calculator — fetches products &amp; prices from the pricing API instead of baking them in. Needs the API running.</p>
+          <div class="card__foot"><span class="open">Open<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pill dev">Source</span></div>
+        </a>
+        <a class="card" href="packaging.html">
+          <div class="card__top"><div class="ico g-dev">&lt;/&gt;</div>
+            <div><div class="card__name">Packaging (server build)</div><div class="card__file">packaging.html</div></div></div>
+          <p class="card__desc">Source of the box configurator. When box data is baked in it becomes the offline build above; otherwise it loads catalogue &amp; dielines from the server.</p>
+          <div class="card__foot"><span class="open">Open<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pill dev">Source</span></div>
+        </a>
+        <a class="card" href="_standalone_template.html">
+          <div class="card__top"><div class="ico g-dev">&lt;/&gt;</div>
+            <div><div class="card__name">Calculator template</div><div class="card__file">_standalone_template.html</div></div></div>
+          <p class="card__desc">The build template. <code style="font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px">build_standalone</code> injects the product data into its placeholder to produce the offline Pricing Calculator. Not meant to open directly.</p>
+          <div class="card__foot"><span class="open">Open<svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="pill dev">Template</span></div>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span>Printoka pricing workspace</span>
+    <span>served from <code>/ui</code> · localhost:8030</span>
+  </footer>
+</body>
+</html>
