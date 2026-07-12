@@ -998,10 +998,24 @@ _NEUTRAL_FIELDS[1] = [  # Business Card: verified price-neutral / quoted-separat
     {"key": "hot_stamping", "label": "Hot Stamping", "options":
      ["No Hot Stamping", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"],
      "note": "Hot-stamping block is quoted separately; the printing price shown excludes it."},
+    # Hot-stamping sub-spec (price-neutral; shown only when hot stamping is selected):
+    {"key": "hot_stamping_colour", "label": "Hot Stamping — Foil Colour",
+     "options": ["Gold", "Silver"], "showWhen": {"field": "hot_stamping", "notValues": ["No Hot Stamping"]},
+     "note": "Foil colour (Gold min. order 3k, Silver min. order 1k)."},
+    {"key": "hot_stamping_w", "label": "Hot Stamping — Area width (mm)", "type": "number",
+     "min": 5, "max": 300, "placeholder": "e.g. 40", "showWhen": {"field": "hot_stamping", "notValues": ["No Hot Stamping"]}},
+    {"key": "hot_stamping_h", "label": "Hot Stamping — Area height (mm)", "type": "number",
+     "min": 5, "max": 300, "placeholder": "e.g. 30", "showWhen": {"field": "hot_stamping", "notValues": ["No Hot Stamping"]},
+     "note": "Stamping area; the block/foil is quoted separately."},
     # Embossing IS priced (qty×package-scaled, ~+RM52.50/run min) — driven via addonDeltas:
     {"key": "embossing", "label": "Embossing", "neutral": False,
      "options": ["Not Required", "Embossing Front", "Embossing Back"],
      "note": "Embossing adds a per-run cost (Front and Back priced the same)."},
+    {"key": "embossing_w", "label": "Embossing — Area width (mm)", "type": "number",
+     "min": 5, "max": 300, "placeholder": "e.g. 40", "showWhen": {"field": "embossing", "notValues": ["Not Required"]}},
+    {"key": "embossing_h", "label": "Embossing — Area height (mm)", "type": "number",
+     "min": 5, "max": 300, "placeholder": "e.g. 30", "showWhen": {"field": "embossing", "notValues": ["Not Required"]},
+     "note": "Embossing area."},
     {"key": "round_corner", "label": "Round Corner", "options": ["No", "Required"],
      "note": "Round corner is price-neutral."},
     {"key": "silkscreen_spot_uv", "label": "Silkscreen Spot UV", "options": ["No Required", "Required"],
@@ -1151,9 +1165,19 @@ def _wire_pricelist_products(data):
         # marked neutral (default) don't affect price; non-neutral extra fields drive addon
         # deltas (below) but are not price axes. None are in axisFields.
         for nf in _NEUTRAL_FIELDS.get(pid, []):
-            fields.append({"key": nf["key"], "label": nf["label"], "addon": True,
-                           "depends": nf.get("depends", []), "neutral": nf.get("neutral", True),
-                           "options": list(nf["options"]), "note": nf.get("note", "")})
+            fld = {"key": nf["key"], "label": nf["label"], "addon": True,
+                   "depends": nf.get("depends", []), "neutral": nf.get("neutral", True),
+                   "note": nf.get("note", "")}
+            if nf.get("type") == "number":
+                fld["type"] = "number"
+                for k in ("min", "max", "placeholder", "default"):
+                    if k in nf:
+                        fld[k] = nf[k]
+            else:
+                fld["options"] = list(nf["options"])
+            if "showWhen" in nf:
+                fld["showWhen"] = nf["showWhen"]
+            fields.append(fld)
         prod["engine"] = "pricelist"
         prod["paramKey"] = tag
         prod["axisFields"] = [_norm(dim) for dim in price_axes]

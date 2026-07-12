@@ -889,21 +889,22 @@ function selectProduct(id){
   }
   const noteHtml = f => f.note ? `<p class="text-[11px] text-slate-400 mt-1">${f.note}</p>` : "";
   $("fields").innerHTML = S.fields.map(f=> f.type==="number"
-    ? `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
-        <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">${noteHtml(f)}</div>`
+    ? `<div id="fw_${f.key}"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
+        <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" placeholder="${f.placeholder||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">${noteHtml(f)}</div>`
     : f.images
-    ? `<div class="md:col-span-2"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
+    ? `<div id="fw_${f.key}" class="md:col-span-2"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
         <div id="f_${f.key}" class="imggrid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2"></div>${noteHtml(f)}</div>`
-    : `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
+    : `<div id="fw_${f.key}"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
         <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"><option value="">—</option></select>${noteHtml(f)}</div>`).join("");
   S.fields.forEach((f,i)=>{ const el=$(`f_${f.key}`);
-    if(f.type==="number") el.oninput=()=>{ const v=el.value; if(v)S.values[f.key]=v; else delete S.values[f.key]; clearTimeout(S.t2); S.t2=setTimeout(quote,350); };
+    if(f.type==="number") el.oninput=()=>{ const v=el.value; if(v)S.values[f.key]=v; else delete S.values[f.key]; updateFieldVis(); clearTimeout(S.t2); S.t2=setTimeout(quote,350); };
     else if(f.images) renderImageGrid(f);
     else el.onchange=()=>onChange(i); });
+  updateFieldVis();
   $("qchips").innerHTML = QCHIPS.map(q=>`<button class="qchip rounded-md border hairline px-2.5 py-1 text-[12px] text-slate-600" data-q="${q}">${q.toLocaleString()}</button>`).join("");
   $("qchips").querySelectorAll(".qchip").forEach(b=>b.onclick=()=>{ $("qty").value=b.dataset.q; markChips(); quote(); });
   $("qty").oninput=()=>{ markChips(); clearTimeout(S.t); S.t=setTimeout(quote,250); };
-  markChips(); populateFrom(0);
+  markChips(); populateFrom(0); updateFieldVis();
 }
 function markChips(){ const v=$("qty").value; $("qchips").querySelectorAll(".qchip").forEach(b=>b.classList.toggle("active",b.dataset.q===v)); }
 function fillSelect(sel,opts,noPlaceholder){ const cur=sel.value;
@@ -935,8 +936,19 @@ function enforceValidity(){
     if(allow.includes(cur)){ sel.value=cur; } else { S.values[f.key]=allow[0]; sel.value=allow[0]; }
   }
 }
+// Show/hide fields that only apply for certain values of another field (e.g. hot-stamping
+// foil colour + area only when hot stamping is selected). showWhen = {field, values?, notValues?}.
+function updateFieldVis(){
+  for(const f of (S.fields||[])){ const sw=f.showWhen; const wrap=$(`fw_${f.key}`); if(!sw||!wrap) continue;
+    const el=$(`f_${sw.field}`);
+    const cur = (S.values[sw.field]!=null && S.values[sw.field]!=="") ? S.values[sw.field] : (el ? el.value : "");
+    const show = sw.values ? sw.values.indexOf(cur)>=0 : (sw.notValues ? sw.notValues.indexOf(cur)<0 : true);
+    wrap.classList.toggle("hidden", !show);
+  }
+}
 function onChange(idx){ const f=S.fields[idx], v=$(`f_${f.key}`).value;
   if(v)S.values[f.key]=v; else delete S.values[f.key];
+  updateFieldVis();
   if(f.addon||f.type==="number"){ enforceValidity(); quote(); return; }
   for(let j=idx+1;j<S.fields.length;j++) if(!S.fields[j].addon) delete S.values[S.fields[j].key];
   populateFrom(idx+1); }
