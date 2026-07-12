@@ -1065,6 +1065,15 @@ _NEUTRAL_FIELDS[114] = [  # Kad Kahwin: category drives contact; hot-stamping/en
     {"key": "hot_stamping", "label": "Hot Stamping", "options":
      ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"],
      "note": "Hot-stamping block is quoted separately."},
+    {"key": "hot_stamping_colour", "label": "Hot Stamping — Foil Colour",
+     "options": ["Black", "Blue", "Gold", "Green", "Red", "Silver"],
+     "showWhen": {"field": "hot_stamping", "notValues": ["Not Required"]},
+     "note": "Foil colour."},
+    {"key": "hot_stamping_w", "label": "Hot Stamping — Panel width (mm)", "type": "number",
+     "min": 5, "max": 300, "placeholder": "e.g. 90", "showWhen": {"field": "hot_stamping", "notValues": ["Not Required"]}},
+    {"key": "hot_stamping_h", "label": "Hot Stamping — Panel height (mm)", "type": "number",
+     "min": 5, "max": 300, "placeholder": "e.g. 30", "showWhen": {"field": "hot_stamping", "notValues": ["Not Required"]},
+     "note": "Stamping area; the block/foil is quoted separately."},
     {"key": "envelope", "label": "Envelope", "options":
      ["Not Required", "White (DL)", "White (A5)", "White (A6)", "Pink (DL)", "Pink (A5)", "Pink (A6)"],
      "note": "Envelopes are quoted separately from the card printing price."},
