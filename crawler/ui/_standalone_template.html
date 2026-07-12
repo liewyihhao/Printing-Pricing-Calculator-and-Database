@@ -887,14 +887,15 @@ function selectProduct(id){
     $("status").textContent="";
     return;
   }
+  const noteHtml = f => f.note ? `<p class="text-[11px] text-slate-400 mt-1">${f.note}</p>` : "";
   $("fields").innerHTML = S.fields.map(f=> f.type==="number"
     ? `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
-        <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"></div>`
+        <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">${noteHtml(f)}</div>`
     : f.images
     ? `<div class="md:col-span-2"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
-        <div id="f_${f.key}" class="imggrid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2"></div></div>`
+        <div id="f_${f.key}" class="imggrid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2"></div>${noteHtml(f)}</div>`
     : `<div><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
-        <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"><option value="">—</option></select></div>`).join("");
+        <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"><option value="">—</option></select>${noteHtml(f)}</div>`).join("");
   S.fields.forEach((f,i)=>{ const el=$(`f_${f.key}`);
     if(f.type==="number") el.oninput=()=>{ const v=el.value; if(v)S.values[f.key]=v; else delete S.values[f.key]; clearTimeout(S.t2); S.t2=setTimeout(quote,350); };
     else if(f.images) renderImageGrid(f);
