@@ -1005,6 +1005,14 @@ document.addEventListener("click", e=>{
   }
 });
 initPicker();
+// Deep-link: ?product=<id> (or #p-<id>) preselects a product — used by the per-product
+// SEO landing pages' "Check price / use the simulator" call-to-action.
+(function deepLink(){
+  try{
+    const m=(location.search.match(/[?&]product=(\d+)/)||location.hash.match(/#p-(\d+)/));
+    if(m){ const id=+m[1]; if(DATA.products.some(p=>p.id===id)) selectProduct(id); }
+  }catch(e){}
+})();
 </script>
 </body>
 </html>

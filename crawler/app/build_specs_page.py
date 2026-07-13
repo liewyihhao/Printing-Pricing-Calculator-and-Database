@@ -64,6 +64,13 @@ def clean_name(name):
     return re.sub(r"\s*\(=\s*[^)]*\)", "", name).strip()
 
 
+def slugify(name):
+    """Canonical per-product page slug (shared with build_product_pages)."""
+    s = clean_name(name).lower()
+    s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
+    return re.sub(r"-+", "-", s)
+
+
 def field_rows(prod):
     """Return list of (label, choices_html, note) for a product's customer-facing options."""
     contact = {}
@@ -138,10 +145,11 @@ def build():
                 f'<div class="spec"><div class="spec__k">{lab}</div>'
                 f'<div class="spec__v">{ch}{f"<p class=n>{html.escape(nt)}</p>" if nt else ""}</div></div>'
                 for lab, ch, nt in rows) or '<p class="n">Fixed specification — contact us to configure.</p>'
+            purl = f'products/{slugify(p["name"])}.html'
             cards.append(
                 f'<article class="prod" id="p-{p["id"]}">'
-                f'<div class="prod__h"><h3>{name}</h3>'
-                f'<a class="cta" href="calculator_standalone.html">Get a price<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>'
+                f'<div class="prod__h"><h3><a href="{purl}">{name}</a></h3>'
+                f'<a class="cta" href="{purl}">View product<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>'
                 + (f'<p class="prod__d">{desc}</p>' if desc else "")
                 + f'<div class="specs">{body}</div></article>')
         sections.append(
