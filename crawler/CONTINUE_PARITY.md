@@ -58,16 +58,32 @@ returns nothing.
   assuming neutral.
 
 ## Open items / next
-1. **Extend hot-stamping/embossing sub-configs** (foil colour + area, and embossing pricing) to the
-   remaining products that have them (folder, money packets, greeting card, …). Same pattern as
-   Business Card / Kad Kahwin. Rebuild + regenerate specs page.
-2. **1C Loose Sheet Litho exact price** (currently "on request"). No CheckPrice API (v4 500s); must
-   crawl the www `/spec/Litho/Loose_Sheet` form. Key facts learned: colour/package/envelope are
-   `<select>`s named `rblPrintColourSide` / `rblPackage` / `rblEnvelope`; controls are progressively
-   disclosed (colour/lamination appear after size+paper); `_read_price` (from `sticker_capture`)
-   reads the rendered price and 4C reads matched our data to the cent. Unresolved: 1C selections
-   returned `0.0` in the last probe (investigate — may need a settle/postback wait or the price only
-   updates after a valid full config incl. lamination). Aliases 101/102/103 share the fix.
+1. **Hot-stamping/embossing sub-configs — DONE / non-task (verified 2026-07-13).** Every product
+   that GENUINELY has hot stamping / embossing / deboss on Excard already exposes it; the
+   "folder / money packets / greeting card still to do" claim above was a FALSE POSITIVE from
+   `option_audit` (it dumps the shared v4 template, so `ddlHS`/`ddlDeBoss*`/`ddlCoverHotStamping*`
+   appear hidden on ~42/53 products). Ground truth (captured CheckPrice spec keys / metrics cols,
+   see `app/_hs_probe.py`):
+   - Money Packet: only the **Hot Stamping** variant (168) has it, already a priced `finishing`
+     axis (Gold Both / Front-Back; cent-exact vs `hotstamp_mp_pl_params`). Standard (138) /
+     Premium (167) / Envelope (169) have NO hot stamping.
+   - Wire-O Notebook (112) `hotstamping` axis; Perfect Bind Notebook (164) `hotstampingcolour`
+     axis; Leather Wire-O (163) `deboss`+`deboss H/W` axes; Booklet (19/37) `cover_embossing`+
+     `hot_stamping` fields. All already exposed.
+   - Folder (107), Greeting Card (166), Kad Terima Kasih (115), Creative Cut Card (165) etc. have
+     NO hot stamping. See memory `hotstamp-emboss-parity-complete`.
+2. **1C Loose Sheet Litho exact price — BLOCKED, stays on-request (investigated 2026-07-13).**
+   Exact 1C prices DO exist in `output/spot_samples_21.json` (190 pts 1C Front, 243 pts 1C Both,
+   all non-zero — the old "returned 0.0" issue is gone). BUT `spot_samples_21.json` is on a
+   DIFFERENT price scale from the shipped `loosesheet_plx_params.json` (the current 393 4C curves):
+   overlapping 4C points match at low qty but diverge up to ~1.16× at high qty, with some ratios
+   as low as 0.16 — i.e. the two captures are incompatible (different epoch/field/ganging), so 1C
+   from `spot_samples` CANNOT be grafted onto the 4C params without mispricing. Worse, the source
+   that built the current `loosesheet_plx_params.json` is not reproducible in-repo (no builder
+   script, no source CSV in `output/`). Getting consistent exact 1C requires a FRESH full
+   `order_capture` re-crawl of the whole size×paper×lamination grid for BOTH 1C and 4C (thousands
+   of configs, hours, session-recycling) — a large, risky, separate effort (would re-touch
+   shipped-exact 4C). Left on-request per the "impractical → on-request" fallback.
 3. Minor: `www_audit` URL guesses missed desk-calendar-hard/soft, mask-keeper (contact anyway),
    sublimation (audit via v4 slug `shirt`). Fix URLs if you want their corpus complete.
 
