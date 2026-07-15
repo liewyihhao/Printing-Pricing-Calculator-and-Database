@@ -216,3 +216,71 @@ def whatsnew():
 def capture():
     """Market Scan helper: capture bookmarklet + the full product checklist."""
     return FileResponse(ROOT / "ui" / "capture.html")
+
+
+# ── Order intake ───────────────────────────────────────────────────────────────
+# The standalone calculator's Excard-style order flow POSTs a configured order here.
+# No payment: an order is a *request* Printoka fulfils manually. Stored as one JSON
+# file per order under output/orders/ plus an append-only output/orders.jsonl log.
+import datetime as _dt
+import secrets as _secrets
+import threading as _threading
+
+ORDERS_DIR = ROOT / "output" / "orders"
+ORDERS_LOG = ROOT / "output" / "orders.jsonl"
+_ORDER_LOCK = _threading.Lock()
+
+
+class OrderLine(BaseModel):
+    product_id: int
+    product_name: str = ""
+    options: dict = {}
+    quantity: int
+    unit_price: float | None = None
+    cash: float | None = None
+    weight_kg: float | None = None
+
+
+class OrderRequest(BaseModel):
+    items: list[OrderLine]
+    contact: dict = {}          # name, email, phone, company
+    delivery: dict = {}         # destination code/label, address lines, method
+    artwork: dict = {}          # filename, note, design_service
+    totals: dict = {}           # subtotal, delivery_fee, grand_total (as computed client-side)
+    remarks: str = ""
+
+
+def _new_ref() -> str:
+    return f"ORD-{_dt.datetime.now():%y%m%d}-{_secrets.token_hex(3).upper()}"
+
+
+@app.post("/api/v1/orders")
+def create_order(req: OrderRequest):
+    if not req.items:
+        raise HTTPException(400, "order has no items")
+    for ln in req.items:
+        if ln.product_id not in PRODUCTS:
+            raise HTTPException(404, f"unknown product_id {ln.product_id}")
+        if ln.quantity <= 0:
+            raise HTTPException(400, "quantity must be positive")
+    ref = _new_ref()
+    record = {"order_ref": ref, "status": "received",
+              "received_at": _dt.datetime.now().isoformat(timespec="seconds"),
+              **req.model_dump()}
+    with _ORDER_LOCK:
+        ORDERS_DIR.mkdir(parents=True, exist_ok=True)
+        (ORDERS_DIR / f"{ref}.json").write_text(json.dumps(record, ensure_ascii=False, indent=1),
+                                                encoding="utf-8")
+        with ORDERS_LOG.open("a", encoding="utf-8") as fh:
+            fh.write(json.dumps(record, ensure_ascii=False) + "\n")
+    return {"ok": True, "order_ref": ref, "status": record["status"],
+            "received_at": record["received_at"]}
+
+
+@app.get("/api/v1/orders/{order_ref}")
+def get_order(order_ref: str):
+    """Order tracking — look up a previously placed order request by reference."""
+    f = ORDERS_DIR / f"{order_ref}.json"
+    if not f.exists():
+        raise HTTPException(404, "unknown order reference")
+    return json.loads(f.read_text(encoding="utf-8"))

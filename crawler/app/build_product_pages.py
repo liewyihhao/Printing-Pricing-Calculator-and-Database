@@ -22,7 +22,6 @@ from pathlib import Path
 from app.build_specs_page import (
     CATEGORIES, cat_of, clean_name, field_rows, _clean_note, SKIP_FIELD, slugify,
 )
-from app.build_standalone import _PRICELIST_FROM_OPTIONS as _PLO
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "output"
@@ -31,25 +30,6 @@ PDIR = UI / "products"
 TDIR = UI / "templates"
 
 CAT_LABEL = {k: l for k, l, _ in CATEGORIES}
-EXCARD_SEARCH = "https://www.excard.com.my/"
-
-
-def _order_urls():
-    """id -> Excard order URL. Prefer the verified www product page (from the catalogue's
-    built_as map); fall back to the v4 ordering slug; else Excard home/search."""
-    m = {}
-    try:
-        cat = json.loads((OUT / "excard_catalogue.json").read_text(encoding="utf-8"))["products"]
-        for c in cat:
-            for b in (c.get("built_as") or []):
-                mm = re.search(r"\((\d+)\)", b)
-                if mm and c.get("url"):
-                    m[int(mm.group(1))] = c["url"]
-    except Exception:
-        pass
-    for pid, (slug, _tag) in _PLO.items():
-        m.setdefault(pid, f"https://v4.excard.com.my/ordering/{slug.lower()}")
-    return m
 
 
 def _templates_for(slug: str):
@@ -79,7 +59,7 @@ def _intro(name: str, cat_label: str, opt_labels: list[str]) -> str:
     return " ".join(bits)
 
 
-def _page(prod, cat_key, order_url, prev_p, next_p):
+def _page(prod, cat_key, prev_p, next_p):
     pid = prod["id"]
     name = clean_name(prod["name"])
     slug = slugify(prod["name"])
@@ -105,9 +85,8 @@ def _page(prod, cat_key, order_url, prev_p, next_p):
             for fn, href, sz in tpls) + '</div>'
     else:
         thtml = ('<p class="tpl-empty">Print-ready templates (die-lines &amp; artwork guides) for '
-                 f'{html.escape(name)} are coming soon. <a href="{html.escape(order_url)}" '
-                 'target="_blank" rel="noopener nofollow">Request a template</a> or start from the '
-                 'specification below.</p>')
+                 f'{html.escape(name)} are coming soon. Start from the specification below and '
+                 f'<a href="../calculator_standalone.html?product={pid}">configure &amp; order</a>.</p>')
 
     # ---- SEO structured data ----
     kw_desc = (f"Custom {name} printing in Malaysia. Options: "
@@ -136,7 +115,6 @@ def _page(prod, cat_key, order_url, prev_p, next_p):
             .replace("__INTRO__", intro)
             .replace("__ACCBADGE__", acc_badge)
             .replace("__SIMURL__", f"../calculator_standalone.html?product={pid}")
-            .replace("__ORDERURL__", html.escape(order_url))
             .replace("__SPECS__", specs_html)
             .replace("__TEMPLATES__", thtml)
             .replace("__PREV__", nav_prev)
@@ -167,7 +145,6 @@ def _index(by_cat, cat_meta):
 def build():
     data = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))
     prods = data["products"]
-    orders = _order_urls()
     PDIR.mkdir(parents=True, exist_ok=True)
     TDIR.mkdir(parents=True, exist_ok=True)
 
@@ -183,14 +160,12 @@ def build():
     n = 0
     for i, p in enumerate(ordered):
         cat_key = cat_of(p["name"])
-        url = orders.get(p["id"], EXCARD_SEARCH)
-        page = _page(p, cat_key, url, ordered[i - 1] if i else None,
+        page = _page(p, cat_key, ordered[i - 1] if i else None,
                      ordered[i + 1] if i + 1 < len(ordered) else None)
         (PDIR / f"{slugify(p['name'])}.html").write_text(page, encoding="utf-8")
         n += 1
     (PDIR / "index.html").write_text(_index(by_cat, cat_meta), encoding="utf-8")
-    print(f"wrote {n} product pages + index to ui/products/ "
-          f"({sum(1 for p in prods if p['id'] in orders)} with an Excard order link)")
+    print(f"wrote {n} product pages + index to ui/products/ (order flow -> calculator, no external links)")
 
 
 # ---------------------------------------------------------------- templates
@@ -283,9 +258,8 @@ _PROD_TMPL = r"""<!doctype html>
 
   <main class="wrap">
     <div class="ctarow">
-      <a class="btn btn--primary" href="__SIMURL__">Check price / use the simulator
+      <a class="btn btn--primary" href="__SIMURL__">Configure, price &amp; order
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-      <a class="btn btn--ghost" href="__ORDERURL__" target="_blank" rel="noopener nofollow">Place order</a>
       <a class="btn btn--ghost" href="#templates">Download templates</a>
     </div>
 
@@ -317,10 +291,10 @@ _PROD_TMPL = r"""<!doctype html>
       <aside>
         <div class="panel">
           <h2>Get __NAME__ now</h2>
-          <p class="sub">Instant price, then order.</p>
+          <p class="sub">Instant price, then order — all on Printoka.</p>
           <div class="aside-cta">
-            <a class="btn btn--primary" href="__SIMURL__" style="justify-content:center">Check the price</a>
-            <a class="btn btn--ghost" href="__ORDERURL__" target="_blank" rel="noopener nofollow" style="justify-content:center">Place order</a>
+            <a class="btn btn--primary" href="__SIMURL__" style="justify-content:center">Configure &amp; price</a>
+            <a class="btn btn--ghost" href="__SIMURL__" style="justify-content:center">Place order</a>
             <a class="btn btn--ghost" href="#templates" style="justify-content:center">Download template</a>
           </div>
         </div>
