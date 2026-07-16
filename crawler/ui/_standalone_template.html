@@ -1035,12 +1035,16 @@ function enforceValidity(){
 }
 // Show/hide fields that only apply for certain values of another field (e.g. hot-stamping
 // foil colour + area only when hot stamping is selected). showWhen = {field, values?, notValues?}.
+// Whether a field is currently applicable given its showWhen parent (no showWhen ⇒ always shown).
+function fieldShown(f){
+  const sw=f.showWhen; if(!sw) return true;
+  const el=$(`f_${sw.field}`);
+  const cur=(S.values[sw.field]!=null && S.values[sw.field]!=="")?S.values[sw.field]:(el?el.value:"");
+  return sw.values ? sw.values.indexOf(cur)>=0 : (sw.notValues ? sw.notValues.indexOf(cur)<0 : true);
+}
 function updateFieldVis(){
-  for(const f of (S.fields||[])){ const sw=f.showWhen; const wrap=$(`fw_${f.key}`); if(!sw||!wrap) continue;
-    const el=$(`f_${sw.field}`);
-    const cur = (S.values[sw.field]!=null && S.values[sw.field]!=="") ? S.values[sw.field] : (el ? el.value : "");
-    const show = sw.values ? sw.values.indexOf(cur)>=0 : (sw.notValues ? sw.notValues.indexOf(cur)<0 : true);
-    wrap.classList.toggle("hidden", !show);
+  for(const f of (S.fields||[])){ const wrap=$(`fw_${f.key}`); if(!f.showWhen||!wrap) continue;
+    wrap.classList.toggle("hidden", !fieldShown(f));
   }
 }
 function onChange(idx){ const f=S.fields[idx], v=$(`f_${f.key}`).value;
@@ -1065,7 +1069,10 @@ function populateFrom(start){
   quote();
 }
 function quote(){
-  const qty=parseInt($("qty").value||"0"), complete=S.fields.every(f=>f.optional||S.values[f.key]);
+  // A field is required only if it's currently applicable (showWhen) and not an optional/neutral
+  // dimension input. Hidden sub-fields (e.g. hot-stamp area when hot-stamping is off) never block.
+  const qty=parseInt($("qty").value||"0"),
+        complete=S.fields.every(f=>f.optional||f.type==="number"||!fieldShown(f)||S.values[f.key]);
   if(!complete||!qty){ $("status").textContent=""; clearPrice("Configure a job…"); return; }
   try{ const q=localQuote(S.prod,S.values,qty);
     const mk=S.prod.markup||1;   // reference selling-price markup for non-exact products
