@@ -10,7 +10,7 @@
 <script>
 tailwind.config = { theme: { extend: {
   fontFamily: { sans:['Inter','system-ui','sans-serif'], display:['Poppins','sans-serif'] },
-  colors: { ink:'#061b31', brand:{50:'#fff1ec',100:'#ffe3d8',500:'#ff5a2e',600:'#e6491c',700:'#c43c14'},
+  colors: { ink:'#212529', brand:{50:'#e7f2f6',100:'#cfe4ec',500:'#005b7f',600:'#00485f',700:'#003647'}, gold:{500:'#fdb913',600:'#e9a800'},
     slate:{50:'#f8fafd',100:'#f1f5f9',150:'#e9eef4',200:'#e5edf5',300:'#d8d6df',400:'#64748d',500:'#50617a',600:'#42526b',700:'#2c3a4f',900:'#061b31'} },
   boxShadow:{ card:'0 0 0 1px rgba(60,66,87,.04), 0 2px 5px 0 rgba(60,66,87,.06), 0 1px 1.5px 0 rgba(0,0,0,.04)' } } } };
 </script>
@@ -18,17 +18,18 @@ tailwind.config = { theme: { extend: {
   html{color-scheme:light} body{-webkit-font-smoothing:antialiased;letter-spacing:-0.006em}
   h1,h2,h3{text-wrap:balance;letter-spacing:-0.018em;font-weight:600}
   .tabular-nums{font-variant-numeric:tabular-nums}
-  .brand-orb{background:conic-gradient(from 210deg,#ff3d2e,#ff8a00,#ffd000,#39c46e,#1fa2ff,#7b5bff,#ff3d2e)}
-  .brand-gradient{background:linear-gradient(99deg,#ff5a2e 0%,#ff8a00 28%,#7b5bff 72%,#1fa2ff 100%)}
-  .hairline{border-color:#e3e8ef}
+  .brand-orb{background:conic-gradient(from 210deg,#00b3c4,#0d6385,#005b7f,#00485f,#fdb913,#00b3c4)}
+  .brand-gradient{background:linear-gradient(99deg,#0d6385 0%,#005b7f 60%,#00485f 100%)}
+  .gold-btn{background:#fdb913;color:#3a2c00}.gold-btn:hover{background:#e9a800}
+  .hairline{border-color:#e6e9ee}
   .fieldsel{transition:border .12s,box-shadow .12s}
-  .fieldsel:focus{outline:none;border-color:rgba(255,90,46,.55);box-shadow:0 0 0 3px rgba(255,90,46,.16)}
+  .fieldsel:focus{outline:none;border-color:rgba(0,91,127,.55);box-shadow:0 0 0 3px rgba(0,91,127,.16)}
   .fieldsel:disabled{background:#f8fafd;color:#9aa7ba;cursor:not-allowed}
   .prodcard{transition:border .12s,box-shadow .12s;cursor:pointer}
-  .prodcard:hover{box-shadow:0 7px 14px 0 rgba(60,66,87,.10)}
-  .prodcard.active{border-color:#ff5a2e;background:#fff8f5}
-  .prodcard.active .pc-orb{box-shadow:0 0 0 3px #ffe3d8}
-  .qchip{transition:all .1s;cursor:pointer}.qchip.active{background:#ff5a2e;color:#fff;border-color:#ff5a2e}
+  .prodcard:hover{box-shadow:0 7px 14px 0 rgba(20,40,60,.10)}
+  .prodcard.active{border-color:#005b7f;background:#f2fafd}
+  .prodcard.active .pc-orb{box-shadow:0 0 0 3px #cfe4ec}
+  .qchip{transition:all .1s;cursor:pointer}.qchip.active{background:#005b7f;color:#fff;border-color:#005b7f}
   .fade{animation:f .25s ease both}@keyframes f{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   .pricepulse{animation:pp .4s ease both}@keyframes pp{0%{opacity:.35}100%{opacity:1}}
 </style>
@@ -110,7 +111,7 @@ tailwind.config = { theme: { extend: {
           <div class="flex items-center justify-between py-1"><span class="text-slate-500" id="deliv_label">Delivery</span><span id="deliv_fee" class="tabular-nums text-slate-700"></span></div>
           <div class="flex items-center justify-between py-1 font-semibold"><span class="text-ink">Total (Cash + delivery)</span><span id="deliv_total" class="tabular-nums text-ink"></span></div>
         </div>
-        <button id="toOrder" class="hidden w-full mt-3 rounded-lg brand-gradient text-white text-[13.5px] font-semibold px-4 py-2.5 hover:opacity-95 shadow-card">Proceed to order →</button>
+        <button id="toOrder" class="hidden w-full mt-3 rounded-lg gold-btn text-[13.5px] font-bold px-4 py-2.5 shadow-card">Proceed to order →</button>
         <div id="meta" class="mt-3 pt-3 border-t hairline space-y-1.5 text-[12px] hidden">
           <div class="flex justify-between"><span class="text-slate-400">Weight (est.)</span><span id="m_wt" class="tabular-nums text-slate-600"></span></div>
           <div class="flex justify-between"><span class="text-slate-400">Chargeable weight</span><span id="m_cw" class="tabular-nums text-slate-600"></span></div>
@@ -228,7 +229,7 @@ tailwind.config = { theme: { extend: {
       <div id="ord_nav" class="flex items-center justify-between gap-3 px-6 py-4 border-t hairline">
         <button id="ord_back" class="rounded-lg border hairline text-[13px] font-medium px-4 py-2 text-slate-600 hover:bg-slate-50">Back</button>
         <span id="ord_err" class="text-[12px] text-red-500 flex-1 text-center"></span>
-        <button id="ord_next" class="rounded-lg brand-gradient text-white text-[13px] font-semibold px-5 py-2 hover:opacity-95">Continue</button>
+        <button id="ord_next" class="rounded-lg gold-btn text-[13px] font-bold px-5 py-2">Continue</button>
       </div>
     </div>
   </div>

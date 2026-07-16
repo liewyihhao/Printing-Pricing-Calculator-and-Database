@@ -176,79 +176,84 @@ _PAGE = r"""<!doctype html>
 <meta name="robots" content="index,follow">
 <link rel="canonical" href="specs.html">
 <style>
-  :root{--ink:#0a2540;--muted:#425466;--faint:#697386;--hair:#e6ebf1;--bg:#f6f9fc;--card:#fff;
-    --blurple:#635bff;--chip:#f0f3f9;--onreq:#8a6d1f;--onreqbg:#fbf1d3;
-    --shadow:0 1px 2px rgba(60,66,87,.06),0 1px 1px rgba(0,0,0,.03);}
+  :root{--ink:#212529;--muted:#546e7a;--faint:#7d879c;--hair:#e6e9ee;--line:#eef1f4;--bg:#fff;--card:#fff;
+    --teal:#005b7f;--teal-d:#00485f;--yellow:#fdb913;--chip:#eef4f7;--chipink:#2b5563;
+    --onreq:#a1660a;--onreqbg:#fff5e2;--shadow:0 1px 2px rgba(20,40,60,.05),0 1px 1px rgba(0,0,0,.03);}
   *{box-sizing:border-box}
   html,body{overflow-x:hidden}
-  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.5;
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.55;font-size:14px;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif}
   a{color:inherit;text-decoration:none}
   .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
 
-  header.hero{background:linear-gradient(102deg,#3ee0d8 0%,#3b8bff 30%,#635bff 60%,#8b5cf6 100%);
-    color:#fff;padding:56px 24px 66px;clip-path:polygon(0 0,100% 0,100% calc(100% - 40px),0 100%)}
-  .hero .wrap{padding-bottom:8px}
-  .brand{display:flex;align-items:center;gap:11px;margin-bottom:26px}
-  .orb{height:30px;width:30px;border-radius:50%;
-    background:conic-gradient(from 210deg,#42e8e0,#3b8bff,#635bff,#8b5cf6,#ff5c8a,#ffcb57,#42e8e0)}
-  .brand b{font-size:17px;letter-spacing:-.02em} .brand span{opacity:.75;font-size:13.5px}
-  header h1{margin:0 0 10px;font-size:clamp(28px,4vw,42px);letter-spacing:-.03em;font-weight:800;line-height:1.08}
-  header p{margin:0;max-width:64ch;font-size:clamp(15px,1.4vw,17px);opacity:.92}
+  .topbar{border-top:3px solid var(--yellow);border-bottom:1px solid var(--hair);background:#fff}
+  .topbar .wrap{display:flex;align-items:center;gap:11px;height:56px}
+  .topbar b{font-size:16px;color:var(--ink)}.topbar .sub{color:var(--faint);font-size:13px}
+  .topbar .spacer{margin-left:auto}.topbar .mini{font-size:13px;font-weight:600;color:var(--teal)}
+  header.hero{background:#fff;padding:26px 0 6px}
+  .brand{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+  .orb{height:28px;width:28px;border-radius:50%;
+    background:conic-gradient(from 210deg,#00b3c4,#0d6385,#005b7f,#00485f,#fdb913,#00b3c4)}
+  .brand b{font-size:16px;color:var(--ink)} .brand span{color:var(--faint);font-size:13.5px}
+  header h1{margin:0 0 8px;font-size:clamp(26px,3.4vw,36px);letter-spacing:-.01em;font-weight:700;line-height:1.12;color:var(--ink)}
+  header p{margin:0;max-width:70ch;font-size:15px;color:var(--muted)}
 
-  .toolbar{position:sticky;top:0;z-index:20;background:rgba(246,249,252,.86);backdrop-filter:blur(8px);
+  .toolbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.9);backdrop-filter:blur(8px);
     border-bottom:1px solid var(--hair)}
   .toolbar .wrap{display:flex;gap:12px;align-items:center;padding:12px 24px;flex-wrap:wrap}
-  #q{flex:1;min-width:180px;border:1px solid var(--hair);border-radius:9px;background:#fff;
-    padding:9px 12px;font-size:14px;color:var(--ink);box-shadow:var(--shadow)}
-  #q:focus{outline:none;border-color:var(--blurple);box-shadow:0 0 0 3px rgba(99,91,255,.15)}
-  .navchips{display:flex;gap:7px;flex-wrap:wrap}
-  .navchip{font-size:12.5px;color:var(--muted);background:#fff;border:1px solid var(--hair);
-    border-radius:20px;padding:6px 11px;box-shadow:var(--shadow)}
-  .navchip:hover{border-color:#cdd6e4;color:var(--ink)}
-  .navchip b{color:var(--blurple);font-weight:700;margin-left:2px}
+  #q{flex:1;min-width:180px;border:1px solid var(--hair);border-radius:8px;background:#fff;
+    padding:9px 12px;font-size:14px;color:var(--ink)}
+  #q:focus{outline:none;border-color:var(--teal);box-shadow:0 0 0 3px rgba(0,91,127,.14)}
+  .navchips{display:flex;gap:8px;flex-wrap:wrap}
+  .navchip{font-size:12.5px;color:var(--teal);background:var(--chip);border-radius:6px;padding:6px 11px;font-weight:600}
+  .navchip:hover{background:#dfeef4}
+  .navchip b{color:var(--faint);font-weight:700;margin-left:3px}
 
-  main{padding:34px 0 70px}
-  .cat{margin-bottom:40px;scroll-margin-top:66px}
-  .cat__h{display:flex;align-items:baseline;gap:12px;margin:0 2px 16px;padding-bottom:10px;border-bottom:1px solid var(--hair)}
-  .cat__h h2{margin:0;font-size:20px;letter-spacing:-.02em}
+  main{padding:30px 0 70px}
+  .cat{margin-bottom:38px;scroll-margin-top:66px}
+  .cat__h{display:flex;align-items:baseline;gap:12px;margin:0 0 16px;padding-bottom:10px;border-bottom:1px solid var(--hair)}
+  .cat__h h2{margin:0;font-size:23px;font-weight:300;color:var(--faint)}
   .cat__c{font-size:12.5px;color:var(--faint)}
   .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
 
-  .prod{background:var(--card);border:1px solid var(--hair);border-radius:14px;padding:18px 18px 8px;
-    box-shadow:var(--shadow);scroll-margin-top:72px}
+  .prod{background:var(--card);border:1px solid var(--hair);border-radius:11px;padding:18px 18px 10px;
+    scroll-margin-top:72px}
+  .prod:hover{border-color:#cfdbe2}
   .prod__h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
-  .prod__h h3{margin:0;font-size:16px;letter-spacing:-.01em}
-  .cta{flex:none;display:inline-flex;align-items:center;gap:4px;color:var(--blurple);font-weight:600;
-    font-size:12.5px;border:1px solid #e4e2ff;background:#f4f3ff;border-radius:8px;padding:5px 9px}
-  .cta:hover{background:#ecebff}
+  .prod__h h3{margin:0;font-size:16px;font-weight:700}.prod__h h3 a:hover{color:var(--teal)}
+  .cta{flex:none;display:inline-flex;align-items:center;gap:4px;color:#3a2c00;font-weight:700;
+    font-size:12.5px;background:var(--yellow);border-radius:7px;padding:6px 11px}
+  .cta:hover{background:#e9a800}
   .prod__d{margin:2px 0 12px;color:var(--faint);font-size:12.5px;line-height:1.5}
   .specs{margin-top:8px}
-  .spec{display:grid;grid-template-columns:132px 1fr;gap:12px;padding:10px 0;border-top:1px solid #f0f3f8;align-items:start}
+  .spec{display:grid;grid-template-columns:132px 1fr;gap:12px;padding:11px 0;border-top:1px solid var(--line);align-items:start}
   .spec:first-child{border-top:none}
-  .spec__k{font-size:12.5px;font-weight:600;color:var(--muted)}
+  .spec__k{font-size:12.5px;font-weight:700;color:var(--teal)}
   .spec__k .cond{display:block;font-weight:400;color:var(--faint);font-size:11px;margin-top:2px}
   .spec__v{display:flex;flex-wrap:wrap;gap:5px;align-items:flex-start}
-  .opt{font-size:12px;background:var(--chip);color:#334155;border-radius:6px;padding:3px 8px;line-height:1.35}
+  .opt{font-size:12px;background:var(--chip);color:var(--chipink);border-radius:5px;padding:3px 8px;line-height:1.35}
   .opt.onreq{background:var(--onreqbg);color:var(--onreq)}
-  .opt em{font-style:normal;opacity:.8;font-size:10.5px}
+  .opt em{font-style:normal;opacity:.85;font-size:10.5px}
   .cust{font-size:12px;color:var(--faint);font-style:italic}
   .spec__v .n,.specs>.n{flex-basis:100%;color:var(--faint);font-size:11px;margin:3px 0 0}
   .n{color:var(--faint);font-size:11px;margin:3px 0 0}
 
   footer{border-top:1px solid var(--hair);color:var(--faint);font-size:12.5px}
   footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:22px 24px 50px}
-  footer a{color:var(--blurple)}
+  footer a{color:var(--teal)}
   .empty{display:none;text-align:center;color:var(--faint);padding:50px 0;font-size:14px}
   @media (max-width:560px){.cards{grid-template-columns:1fr}.spec{grid-template-columns:1fr;gap:4px}}
 </style>
 <script type="application/ld+json">__LD__</script>
 </head>
 <body>
+  <div class="topbar"><div class="wrap">
+    <span class="orb"></span><b>Printoka</b><span class="sub">/ product specifications</span>
+    <span class="spacer"></span><a class="mini" href="calculator_standalone.html">Pricing calculator</a>
+  </div></div>
   <header class="hero"><div class="wrap">
-    <div class="brand"><span class="orb"></span><b>Printoka</b><span>/ product specifications</span></div>
     <h1>Every product, every option</h1>
-    <p>Browse our full print catalogue and the customisation we offer — sizes, papers, print colours, lamination, binding and finishing. __TOTAL__ products across __NCAT__ categories. Pick a product, configure it, and get an instant price.</p>
+    <p>Browse our full print catalogue and the customisation we offer — sizes, papers, print colours, lamination, binding and finishing. __TOTAL__ products across __NCAT__ categories. Pick a product, view its full spec and get an instant price.</p>
   </div></header>
 
   <div class="toolbar"><div class="wrap">
