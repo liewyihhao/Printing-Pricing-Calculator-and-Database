@@ -1,0 +1,40 @@
+{
+  "_note": "Printoka-authored factual spec content (our own wording). Optional depth rendered on the product page's Product Spec tab by app.build_product_pages._rich_spec.",
+  "sections": [
+    {
+      "title": "Materials & where they work best",
+      "type": "cards",
+      "items": [
+        {"name": "Mirror Kote", "ideal": ["Flat surfaces — paper, plastic, glass, metal", "Dry, indoor use", "Most economical everyday label"]},
+        {"name": "Transparent OPP", "ideal": ["No-label / see-through look", "Smooth flat surfaces", "Water-resistant when laminated"]},
+        {"name": "White PP (Polypropylene)", "ideal": ["Bottles, jars and cosmetics", "Curved surfaces", "Moisture and tear resistant"]},
+        {"name": "White PE (Polyethylene)", "ideal": ["Squeezable bottles and tubes", "Flexible / curved surfaces", "Durable outdoor use"]},
+        {"name": "Synthetic Paper", "ideal": ["Heavy-duty, waterproof labels", "Tear resistant", "Indoor and short outdoor use"]},
+        {"name": "Brown Kraft Paper", "ideal": ["Natural, eco and artisanal look", "Flat surfaces", "Dry indoor use"]},
+        {"name": "Silver Polyester (Matte / Bright)", "ideal": ["Warranty, asset and rating labels", "Metallic finish", "Scratch and solvent resistant"]}
+      ],
+      "note": "Material availability and exact suitability vary by artwork and application — tell us your surface and we'll advise."
+    },
+    {
+      "title": "Print & finishing",
+      "type": "keyvalue",
+      "rows": [
+        {"k": "Print colour", "v": "Full colour (CMYK / 4C) or single colour (1C)"},
+        {"k": "Material thickness", "v": "≈ 90 micron (material-dependent)"},
+        {"k": "Lamination / coating", "v": "Gloss lamination · Matte lamination · Soft-touch lamination · UV varnish · Gloss water-based varnish"},
+        {"k": "Hot stamping", "v": "Gold or silver foil (quoted separately)"}
+      ]
+    },
+    {
+      "title": "Cutting methods & sizes",
+      "type": "keyvalue",
+      "rows": [
+        {"k": "Standard / rectangle / square", "v": "Min 10 × 25 mm · Max 300 × 420 mm"},
+        {"k": "Round", "v": "Min Ø 15 mm · Max Ø 300 mm"},
+        {"k": "Custom die-cut", "v": "Single die-line · Min 10 × 25 mm · Max 300 × 420 mm"},
+        {"k": "Kiss-cut / no-cut", "v": "Supplied on backing sheet; cut-to-size available"}
+      ],
+      "note": "Dimensions are production limits; artwork should include bleed on the correct template."
+    }
+  ]
+}

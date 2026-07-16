@@ -32,6 +32,34 @@ TDIR = UI / "templates"
 CAT_LABEL = {k: l for k, l, _ in CATEGORIES}
 
 
+def _rich_spec(slug: str) -> str:
+    """Optional per-product depth: render output/spec_content/<slug>.json (our own factual,
+    restructured spec content) as Excard-style sections. Returns "" if the file is absent."""
+    f = OUT / "spec_content" / f"{slug}.json"
+    if not f.is_file():
+        return ""
+    d = json.loads(f.read_text(encoding="utf-8"))
+    out = []
+    for sec in d.get("sections", []):
+        title = html.escape(sec.get("title", ""))
+        t = sec.get("type")
+        if t == "cards":
+            cards = "".join(
+                f'<div class="matcard"><h4>{html.escape(it.get("name",""))}</h4>'
+                f'<ul>{"".join(f"<li>{html.escape(x)}</li>" for x in it.get("ideal", []))}</ul></div>'
+                for it in sec.get("items", []))
+            body = f'<div class="matcards">{cards}</div>'
+        elif t == "keyvalue":
+            rows = "".join(f'<tr><th>{html.escape(r.get("k",""))}</th>'
+                           f'<td>{html.escape(r.get("v",""))}</td></tr>' for r in sec.get("rows", []))
+            body = f'<table class="kv"><tbody>{rows}</tbody></table>'
+        else:
+            body = f'<p class="about">{html.escape(sec.get("text",""))}</p>'
+        note = f'<p class="rich-note">{html.escape(sec["note"])}</p>' if sec.get("note") else ""
+        out.append(f'<div class="rich"><h3 class="sec-ttl">{title}</h3>{body}{note}</div>')
+    return "".join(out)
+
+
 def _templates_for(slug: str):
     """List files present under ui/templates/<slug>/ (the folder you drop rights-cleared
     template files into). Returns [(filename, rel_href, size_label)]."""
@@ -115,6 +143,7 @@ def _page(prod, cat_key, prev_p, next_p):
             .replace("__INTRO__", intro)
             .replace("__ACCBADGE__", acc_badge)
             .replace("__SIMURL__", f"../calculator_standalone.html?product={pid}")
+            .replace("__RICHSPEC__", _rich_spec(slug))
             .replace("__SPECS__", specs_html)
             .replace("__TEMPLATES__", thtml)
             .replace("__PREV__", nav_prev)
@@ -252,7 +281,19 @@ _STYLE = r"""
   footer{border-top:1px solid var(--hair);color:var(--faint);font-size:12.5px;margin-top:24px}
   footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:22px 0 46px}
   footer a{color:var(--teal)}
-  @media(max-width:560px){.spectable th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
+  /* rich spec sections (optional per-product depth) */
+  .rich{margin-bottom:28px}
+  .rich .sec-ttl{margin-bottom:12px}
+  .matcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .matcard{border:1px solid var(--hair);border-radius:9px;padding:14px 15px;background:#fff}
+  .matcard h4{margin:0 0 8px;font-size:14px;color:var(--teal);font-weight:700}
+  .matcard ul{margin:0;padding-left:16px;color:var(--muted);font-size:12.5px;line-height:1.65}
+  .kv{width:100%;border-collapse:collapse}
+  .kv tr{border-bottom:1px solid var(--line)}.kv tr:last-child{border-bottom:none}
+  .kv th{text-align:left;vertical-align:top;width:210px;padding:12px 16px 12px 0;font-size:13px;font-weight:700;color:var(--teal)}
+  .kv td{padding:12px 0;font-size:13.5px;color:var(--ink)}
+  .rich-note{font-size:12.5px;color:var(--faint);margin-top:8px}
+  @media(max-width:560px){.spectable th,.kv th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
 """
 
 _PROD_TMPL = r"""<!doctype html>
@@ -299,8 +340,9 @@ _PROD_TMPL = r"""<!doctype html>
 
   <main class="wrap">
     <section class="panel show" id="spec">
-      <h2 class="sec-ttl">Product Specification</h2>
-      <p class="sec-sub">Every option you can configure for __NAME__ — mirrored from our live order form.</p>
+      __RICHSPEC__
+      <h2 class="sec-ttl">Configurable Options</h2>
+      <p class="sec-sub">Every option you can set for __NAME__ when you order — mirrored from our live order form.</p>
       <table class="spectable"><tbody>__SPECS__</tbody></table>
     </section>
 

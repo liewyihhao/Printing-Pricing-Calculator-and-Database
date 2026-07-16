@@ -90,7 +90,19 @@
   footer{border-top:1px solid var(--hair);color:var(--faint);font-size:12.5px;margin-top:24px}
   footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:22px 0 46px}
   footer a{color:var(--teal)}
-  @media(max-width:560px){.spectable th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
+  /* rich spec sections (optional per-product depth) */
+  .rich{margin-bottom:28px}
+  .rich .sec-ttl{margin-bottom:12px}
+  .matcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .matcard{border:1px solid var(--hair);border-radius:9px;padding:14px 15px;background:#fff}
+  .matcard h4{margin:0 0 8px;font-size:14px;color:var(--teal);font-weight:700}
+  .matcard ul{margin:0;padding-left:16px;color:var(--muted);font-size:12.5px;line-height:1.65}
+  .kv{width:100%;border-collapse:collapse}
+  .kv tr{border-bottom:1px solid var(--line)}.kv tr:last-child{border-bottom:none}
+  .kv th{text-align:left;vertical-align:top;width:210px;padding:12px 16px 12px 0;font-size:13px;font-weight:700;color:var(--teal)}
+  .kv td{padding:12px 0;font-size:13.5px;color:var(--ink)}
+  .rich-note{font-size:12.5px;color:var(--faint);margin-top:8px}
+  @media(max-width:560px){.spectable th,.kv th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "Paper Bag — Litho", "category": "Packaging & Bags", "description": "Custom Paper Bag — Litho printing in Malaysia. Options: Model, Size, Paper, Lamination, Hot Stamping Size, Rope Colour", "brand": {"@type": "Brand", "name": "Printoka"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Products", "item": "index.html"}, {"@type": "ListItem", "position": 2, "name": "Packaging & Bags", "item": "index.html#packaging"}, {"@type": "ListItem", "position": 3, "name": "Paper Bag — Litho", "item": "paper-bag-litho.html"}]}</script>
@@ -123,8 +135,9 @@
 
   <main class="wrap">
     <section class="panel show" id="spec">
-      <h2 class="sec-ttl">Product Specification</h2>
-      <p class="sec-sub">Every option you can configure for Paper Bag — Litho — mirrored from our live order form.</p>
+      
+      <h2 class="sec-ttl">Configurable Options</h2>
+      <p class="sec-sub">Every option you can set for Paper Bag — Litho when you order — mirrored from our live order form.</p>
       <table class="spectable"><tbody><tr><th>Model</th><td><div class="opts"><span class="opt">PBG 001</span><span class="opt">PBG 002</span><span class="opt">PBG 004</span><span class="opt">PBG 005</span><span class="opt">PBG 003</span><span class="opt">PBG 006</span><span class="opt">PBG 007</span></div></td></tr><tr><th>Size</th><td><div class="opts"><span class="opt">180mm x 80mm x 230mm</span><span class="opt">220mm x 80mm x 230mm</span><span class="opt">200mm x 95mm x 290mm</span><span class="opt">320mm x 95mm x 230mm</span><span class="opt">250mm x 95mm x 350mm</span><span class="opt">370mm x 120mm x 295mm</span><span class="opt">320mm x 120mm x 420mm</span></div></td></tr><tr><th>Paper</th><td><div class="opts"><span class="opt">Gloss Art Paper 157gsm</span><span class="opt">Gloss Art Card 190gsm</span></div></td></tr><tr><th>Lamination</th><td><div class="opts"><span class="opt">Gloss Lamination (Front)</span><span class="opt">Matte Lamination (Front)</span><span class="opt">Matte Lamination + Spot UV</span></div></td></tr><tr><th>Hot Stamping Size</th><td><div class="opts"><span class="opt">Not Required</span><span class="opt">100mm x 100mm</span><span class="opt">100mm x 200mm</span><span class="opt">200mm x 200mm</span><span class="opt">300mm x 100mm</span><span class="opt">300mm x 200mm</span><span class="opt">400mm x 100mm</span><span class="opt">400mm x 200mm</span><span class="opt">460mm x 100mm</span><span class="opt">460mm x 200mm</span></div></td></tr><tr><th>Rope Colour</th><td><div class="opts"><span class="opt">Black</span><span class="opt">Blue</span><span class="opt">Gold</span><span class="opt">Green</span><span class="opt">Red</span><span class="opt">Silver</span><span class="opt">White</span></div><p class=n>Rope/handle colour is selectable free of charge (price-neutral).</p></td></tr></tbody></table>
     </section>
 

@@ -90,7 +90,19 @@
   footer{border-top:1px solid var(--hair);color:var(--faint);font-size:12.5px;margin-top:24px}
   footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;padding:22px 0 46px}
   footer a{color:var(--teal)}
-  @media(max-width:560px){.spectable th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
+  /* rich spec sections (optional per-product depth) */
+  .rich{margin-bottom:28px}
+  .rich .sec-ttl{margin-bottom:12px}
+  .matcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+  .matcard{border:1px solid var(--hair);border-radius:9px;padding:14px 15px;background:#fff}
+  .matcard h4{margin:0 0 8px;font-size:14px;color:var(--teal);font-weight:700}
+  .matcard ul{margin:0;padding-left:16px;color:var(--muted);font-size:12.5px;line-height:1.65}
+  .kv{width:100%;border-collapse:collapse}
+  .kv tr{border-bottom:1px solid var(--line)}.kv tr:last-child{border-bottom:none}
+  .kv th{text-align:left;vertical-align:top;width:210px;padding:12px 16px 12px 0;font-size:13px;font-weight:700;color:var(--teal)}
+  .kv td{padding:12px 0;font-size:13.5px;color:var(--ink)}
+  .rich-note{font-size:12.5px;color:var(--faint);margin-top:8px}
+  @media(max-width:560px){.spectable th,.kv th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "Mug — Litho", "category": "Promo & Apparel", "description": "Custom Mug — Litho printing in Malaysia. Options: Model, Size", "brand": {"@type": "Brand", "name": "Printoka"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Products", "item": "index.html"}, {"@type": "ListItem", "position": 2, "name": "Promo & Apparel", "item": "index.html#promo"}, {"@type": "ListItem", "position": 3, "name": "Mug — Litho", "item": "mug-litho.html"}]}</script>
@@ -123,8 +135,9 @@
 
   <main class="wrap">
     <section class="panel show" id="spec">
-      <h2 class="sec-ttl">Product Specification</h2>
-      <p class="sec-sub">Every option you can configure for Mug — Litho — mirrored from our live order form.</p>
+      
+      <h2 class="sec-ttl">Configurable Options</h2>
+      <p class="sec-sub">Every option you can set for Mug — Litho when you order — mirrored from our live order form.</p>
       <table class="spectable"><tbody><tr><th>Model</th><td><div class="opts"><span class="opt">11OZ</span><span class="opt">15OZ</span><span class="opt">12OZ</span></div></td></tr><tr><th>Size</th><td><div class="opts"><span class="opt">81mm x 95mm</span><span class="opt">65mm x 115mm</span><span class="opt">60mm x 100mm</span></div></td></tr></tbody></table>
     </section>
 

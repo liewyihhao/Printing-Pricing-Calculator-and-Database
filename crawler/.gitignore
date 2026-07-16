@@ -3,4 +3,6 @@
 __pycache__/
 *.pyc
 state/
-output/
+output/*
+# authored, versioned spec content (our own factual per-product depth) — keep tracked
+!output/spec_content/
