@@ -102,6 +102,8 @@
   .kv th{text-align:left;vertical-align:top;width:210px;padding:12px 16px 12px 0;font-size:13px;font-weight:700;color:var(--teal)}
   .kv td{padding:12px 0;font-size:13.5px;color:var(--ink)}
   .rich-note{font-size:12.5px;color:var(--faint);margin-top:8px}
+  .spec-list{margin:0;padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.8}
+  .spec-list li{margin-bottom:2px}
   @media(max-width:560px){.spectable th,.kv th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
   /* hero art */
   .hero-flex{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
@@ -162,22 +164,29 @@
 
   <nav class="tabs"><div class="wrap">
     <button class="tab active" data-tab="spec">Product Spec</button>
+    <button class="tab" data-tab="artwork">Artwork Spec</button>
     <button class="tab" data-tab="templates">Templates</button>
     <button class="tab" data-tab="about">About &amp; Order</button>
   </div></nav>
 
   <main class="wrap">
     <section class="panel show" id="spec">
-      
+      <div class="rich"><h3 class="sec-ttl">At a glance</h3><table class="kv"><tbody><tr><th>Materials / paper</th><td>Gloss Art Card 230gsm (2 sides coated), Gloss Art Card 260gsm (2 sides coated), Gloss Art Card 310gsm (2 sides coated), Gloss Art Card 360gsm (2 sides coated), Super White 240gsm, Vellum 220gsm…</td></tr><tr><th>Print colour</th><td>4C (Front), 4C (Both)</td></tr><tr><th>Finishing</th><td>Not Required, Gloss Lamination (Front), Gloss Lamination (Both), Matte Lamination (Front), Matte Lamination (Both)</td></tr><tr><th>Standard sizes</th><td>3 sizes available — see Template Sizes</td></tr></tbody></table></div>
       <h2 class="sec-ttl">Configurable Options</h2>
       <p class="sec-sub">Every option you can set for Kad Terima Kasih — Digital when you order — mirrored from our live order form.</p>
       <table class="spectable"><tbody><tr><th>Size</th><td><div class="opts"><span class="opt">52mm x 52mm</span><span class="opt">40mm x 86mm</span><span class="opt">40mm x 70mm</span></div></td></tr><tr><th>Paper</th><td><div class="opts"><span class="opt">Gloss Art Card 230gsm (2 sides coated)</span><span class="opt">Gloss Art Card 260gsm (2 sides coated)</span><span class="opt">Gloss Art Card 310gsm (2 sides coated)</span><span class="opt">Gloss Art Card 360gsm (2 sides coated)</span><span class="opt">Super White 240gsm</span><span class="opt">Vellum 220gsm</span><span class="opt">Metal Ice 250gsm</span></div></td></tr><tr><th>Print Colour</th><td><div class="opts"><span class="opt">4C (Front)</span><span class="opt">4C (Both)</span></div></td></tr><tr><th>Lamination</th><td><div class="opts"><span class="opt">Not Required</span><span class="opt">Gloss Lamination (Front)</span><span class="opt">Gloss Lamination (Both)</span><span class="opt">Matte Lamination (Front)</span><span class="opt">Matte Lamination (Both)</span></div></td></tr><tr><th>Hole Punch</th><td><div class="opts"><span class="opt">Not Required</span><span class="opt">Hole Punching (3mm)</span></div></td></tr></tbody></table>
     </section>
 
+    <section class="panel" id="artwork">
+      <h2 class="sec-ttl">Artwork Specification</h2>
+      <p class="sec-sub">How to set up print-ready artwork for Kad Terima Kasih — Digital so it prints exactly as you expect.</p>
+      <div class="rich"><h3 class="sec-ttl">File format &amp; setup</h3><table class="kv"><tbody><tr><th>File format</th><td>Print-ready PDF preferred. AI, EPS, or high-resolution PNG/TIFF also accepted.</td></tr><tr><th>Resolution</th><td>300 dpi at 100% size. Vector art (AI/EPS/PDF) is ideal and stays sharp.</td></tr><tr><th>Colour mode</th><td>CMYK for accurate print colour (RGB is converted and can shift).</td></tr><tr><th>Bleed</th><td>3 mm on every side — extend background artwork into the bleed.</td></tr><tr><th>Safe margin</th><td>Keep text and logos ≥ 3–5 mm inside the trim so nothing is cut off.</td></tr><tr><th>Fonts</th><td>Outline or embed all fonts before exporting.</td></tr></tbody></table></div><div class="rich"><h3 class="sec-ttl">Card setup</h3><ul class="spec-list"><li>Supply front and back as separate pages.</li><li>For rounded corners, keep content ≥ 4 mm inside the trim.</li><li>For spot UV or foil, supply a separate 100% black mask layer.</li></ul></div><div class="rich"><h3 class="sec-ttl">Before you send</h3><ul class="spec-list"><li>Export at 1:1 scale (100%).</li><li>Double-check spelling, contact details and the final size.</li><li>Flatten transparencies, or supply layered files if we&#x27;ve asked for them.</li></ul><p class="rich-note">Not sure? Send us your file and we&#x27;ll check it before printing.</p></div>
+    </section>
+
     <section class="panel" id="templates">
-      <h2 class="sec-ttl">Print-ready Templates</h2>
-      <p class="sec-sub">Set up your artwork on the correct die-line and bleed before you order.</p>
-      <p class="tpl-empty">Print-ready templates (die-lines &amp; artwork guides) for Kad Terima Kasih — Digital are coming soon. Start from the specification below and <a href="../calculator_standalone.html?product=115">configure &amp; order</a>.</p>
+      <h2 class="sec-ttl">Template Sizes &amp; Downloads</h2>
+      <p class="sec-sub">Set up your artwork on the correct size, die-line and bleed before you order.</p>
+      <div class="rich"><h3 class="sec-ttl">Standard sizes</h3><ul class="spec-list"><li>52mm x 52mm  ·  add 3 mm bleed on each side</li><li>40mm x 86mm  ·  add 3 mm bleed on each side</li><li>40mm x 70mm  ·  add 3 mm bleed on each side</li></ul><p class="rich-note">The size you order is the finished (trim) size.</p></div><div class="rich"><h3 class="sec-ttl">Setting up your file</h3><table class="kv"><tbody><tr><th>Trim size</th><td>The finished size you order.</td></tr><tr><th>Bleed</th><td>3 mm on every side (large formats per finishing).</td></tr><tr><th>Safe area</th><td>Keep important content ≥ 3–5 mm inside the trim.</td></tr></tbody></table><p class="rich-note">Download the matching print-ready template below and design inside it.</p></div><h3 class="sec-ttl" style="margin-top:8px">Download template</h3><p class="sec-sub">Rights-cleared, print-ready files.</p><p class="tpl-empty">A print-ready template for Kad Terima Kasih — Digital is coming soon. Set your artwork to the sizes above and <a href="../calculator_standalone.html?product=115">configure &amp; order</a>.</p>
     </section>
 
     <section class="panel" id="about">

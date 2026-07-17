@@ -102,6 +102,8 @@
   .kv th{text-align:left;vertical-align:top;width:210px;padding:12px 16px 12px 0;font-size:13px;font-weight:700;color:var(--teal)}
   .kv td{padding:12px 0;font-size:13.5px;color:var(--ink)}
   .rich-note{font-size:12.5px;color:var(--faint);margin-top:8px}
+  .spec-list{margin:0;padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.8}
+  .spec-list li{margin-bottom:2px}
   @media(max-width:560px){.spectable th,.kv th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
   /* hero art */
   .hero-flex{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
@@ -162,22 +164,29 @@
 
   <nav class="tabs"><div class="wrap">
     <button class="tab active" data-tab="spec">Product Spec</button>
+    <button class="tab" data-tab="artwork">Artwork Spec</button>
     <button class="tab" data-tab="templates">Templates</button>
     <button class="tab" data-tab="about">About &amp; Order</button>
   </div></nav>
 
   <main class="wrap">
     <section class="panel show" id="spec">
-      
+      <div class="rich"><h3 class="sec-ttl">At a glance</h3><table class="kv"><tbody><tr><th>Materials / paper</th><td>Metalised Pet Film, Transparent Pet Film</td></tr><tr><th>Finishing</th><td>Matte Lamination (Both), Gloss Lamination (Both)</td></tr><tr><th>Standard sizes</th><td>6 sizes available — see Template Sizes</td></tr></tbody></table></div>
       <h2 class="sec-ttl">Configurable Options</h2>
       <p class="sec-sub">Every option you can set for Standing Pouch — Litho when you order — mirrored from our live order form.</p>
       <table class="spectable"><tbody><tr><th>Model</th><td><div class="opts"><span class="opt">M1</span><span class="opt">M4</span><span class="opt">M6</span><span class="opt">M7</span><span class="opt">M8</span><span class="opt">M9</span></div></td></tr><tr><th>Size</th><td><div class="opts"><span class="opt">100mm x 160mm x 60mm</span><span class="opt">190mm x 280mm x 90mm</span><span class="opt">135mm x 190mm x 70mm</span><span class="opt">155mm x 230mm x 80mm</span><span class="opt">175mm x 260mm x 90mm</span><span class="opt">220mm x 300mm x 110mm</span></div></td></tr><tr><th>Paper</th><td><div class="opts"><span class="opt">Metalised Pet Film</span><span class="opt">Transparent Pet Film</span></div></td></tr><tr><th>Lamination</th><td><div class="opts"><span class="opt">Matte Lamination (Both)</span><span class="opt">Gloss Lamination (Both)</span></div></td></tr></tbody></table>
     </section>
 
+    <section class="panel" id="artwork">
+      <h2 class="sec-ttl">Artwork Specification</h2>
+      <p class="sec-sub">How to set up print-ready artwork for Standing Pouch — Litho so it prints exactly as you expect.</p>
+      <div class="rich"><h3 class="sec-ttl">File format &amp; setup</h3><table class="kv"><tbody><tr><th>File format</th><td>Print-ready PDF preferred. AI, EPS, or high-resolution PNG/TIFF also accepted.</td></tr><tr><th>Resolution</th><td>300 dpi at 100% size. Vector art (AI/EPS/PDF) is ideal and stays sharp.</td></tr><tr><th>Colour mode</th><td>CMYK for accurate print colour (RGB is converted and can shift).</td></tr><tr><th>Bleed</th><td>3 mm on every side — extend background artwork into the bleed.</td></tr><tr><th>Safe margin</th><td>Keep text and logos ≥ 3–5 mm inside the trim so nothing is cut off.</td></tr><tr><th>Fonts</th><td>Outline or embed all fonts before exporting.</td></tr></tbody></table></div><div class="rich"><h3 class="sec-ttl">Before you send</h3><ul class="spec-list"><li>Export at 1:1 scale (100%).</li><li>Double-check spelling, contact details and the final size.</li><li>Flatten transparencies, or supply layered files if we&#x27;ve asked for them.</li></ul><p class="rich-note">Not sure? Send us your file and we&#x27;ll check it before printing.</p></div>
+    </section>
+
     <section class="panel" id="templates">
-      <h2 class="sec-ttl">Print-ready Templates</h2>
-      <p class="sec-sub">Set up your artwork on the correct die-line and bleed before you order.</p>
-      <p class="tpl-empty">Print-ready templates (die-lines &amp; artwork guides) for Standing Pouch — Litho are coming soon. Start from the specification below and <a href="../calculator_standalone.html?product=137">configure &amp; order</a>.</p>
+      <h2 class="sec-ttl">Template Sizes &amp; Downloads</h2>
+      <p class="sec-sub">Set up your artwork on the correct size, die-line and bleed before you order.</p>
+      <div class="rich"><h3 class="sec-ttl">Standard sizes</h3><ul class="spec-list"><li>100mm x 160mm x 60mm  ·  add 3 mm bleed on each side</li><li>190mm x 280mm x 90mm  ·  add 3 mm bleed on each side</li><li>135mm x 190mm x 70mm  ·  add 3 mm bleed on each side</li><li>155mm x 230mm x 80mm  ·  add 3 mm bleed on each side</li><li>175mm x 260mm x 90mm  ·  add 3 mm bleed on each side</li><li>220mm x 300mm x 110mm  ·  add 3 mm bleed on each side</li></ul><p class="rich-note">The size you order is the finished (trim) size.</p></div><div class="rich"><h3 class="sec-ttl">Setting up your file</h3><table class="kv"><tbody><tr><th>Trim size</th><td>The finished size you order.</td></tr><tr><th>Bleed</th><td>3 mm on every side (large formats per finishing).</td></tr><tr><th>Safe area</th><td>Keep important content ≥ 3–5 mm inside the trim.</td></tr></tbody></table><p class="rich-note">Download the matching print-ready template below and design inside it.</p></div><h3 class="sec-ttl" style="margin-top:8px">Download template</h3><p class="sec-sub">Rights-cleared, print-ready files.</p><p class="tpl-empty">A print-ready template for Standing Pouch — Litho is coming soon. Set your artwork to the sizes above and <a href="../calculator_standalone.html?product=137">configure &amp; order</a>.</p>
     </section>
 
     <section class="panel" id="about">

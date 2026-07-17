@@ -102,6 +102,8 @@
   .kv th{text-align:left;vertical-align:top;width:210px;padding:12px 16px 12px 0;font-size:13px;font-weight:700;color:var(--teal)}
   .kv td{padding:12px 0;font-size:13.5px;color:var(--ink)}
   .rich-note{font-size:12.5px;color:var(--faint);margin-top:8px}
+  .spec-list{margin:0;padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.8}
+  .spec-list li{margin-bottom:2px}
   @media(max-width:560px){.spectable th,.kv th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
   /* hero art */
   .hero-flex{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
@@ -162,22 +164,29 @@
 
   <nav class="tabs"><div class="wrap">
     <button class="tab active" data-tab="spec">Product Spec</button>
+    <button class="tab" data-tab="artwork">Artwork Spec</button>
     <button class="tab" data-tab="templates">Templates</button>
     <button class="tab" data-tab="about">About &amp; Order</button>
   </div></nav>
 
   <main class="wrap">
     <section class="panel show" id="spec">
-      
+      <div class="rich"><h3 class="sec-ttl">At a glance</h3><table class="kv"><tbody><tr><th>Standard sizes</th><td>4 sizes available — see Template Sizes</td></tr></tbody></table></div>
       <h2 class="sec-ttl">Configurable Options</h2>
       <p class="sec-sub">Every option you can set for Wall Calendar — Litho when you order — mirrored from our live order form.</p>
       <table class="spectable"><tbody><tr><th>Category</th><td><div class="opts"><span class="opt">Racing Horse With School Holiday</span><span class="opt">Custom Design Content</span><span class="opt">Thailand BE Calendar</span><span class="opt">-</span></div></td></tr><tr><th>Model</th><td><div class="opts"><span class="opt">RHC 001 (Racing Horse)</span><span class="opt">RHC 002 (Racing Horse)</span><span class="opt">RHC 003 (Racing Horse)</span><span class="opt">RHC 003</span><span class="opt">RHC 006</span><span class="opt">RHC 007</span></div></td></tr><tr><th>Header Size</th><td><div class="opts"><span class="opt">150mm x 150mm</span><span class="opt">206mm x 230mm</span><span class="opt">260mm x 265mm</span><span class="opt">300mm x 300mm</span></div></td></tr><tr><th>Content Artwork</th><td><div class="opts"><span class="opt">Racing Horse</span><span class="opt">-</span><span class="opt">Thailand BE Calendar</span></div></td></tr><tr><th>Content Size</th><td><div class="opts"><span class="opt">150mm x 150mm</span><span class="opt">206mm x 230mm</span><span class="opt">260mm x 265mm</span><span class="opt">150mm x 300mm</span><span class="opt">300mm x 300mm</span></div></td></tr><tr><th>Package</th><td><div class="opts"><span class="opt">Normal</span><span class="opt">2 IN 1 (5% Off)</span><span class="opt">3 IN 1 (7% Off)</span><span class="opt">4 IN 1 (10% Off)</span><span class="opt">5 IN 1 (10% Off)</span><span class="opt">6 IN 1 (10% Off)</span><span class="opt">7 IN 1 (10% Off)</span><span class="opt">8 IN 1 (10% Off)</span><span class="opt">9 IN 1 (10% Off)</span><span class="opt">10 IN 1 (10% Off)</span></div></td></tr></tbody></table>
     </section>
 
+    <section class="panel" id="artwork">
+      <h2 class="sec-ttl">Artwork Specification</h2>
+      <p class="sec-sub">How to set up print-ready artwork for Wall Calendar — Litho so it prints exactly as you expect.</p>
+      <div class="rich"><h3 class="sec-ttl">File format &amp; setup</h3><table class="kv"><tbody><tr><th>File format</th><td>Print-ready PDF preferred. AI, EPS, or high-resolution PNG/TIFF also accepted.</td></tr><tr><th>Resolution</th><td>300 dpi at 100% size. Vector art (AI/EPS/PDF) is ideal and stays sharp.</td></tr><tr><th>Colour mode</th><td>CMYK for accurate print colour (RGB is converted and can shift).</td></tr><tr><th>Bleed</th><td>3 mm on every side — extend background artwork into the bleed.</td></tr><tr><th>Safe margin</th><td>Keep text and logos ≥ 3–5 mm inside the trim so nothing is cut off.</td></tr><tr><th>Fonts</th><td>Outline or embed all fonts before exporting.</td></tr></tbody></table></div><div class="rich"><h3 class="sec-ttl">Layout &amp; binding</h3><ul class="spec-list"><li>Supply each panel/month as its own page in order.</li><li>Allow for the binding/wire punch area at the top.</li><li>Keep dates and text clear of the trim and punch holes.</li></ul></div><div class="rich"><h3 class="sec-ttl">Before you send</h3><ul class="spec-list"><li>Export at 1:1 scale (100%).</li><li>Double-check spelling, contact details and the final size.</li><li>Flatten transparencies, or supply layered files if we&#x27;ve asked for them.</li></ul><p class="rich-note">Not sure? Send us your file and we&#x27;ll check it before printing.</p></div>
+    </section>
+
     <section class="panel" id="templates">
-      <h2 class="sec-ttl">Print-ready Templates</h2>
-      <p class="sec-sub">Set up your artwork on the correct die-line and bleed before you order.</p>
-      <p class="tpl-empty">Print-ready templates (die-lines &amp; artwork guides) for Wall Calendar — Litho are coming soon. Start from the specification below and <a href="../calculator_standalone.html?product=118">configure &amp; order</a>.</p>
+      <h2 class="sec-ttl">Template Sizes &amp; Downloads</h2>
+      <p class="sec-sub">Set up your artwork on the correct size, die-line and bleed before you order.</p>
+      <div class="rich"><h3 class="sec-ttl">Standard sizes</h3><ul class="spec-list"><li>150mm x 150mm  ·  add 3 mm bleed on each side</li><li>206mm x 230mm  ·  add 3 mm bleed on each side</li><li>260mm x 265mm  ·  add 3 mm bleed on each side</li><li>300mm x 300mm  ·  add 3 mm bleed on each side</li></ul><p class="rich-note">The size you order is the finished (trim) size.</p></div><div class="rich"><h3 class="sec-ttl">Setting up your file</h3><table class="kv"><tbody><tr><th>Trim size</th><td>The finished size you order.</td></tr><tr><th>Bleed</th><td>3 mm on every side (large formats per finishing).</td></tr><tr><th>Safe area</th><td>Keep important content ≥ 3–5 mm inside the trim.</td></tr></tbody></table><p class="rich-note">Download the matching print-ready template below and design inside it.</p></div><h3 class="sec-ttl" style="margin-top:8px">Download template</h3><p class="sec-sub">Rights-cleared, print-ready files.</p><p class="tpl-empty">A print-ready template for Wall Calendar — Litho is coming soon. Set your artwork to the sizes above and <a href="../calculator_standalone.html?product=118">configure &amp; order</a>.</p>
     </section>
 
     <section class="panel" id="about">

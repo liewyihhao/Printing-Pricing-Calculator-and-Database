@@ -1,0 +1,109 @@
+{
+ "sections": [
+  {
+   "title": "At a glance",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "Materials / paper",
+     "v": "Gloss Art Card 250gsm, Gloss Art Card 310gsm, Gloss Art Card 360gsm, Matte Art Card 250gsm, Linen 240gsm, Metal Ice 250gsm…"
+    },
+    {
+     "k": "Print colour",
+     "v": "4C (Both), 4C (Front)"
+    },
+    {
+     "k": "Finishing",
+     "v": "Gloss Lamination (Both), Matte Lamination (Both), Gloss Water Based Varnish (Both)"
+    },
+    {
+     "k": "Standard sizes",
+     "v": "4 sizes available — see Template Sizes"
+    }
+   ]
+  }
+ ],
+ "artwork": [
+  {
+   "title": "File format & setup",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "File format",
+     "v": "Print-ready PDF preferred. AI, EPS, or high-resolution PNG/TIFF also accepted."
+    },
+    {
+     "k": "Resolution",
+     "v": "300 dpi at 100% size. Vector art (AI/EPS/PDF) is ideal and stays sharp."
+    },
+    {
+     "k": "Colour mode",
+     "v": "CMYK for accurate print colour (RGB is converted and can shift)."
+    },
+    {
+     "k": "Bleed",
+     "v": "3 mm on every side — extend background artwork into the bleed."
+    },
+    {
+     "k": "Safe margin",
+     "v": "Keep text and logos ≥ 3–5 mm inside the trim so nothing is cut off."
+    },
+    {
+     "k": "Fonts",
+     "v": "Outline or embed all fonts before exporting."
+    }
+   ]
+  },
+  {
+   "title": "Card setup",
+   "type": "list",
+   "items": [
+    "Supply front and back as separate pages.",
+    "For rounded corners, keep content ≥ 4 mm inside the trim.",
+    "For spot UV or foil, supply a separate 100% black mask layer."
+   ]
+  },
+  {
+   "title": "Before you send",
+   "type": "list",
+   "items": [
+    "Export at 1:1 scale (100%).",
+    "Double-check spelling, contact details and the final size.",
+    "Flatten transparencies, or supply layered files if we've asked for them."
+   ],
+   "note": "Not sure? Send us your file and we'll check it before printing."
+  }
+ ],
+ "templates": [
+  {
+   "title": "Standard sizes",
+   "type": "list",
+   "items": [
+    "54mm x 89mm  ·  add 3 mm bleed on each side",
+    "52mm x 86mm  ·  add 3 mm bleed on each side",
+    "50mm x 89mm  ·  add 3 mm bleed on each side",
+    "54mm x 86mm  ·  add 3 mm bleed on each side"
+   ],
+   "note": "The size you order is the finished (trim) size."
+  },
+  {
+   "title": "Setting up your file",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "Trim size",
+     "v": "The finished size you order."
+    },
+    {
+     "k": "Bleed",
+     "v": "3 mm on every side (large formats per finishing)."
+    },
+    {
+     "k": "Safe area",
+     "v": "Keep important content ≥ 3–5 mm inside the trim."
+    }
+   ],
+   "note": "Download the matching print-ready template below and design inside it."
+  }
+ ]
+}

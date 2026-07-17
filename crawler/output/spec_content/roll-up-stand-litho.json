@@ -1,0 +1,86 @@
+{
+ "sections": [
+  {
+   "title": "At a glance",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "Finishing",
+     "v": "Gloss Lamination, Matte Lamination"
+    }
+   ]
+  }
+ ],
+ "artwork": [
+  {
+   "title": "File format & setup",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "File format",
+     "v": "Print-ready PDF preferred. AI, EPS, or high-resolution PNG/TIFF also accepted."
+    },
+    {
+     "k": "Resolution",
+     "v": "150 dpi at final size (or 300 dpi at 1:2). Vector art scales without loss."
+    },
+    {
+     "k": "Colour mode",
+     "v": "CMYK for accurate print colour (RGB is converted and can shift)."
+    },
+    {
+     "k": "Bleed",
+     "v": "Add bleed as advised for the finishing (hem / pole pocket / eyelets)."
+    },
+    {
+     "k": "Safe margin",
+     "v": "Keep text and logos ≥ 3–5 mm inside the trim so nothing is cut off."
+    },
+    {
+     "k": "Fonts",
+     "v": "Outline or embed all fonts before exporting."
+    }
+   ]
+  },
+  {
+   "title": "Large-format setup",
+   "type": "list",
+   "items": [
+    "Design at final size, or a clean fraction (e.g. 1:10) — note the scale.",
+    "Keep key content inside the safe area, away from eyelets and pole pockets.",
+    "Convert hairlines to ≥ 1 pt so they hold at large size."
+   ]
+  },
+  {
+   "title": "Before you send",
+   "type": "list",
+   "items": [
+    "Export at 1:1 scale (100%).",
+    "Double-check spelling, contact details and the final size.",
+    "Flatten transparencies, or supply layered files if we've asked for them."
+   ],
+   "note": "Not sure? Send us your file and we'll check it before printing."
+  }
+ ],
+ "templates": [
+  {
+   "title": "Setting up your file",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "Trim size",
+     "v": "The finished size you order."
+    },
+    {
+     "k": "Bleed",
+     "v": "3 mm on every side (large formats per finishing)."
+    },
+    {
+     "k": "Safe area",
+     "v": "Keep important content ≥ 3–5 mm inside the trim."
+    }
+   ],
+   "note": "Download the matching print-ready template below and design inside it."
+  }
+ ]
+}

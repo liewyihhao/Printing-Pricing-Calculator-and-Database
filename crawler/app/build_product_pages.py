@@ -37,11 +37,19 @@ def _rich_spec(slug: str) -> str:
     """Optional per-product depth: render output/spec_content/<slug>.json (our own factual,
     restructured spec content) as Excard-style sections. Returns "" if the file is absent."""
     f = OUT / "spec_content" / f"{slug}.json"
-    if not f.is_file():
-        return ""
-    d = json.loads(f.read_text(encoding="utf-8"))
+    return _sections_html(_spec_data(slug).get("sections", []))
+
+
+def _spec_data(slug: str) -> dict:
+    f = OUT / "spec_content" / f"{slug}.json"
+    return json.loads(f.read_text(encoding="utf-8")) if f.is_file() else {}
+
+
+def _sections_html(secs) -> str:
+    """Render a list of section dicts (types: cards / keyvalue / list / text) to Excard-style
+    sections. Shared by Product Spec, Artwork Spec and Template content."""
     out = []
-    for sec in d.get("sections", []):
+    for sec in secs or []:
         title = html.escape(sec.get("title", ""))
         t = sec.get("type")
         if t == "cards":
@@ -54,6 +62,8 @@ def _rich_spec(slug: str) -> str:
             rows = "".join(f'<tr><th>{html.escape(r.get("k",""))}</th>'
                            f'<td>{html.escape(r.get("v",""))}</td></tr>' for r in sec.get("rows", []))
             body = f'<table class="kv"><tbody>{rows}</tbody></table>'
+        elif t == "list":
+            body = f'<ul class="spec-list">{"".join(f"<li>{html.escape(x)}</li>" for x in sec.get("items", []))}</ul>'
         else:
             body = f'<p class="about">{html.escape(sec.get("text",""))}</p>'
         note = f'<p class="rich-note">{html.escape(sec["note"])}</p>' if sec.get("note") else ""
@@ -105,17 +115,28 @@ def _page(prod, cat_key, prev_p, next_p):
         f'<td><div class="opts">{ch}</div>{f"<p class=n>{html.escape(nt)}</p>" if nt else ""}</td></tr>'
         for lab, ch, nt in rows) or '<tr><td class="n">Fixed specification — contact us to configure.</td></tr>'
 
-    # ---- templates ----
+    # ---- rich content (Product Spec / Artwork Spec / Template sizes) ----
+    spec = _spec_data(slug)
+    rich_spec = _sections_html(spec.get("sections"))
+    artwork_html = _sections_html(spec.get("artwork"))
+    template_sizes = _sections_html(spec.get("templates"))
+
+    # ---- downloadable templates (own, rights-cleared files) ----
     tpls = _templates_for(slug)
     if tpls:
-        thtml = '<div class="tpl-grid">' + "".join(
+        dl = '<div class="tpl-grid">' + "".join(
             f'<a class="tpl" href="{href}" download><span class="tpl__i">⬇</span>'
             f'<span class="tpl__n">{html.escape(fn)}</span><span class="tpl__s">{sz}</span></a>'
             for fn, href, sz in tpls) + '</div>'
     else:
-        thtml = ('<p class="tpl-empty">Print-ready templates (die-lines &amp; artwork guides) for '
-                 f'{html.escape(name)} are coming soon. Start from the specification below and '
-                 f'<a href="../calculator_standalone.html?product={pid}">configure &amp; order</a>.</p>')
+        dl = ('<p class="tpl-empty">A print-ready template for '
+              f'{html.escape(name)} is coming soon. Set your artwork to the sizes above and '
+              f'<a href="../calculator_standalone.html?product={pid}">configure &amp; order</a>.</p>')
+    thtml = (template_sizes + '<h3 class="sec-ttl" style="margin-top:8px">Download template</h3>'
+             '<p class="sec-sub">Rights-cleared, print-ready files.</p>' + dl)
+    artwork_html = artwork_html or (
+        '<p class="tpl-empty">Artwork guidance for this product is coming soon — in the meantime, '
+        'supply print-ready PDF at 300 dpi in CMYK with 3 mm bleed.</p>')
 
     # ---- SEO structured data ----
     kw_desc = (f"Custom {name} printing in Malaysia. Options: "
@@ -144,7 +165,8 @@ def _page(prod, cat_key, prev_p, next_p):
             .replace("__INTRO__", intro)
             .replace("__ACCBADGE__", acc_badge)
             .replace("__SIMURL__", f"../calculator_standalone.html?product={pid}")
-            .replace("__RICHSPEC__", _rich_spec(slug))
+            .replace("__RICHSPEC__", rich_spec)
+            .replace("__ARTWORK__", artwork_html)
             .replace("__ART__", svg_for(prod["name"], cat_label))
             .replace("__SPECS__", specs_html)
             .replace("__TEMPLATES__", thtml)
@@ -295,6 +317,8 @@ _STYLE = r"""
   .kv th{text-align:left;vertical-align:top;width:210px;padding:12px 16px 12px 0;font-size:13px;font-weight:700;color:var(--teal)}
   .kv td{padding:12px 0;font-size:13.5px;color:var(--ink)}
   .rich-note{font-size:12.5px;color:var(--faint);margin-top:8px}
+  .spec-list{margin:0;padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.8}
+  .spec-list li{margin-bottom:2px}
   @media(max-width:560px){.spectable th,.kv th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
   /* hero art */
   .hero-flex{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
@@ -346,6 +370,7 @@ _PROD_TMPL = r"""<!doctype html>
 
   <nav class="tabs"><div class="wrap">
     <button class="tab active" data-tab="spec">Product Spec</button>
+    <button class="tab" data-tab="artwork">Artwork Spec</button>
     <button class="tab" data-tab="templates">Templates</button>
     <button class="tab" data-tab="about">About &amp; Order</button>
   </div></nav>
@@ -358,9 +383,15 @@ _PROD_TMPL = r"""<!doctype html>
       <table class="spectable"><tbody>__SPECS__</tbody></table>
     </section>
 
+    <section class="panel" id="artwork">
+      <h2 class="sec-ttl">Artwork Specification</h2>
+      <p class="sec-sub">How to set up print-ready artwork for __NAME__ so it prints exactly as you expect.</p>
+      __ARTWORK__
+    </section>
+
     <section class="panel" id="templates">
-      <h2 class="sec-ttl">Print-ready Templates</h2>
-      <p class="sec-sub">Set up your artwork on the correct die-line and bleed before you order.</p>
+      <h2 class="sec-ttl">Template Sizes &amp; Downloads</h2>
+      <p class="sec-sub">Set up your artwork on the correct size, die-line and bleed before you order.</p>
       __TEMPLATES__
     </section>
 

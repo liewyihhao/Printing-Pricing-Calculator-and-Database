@@ -1,40 +1,196 @@
 {
-  "_note": "Printoka-authored factual spec content (our own wording). Optional depth rendered on the product page's Product Spec tab by app.build_product_pages._rich_spec.",
-  "sections": [
+ "_note": "Printoka-authored factual spec content (our own wording). Optional depth rendered on the product page's Product Spec tab by app.build_product_pages._rich_spec.",
+ "sections": [
+  {
+   "title": "Materials & where they work best",
+   "type": "cards",
+   "items": [
     {
-      "title": "Materials & where they work best",
-      "type": "cards",
-      "items": [
-        {"name": "Mirror Kote", "ideal": ["Flat surfaces — paper, plastic, glass, metal", "Dry, indoor use", "Most economical everyday label"]},
-        {"name": "Transparent OPP", "ideal": ["No-label / see-through look", "Smooth flat surfaces", "Water-resistant when laminated"]},
-        {"name": "White PP (Polypropylene)", "ideal": ["Bottles, jars and cosmetics", "Curved surfaces", "Moisture and tear resistant"]},
-        {"name": "White PE (Polyethylene)", "ideal": ["Squeezable bottles and tubes", "Flexible / curved surfaces", "Durable outdoor use"]},
-        {"name": "Synthetic Paper", "ideal": ["Heavy-duty, waterproof labels", "Tear resistant", "Indoor and short outdoor use"]},
-        {"name": "Brown Kraft Paper", "ideal": ["Natural, eco and artisanal look", "Flat surfaces", "Dry indoor use"]},
-        {"name": "Silver Polyester (Matte / Bright)", "ideal": ["Warranty, asset and rating labels", "Metallic finish", "Scratch and solvent resistant"]}
-      ],
-      "note": "Material availability and exact suitability vary by artwork and application — tell us your surface and we'll advise."
+     "name": "Mirror Kote",
+     "ideal": [
+      "Flat surfaces — paper, plastic, glass, metal",
+      "Dry, indoor use",
+      "Most economical everyday label"
+     ]
     },
     {
-      "title": "Print & finishing",
-      "type": "keyvalue",
-      "rows": [
-        {"k": "Print colour", "v": "Full colour (CMYK / 4C) or single colour (1C)"},
-        {"k": "Material thickness", "v": "≈ 90 micron (material-dependent)"},
-        {"k": "Lamination / coating", "v": "Gloss lamination · Matte lamination · Soft-touch lamination · UV varnish · Gloss water-based varnish"},
-        {"k": "Hot stamping", "v": "Gold or silver foil (quoted separately)"}
-      ]
+     "name": "Transparent OPP",
+     "ideal": [
+      "No-label / see-through look",
+      "Smooth flat surfaces",
+      "Water-resistant when laminated"
+     ]
     },
     {
-      "title": "Cutting methods & sizes",
-      "type": "keyvalue",
-      "rows": [
-        {"k": "Standard / rectangle / square", "v": "Min 10 × 25 mm · Max 300 × 420 mm"},
-        {"k": "Round", "v": "Min Ø 15 mm · Max Ø 300 mm"},
-        {"k": "Custom die-cut", "v": "Single die-line · Min 10 × 25 mm · Max 300 × 420 mm"},
-        {"k": "Kiss-cut / no-cut", "v": "Supplied on backing sheet; cut-to-size available"}
-      ],
-      "note": "Dimensions are production limits; artwork should include bleed on the correct template."
+     "name": "White PP (Polypropylene)",
+     "ideal": [
+      "Bottles, jars and cosmetics",
+      "Curved surfaces",
+      "Moisture and tear resistant"
+     ]
+    },
+    {
+     "name": "White PE (Polyethylene)",
+     "ideal": [
+      "Squeezable bottles and tubes",
+      "Flexible / curved surfaces",
+      "Durable outdoor use"
+     ]
+    },
+    {
+     "name": "Synthetic Paper",
+     "ideal": [
+      "Heavy-duty, waterproof labels",
+      "Tear resistant",
+      "Indoor and short outdoor use"
+     ]
+    },
+    {
+     "name": "Brown Kraft Paper",
+     "ideal": [
+      "Natural, eco and artisanal look",
+      "Flat surfaces",
+      "Dry indoor use"
+     ]
+    },
+    {
+     "name": "Silver Polyester (Matte / Bright)",
+     "ideal": [
+      "Warranty, asset and rating labels",
+      "Metallic finish",
+      "Scratch and solvent resistant"
+     ]
     }
-  ]
+   ],
+   "note": "Material availability and exact suitability vary by artwork and application — tell us your surface and we'll advise."
+  },
+  {
+   "title": "Print & finishing",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "Print colour",
+     "v": "Full colour (CMYK / 4C) or single colour (1C)"
+    },
+    {
+     "k": "Material thickness",
+     "v": "≈ 90 micron (material-dependent)"
+    },
+    {
+     "k": "Lamination / coating",
+     "v": "Gloss lamination · Matte lamination · Soft-touch lamination · UV varnish · Gloss water-based varnish"
+    },
+    {
+     "k": "Hot stamping",
+     "v": "Gold or silver foil (quoted separately)"
+    }
+   ]
+  },
+  {
+   "title": "Cutting methods & sizes",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "Standard / rectangle / square",
+     "v": "Min 10 × 25 mm · Max 300 × 420 mm"
+    },
+    {
+     "k": "Round",
+     "v": "Min Ø 15 mm · Max Ø 300 mm"
+    },
+    {
+     "k": "Custom die-cut",
+     "v": "Single die-line · Min 10 × 25 mm · Max 300 × 420 mm"
+    },
+    {
+     "k": "Kiss-cut / no-cut",
+     "v": "Supplied on backing sheet; cut-to-size available"
+    }
+   ],
+   "note": "Dimensions are production limits; artwork should include bleed on the correct template."
+  }
+ ],
+ "artwork": [
+  {
+   "title": "File format & setup",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "File format",
+     "v": "Print-ready PDF preferred. AI, EPS, or high-resolution PNG/TIFF also accepted."
+    },
+    {
+     "k": "Resolution",
+     "v": "300 dpi at 100% size. Vector art (AI/EPS/PDF) is ideal and stays sharp."
+    },
+    {
+     "k": "Colour mode",
+     "v": "CMYK for accurate print colour (RGB is converted and can shift)."
+    },
+    {
+     "k": "Bleed",
+     "v": "3 mm on every side — extend background artwork into the bleed."
+    },
+    {
+     "k": "Safe margin",
+     "v": "Keep text and logos ≥ 3–5 mm inside the trim so nothing is cut off."
+    },
+    {
+     "k": "Fonts",
+     "v": "Outline or embed all fonts before exporting."
+    }
+   ]
+  },
+  {
+   "title": "Die-line & cutting",
+   "type": "list",
+   "items": [
+    "Add your cut path as a separate spot colour named “CutContour” (set to overprint).",
+    "Keep the die-line a single, smooth line — simpler shapes cut more cleanly.",
+    "Leave 2–3 mm between the artwork edge and the cut on kiss-cut labels.",
+    "Round tight internal corners to ≥ 3 mm radius."
+   ]
+  },
+  {
+   "title": "Before you send",
+   "type": "list",
+   "items": [
+    "Export at 1:1 scale (100%).",
+    "Double-check spelling, contact details and the final size.",
+    "Flatten transparencies, or supply layered files if we've asked for them."
+   ],
+   "note": "Not sure? Send us your file and we'll check it before printing."
+  }
+ ],
+ "templates": [
+  {
+   "title": "Standard sizes",
+   "type": "list",
+   "items": [
+    "A3+  ·  add 3 mm bleed on each side",
+    "A4  ·  add 3 mm bleed on each side",
+    "A5  ·  add 3 mm bleed on each side"
+   ],
+   "note": "The size you order is the finished (trim) size."
+  },
+  {
+   "title": "Setting up your file",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "Trim size",
+     "v": "The finished size you order."
+    },
+    {
+     "k": "Bleed",
+     "v": "3 mm on every side (large formats per finishing)."
+    },
+    {
+     "k": "Safe area",
+     "v": "Keep important content ≥ 3–5 mm inside the trim."
+    }
+   ],
+   "note": "Download the matching print-ready template below and design inside it."
+  }
+ ]
 }
