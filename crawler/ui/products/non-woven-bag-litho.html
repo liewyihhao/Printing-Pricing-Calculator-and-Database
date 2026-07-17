@@ -103,6 +103,34 @@
   .kv td{padding:12px 0;font-size:13.5px;color:var(--ink)}
   .rich-note{font-size:12.5px;color:var(--faint);margin-top:8px}
   @media(max-width:560px){.spectable th,.kv th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
+  /* hero art */
+  .hero-flex{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+  .hero-copy{flex:1 1 340px;min-width:0}
+  .hero-art{flex:0 0 300px;max-width:340px;width:100%;aspect-ratio:4/3;filter:drop-shadow(0 12px 24px rgba(10,51,69,.12))}
+  @media(max-width:640px){.hero-art{flex:1 1 100%;max-width:380px;margin-top:6px}}
+
+  .pa-svg{width:100%;height:100%;display:block}
+  @keyframes paFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes paShadow{0%,100%{transform:scaleX(1);opacity:.13}50%{transform:scaleX(.9);opacity:.09}}
+  @keyframes paShine{0%{transform:translateX(0) skewX(-18deg)}60%,100%{transform:translateX(240px) skewX(-18deg)}}
+  @keyframes paWave{0%,100%{d:path("M120 60 h80 v130 q-40 12 -80 0 z")}50%{d:path("M120 60 h80 v130 q-40 -6 -80 0 z")}}
+  @keyframes paPeel{0%,100%{transform:rotate(0)}50%{transform:rotate(-8deg)}}
+  @keyframes paSteam{0%{opacity:0;transform:translateY(4px)}40%{opacity:.7}100%{opacity:0;transform:translateY(-10px)}}
+  @keyframes paPress{0%,100%{transform:translateY(0)}45%{transform:translateY(10px)}55%{transform:translateY(10px)}}
+  .pa-shine{transform:translateX(0) skewX(-18deg)}
+  /* always-on (hero) */
+  .hero-art .pa-float{animation:paFloat 4.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  .hero-art .pa-shadow{animation:paShadow 4.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  .hero-art .pa-shine{animation:paShine 5s ease-in-out infinite}
+  .hero-art .pa-wave{animation:paWave 4s ease-in-out infinite}
+  .hero-art .pa-peel{animation:paPeel 4.5s ease-in-out infinite;transform-box:fill-box;transform-origin:top right}
+  .hero-art .pa-steam{animation:paSteam 3s ease-in-out infinite}
+  .hero-art .pa-press{animation:paPress 3.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  /* hover (thumbnails) */
+  .pa-thumb .pa-float{transition:transform .4s ease}
+  .pcard:hover .pa-thumb .pa-float,.pa-thumb:hover .pa-float{animation:paFloat 4.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  .pcard:hover .pa-thumb .pa-shine,.pa-thumb:hover .pa-shine{animation:paShine 1.2s ease-out}
+  @media(prefers-reduced-motion:reduce){.pa-float,.pa-shine,.pa-wave,.pa-peel,.pa-steam,.pa-press,.pa-shadow{animation:none!important}}
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Product", "name": "Non-Woven Bag — Litho", "category": "Packaging & Bags", "description": "Custom Non-Woven Bag — Litho printing in Malaysia. Options: Model (determines size · WN-B5=200x230x80mm · WS-A4=280x330x80mm · WS-A3P=350x350x100mm · WS-A3L=420x320x100mm · WH-A4=280x330x80mm), Print Colour (WN/WS=1C only · WH=4C only), Bag Colour (price-neutral; for info), Handle Length (", "brand": {"@type": "Brand", "name": "Printoka"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Products", "item": "index.html"}, {"@type": "ListItem", "position": 2, "name": "Packaging & Bags", "item": "index.html#packaging"}, {"@type": "ListItem", "position": 3, "name": "Non-Woven Bag — Litho", "item": "non-woven-bag-litho.html"}]}</script>
@@ -117,13 +145,18 @@
   <header class="hero"><div class="wrap">
     <nav class="crumbs"><a href="../index.html">Home</a> › <a href="index.html">Products</a> ›
       <a href="index.html#packaging">Packaging &amp; Bags</a> › <span>Non-Woven Bag — Litho</span></nav>
-    <h1>Non-Woven Bag — Litho Printing</h1>
-    <p class="lead">Custom <strong>Non-Woven Bag — Litho printing</strong> in Malaysia, made simple. Configure model (determines size · wn-b5=200x230x80mm · ws-a4=280x330x80mm · ws-a3p=350x350x100mm · ws-a3l=420x320x100mm · wh-a4=280x330x80mm), print colour (wn/ws=1c only · wh=4c only), bag colour (price-neutral; for info), handle length (price-neutral; for info) and more, then get an instant, market-matched price online — no waiting for a quote. Download a print-ready template, check the price in our simulator, and place your order in minutes.</p>
-    <div><span class="badge badge--ok">Exact market price</span></div>
-    <div class="ctarow">
-      <a class="btn btn--order" href="../calculator_standalone.html?product=139">Order Now</a>
-      <a class="btn btn--price" href="../calculator_standalone.html?product=139">Get a Price
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <div class="hero-flex">
+      <div class="hero-copy">
+        <h1>Non-Woven Bag — Litho Printing</h1>
+        <p class="lead">Custom <strong>Non-Woven Bag — Litho printing</strong> in Malaysia, made simple. Configure model (determines size · wn-b5=200x230x80mm · ws-a4=280x330x80mm · ws-a3p=350x350x100mm · ws-a3l=420x320x100mm · wh-a4=280x330x80mm), print colour (wn/ws=1c only · wh=4c only), bag colour (price-neutral; for info), handle length (price-neutral; for info) and more, then get an instant, market-matched price online — no waiting for a quote. Download a print-ready template, check the price in our simulator, and place your order in minutes.</p>
+        <div><span class="badge badge--ok">Exact market price</span></div>
+        <div class="ctarow">
+          <a class="btn btn--order" href="../calculator_standalone.html?product=139">Order Now</a>
+          <a class="btn btn--price" href="../calculator_standalone.html?product=139">Get a Price
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+      <div class="hero-art"><svg class="pa-svg" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid meet"><defs><linearGradient id="pabg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4fafc"/><stop offset="1" stop-color="#e7f1f5"/></linearGradient><linearGradient id="pash" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient></defs><rect width="320" height="240" rx="18" fill="url(#pabg)"/><ellipse class="pa-shadow" cx="160" cy="205" rx="92" ry="15" fill="#0a3345" opacity=".13"/><g class="pa-float"><g transform="translate(0 4)"><rect x="112" y="86" width="96" height="104" rx="5" fill="#0a3345" opacity=".10" transform="translate(5 7)"/><path d="M124 78 q0-16 16-16 q0 12 0 16" fill="none" stroke="#00485f" stroke-width="5"/><path d="M196 78 q0-16-16-16 q0 12 0 16" fill="none" stroke="#00485f" stroke-width="5"/><rect x="112" y="80" width="96" height="110" rx="5" fill="#1f6f8b"/><rect x="112" y="80" width="96" height="110" rx="5" fill="url(#pash)" opacity=".25"/><circle cx="160" cy="128" r="20" fill="#fdb913"/><rect x="140" y="160" width="40" height="7" rx="3.5" fill="#ffffff" opacity=".7"/><clipPath id="pac11280"><rect x="112" y="80" width="96" height="110" rx="5"/></clipPath><g clip-path="url(#pac11280)"><rect class="pa-shine" x="52" y="80" width="46" height="110" fill="url(#pash)" transform="skewX(-18)"/></g></g></g></svg></div>
     </div>
   </div></header>
 

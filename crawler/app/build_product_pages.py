@@ -22,6 +22,7 @@ from pathlib import Path
 from app.build_specs_page import (
     CATEGORIES, cat_of, clean_name, field_rows, _clean_note, SKIP_FIELD, slugify,
 )
+from app.product_art import svg_for, archetype_of, ART_KEYFRAMES
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "output"
@@ -144,6 +145,7 @@ def _page(prod, cat_key, prev_p, next_p):
             .replace("__ACCBADGE__", acc_badge)
             .replace("__SIMURL__", f"../calculator_standalone.html?product={pid}")
             .replace("__RICHSPEC__", _rich_spec(slug))
+            .replace("__ART__", svg_for(prod["name"], cat_label))
             .replace("__SPECS__", specs_html)
             .replace("__TEMPLATES__", thtml)
             .replace("__PREV__", nav_prev)
@@ -160,9 +162,9 @@ def _index(by_cat, cat_meta):
     for key, label in cat_meta:
         cards = "".join(
             f'<a class="pcard" href="{slugify(p["name"])}.html">'
-            f'<span class="pcard__o">{html.escape(clean_name(p["name"])[0])}</span>'
-            f'<span class="pcard__n">{html.escape(clean_name(p["name"]))}</span>'
-            f'{"<span class=pcard__b>Exact price</span>" if p.get("accuracy")==0 else ""}</a>'
+            f'<div class="pa-thumb">{svg_for(p["name"])}</div>'
+            f'<div class="pcard__foot"><span class="pcard__n">{html.escape(clean_name(p["name"]))}</span>'
+            f'{"<span class=pcard__b>Exact price</span>" if p.get("accuracy")==0 else ""}</div></a>'
             for p in by_cat[key])
         secs.append(f'<section class="cat" id="{key}"><div class="cat__h"><h2>{html.escape(label)}</h2>'
                     f'<span class="cat__c">{len(by_cat[key])} products</span></div>'
@@ -294,7 +296,12 @@ _STYLE = r"""
   .kv td{padding:12px 0;font-size:13.5px;color:var(--ink)}
   .rich-note{font-size:12.5px;color:var(--faint);margin-top:8px}
   @media(max-width:560px){.spectable th,.kv th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
-"""
+  /* hero art */
+  .hero-flex{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+  .hero-copy{flex:1 1 340px;min-width:0}
+  .hero-art{flex:0 0 300px;max-width:340px;width:100%;aspect-ratio:4/3;filter:drop-shadow(0 12px 24px rgba(10,51,69,.12))}
+  @media(max-width:640px){.hero-art{flex:1 1 100%;max-width:380px;margin-top:6px}}
+""" + ART_KEYFRAMES
 
 _PROD_TMPL = r"""<!doctype html>
 <html lang="en">
@@ -322,13 +329,18 @@ _PROD_TMPL = r"""<!doctype html>
   <header class="hero"><div class="wrap">
     <nav class="crumbs"><a href="../index.html">Home</a> › <a href="index.html">Products</a> ›
       <a href="index.html#__CATKEY__">__CATLABEL__</a> › <span>__NAME__</span></nav>
-    <h1>__NAME__ Printing</h1>
-    <p class="lead">__INTRO__</p>
-    <div>__ACCBADGE__</div>
-    <div class="ctarow">
-      <a class="btn btn--order" href="__SIMURL__">Order Now</a>
-      <a class="btn btn--price" href="__SIMURL__">Get a Price
-        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <div class="hero-flex">
+      <div class="hero-copy">
+        <h1>__NAME__ Printing</h1>
+        <p class="lead">__INTRO__</p>
+        <div>__ACCBADGE__</div>
+        <div class="ctarow">
+          <a class="btn btn--order" href="__SIMURL__">Order Now</a>
+          <a class="btn btn--price" href="__SIMURL__">Get a Price
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+      <div class="hero-art">__ART__</div>
     </div>
   </div></header>
 
@@ -407,14 +419,14 @@ _INDEX_TMPL = r"""<!doctype html>
   .cat{margin-bottom:36px;scroll-margin-top:70px}
   .cat__h{display:flex;align-items:baseline;gap:12px;margin:0 0 14px;padding-bottom:10px;border-bottom:1px solid var(--hair)}
   .cat__h h2{margin:0;font-size:22px;font-weight:300;color:var(--faint)}.cat__c{font-size:12.5px;color:var(--faint)}
-  .pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-  .pcard{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--hair);
-    border-radius:9px;padding:13px 14px}
-  .pcard:hover{border-color:var(--teal);background:#f8fcfd}
-  .pcard__o{height:32px;width:32px;border-radius:8px;background:linear-gradient(135deg,#0d6385,#005b7f);
-    color:#fff;display:grid;place-items:center;font-weight:700;font-size:14px;flex:none}
+  .pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .pcard{display:flex;flex-direction:column;background:#fff;border:1px solid var(--hair);
+    border-radius:12px;overflow:hidden;transition:box-shadow .18s,border-color .18s,transform .18s}
+  .pcard:hover{border-color:var(--teal);box-shadow:0 8px 20px rgba(10,51,69,.10);transform:translateY(-2px)}
+  .pa-thumb{width:100%;aspect-ratio:4/3;background:#eef4f7;overflow:hidden}
+  .pcard__foot{display:flex;align-items:center;gap:8px;padding:11px 13px}
   .pcard__n{font-size:13.5px;font-weight:600;flex:1;min-width:0;color:var(--ink)}
-  .pcard__b{font-size:10px;color:#1a7d3f;background:#e6f4ea;border-radius:5px;padding:2px 6px;font-weight:700}
+  .pcard__b{font-size:10px;color:#1a7d3f;background:#e6f4ea;border-radius:5px;padding:2px 6px;font-weight:700;white-space:nowrap}
 </style>
 </head>
 <body>
