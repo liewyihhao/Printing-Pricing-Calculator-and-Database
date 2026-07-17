@@ -1249,6 +1249,7 @@ def _emit_api_artifacts(data, tmpl):
     (OUT / "calculator_data.json").write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
     edata = copy.deepcopy(data)
     for p in edata["products"]:
+        p.pop("art", None)                   # pricing engine never needs the illustration
         for f in p.get("fields", []):
             f.pop("images", None)            # pricing never needs images
     marker = "const DATA = /*__DATA__*/;"
@@ -1278,6 +1279,14 @@ def _attach_configurators(data):
             p["configuratorNote"] = c["note"]
 
 
+def _attach_art(data):
+    """Bake each product's original animated SVG illustration into the catalog so the
+    calculator's picker + config header can show it (same art as the product pages)."""
+    from app.product_art import svg_for
+    for p in data["products"]:
+        p["art"] = svg_for(p["name"])
+
+
 def main():
     data = build_data()
     _drop_unsampled(data)
@@ -1287,7 +1296,10 @@ def main():
     _attach_excard_parity(data)
     _apply_ref_markup(data)
     _embed_images(data)
+    _attach_art(data)
+    from app.product_art import ART_KEYFRAMES
     tmpl = (UI / "_standalone_template.html").read_text(encoding="utf-8")
+    tmpl = tmpl.replace("/*__ARTCSS__*/", ART_KEYFRAMES)
     html = tmpl.replace("/*__DATA__*/", json.dumps(data, ensure_ascii=False))
     (UI / "calculator_standalone.html").write_text(html, encoding="utf-8")
     _emit_api_artifacts(data, tmpl)

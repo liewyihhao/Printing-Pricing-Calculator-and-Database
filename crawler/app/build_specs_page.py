@@ -11,6 +11,8 @@ import json
 import re
 from pathlib import Path
 
+from app.product_art import svg_for, ART_KEYFRAMES
+
 # Internal/engineering wording that must never appear on the customer-facing page.
 _JARGON = re.compile(
     r"check\s*price|/product|\bv4\b|order engine|curves?\b|combos?\b|param|workers?|\bapi\b|"
@@ -148,7 +150,8 @@ def build():
             purl = f'products/{slugify(p["name"])}.html'
             cards.append(
                 f'<article class="prod" id="p-{p["id"]}">'
-                f'<div class="prod__h"><h3><a href="{purl}">{name}</a></h3>'
+                f'<div class="prod__h"><div class="pa-thumb prod__art">{svg_for(p["name"])}</div>'
+                f'<h3><a href="{purl}">{name}</a></h3>'
                 f'<a class="cta" href="{purl}">View product<svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg></a></div>'
                 + (f'<p class="prod__d">{desc}</p>' if desc else "")
                 + f'<div class="specs">{body}</div></article>')
@@ -159,6 +162,7 @@ def build():
 
     tmpl = _PAGE.replace("__NAV__", nav).replace("__SECTIONS__", "".join(sections))\
         .replace("__TOTAL__", str(total)).replace("__NCAT__", str(len(cat_meta)))\
+        .replace("__ARTCSS__", ART_KEYFRAMES)\
         .replace("__LD__", json.dumps(ld, ensure_ascii=False))
     (UI / "specs.html").write_text(tmpl, encoding="utf-8")
     print(f"wrote ui/specs.html — {total} products across {len(cat_meta)} categories")
@@ -219,8 +223,9 @@ _PAGE = r"""<!doctype html>
   .prod{background:var(--card);border:1px solid var(--hair);border-radius:11px;padding:18px 18px 10px;
     scroll-margin-top:72px}
   .prod:hover{border-color:#cfdbe2}
-  .prod__h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px}
-  .prod__h h3{margin:0;font-size:16px;font-weight:700}.prod__h h3 a:hover{color:var(--teal)}
+  .prod__h{display:flex;align-items:center;gap:11px;margin-bottom:4px}
+  .prod__art{width:66px;height:50px;border-radius:8px;overflow:hidden;flex:none;background:#eef4f7}
+  .prod__h h3{margin:0;font-size:16px;font-weight:700;flex:1;min-width:0}.prod__h h3 a:hover{color:var(--teal)}
   .cta{flex:none;display:inline-flex;align-items:center;gap:4px;color:#3a2c00;font-weight:700;
     font-size:12.5px;background:var(--yellow);border-radius:7px;padding:6px 11px}
   .cta:hover{background:#e9a800}
@@ -243,6 +248,7 @@ _PAGE = r"""<!doctype html>
   footer a{color:var(--teal)}
   .empty{display:none;text-align:center;color:var(--faint);padding:50px 0;font-size:14px}
   @media (max-width:560px){.cards{grid-template-columns:1fr}.spec{grid-template-columns:1fr;gap:4px}}
+__ARTCSS__
 </style>
 <script type="application/ld+json">__LD__</script>
 </head>

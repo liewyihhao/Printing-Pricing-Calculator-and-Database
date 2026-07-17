@@ -32,6 +32,9 @@ tailwind.config = { theme: { extend: {
   .qchip{transition:all .1s;cursor:pointer}.qchip.active{background:#005b7f;color:#fff;border-color:#005b7f}
   .fade{animation:f .25s ease both}@keyframes f{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
   .pricepulse{animation:pp .4s ease both}@keyframes pp{0%{opacity:.35}100%{opacity:1}}
+  #cfgorb .pa-float{animation:paFloat 4.5s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  #cfgorb .pa-shine{animation:paShine 5s ease-in-out infinite}
+/*__ARTCSS__*/
 </style>
 </head>
 <body class="font-sans bg-slate-50 text-slate-900">
@@ -69,7 +72,7 @@ tailwind.config = { theme: { extend: {
       </button>
       <div class="flex items-center justify-between mb-4">
         <div class="flex items-center gap-2.5 min-w-0">
-          <div id="cfgorb" class="h-8 w-8 rounded-lg brand-gradient grid place-items-center text-white text-[12px] font-bold shrink-0"></div>
+          <div id="cfgorb" class="pa-thumb h-11 w-14 rounded-lg overflow-hidden shrink-0" style="background:#eef4f7"></div>
           <h3 id="cfgtitle" class="font-semibold text-[15px] text-ink truncate">Configuration</h3>
         </div>
         <span id="acc" class="text-[12px] shrink-0 ml-2"></span>
@@ -942,11 +945,10 @@ function renderProducts(){
       ? `<span class="inline-flex items-center gap-1 text-[10.5px] text-emerald-700 font-semibold mt-0.5"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Verified price</span>`
       : `<span class="text-[10.5px] text-slate-400 font-medium mt-0.5 block">≈ +5–10% (reference)</span>`;
     return `
-    <button type="button" class="prodcard text-left bg-white rounded-xl border hairline shadow-card p-4" data-id="${p.id}">
-      <div class="flex items-center gap-2.5">
-        <div class="pc-orb h-9 w-9 rounded-lg brand-gradient grid place-items-center text-white text-[13px] font-bold shrink-0">${p.name[0]}</div>
-        <div class="min-w-0"><div class="font-semibold text-slate-800 text-[13px] leading-tight truncate">${p.name}</div>${badge}</div>
-      </div></button>`; }).join("");
+    <button type="button" class="prodcard text-left bg-white rounded-xl border hairline shadow-card overflow-hidden" data-id="${p.id}">
+      <div class="pa-thumb w-full" style="aspect-ratio:4/3;background:#eef4f7">${p.art||''}</div>
+      <div class="px-3 py-2.5 min-w-0"><div class="font-semibold text-slate-800 text-[13px] leading-tight truncate">${p.name}</div>${badge}</div>
+    </button>`; }).join("");
   $("prodgrid").querySelectorAll(".prodcard").forEach(c=>c.onclick=()=>selectProduct(+c.dataset.id));
 }
 function initPicker(){
@@ -964,7 +966,7 @@ function selectProduct(id){
   $("picker").classList.add("hidden");
   $("calc").classList.remove("hidden"); $("calc").classList.add("fade");
   $("changeprod").classList.remove("hidden");
-  $("cfgorb").textContent=prod.name[0];
+  $("cfgorb").innerHTML=prod.art||prod.name[0];
   $("cfgtitle").textContent=prod.name;
   $("acc").innerHTML = prod.accuracy===0
     ? `<span class="inline-flex items-center gap-1.5 text-emerald-700 bg-emerald-50 border border-emerald-100 rounded-full px-2.5 py-1 font-medium"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Exact market price</span>`
