@@ -6,3 +6,5 @@ state/
 output/*
 # authored, versioned spec content (our own factual per-product depth) — keep tracked
 !output/spec_content/
+# crawled production facts (min/max limits, thickness) folded into product pages — keep tracked
+!output/spec_facts/

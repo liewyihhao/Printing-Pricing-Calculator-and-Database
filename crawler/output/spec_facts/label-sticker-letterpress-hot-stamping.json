@@ -1,0 +1,40 @@
+{
+ "excard_slug": "label-sticker",
+ "sizes": [
+  "10mmx25mm",
+  "300mmx420mm",
+  "50mmx50mm",
+  "54mmx89mm",
+  "100mmx150mm",
+  "115mmx115mm",
+  "98mmx92mm",
+  "102mmx96mm",
+  "190mmx277mm"
+ ],
+ "min_max": [
+  [
+   "10mmx25mm",
+   "300mmx420mm"
+  ],
+  [
+   "15mm",
+   "300mm"
+  ],
+  [
+   "50mmx50mm",
+   "300mmx420mm"
+  ]
+ ],
+ "thickness_micron": [
+  "90",
+  "100",
+  "50",
+  "70",
+  "83",
+  "40"
+ ],
+ "sources": [
+  "https://www.excard.com.my/product/label-sticker?view=prd_spec",
+  "https://www.excard.com.my/label-sticker?view=prd_spec"
+ ]
+}

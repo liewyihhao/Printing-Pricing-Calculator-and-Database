@@ -45,6 +45,35 @@ def _spec_data(slug: str) -> dict:
     return json.loads(f.read_text(encoding="utf-8")) if f.is_file() else {}
 
 
+def _fmt_size(s: str) -> str:
+    return (s.replace("mm", " mm").replace("x", " × ").replace("  ", " ").strip())
+
+
+def _facts_html(slug: str) -> str:
+    """Fold in the exact production facts crawled from the supplier's published spec pages
+    (min/max die-cut limits, material thickness) — facts only, rendered in our own format."""
+    f = OUT / "spec_facts" / f"{slug}.json"
+    if not f.is_file():
+        return ""
+    d = json.loads(f.read_text(encoding="utf-8"))
+    # Only the min/max die-cut production range is clean & product-specific; thickness on these
+    # pages is usually a paper-material option (e.g. "Synthetic Paper 180micron"), so we don't
+    # surface it as a "product thickness" fact.
+    rows, seen = [], set()
+    for a, b in d.get("min_max", []):
+        rnd = "x" not in a and "x" not in b
+        k = "Cut-to-size (round diameter)" if rnd else "Cut-to-size range"
+        v = (f"Min Ø {_fmt_size(a)}  ·  Max Ø {_fmt_size(b)}" if rnd
+             else f"Min {_fmt_size(a)}  ·  Max {_fmt_size(b)}")
+        if (k, v) not in seen:
+            seen.add((k, v))
+            rows.append({"k": k, "v": v})
+    if not rows:
+        return ""
+    return _sections_html([{"title": "Production size limits", "type": "keyvalue", "rows": rows,
+                            "note": "Exact die-cut production limits — check these before you finalise artwork."}])
+
+
 def _sections_html(secs) -> str:
     """Render a list of section dicts (types: cards / keyvalue / list / text) to Excard-style
     sections. Shared by Product Spec, Artwork Spec and Template content."""
@@ -166,6 +195,7 @@ def _page(prod, cat_key, prev_p, next_p):
             .replace("__ACCBADGE__", acc_badge)
             .replace("__SIMURL__", f"../calculator_standalone.html?product={pid}")
             .replace("__RICHSPEC__", rich_spec)
+            .replace("__FACTS__", _facts_html(slug))
             .replace("__ARTWORK__", artwork_html)
             .replace("__ART__", svg_for(prod["name"], cat_label))
             .replace("__SPECS__", specs_html)
@@ -378,6 +408,7 @@ _PROD_TMPL = r"""<!doctype html>
   <main class="wrap">
     <section class="panel show" id="spec">
       __RICHSPEC__
+      __FACTS__
       <h2 class="sec-ttl">Configurable Options</h2>
       <p class="sec-sub">Every option you can set for __NAME__ when you order — mirrored from our live order form.</p>
       <table class="spectable"><tbody>__SPECS__</tbody></table>
