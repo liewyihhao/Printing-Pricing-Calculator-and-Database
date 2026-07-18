@@ -1297,6 +1297,9 @@ def main():
     _apply_ref_markup(data)
     _embed_images(data)
     _attach_art(data)
+    from app.product_quantity import attach as _attach_quantity
+    _n, _hit = _attach_quantity(data)
+    print(f"quantity: {_hit}/{_n} products with order-form MOQ")
     from app.product_art import ART_KEYFRAMES
     tmpl = (UI / "_standalone_template.html").read_text(encoding="utf-8")
     tmpl = tmpl.replace("/*__ARTCSS__*/", ART_KEYFRAMES)

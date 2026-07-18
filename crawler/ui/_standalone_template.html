@@ -82,7 +82,7 @@ tailwind.config = { theme: { extend: {
         <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Quantity</label>
         <input id="qty" type="number" min="1" value="1000" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">
         <div id="qchips" class="flex flex-wrap gap-1.5 mt-2"></div>
-        <p class="text-[11.5px] text-slate-400 mt-2">Any quantity works — the formula interpolates between standard quantity breakpoints.</p>
+        <p id="qtyhint" class="text-[11.5px] text-slate-400 mt-2">Any quantity works — the formula interpolates between standard quantity breakpoints.</p>
       </div>
       <div id="destwrap" class="mt-4">
         <label class="block text-[13px] font-medium text-slate-600 mb-1.5">Delivery destination</label>
@@ -1001,10 +1001,36 @@ function selectProduct(id){
     else if(f.images) renderImageGrid(f);
     else el.onchange=()=>onChange(i); });
   updateFieldVis();
-  $("qchips").innerHTML = QCHIPS.map(q=>`<button class="qchip rounded-md border hairline px-2.5 py-1 text-[12px] text-slate-600" data-q="${q}">${q.toLocaleString()}</button>`).join("");
+  // Per-product order quantity: MOQ, standard quantities, and whether custom qty is allowed
+  // (mirrors the supplier's order-form quantity dropdown). See app/product_quantity.py.
+  const Q = S.prod.quantity || {moq:1, maxq:null, chips:QCHIPS, custom:true, mode:"free", options:[]};
+  S.qty = Q;
+  const chips = (Q.chips && Q.chips.length ? Q.chips : QCHIPS);
+  $("qchips").innerHTML = chips.map(q=>`<button class="qchip rounded-md border hairline px-2.5 py-1 text-[12px] text-slate-600" data-q="${q}">${q.toLocaleString()}</button>`).join("");
   $("qchips").querySelectorAll(".qchip").forEach(b=>b.onclick=()=>{ $("qty").value=b.dataset.q; markChips(); quote(); });
+  $("qty").min = Q.moq || 1;
+  if(Q.mode!=="free" || Q.maxq) $("qty").max = Q.maxq || ""; else $("qty").removeAttribute("max");
+  // default quantity: a standard value near 1000 that's >= MOQ, else the MOQ
+  const def = chips.filter(q=>q>=(Q.moq||1)).sort((a,b)=>Math.abs(a-1000)-Math.abs(b-1000))[0] || Q.moq || 1;
+  $("qty").value = def;
+  $("qtyhint").textContent = Q.custom
+    ? `Minimum order ${Q.moq.toLocaleString()}. Any quantity from ${Q.moq.toLocaleString()} works — price interpolates between standard breakpoints.`
+    : Q.mode==="free"
+      ? `Order ${Q.moq.toLocaleString()}–${(Q.maxq||"").toLocaleString?.()||Q.maxq} pcs.`
+      : `Minimum order ${Q.moq.toLocaleString()}. Available in set quantities — the value snaps to the nearest available quantity.`;
   $("qty").oninput=()=>{ markChips(); clearTimeout(S.t); S.t=setTimeout(quote,250); };
+  $("qty").onchange=()=>{ const v=validQty($("qty").value); if(v && String(v)!==$("qty").value){ $("qty").value=v; } markChips(); quote(); };
   markChips(); populateFrom(0); updateFieldVis();
+}
+// Enforce MOQ + fixed-quantity snapping; returns the order-valid quantity (or null if invalid).
+function validQty(raw){
+  const Q=S.qty||{moq:1,mode:"free"}; let q=parseInt(raw||"0");
+  if(!q||q<1) return null;
+  if(q < (Q.moq||1)) q = Q.moq;
+  if(Q.mode==="fixed" && Q.options && Q.options.length){
+    q = Q.options.reduce((best,o)=>Math.abs(o-q)<Math.abs(best-q)?o:best, Q.options[0]);
+  } else if(Q.maxq && q>Q.maxq) q = Q.maxq;
+  return q;
 }
 function markChips(){ const v=$("qty").value; $("qchips").querySelectorAll(".qchip").forEach(b=>b.classList.toggle("active",b.dataset.q===v)); }
 function fillSelect(sel,opts,noPlaceholder){ const cur=sel.value;
@@ -1074,7 +1100,7 @@ function populateFrom(start){
 function quote(){
   // A field is required only if it's currently applicable (showWhen) and not an optional/neutral
   // dimension input. Hidden sub-fields (e.g. hot-stamp area when hot-stamping is off) never block.
-  const qty=parseInt($("qty").value||"0"),
+  const qty=validQty($("qty").value),
         complete=S.fields.every(f=>f.optional||f.type==="number"||!fieldShown(f)||S.values[f.key]);
   if(!complete||!qty){ $("status").textContent=""; clearPrice("Configure a job…"); return; }
   try{ const q=localQuote(S.prod,S.values,qty);
