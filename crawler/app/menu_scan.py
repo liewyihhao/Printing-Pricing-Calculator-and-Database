@@ -1,67 +1,60 @@
-"""Scrape Excard's authoritative product mega-menu (every product link + label) and diff it
-against our calculator's products, so we can see coverage gaps. Read-only.
+"""Verify product coverage against Excard's authoritative product list — the public
+sitemap.xml (all /product/ URLs). Plain HTTP, no login, no fragile mega-menu driving.
 
   python -m app.menu_scan
 """
 from __future__ import annotations
-import asyncio, json, re, sys
+import json, re, ssl, sys, urllib.request
 from pathlib import Path
-from playwright.async_api import async_playwright
-from app import browser as B
+
+from app.build_specs_page import clean_name
 
 OUT = Path(__file__).resolve().parent.parent / "output"
+SITEMAP = "https://www.excard.com.my/sitemap.xml"
+_CTX = ssl._create_unverified_context()
 
 
 def _norm(s: str) -> str:
     return re.sub(r"[^a-z0-9]", "", str(s).lower())
 
 
-async def run():
-    async with async_playwright() as pw:
-        b = await B.launch(pw)
-        ctx = await b.new_context(viewport={"width": 1500, "height": 1200})
-        page = await ctx.new_page()
-        await B.login(page)
-        await page.goto("https://www.excard.com.my/home-member", wait_until="networkidle", timeout=45000)
-        await page.wait_for_timeout(2000)
-        # Every product link in the mega-menu: anchors under /product/ or /spec/
-        items = await page.evaluate(r"""() => {
-          const seen={}, out=[];
-          document.querySelectorAll("a[href]").forEach(a=>{
-            const href=a.getAttribute('href')||'';
-            if(/\/(product|spec)\//i.test(href)){
-              const label=(a.innerText||a.textContent||'').replace(/\s+/g,' ').trim();
-              if(label && label.length<50 && !seen[label]){seen[label]=1;out.push({label, href});}
-            }});
-          return out;}""")
-        await b.close()
-    (OUT / "excard_menu.json").write_text(json.dumps(items, indent=1))
-    return items
+def _get(url: str) -> str:
+    try:
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urllib.request.urlopen(req, timeout=25, context=_CTX) as r:
+            return r.read().decode("utf-8", "ignore")
+    except Exception as e:  # noqa: BLE001
+        return f"ERR {e}"
 
 
-def diff(items):
-    data = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))
-    ours = data["products"]
-    # normalized token sets of our product names (strip the "— Method" suffix + alias notes)
-    def base(n): return _norm(re.split(r"[—(]", n)[0])
-    ourbases = {base(p["name"]) for p in ours}
-    ournames = "\n".join(_norm(p["name"]) for p in ours)
+def excard_products():
+    xml = _get(SITEMAP)
+    if xml.startswith("ERR"):
+        raise SystemExit(f"sitemap fetch failed: {xml}")
+    slugs = [l.rsplit("/", 1)[-1] for l in re.findall(r"<loc>([^<]+)</loc>", xml) if "/product/" in l]
+    return sorted(set(slugs))
+
+
+def diff(slugs):
+    ours = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))["products"]
+    obases = {_norm(re.split(r"[—(]", p["name"])[0]) for p in ours}
+    ofull = {_norm(clean_name(p["name"])) for p in ours}
     missing = []
-    for it in items:
-        lab = it["label"]
-        nb = _norm(re.split(r"[—(]", lab)[0])
-        # match if our product base-name contains or equals the menu label token, or vice-versa
-        hit = any(nb and (nb in ob or ob in nb) for ob in ourbases) or (_norm(lab) in ournames)
+    for s in slugs:
+        nb = _norm(s.replace("-", ""))
+        # match if a Printoka product's base/full name contains or equals the slug tokens
+        hit = any(nb and (nb in ob or ob in nb) for ob in obases) or any(nb in f or f in nb for f in ofull)
         if not hit:
-            missing.append(lab)
+            missing.append(s)
     return missing
 
 
 if __name__ == "__main__":
-    items = asyncio.run(run())
-    print(f"Excard menu: {len(items)} product links", file=sys.stderr)
-    miss = diff(items)
-    print("\n=== Excard menu products NOT obviously in our calculator ===")
-    for m in sorted(set(miss)):
+    slugs = excard_products()
+    (OUT / "excard_menu.json").write_text(json.dumps(slugs, indent=1))
+    print(f"Excard sitemap: {len(slugs)} product URLs", file=sys.stderr)
+    miss = diff(slugs)
+    print("\n=== Excard products with NO obvious match in our calculator ===")
+    for m in sorted(miss):
         print("  ", m)
-    print(f"\n({len(set(miss))} to review of {len(items)} menu items)")
+    print(f"\n({len(miss)} to review of {len(slugs)} sitemap products)")
