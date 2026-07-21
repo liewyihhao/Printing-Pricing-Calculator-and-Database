@@ -1296,6 +1296,9 @@ def main():
     _attach_excard_parity(data)
     _apply_ref_markup(data)
     _embed_images(data)
+    from app.field_order import reorder as _reorder_fields
+    _fn, _fc = _reorder_fields(data)
+    print(f"field order: {_fc}/{_fn} products resequenced to the supplier's option order")
     _attach_art(data)
     from app.product_quantity import attach as _attach_quantity
     _n, _hit = _attach_quantity(data)
