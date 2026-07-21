@@ -14,6 +14,7 @@ manual content (e.g. label-sticker) is never clobbered.
 """
 from __future__ import annotations
 import json
+import re
 from pathlib import Path
 
 from app.build_specs_page import clean_name, slugify
@@ -41,6 +42,41 @@ def _opts(prod, keys, labelkw):
 
 
 # ---- Product Spec: an "at a glance" summary (the full detail is in the options table below) ----
+FACTS = OUT / "spec_facts"
+
+
+def _fmt_size(s):
+    m = re.match(r"(\d+(?:\.\d+)?)mmx(\d+(?:\.\d+)?)mm", s)
+    if m:
+        return f"{m.group(1)} × {m.group(2)} mm"
+    m = re.match(r"(\d+(?:\.\d+)?)mm", s)
+    return f"{m.group(1)} mm" if m else s
+
+
+def _facts_section(prod):
+    """A 'Production limits' section from crawled supplier facts — only clean, high-confidence
+    figures: min/max production sizes, and a genuine thickness RANGE (>=3 distinct values, so we
+    skip single material-name artefacts like a stray '180 micron' from a paper option)."""
+    from app.build_specs_page import slugify
+    f = FACTS / f"{slugify(clean_name(prod['name']))}.json"
+    if not f.is_file():
+        return None
+    d = json.loads(f.read_text(encoding="utf-8"))
+    rows = []
+    labels = ["Rectangle / square", "Round (diameter)", "Custom die-cut"]
+    for i, pair in enumerate(d.get("min_max") or []):
+        lo, hi = pair
+        lbl = "Round (diameter)" if ("x" not in lo and "x" not in hi) else (labels[i] if i < len(labels) else "Size")
+        rows.append({"k": f"{lbl} — production size", "v": f"Min {_fmt_size(lo)} · Max {_fmt_size(hi)}"})
+    th = sorted({int(x) for x in (d.get("thickness_micron") or [])})
+    if len(th) >= 3:
+        rows.append({"k": "Material thickness", "v": f"{min(th)}–{max(th)} micron (varies by material)"})
+    if not rows:
+        return None
+    return {"title": "Production limits", "type": "keyvalue", "rows": rows,
+            "note": "Exact production sizes — keep your artwork within these limits (add bleed)."}
+
+
 def _sections(prod):
     papers = _opts(prod, {"paper", "papermaterials", "material", "paper_tint"}, {"paper", "material"})
     colours = _opts(prod, {"colour", "printcolour", "print_colour"}, {"print colour", "colour"})
@@ -160,6 +196,14 @@ def build():
         for key in ("sections", "artwork", "templates"):
             if key not in cur:             # respect existing content; only fill genuinely-absent areas
                 cur[key] = auto[key]
+                changed = True
+        # Merge crawled supplier facts (min/max sizes, thickness range) as a "Production limits"
+        # section — skip if the product already documents cutting/production sizes (manual content).
+        fs = _facts_section(prod)
+        if fs:
+            titles = " ".join(s.get("title", "").lower() for s in (cur.get("sections") or []))
+            if not any(w in titles for w in ("production", "cutting", "limits")):
+                cur.setdefault("sections", []).append(fs)
                 changed = True
         if changed or not f.is_file():
             f.write_text(json.dumps(cur, ensure_ascii=False, indent=1), encoding="utf-8")

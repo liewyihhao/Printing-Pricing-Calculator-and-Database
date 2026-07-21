@@ -9,6 +9,29 @@
      "v": "Gold, Silver"
     }
    ]
+  },
+  {
+   "title": "Production limits",
+   "type": "keyvalue",
+   "rows": [
+    {
+     "k": "Rectangle / square — production size",
+     "v": "Min 10 × 25 mm · Max 300 × 420 mm"
+    },
+    {
+     "k": "Round (diameter) — production size",
+     "v": "Min 15 mm · Max 300 mm"
+    },
+    {
+     "k": "Custom die-cut — production size",
+     "v": "Min 50 × 50 mm · Max 300 × 420 mm"
+    },
+    {
+     "k": "Material thickness",
+     "v": "40–100 micron (varies by material)"
+    }
+   ],
+   "note": "Exact production sizes — keep your artwork within these limits (add bleed)."
   }
  ],
  "artwork": [
