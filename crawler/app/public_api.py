@@ -136,8 +136,24 @@ def _detail(p):
     return {"id": p["id"], "name": p["name"], "category": _category(p["name"]),
             "pricing_type": _pricing_type(p), "markup": p.get("markup", 1.0),
             "fields": fields, "validity": validity,
-            "quantity": {"min": 1, "note": "any positive integer; price interpolates between breakpoints"},
+            "quantity": _quantity_of(p),
             "tiers": ["Cash", "Silver", "Gold", "Platinum"]}
+
+
+def _quantity_of(p):
+    """Per-product order quantity rules, mirrored from the supplier's order form:
+    moq = minimum order quantity, options = the standard order quantities,
+    custom = whether an arbitrary quantity is accepted, mode = 'free' | 'fixed'
+    ('fixed' means the order quantity must be one of `options`)."""
+    q = p.get("quantity") or {}
+    if not q:
+        return {"moq": 1, "maxq": None, "options": [], "custom": True, "mode": "free",
+                "note": "any positive integer; price interpolates between breakpoints"}
+    return {"moq": q.get("moq", 1), "maxq": q.get("maxq"), "options": q.get("options", []),
+            "custom": q.get("custom", True), "mode": q.get("mode", "free"),
+            "note": ("any quantity from the MOQ; price interpolates between breakpoints"
+                     if q.get("custom") else
+                     "order quantity must be one of `options` (minimum = moq)")}
 
 
 app = FastAPI(title="Printoka Pricing API", version="1.0",
@@ -180,6 +196,14 @@ class QuoteRequest(BaseModel):
 def quote(req: QuoteRequest):
     if req.product_id not in PRODUCTS:
         raise HTTPException(404, "unknown product_id")
+    # Enforce the supplier's order-quantity rules (MOQ / fixed quantities)
+    q = _quantity_of(PRODUCTS[req.product_id])
+    if req.quantity < q["moq"]:
+        raise HTTPException(400, {"error": "quantity below minimum order quantity",
+                                  "moq": q["moq"], "options": q["options"][:20]})
+    if q["mode"] == "fixed" and q["options"] and req.quantity not in q["options"]:
+        raise HTTPException(400, {"error": "quantity must be one of the standard order quantities",
+                                  "moq": q["moq"], "options": q["options"]})
     payload = json.dumps({"product_id": req.product_id, "options": req.options,
                           "quantity": req.quantity})
     try:
