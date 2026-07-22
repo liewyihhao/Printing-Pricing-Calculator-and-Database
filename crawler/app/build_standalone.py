@@ -1303,6 +1303,11 @@ def main():
     _attach_configurators(data)
     _attach_images(data)
     _attach_excard_parity(data)
+    # Mirror the supplier's single-option controls (included processes, fixed specs) as
+    # display-only fields — trivially price-neutral, required for full option parity.
+    from app.auto_parity import attach as _attach_auto_parity
+    _t, _a = _attach_auto_parity(data)
+    print(f"option parity: +{_a} single-option controls across {_t} products")
     _apply_ref_markup(data)
     _embed_images(data)
     from app.field_order import reorder as _reorder_fields

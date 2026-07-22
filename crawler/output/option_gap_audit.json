@@ -21,65 +21,6 @@
      ""
     ],
     "n": 1
-   },
-   {
-    "control": "ddlSize",
-    "options": [
-     "80mm x 106mm"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlBinding",
-    "options": [
-     "Simili 80gsm (40 Sheets)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlPrintColour",
-    "options": [
-     "4C+4C (Cover), 1C (Content)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlFinishing",
-    "options": [
-     "Wire O Assembly (White)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Wire O Hole Punching"
-    ],
-    "n": 1
-   }
-  ]
- },
- "106": {
-  "name": "Envelope — Litho",
-  "missing": [
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-Cutting, Folding + Gluing"
-    ],
-    "n": 1
-   }
-  ]
- },
- "107": {
-  "name": "Folder — Litho",
-  "missing": [
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-cutting + creasing"
-    ],
-    "n": 1
    }
   ]
  },
@@ -97,60 +38,6 @@
      "Booklet"
     ],
     "n": 79
-   },
-   {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Digital"
-    ],
-    "n": 1
-   }
-  ]
- },
- "118": {
-  "name": "Wall Calendar — Litho",
-  "missing": [
-   {
-    "control": "ddlHeaderPaper",
-    "options": [
-     "Boxboard Grey Back 300gsm (1 Sheet)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblHeaderPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblHeaderCompulsory",
-    "options": [
-     "Collating and Side Stitching, Creasing, Hole Punching (6mm), UV Varnish"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlContentPaper",
-    "options": [
-     "Simili 60gsm (12 Sheets)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlContentPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblContentCompulsory",
-    "options": [
-     "Side stitching, Cutting, Perforation, Folding"
-    ],
-    "n": 1
    }
   ]
  },
@@ -158,58 +45,9 @@
   "name": "Arch File — Digital",
   "missing": [
    {
-    "control": "ddlSize",
-    "options": [
-     "350mm x 640mm"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlPaper",
-    "options": [
-     "Steel Binding- 4 ring & Metal Clip & Wire-O & Oval curve & 2 L-shape corner"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlBinding",
-    "options": [
-     "Chipboard 1200gsm & Gloss Art Paper 150gsm"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlPrintColour",
-    "options": [
-     "4C"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlLamination",
-    "options": [
-     "Matte Lamination (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlHeaderSize",
-    "options": [
-     "Ready Design"
-    ],
-    "n": 1
-   },
-   {
     "control": "ddlCoverPaper",
     "options": [
      "Simili 140gsm"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlCoverLamination",
-    "options": [
-     "1C"
     ],
     "n": 1
    }
@@ -229,46 +67,6 @@
      "Booklet"
     ],
     "n": 79
-   },
-   {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Litho"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblMould",
-    "options": [
-     "WWC 001"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblPunchHole",
-    "options": [
-     "Not Required"
-    ],
-    "n": 1
-   }
-  ]
- },
- "123": {
-  "name": "Banner — Litho",
-  "missing": [
-   {
-    "control": "rblPrintColour",
-    "options": [
-     "720 dpi solvent"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Eyelet & String"
-    ],
-    "n": 1
    }
   ]
  },
@@ -287,82 +85,9 @@
    }
   ]
  },
- "125": {
-  "name": "Roll-Up Stand — Litho",
-  "missing": [
-   {
-    "control": "ddlSize",
-    "options": [
-     "29inch x 78inch"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlPaper",
-    "options": [
-     "Synthethic Paper 180 micron"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblPrintColour",
-    "options": [
-     "1440 dpi eco solvent"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Aluminium Stand"
-    ],
-    "n": 1
-   }
-  ]
- },
- "126": {
-  "name": "Wobbler — Digital",
-  "missing": [
-   {
-    "control": "rblPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Clear Plastic Holder, Double Side Tape"
-    ],
-    "n": 1
-   }
-  ]
- },
  "127": {
   "name": "Paper Bag — Litho",
   "missing": [
-   {
-    "control": "ddlPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlFinishing",
-    "options": [
-     "350mm"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-Cutting, Folding + Gluing (Paper Bag), Hole Punching"
-    ],
-    "n": 1
-   },
    {
     "control": "ddlFrontCoverHSColour1",
     "options": [
@@ -383,39 +108,6 @@
      "DTF Tote Bag With Zip"
     ],
     "n": 3
-   },
-   {
-    "control": "ddlBagColour",
-    "options": [
-     "Natural White"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlHandleColour",
-    "options": [
-     "Same as bag colour"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Stitch"
-    ],
-    "n": 1
-   }
-  ]
- },
- "130": {
-  "name": "Papan Kopi / Sachet Board — Litho",
-  "missing": [
-   {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Litho"
-    ],
-    "n": 1
    }
   ]
  },
@@ -433,70 +125,6 @@
      "Booklet"
     ],
     "n": 79
-   },
-   {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Litho"
-    ],
-    "n": 1
-   }
-  ]
- },
- "132": {
-  "name": "Button Badge — Digital",
-  "missing": [
-   {
-    "control": "ddlPaper",
-    "options": [
-     "Gloss Art Paper 150gsm"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Digital Die Cut, Mould To Badge"
-    ],
-    "n": 1
-   }
-  ]
- },
- "133": {
-  "name": "Hand Fan — Digital",
-  "missing": [
-   {
-    "control": "rblPrintColour",
-    "options": [
-     "4C (Both)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-Cutting, Fan Handle Assembly"
-    ],
-    "n": 1
-   }
-  ]
- },
- "134": {
-  "name": "Hanger — Digital",
-  "missing": [
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-Cutting"
-    ],
-    "n": 1
    }
   ]
  },
@@ -516,20 +144,6 @@
     "n": 79
    },
    {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Digital"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rdType",
-    "options": [
-     "Magnet"
-    ],
-    "n": 1
-   },
-   {
     "control": "ddlfinishing",
     "options": [
      "Matte Laminate (Front)",
@@ -537,44 +151,6 @@
      "Soft Touch Laminate (Front)"
     ],
     "n": 3
-   }
-  ]
- },
- "136": {
-  "name": "Hard Cover Menu — Digital",
-  "missing": [
-   {
-    "control": "rblPrintColour",
-    "options": [
-     "4C (Both)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Screw Binding"
-    ],
-    "n": 1
-   }
-  ]
- },
- "137": {
-  "name": "Standing Pouch — Litho",
-  "missing": [
-   {
-    "control": "ddlPrintColour",
-    "options": [
-     "4C & White Base (Both)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "V cut & Zipper"
-    ],
-    "n": 1
    }
   ]
  },
@@ -598,78 +174,12 @@
      "Ready Designed with Editor"
     ],
     "n": 2
-   },
-   {
-    "control": "rblPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-Cutting, Gluing + Folding"
-    ],
-    "n": 1
-   }
-  ]
- },
- "139": {
-  "name": "Non-Woven Bag — Litho",
-  "missing": [
-   {
-    "control": "ddlPaper",
-    "options": [
-     "Non Woven 100gsm"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Ultrasonic"
-    ],
-    "n": 1
-   }
-  ]
- },
- "140": {
-  "name": "Tent Card — Litho",
-  "missing": [
-   {
-    "control": "ddlPaper",
-    "options": [
-     "Art Card 310gsm"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-Cutting + Creasing"
-    ],
-    "n": 1
    }
   ]
  },
  "141": {
   "name": "Stamp Chop",
   "missing": [
-   {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Litho"
-    ],
-    "n": 1
-   },
    {
     "control": "rblMould",
     "options": [
@@ -791,13 +301,6 @@
     "n": 79
    },
    {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Litho"
-    ],
-    "n": 1
-   },
-   {
     "control": "rblOrderDesc",
     "options": [
      "Hard Cover",
@@ -806,13 +309,6 @@
      "Exclusive Leather Cover"
     ],
     "n": 4
-   },
-   {
-    "control": "rblOrientation",
-    "options": [
-     "Portrait"
-    ],
-    "n": 1
    },
    {
     "control": "ddlCoverLamination",
@@ -852,13 +348,6 @@
     "n": 79
    },
    {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Litho"
-    ],
-    "n": 1
-   },
-   {
     "control": "rblOrderDesc",
     "options": [
      "Hard Cover",
@@ -867,13 +356,6 @@
      "Exclusive Leather Cover"
     ],
     "n": 4
-   },
-   {
-    "control": "rblOrientation",
-    "options": [
-     "Portrait"
-    ],
-    "n": 1
    },
    {
     "control": "ddlCoverHSColourNum",
@@ -916,20 +398,6 @@
      "Ready Designed with Editor"
     ],
     "n": 2
-   },
-   {
-    "control": "rblPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-Cutting, Gluing + Folding"
-    ],
-    "n": 1
    }
   ]
  },
@@ -953,20 +421,6 @@
      "Ready Designed with Editor"
     ],
     "n": 2
-   },
-   {
-    "control": "rblPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-Cutting, Gluing + Folding"
-    ],
-    "n": 1
    }
   ]
  },
@@ -1001,26 +455,12 @@
     "n": 3
    },
    {
-    "control": "rblSize",
-    "options": [
-     "154mm x 79.5mm"
-    ],
-    "n": 1
-   },
-   {
     "control": "rblMixDesign",
     "options": [
      "No",
      "Yes"
     ],
     "n": 2
-   },
-   {
-    "control": "ddlPackage",
-    "options": [
-     "Normal"
-    ],
-    "n": 1
    },
    {
     "control": "ddlPaper",
@@ -1032,13 +472,6 @@
     "n": 3
    },
    {
-    "control": "rblPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
     "control": "rblPacking",
     "options": [
      "5pcs / Pack",
@@ -1047,20 +480,6 @@
      "10pcs / Pack"
     ],
     "n": 4
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-Cutting, Gluing + Folding"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblPrintMethod",
-    "options": [
-     "Quantity below 2,500 pcs : DO Printing, Quantity 2,500 pcs and above : LO Printing"
-    ],
-    "n": 1
    }
   ]
  },
@@ -1075,13 +494,6 @@
      "Sleeveless"
     ],
     "n": 3
-   },
-   {
-    "control": "shirt_pant",
-    "options": [
-     "Soccer Pants"
-    ],
-    "n": 1
    }
   ]
  },
@@ -1096,13 +508,6 @@
      "Sleeveless"
     ],
     "n": 3
-   },
-   {
-    "control": "shirt_pant",
-    "options": [
-     "Soccer Pants"
-    ],
-    "n": 1
    }
   ]
  },
@@ -1125,20 +530,6 @@
      "Matte Lamination + Spot UV"
     ],
     "n": 3
-   },
-   {
-    "control": "ddlFinishing",
-    "options": [
-     "350mm"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-Cutting, Folding + Gluing (Paper Bag), Hole Punching"
-    ],
-    "n": 1
    },
    {
     "control": "ddlRopeColour",
@@ -1173,25 +564,6 @@
    }
   ]
  },
- "179": {
-  "name": "Kotak Cenderahati — Litho",
-  "missing": [
-   {
-    "control": "ddlPrintColour",
-    "options": [
-     "4C (Front)"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Die-cutting"
-    ],
-    "n": 1
-   }
-  ]
- },
  "180": {
   "name": "Corporate Shirt — Digital",
   "missing": [
@@ -1202,13 +574,6 @@
      "Kid"
     ],
     "n": 2
-   },
-   {
-    "control": "shirt_pant",
-    "options": [
-     "Soccer Pants"
-    ],
-    "n": 1
    },
    {
     "control": "shirt_fabric",
@@ -1232,31 +597,12 @@
     "n": 2
    },
    {
-    "control": "shirt_pant",
-    "options": [
-     "Soccer Pants"
-    ],
-    "n": 1
-   },
-   {
     "control": "shirt_fabric",
     "options": [
      "Micro Fiber Eyelet 160gsm",
      "Microfiber Super Square 160gsm"
     ],
     "n": 2
-   }
-  ]
- },
- "182": {
-  "name": "Muslimah Sublimation — Digital",
-  "missing": [
-   {
-    "control": "shirt_pant",
-    "options": [
-     "Soccer Pants"
-    ],
-    "n": 1
    }
   ]
  },
@@ -1270,13 +616,6 @@
      "Kid"
     ],
     "n": 2
-   },
-   {
-    "control": "shirt_pant",
-    "options": [
-     "Soccer Pants"
-    ],
-    "n": 1
    },
    {
     "control": "shirt_fabric",
@@ -1309,13 +648,6 @@
     "n": 3
    },
    {
-    "control": "shirt_pant",
-    "options": [
-     "Soccer Pants"
-    ],
-    "n": 1
-   },
-   {
     "control": "shirt_fabric",
     "options": [
      "Micro Fiber Eyelet 160gsm",
@@ -1335,13 +667,6 @@
      "yes"
     ],
     "n": 2
-   },
-   {
-    "control": "printColour",
-    "options": [
-     "4C"
-    ],
-    "n": 1
    },
    {
     "control": "spotColour",
@@ -1395,25 +720,6 @@
      "Booklet"
     ],
     "n": 79
-   },
-   {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Digital"
-    ],
-    "n": 1
-   }
-  ]
- },
- "117": {
-  "name": "Car Sticker — Digital",
-  "missing": [
-   {
-    "control": "ddlPaper",
-    "options": [
-     "Static Cling"
-    ],
-    "n": 1
    }
   ]
  },
@@ -1448,25 +754,6 @@
    }
   ]
  },
- "113": {
-  "name": "PVC Card — Digital",
-  "missing": [
-   {
-    "control": "ddlPaper",
-    "options": [
-     "0.80mm Gloss PVC Card"
-    ],
-    "n": 1
-   },
-   {
-    "control": "rblCompulsory",
-    "options": [
-     "Round Cornering"
-    ],
-    "n": 1
-   }
-  ]
- },
  "112": {
   "name": "Wire-O Notebook — Litho",
   "missing": [
@@ -1483,13 +770,6 @@
     "n": 79
    },
    {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Litho"
-    ],
-    "n": 1
-   },
-   {
     "control": "rblOrderDesc",
     "options": [
      "Hard Cover",
@@ -1498,13 +778,6 @@
      "Exclusive Leather Cover"
     ],
     "n": 4
-   },
-   {
-    "control": "rblOrientation",
-    "options": [
-     "Portrait"
-    ],
-    "n": 1
    }
   ]
  },
@@ -1522,25 +795,6 @@
      "Booklet"
     ],
     "n": 79
-   },
-   {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Litho"
-    ],
-    "n": 1
-   }
-  ]
- },
- "105": {
-  "name": "Letterhead — Litho",
-  "missing": [
-   {
-    "control": "rblSize",
-    "options": [
-     "A4 (210mm x 297mm)"
-    ],
-    "n": 1
    }
   ]
  },
@@ -1571,13 +825,6 @@
      "Booklet"
     ],
     "n": 79
-   },
-   {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Letterpress"
-    ],
-    "n": 1
    }
   ]
  },
@@ -1595,13 +842,6 @@
      "Booklet"
     ],
     "n": 79
-   },
-   {
-    "control": "ddlPrintMethod",
-    "options": [
-     "Letterpress"
-    ],
-    "n": 1
    }
   ]
  },
