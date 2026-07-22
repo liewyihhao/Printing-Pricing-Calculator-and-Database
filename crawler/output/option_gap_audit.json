@@ -277,34 +277,6 @@
    }
   ]
  },
- "172": {
-  "name": "DTF Shirt — Digital",
-  "missing": [
-   {
-    "control": "shirt_sleeve",
-    "options": [
-     "Short Sleeve",
-     "Long Sleeve",
-     "Sleeveless"
-    ],
-    "n": 3
-   }
-  ]
- },
- "173": {
-  "name": "Silkscreen Shirt — Digital",
-  "missing": [
-   {
-    "control": "shirt_sleeve",
-    "options": [
-     "Short Sleeve",
-     "Long Sleeve",
-     "Sleeveless"
-    ],
-    "n": 3
-   }
-  ]
- },
  "178": {
   "name": "Kraft Paper Bag — Litho",
   "missing": [
@@ -355,99 +327,6 @@
      "N/A"
     ],
     "n": 1
-   }
-  ]
- },
- "180": {
-  "name": "Corporate Shirt — Digital",
-  "missing": [
-   {
-    "control": "shirt_category",
-    "options": [
-     "Adult",
-     "Kid"
-    ],
-    "n": 2
-   },
-   {
-    "control": "shirt_fabric",
-    "options": [
-     "Micro Fiber Eyelet 160gsm",
-     "Microfiber Super Square 160gsm"
-    ],
-    "n": 2
-   }
-  ]
- },
- "181": {
-  "name": "Jacket — Digital",
-  "missing": [
-   {
-    "control": "shirt_category",
-    "options": [
-     "Adult",
-     "Kid"
-    ],
-    "n": 2
-   },
-   {
-    "control": "shirt_fabric",
-    "options": [
-     "Micro Fiber Eyelet 160gsm",
-     "Microfiber Super Square 160gsm"
-    ],
-    "n": 2
-   }
-  ]
- },
- "183": {
-  "name": "Sweatshirt & Hoodies — Digital",
-  "missing": [
-   {
-    "control": "shirt_category",
-    "options": [
-     "Adult",
-     "Kid"
-    ],
-    "n": 2
-   },
-   {
-    "control": "shirt_fabric",
-    "options": [
-     "Micro Fiber Eyelet 160gsm",
-     "Microfiber Super Square 160gsm"
-    ],
-    "n": 2
-   }
-  ]
- },
- "185": {
-  "name": "Cap — DTF",
-  "missing": [
-   {
-    "control": "shirt_category",
-    "options": [
-     "Adult",
-     "Kid"
-    ],
-    "n": 2
-   },
-   {
-    "control": "shirt_sleeve",
-    "options": [
-     "Short Sleeve",
-     "Long Sleeve",
-     "Sleeveless"
-    ],
-    "n": 3
-   },
-   {
-    "control": "shirt_fabric",
-    "options": [
-     "Micro Fiber Eyelet 160gsm",
-     "Microfiber Super Square 160gsm"
-    ],
-    "n": 2
    }
   ]
  },

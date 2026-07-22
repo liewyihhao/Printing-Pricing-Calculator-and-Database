@@ -28,9 +28,11 @@ _ALIAS = {
     "wire-o-notebook": "Wire-O-Notebook",
     "exclusive-leather-cover-wire-o-notebook": "Wire-O-Notebook",
     "hard-cover-perfect-bind-notebook": "Wire-O-Notebook",
-    "sublimation-shirt": "sublimation-shirt", "dtf-shirt": "shirt", "silkscreen-shirt": "shirt",
-    "corporate-shirt": "shirt", "jacket": "shirt", "muslimah-sublimation": "shirt",
-    "sweatshirt-hoodies": "shirt", "cap": "shirt",
+    # Apparel: only Sublimation Shirt shares the sublimation-jersey form. Cap, Jacket, Corporate
+    # Shirt, Sweatshirt/Hoodies, DTF/Silkscreen shirt and Muslimah are distinct products built
+    # from the readymade engine with NO matching option_audit — do NOT alias them to shirt.json
+    # (doing so injected "Soccer Pants" and produced false parity gaps).
+    "sublimation-shirt": "sublimation-shirt",
     "brochure": "brochure", "flyer": "flyer", "customprint": "customprint",
     "premium-money-packet": "money-packet", "hot-stamping-money-packet": "money-packet",
     "envelope-money-packet": "money-packet", "kraft-paper-bag": "paper-bag",
