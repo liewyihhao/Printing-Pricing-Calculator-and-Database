@@ -1058,6 +1058,15 @@ _NEUTRAL_FIELDS[127] = [  # Paper Bag: rope colour is price-neutral (verified)
      "note": "Rope/handle colour is selectable free of charge (price-neutral)."},
 ]
 
+_NEUTRAL_FIELDS[129] = [  # Mug: single-option controls on the supplier's form (price-neutral)
+    {"key": "mug_colour", "label": "Mug Colour", "options": ["White"],
+     "note": "Standard white ceramic mug."},
+    {"key": "print_colour", "label": "Print Colour", "options": ["4C (Full Colour)"],
+     "note": "Full-colour sublimation print."},
+    {"key": "packing", "label": "Packing (included)", "options": ["Individual Blank Box Packing"],
+     "note": "Every mug is individually packed in a blank box."},
+]
+
 _NEUTRAL_FIELDS[114] = [  # Kad Kahwin: category drives contact; hot-stamping/envelope quoted separately
     {"key": "category", "label": "Category", "neutral": False,
      "options": ["Standard Kad Kahwin", "Custom Die Cut Kad Kahwin"],
