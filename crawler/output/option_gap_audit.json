@@ -1,0 +1,1692 @@
+{
+ "1": {
+  "name": "Business Card",
+  "missing": [
+   {
+    "control": "creasing",
+    "options": [
+     "standard_creasing",
+     "customised_creasing"
+    ],
+    "n": 2
+   }
+  ]
+ },
+ "104": {
+  "name": "Notepad — Litho",
+  "missing": [
+   {
+    "control": "rblModel",
+    "options": [
+     ""
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlSize",
+    "options": [
+     "80mm x 106mm"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlBinding",
+    "options": [
+     "Simili 80gsm (40 Sheets)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlPrintColour",
+    "options": [
+     "4C+4C (Cover), 1C (Content)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlFinishing",
+    "options": [
+     "Wire O Assembly (White)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Wire O Hole Punching"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "106": {
+  "name": "Envelope — Litho",
+  "missing": [
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-Cutting, Folding + Gluing"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "107": {
+  "name": "Folder — Litho",
+  "missing": [
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-cutting + creasing"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "108": {
+  "name": "L-Shape Plastic Folder — Digital",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Digital"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "118": {
+  "name": "Wall Calendar — Litho",
+  "missing": [
+   {
+    "control": "ddlHeaderPaper",
+    "options": [
+     "Boxboard Grey Back 300gsm (1 Sheet)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblHeaderPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblHeaderCompulsory",
+    "options": [
+     "Collating and Side Stitching, Creasing, Hole Punching (6mm), UV Varnish"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlContentPaper",
+    "options": [
+     "Simili 60gsm (12 Sheets)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlContentPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblContentCompulsory",
+    "options": [
+     "Side stitching, Cutting, Perforation, Folding"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "119": {
+  "name": "Arch File — Digital",
+  "missing": [
+   {
+    "control": "ddlSize",
+    "options": [
+     "350mm x 640mm"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Steel Binding- 4 ring & Metal Clip & Wire-O & Oval curve & 2 L-shape corner"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlBinding",
+    "options": [
+     "Chipboard 1200gsm & Gloss Art Paper 150gsm"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlPrintColour",
+    "options": [
+     "4C"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlLamination",
+    "options": [
+     "Matte Lamination (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlHeaderSize",
+    "options": [
+     "Ready Design"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlCoverPaper",
+    "options": [
+     "Simili 140gsm"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlCoverLamination",
+    "options": [
+     "1C"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "122": {
+  "name": "Wire-O Wall Calendar — Litho",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Litho"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblMould",
+    "options": [
+     "WWC 001"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblPunchHole",
+    "options": [
+     "Not Required"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "123": {
+  "name": "Banner — Litho",
+  "missing": [
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "720 dpi solvent"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Eyelet & String"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "124": {
+  "name": "Bunting — Litho",
+  "missing": [
+   {
+    "control": "rblCategory",
+    "options": [
+     "Bunting",
+     "Bunting (Gear X Stand)",
+     "Bunting (Round Base Stand)",
+     "Bunting (Tripod Stand)"
+    ],
+    "n": 4
+   }
+  ]
+ },
+ "125": {
+  "name": "Roll-Up Stand — Litho",
+  "missing": [
+   {
+    "control": "ddlSize",
+    "options": [
+     "29inch x 78inch"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Synthethic Paper 180 micron"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "1440 dpi eco solvent"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Aluminium Stand"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "126": {
+  "name": "Wobbler — Digital",
+  "missing": [
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Clear Plastic Holder, Double Side Tape"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "127": {
+  "name": "Paper Bag — Litho",
+  "missing": [
+   {
+    "control": "ddlPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlFinishing",
+    "options": [
+     "350mm"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-Cutting, Folding + Gluing (Paper Bag), Hole Punching"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlFrontCoverHSColour1",
+    "options": [
+     "N/A"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "128": {
+  "name": "Canvas Tote Bag — Litho",
+  "missing": [
+   {
+    "control": "rblCategory",
+    "options": [
+     "Silkscreen Tote Bag ( 1C )",
+     "Heat Transfer Tote Bag ( 4C )",
+     "DTF Tote Bag With Zip"
+    ],
+    "n": 3
+   },
+   {
+    "control": "ddlBagColour",
+    "options": [
+     "Natural White"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlHandleColour",
+    "options": [
+     "Same as bag colour"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Stitch"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "130": {
+  "name": "Papan Kopi / Sachet Board — Litho",
+  "missing": [
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Litho"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "131": {
+  "name": "Pillow — Litho",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Litho"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "132": {
+  "name": "Button Badge — Digital",
+  "missing": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Gloss Art Paper 150gsm"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Digital Die Cut, Mould To Badge"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "133": {
+  "name": "Hand Fan — Digital",
+  "missing": [
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "4C (Both)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-Cutting, Fan Handle Assembly"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "134": {
+  "name": "Hanger — Digital",
+  "missing": [
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-Cutting"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "135": {
+  "name": "Magnet — Digital",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Digital"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rdType",
+    "options": [
+     "Magnet"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlfinishing",
+    "options": [
+     "Matte Laminate (Front)",
+     "Gloss Laminate (Front)",
+     "Soft Touch Laminate (Front)"
+    ],
+    "n": 3
+   }
+  ]
+ },
+ "136": {
+  "name": "Hard Cover Menu — Digital",
+  "missing": [
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "4C (Both)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Screw Binding"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "137": {
+  "name": "Standing Pouch — Litho",
+  "missing": [
+   {
+    "control": "ddlPrintColour",
+    "options": [
+     "4C & White Base (Both)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "V cut & Zipper"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "138": {
+  "name": "Money Packet — Litho",
+  "missing": [
+   {
+    "control": "rblCategory",
+    "options": [
+     "Standard",
+     "Premium",
+     "Hot Stamping",
+     "Pouch"
+    ],
+    "n": 4
+   },
+   {
+    "control": "rblType",
+    "options": [
+     "Custom Made Money Packet",
+     "Ready Designed with Editor"
+    ],
+    "n": 2
+   },
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-Cutting, Gluing + Folding"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "139": {
+  "name": "Non-Woven Bag — Litho",
+  "missing": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Non Woven 100gsm"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Ultrasonic"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "140": {
+  "name": "Tent Card — Litho",
+  "missing": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Art Card 310gsm"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-Cutting + Creasing"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "141": {
+  "name": "Stamp Chop",
+  "missing": [
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Litho"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblMould",
+    "options": [
+     "Pre Inked Stamp",
+     "Index Rubber Stamp",
+     "Self Inked Stamp",
+     "Stock Stamp"
+    ],
+    "n": 4
+   },
+   {
+    "control": "rblShape",
+    "options": [
+     "RECTANGLE",
+     "ROUND",
+     "OVAL",
+     "SQUARE",
+     "KEY CHAIN",
+     "RECTANGLE"
+    ],
+    "n": 12
+   }
+  ]
+ },
+ "160": {
+  "name": "Bunting — Gear X Stand",
+  "missing": [
+   {
+    "control": "rblCategory",
+    "options": [
+     "Bunting",
+     "Bunting (Gear X Stand)",
+     "Bunting (Round Base Stand)",
+     "Bunting (Tripod Stand)"
+    ],
+    "n": 4
+   },
+   {
+    "control": "ddlSize",
+    "options": [
+     "2ft x 5ft",
+     "2ft x 6ft",
+     "2.5ft x 6ft"
+    ],
+    "n": 3
+   },
+   {
+    "control": "ddlFinishing",
+    "options": [
+     "Come With PVC Pipe",
+     "Come With Wood and Pre-Installed Wire (No18)",
+     "Come With Wood Only"
+    ],
+    "n": 3
+   }
+  ]
+ },
+ "161": {
+  "name": "Bunting — Round Base Stand",
+  "missing": [
+   {
+    "control": "rblCategory",
+    "options": [
+     "Bunting",
+     "Bunting (Gear X Stand)",
+     "Bunting (Round Base Stand)",
+     "Bunting (Tripod Stand)"
+    ],
+    "n": 4
+   },
+   {
+    "control": "ddlFinishing",
+    "options": [
+     "Come With PVC Pipe",
+     "Come With Wood and Pre-Installed Wire (No18)",
+     "Come With Wood Only"
+    ],
+    "n": 3
+   }
+  ]
+ },
+ "162": {
+  "name": "Bunting — Tripod Stand",
+  "missing": [
+   {
+    "control": "rblCategory",
+    "options": [
+     "Bunting",
+     "Bunting (Gear X Stand)",
+     "Bunting (Round Base Stand)",
+     "Bunting (Tripod Stand)"
+    ],
+    "n": 4
+   },
+   {
+    "control": "ddlFinishing",
+    "options": [
+     "Come With PVC Pipe",
+     "Come With Wood and Pre-Installed Wire (No18)",
+     "Come With Wood Only"
+    ],
+    "n": 3
+   }
+  ]
+ },
+ "163": {
+  "name": "Exclusive Leather Cover Wire-O Notebook — Litho",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Litho"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblOrderDesc",
+    "options": [
+     "Hard Cover",
+     "VDP Hard Cover",
+     "Soft Cover",
+     "Exclusive Leather Cover"
+    ],
+    "n": 4
+   },
+   {
+    "control": "rblOrientation",
+    "options": [
+     "Portrait"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlCoverLamination",
+    "options": [
+     "Matte Lamination (Front)",
+     "Matte Lamination (Front) + Spot UV (Front Cover)",
+     "Matte Lamination (Front) + Spot UV (Front and Back Cover)",
+     "Gloss Lamination (Front)"
+    ],
+    "n": 4
+   },
+   {
+    "control": "ddlCoverHSColourNum",
+    "options": [
+     "1C (Front Cover)",
+     "2C (Front Cover)",
+     "1C (Front & Back Cover)",
+     "2C (Front & Back Cover)"
+    ],
+    "n": 4
+   }
+  ]
+ },
+ "164": {
+  "name": "Hard Cover Perfect Bind Notebook — Litho",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Litho"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblOrderDesc",
+    "options": [
+     "Hard Cover",
+     "VDP Hard Cover",
+     "Soft Cover",
+     "Exclusive Leather Cover"
+    ],
+    "n": 4
+   },
+   {
+    "control": "rblOrientation",
+    "options": [
+     "Portrait"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlCoverHSColourNum",
+    "options": [
+     "1C (Front Cover)",
+     "2C (Front Cover)",
+     "1C (Front & Back Cover)",
+     "2C (Front & Back Cover)"
+    ],
+    "n": 4
+   },
+   {
+    "control": "ddlAddContent",
+    "options": [
+     "4 sheets",
+     "8 sheets",
+     "12 sheets"
+    ],
+    "n": 3
+   }
+  ]
+ },
+ "167": {
+  "name": "Premium Money Packet — Litho",
+  "missing": [
+   {
+    "control": "rblCategory",
+    "options": [
+     "Standard",
+     "Premium",
+     "Hot Stamping",
+     "Pouch"
+    ],
+    "n": 4
+   },
+   {
+    "control": "rblType",
+    "options": [
+     "Custom Made Money Packet",
+     "Ready Designed with Editor"
+    ],
+    "n": 2
+   },
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-Cutting, Gluing + Folding"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "168": {
+  "name": "Hot Stamping Money Packet — Litho",
+  "missing": [
+   {
+    "control": "rblCategory",
+    "options": [
+     "Standard",
+     "Premium",
+     "Hot Stamping",
+     "Pouch"
+    ],
+    "n": 4
+   },
+   {
+    "control": "rblType",
+    "options": [
+     "Custom Made Money Packet",
+     "Ready Designed with Editor"
+    ],
+    "n": 2
+   },
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-Cutting, Gluing + Folding"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "169": {
+  "name": "Envelope Money Packet — Litho",
+  "missing": [
+   {
+    "control": "rblCategory",
+    "options": [
+     "Standard",
+     "Premium",
+     "Hot Stamping",
+     "Pouch"
+    ],
+    "n": 4
+   },
+   {
+    "control": "rblType",
+    "options": [
+     "Custom Made Money Packet",
+     "Ready Designed with Editor"
+    ],
+    "n": 2
+   },
+   {
+    "control": "rblModel",
+    "options": [
+     "MP 101",
+     "MP 103",
+     "MP 104"
+    ],
+    "n": 3
+   },
+   {
+    "control": "rblSize",
+    "options": [
+     "154mm x 79.5mm"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblMixDesign",
+    "options": [
+     "No",
+     "Yes"
+    ],
+    "n": 2
+   },
+   {
+    "control": "ddlPackage",
+    "options": [
+     "Normal"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Gloss Art Paper 130gsm",
+     "Linen 140gsm",
+     "Art Paper 157gsm"
+    ],
+    "n": 3
+   },
+   {
+    "control": "rblPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblPacking",
+    "options": [
+     "5pcs / Pack",
+     "6pcs / Pack",
+     "8pcs / Pack",
+     "10pcs / Pack"
+    ],
+    "n": 4
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-Cutting, Gluing + Folding"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblPrintMethod",
+    "options": [
+     "Quantity below 2,500 pcs : DO Printing, Quantity 2,500 pcs and above : LO Printing"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "172": {
+  "name": "DTF Shirt — Digital",
+  "missing": [
+   {
+    "control": "shirt_sleeve",
+    "options": [
+     "Short Sleeve",
+     "Long Sleeve",
+     "Sleeveless"
+    ],
+    "n": 3
+   },
+   {
+    "control": "shirt_pant",
+    "options": [
+     "Soccer Pants"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "173": {
+  "name": "Silkscreen Shirt — Digital",
+  "missing": [
+   {
+    "control": "shirt_sleeve",
+    "options": [
+     "Short Sleeve",
+     "Long Sleeve",
+     "Sleeveless"
+    ],
+    "n": 3
+   },
+   {
+    "control": "shirt_pant",
+    "options": [
+     "Soccer Pants"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "178": {
+  "name": "Kraft Paper Bag — Litho",
+  "missing": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Gloss Art Card 190gsm",
+     "Gloss Art Paper 157gsm"
+    ],
+    "n": 2
+   },
+   {
+    "control": "ddlLamination",
+    "options": [
+     "Gloss Lamination",
+     "Matte Lamination",
+     "Matte Lamination + Spot UV"
+    ],
+    "n": 3
+   },
+   {
+    "control": "ddlFinishing",
+    "options": [
+     "350mm"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-Cutting, Folding + Gluing (Paper Bag), Hole Punching"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlRopeColour",
+    "options": [
+     "Black",
+     "Blue",
+     "Gold",
+     "Green",
+     "Red",
+     "Silver"
+    ],
+    "n": 7
+   },
+   {
+    "control": "ddlCoverHotStampingColour",
+    "options": [
+     "Not Required",
+     "100mm x 100mm",
+     "100mm x 200mm",
+     "200mm x 200mm",
+     "300mm x 100mm",
+     "300mm x 200mm"
+    ],
+    "n": 8
+   },
+   {
+    "control": "ddlFrontCoverHSColour1",
+    "options": [
+     "N/A"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "179": {
+  "name": "Kotak Cenderahati — Litho",
+  "missing": [
+   {
+    "control": "ddlPrintColour",
+    "options": [
+     "4C (Front)"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Die-cutting"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "180": {
+  "name": "Corporate Shirt — Digital",
+  "missing": [
+   {
+    "control": "shirt_category",
+    "options": [
+     "Adult",
+     "Kid"
+    ],
+    "n": 2
+   },
+   {
+    "control": "shirt_pant",
+    "options": [
+     "Soccer Pants"
+    ],
+    "n": 1
+   },
+   {
+    "control": "shirt_fabric",
+    "options": [
+     "Micro Fiber Eyelet 160gsm",
+     "Microfiber Super Square 160gsm"
+    ],
+    "n": 2
+   }
+  ]
+ },
+ "181": {
+  "name": "Jacket — Digital",
+  "missing": [
+   {
+    "control": "shirt_category",
+    "options": [
+     "Adult",
+     "Kid"
+    ],
+    "n": 2
+   },
+   {
+    "control": "shirt_pant",
+    "options": [
+     "Soccer Pants"
+    ],
+    "n": 1
+   },
+   {
+    "control": "shirt_fabric",
+    "options": [
+     "Micro Fiber Eyelet 160gsm",
+     "Microfiber Super Square 160gsm"
+    ],
+    "n": 2
+   }
+  ]
+ },
+ "182": {
+  "name": "Muslimah Sublimation — Digital",
+  "missing": [
+   {
+    "control": "shirt_pant",
+    "options": [
+     "Soccer Pants"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "183": {
+  "name": "Sweatshirt & Hoodies — Digital",
+  "missing": [
+   {
+    "control": "shirt_category",
+    "options": [
+     "Adult",
+     "Kid"
+    ],
+    "n": 2
+   },
+   {
+    "control": "shirt_pant",
+    "options": [
+     "Soccer Pants"
+    ],
+    "n": 1
+   },
+   {
+    "control": "shirt_fabric",
+    "options": [
+     "Micro Fiber Eyelet 160gsm",
+     "Microfiber Super Square 160gsm"
+    ],
+    "n": 2
+   }
+  ]
+ },
+ "185": {
+  "name": "Cap — DTF",
+  "missing": [
+   {
+    "control": "shirt_category",
+    "options": [
+     "Adult",
+     "Kid"
+    ],
+    "n": 2
+   },
+   {
+    "control": "shirt_sleeve",
+    "options": [
+     "Short Sleeve",
+     "Long Sleeve",
+     "Sleeveless"
+    ],
+    "n": 3
+   },
+   {
+    "control": "shirt_pant",
+    "options": [
+     "Soccer Pants"
+    ],
+    "n": 1
+   },
+   {
+    "control": "shirt_fabric",
+    "options": [
+     "Micro Fiber Eyelet 160gsm",
+     "Microfiber Super Square 160gsm"
+    ],
+    "n": 2
+   }
+  ]
+ },
+ "184": {
+  "name": "Roll Form Sticker — Litho",
+  "missing": [
+   {
+    "control": "sampleProof",
+    "options": [
+     "no",
+     "yes"
+    ],
+    "n": 2
+   },
+   {
+    "control": "printColour",
+    "options": [
+     "4C"
+    ],
+    "n": 1
+   },
+   {
+    "control": "spotColour",
+    "options": [
+     "EX BLK 01",
+     "EX CYN 01",
+     "EX MAG 01",
+     "EX WHT 01"
+    ],
+    "n": 4
+   },
+   {
+    "control": "lamination",
+    "options": [
+     "Not Required",
+     "Matte Lamination",
+     "Gloss Lamination",
+     "UV Varnish"
+    ],
+    "n": 4
+   },
+   {
+    "control": "hotStamping",
+    "options": [
+     "Not Required",
+     "1C (Front)"
+    ],
+    "n": 2
+   },
+   {
+    "control": "hotStampingColour1",
+    "options": [
+     "Gold",
+     "Silver"
+    ],
+    "n": 2
+   }
+  ]
+ },
+ "116": {
+  "name": "Static Cling Window Sticker — Digital",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Digital"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "117": {
+  "name": "Car Sticker — Digital",
+  "missing": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "Static Cling"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "114": {
+  "name": "Kad Kahwin — Digital",
+  "missing": [
+   {
+    "control": "rblFoldingType",
+    "options": [
+     "Not Required",
+     "1Fa – Landscape",
+     "2Fa – Landscape",
+     "2Fb – Landscape",
+     "2Fd – Landscape",
+     "1Fa – Portrait"
+    ],
+    "n": 6
+   },
+   {
+    "control": "ddlFrontCoverHSColour1",
+    "options": [
+     "N/A"
+    ],
+    "n": 1
+   },
+   {
+    "control": "ddlFrontCoverHSColour2",
+    "options": [
+     "N/A"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "113": {
+  "name": "PVC Card — Digital",
+  "missing": [
+   {
+    "control": "ddlPaper",
+    "options": [
+     "0.80mm Gloss PVC Card"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblCompulsory",
+    "options": [
+     "Round Cornering"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "112": {
+  "name": "Wire-O Notebook — Litho",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Litho"
+    ],
+    "n": 1
+   },
+   {
+    "control": "rblOrderDesc",
+    "options": [
+     "Hard Cover",
+     "VDP Hard Cover",
+     "Soft Cover",
+     "Exclusive Leather Cover"
+    ],
+    "n": 4
+   },
+   {
+    "control": "rblOrientation",
+    "options": [
+     "Portrait"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "110": {
+  "name": "Voucher — Litho",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Litho"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "105": {
+  "name": "Letterhead — Litho",
+  "missing": [
+   {
+    "control": "rblSize",
+    "options": [
+     "A4 (210mm x 297mm)"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "24": {
+  "name": "Bill-Book — Litho (NCR Carbonless)",
+  "missing": [
+   {
+    "control": "backPrintLayer",
+    "options": [
+     "First Layer Only",
+     "All Layers"
+    ],
+    "n": 2
+   }
+  ]
+ },
+ "60": {
+  "name": "Label Sticker — Digital",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Letterpress"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "61": {
+  "name": "Label Sticker — Letterpress (Hot Stamping)",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "ddlPrintMethod",
+    "options": [
+     "Letterpress"
+    ],
+    "n": 1
+   }
+  ]
+ },
+ "21": {
+  "name": "Loose Sheet — Litho (Offset)",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   }
+  ]
+ },
+ "50": {
+  "name": "Loose Sheet — Digital",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   }
+  ]
+ },
+ "19": {
+  "name": "Booklet — Litho (Offset)",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "rdbidning",
+    "options": [
+     "Saddle Stitch",
+     "Perfect Binding"
+    ],
+    "n": 2
+   }
+  ]
+ },
+ "37": {
+  "name": "Booklet — Digital",
+  "missing": [
+   {
+    "control": "ddlProduct",
+    "options": [
+     "3 Side Seal Packaging",
+     "Arch File",
+     "Banner",
+     "Bill-Book",
+     "Booklet",
+     "Booklet"
+    ],
+    "n": 79
+   },
+   {
+    "control": "rdbidning",
+    "options": [
+     "Saddle Stitch",
+     "Perfect Binding"
+    ],
+    "n": 2
+   }
+  ]
+ }
+}

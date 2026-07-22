@@ -1,0 +1,2233 @@
+{
+ "generated_at": "2026-07-22T10:37:20",
+ "summary": {
+  "site": {
+   "sitemap_urls": 162,
+   "by_type": {
+    "product": 52,
+    "product-template": 52,
+    "help": 4,
+    "ready": 1,
+    "spec": 14,
+    "other": 39
+   },
+   "help_pages": [
+    "https://www.excard.com.my/help-faq",
+    "https://www.excard.com.my/help-artwork-specification",
+    "https://www.excard.com.my/help-tutorial",
+    "https://www.excard.com.my/help-inspire-zone"
+   ]
+  },
+  "products": {
+   "count": 52,
+   "fetched": 52,
+   "with_pdf": 52,
+   "with_template": 51,
+   "with_faq": 52,
+   "with_min_max": 0
+  },
+  "common_spec_sections": [
+   [
+    "You may also be interested",
+    52
+   ],
+   [
+    "Explore Ideas",
+    49
+   ],
+   [
+    "Frequently Asked Questions",
+    29
+   ],
+   [
+    "Excard Editor",
+    4
+   ],
+   [
+    "Static Cling Window Stickers(Car Stickers) Components",
+    2
+   ],
+   [
+    "Sachet Boards Components",
+    2
+   ],
+   [
+    "Sachet Boards Specifications",
+    2
+   ],
+   [
+    "Stamp Chops Specifications",
+    2
+   ],
+   [
+    "Business Cards Specifications",
+    1
+   ],
+   [
+    "Desk Calendars (Hard Stand) Components",
+    1
+   ],
+   [
+    "Desk Calendars (Hard Stand) Specifications",
+    1
+   ],
+   [
+    "Desk Calendars (Soft Stand) Components",
+    1
+   ],
+   [
+    "Desk Calendars (Soft Stand) Specifications",
+    1
+   ],
+   [
+    "Wall Calendars Components",
+    1
+   ],
+   [
+    "Wall Calendars Specifications",
+    1
+   ],
+   [
+    "Wire-O Calendars Components",
+    1
+   ],
+   [
+    "Wire-O Calendars Specifications",
+    1
+   ],
+   [
+    "Wedding Cards Specifications",
+    1
+   ],
+   [
+    "Gift Boxes Specifications",
+    1
+   ],
+   [
+    "Thank You Cards (Kad Terima Kasih) Specifications",
+    1
+   ]
+  ]
+ },
+ "sitemap": {
+  "product": [
+   "https://www.excard.com.my/product/business-card",
+   "https://www.excard.com.my/product/static-cling-window-sticker",
+   "https://www.excard.com.my/product/car-sticker",
+   "https://www.excard.com.my/product/desk-calendar-hard-stand",
+   "https://www.excard.com.my/product/desk-calendar-soft-stand",
+   "https://www.excard.com.my/product/wall-calendar",
+   "https://www.excard.com.my/product/wire-o-wall-calendar",
+   "https://www.excard.com.my/product/kad-kahwin",
+   "https://www.excard.com.my/product/kotak-cenderahati",
+   "https://www.excard.com.my/product/kad-terima-kasih",
+   "https://www.excard.com.my/product/banner",
+   "https://www.excard.com.my/product/bill-book",
+   "https://www.excard.com.my/product/button-badge",
+   "https://www.excard.com.my/product/bunting",
+   "https://www.excard.com.my/product/booklet",
+   "https://www.excard.com.my/product/bookmark",
+   "https://www.excard.com.my/product/computer-form",
+   "https://www.excard.com.my/product/canvas-tote-bag",
+   "https://www.excard.com.my/product/envelope",
+   "https://www.excard.com.my/product/folder",
+   "https://www.excard.com.my/product/l-shape-folder",
+   "https://www.excard.com.my/product/hand-fan",
+   "https://www.excard.com.my/product/hanger",
+   "https://www.excard.com.my/product/hard-cover-menu",
+   "https://www.excard.com.my/product/label-sticker-with-hot-stamping",
+   "https://www.excard.com.my/product/letterhead",
+   "https://www.excard.com.my/product/loose-sheet",
+   "https://www.excard.com.my/product/flyer",
+   "https://www.excard.com.my/product/brochure",
+   "https://www.excard.com.my/product/customprint",
+   "https://www.excard.com.my/product/Wire-O-Notebook",
+   "https://www.excard.com.my/product/magnet",
+   "https://www.excard.com.my/product/mask-keeper",
+   "https://www.excard.com.my/product/money-packet",
+   "https://www.excard.com.my/product/mug",
+   "https://www.excard.com.my/product/non-woven-bag",
+   "https://www.excard.com.my/product/notepad",
+   "https://www.excard.com.my/product/paper-bag",
+   "https://www.excard.com.my/product/papan-kopi",
+   "https://www.excard.com.my/product/pillow",
+   "https://www.excard.com.my/product/pre-inked-stamp",
+   "https://www.excard.com.my/product/pvc-card",
+   "https://www.excard.com.my/product/Stamp-chop",
+   "https://www.excard.com.my/product/sachet-board",
+   "https://www.excard.com.my/product/standing-pouch",
+   "https://www.excard.com.my/product/sublimation-shirt",
+   "https://www.excard.com.my/product/tent-card",
+   "https://www.excard.com.my/product/voucher",
+   "https://www.excard.com.my/product/arch-file",
+   "https://www.excard.com.my/product/wobbler",
+   "https://www.excard.com.my/product/roll-up-stand",
+   "https://www.excard.com.my/product/roll-form-sticker"
+  ],
+  "product-template": [
+   "https://www.excard.com.my/product-template/business-card",
+   "https://www.excard.com.my/product-template/arch-file",
+   "https://www.excard.com.my/product-template/bill-book",
+   "https://www.excard.com.my/product-template/button-badge",
+   "https://www.excard.com.my/product-template/booklet",
+   "https://www.excard.com.my/product-template/bookmark",
+   "https://www.excard.com.my/product-template/desk-calendar-hard-stand",
+   "https://www.excard.com.my/product-template/desk-calendar-soft-stand",
+   "https://www.excard.com.my/product-template/Premium-Desk-Calendar",
+   "https://www.excard.com.my/product-template/wall-calendar",
+   "https://www.excard.com.my/product-template/wire-o-wall-calendar",
+   "https://www.excard.com.my/product-template/computer-form",
+   "https://www.excard.com.my/product-template/canvas-tote-bag",
+   "https://www.excard.com.my/product-template/perfect-bind-notebook",
+   "https://www.excard.com.my/product-template/wire-o-notebook",
+   "https://www.excard.com.my/product-template/envelope",
+   "https://www.excard.com.my/product-template/folder",
+   "https://www.excard.com.my/product-template/hand-fan",
+   "https://www.excard.com.my/product-template/hanger",
+   "https://www.excard.com.my/product-template/hard-cover-menu",
+   "https://www.excard.com.my/product-template/banner",
+   "https://www.excard.com.my/product-template/bunting",
+   "https://www.excard.com.my/product-template/roll-up-stand",
+   "https://www.excard.com.my/product-template/l-shaped-plastic-folder",
+   "https://www.excard.com.my/product-template/lanyard",
+   "https://www.excard.com.my/product-template/letterhead",
+   "https://www.excard.com.my/product-template/bunting",
+   "https://www.excard.com.my/product-template/loose-sheet-do",
+   "https://www.excard.com.my/product-template/loose-sheet",
+   "https://www.excard.com.my/product-template/magnet",
+   "https://www.excard.com.my/product-template/mask-keeper",
+   "https://www.excard.com.my/product-template/money-packet",
+   "https://www.excard.com.my/product-template/mug",
+   "https://www.excard.com.my/product-template/non-woven-bag",
+   "https://www.excard.com.my/product-template/notepad",
+   "https://www.excard.com.my/product-template/paper-bag",
+   "https://www.excard.com.my/product-template/pillow",
+   "https://www.excard.com.my/product-template/pvc-card",
+   "https://www.excard.com.my/product-template/sachet-board",
+   "https://www.excard.com.my/product-template/stamp-chop",
+   "https://www.excard.com.my/product-template/standing-pouch",
+   "https://www.excard.com.my/product-template/label-sticker",
+   "https://www.excard.com.my/product-template/label-sticker-with-hot-stamping",
+   "https://www.excard.com.my/product-template/car-sticker",
+   "https://www.excard.com.my/product-template/uv-dtf-sticker",
+   "https://www.excard.com.my/product-template/sublimation-shirt",
+   "https://www.excard.com.my/product-template/muslimah-sublimation-shirt",
+   "https://www.excard.com.my/product-template/tent-card",
+   "https://www.excard.com.my/product-template/voucher-ticket",
+   "https://www.excard.com.my/product-template/kad-kahwin",
+   "https://www.excard.com.my/product-template/kotak-cenderahati",
+   "https://www.excard.com.my/product-template/kad-terima-kasih"
+  ],
+  "help": [
+   "https://www.excard.com.my/help-faq",
+   "https://www.excard.com.my/help-artwork-specification",
+   "https://www.excard.com.my/help-tutorial",
+   "https://www.excard.com.my/help-inspire-zone"
+  ],
+  "ready": [
+   "https://www.excard.com.my/ready-designed-template"
+  ],
+  "spec": [
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=white_pe_polyethylene",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=mirror_kote",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=mirror_kote_strong_glue",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=printing_paper",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=transparent_opp",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=removable_transparent_opp",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=synthetic_paper",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=white_pp",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=bright_silver_polyester",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=matte_silver_polyester",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=removable_white_pp",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=brown_craft_paper",
+   "https://www.excard.com.my/label-sticker?view=prd_spec&amp;pp=warranty_sticker",
+   "https://www.excard.com.my/start-member-special"
+  ],
+  "other": [
+   "https://www.excard.com.my/home-visitor",
+   "https://www.excard.com.my/excard-editor-order",
+   "https://www.excard.com.my/free-mobileapp",
+   "https://www.excard.com.my/news-promos",
+   "https://www.excard.com.my/label-sticker",
+   "https://www.excard.com.my/packagingbox",
+   "https://www.excard.com.my/product-index/packaging",
+   "https://www.excard.com.my/start-how-it-work",
+   "https://www.excard.com.my/start-member-join",
+   "https://www.excard.com.my/delivery-schedule",
+   "https://www.excard.com.my/blog",
+   "https://www.excard.com.my/eprinting-fest",
+   "https://www.excard.com.my/PDF/Shirt-Catalogue.pdf",
+   "https://www.excard.com.my/product-material",
+   "https://www.excard.com.my/paper/bond-paper",
+   "https://www.excard.com.my/paper/boxboard-grey-back",
+   "https://www.excard.com.my/paper/bright-silver-polyester",
+   "https://www.excard.com.my/paper/brown-craft-paper",
+   "https://www.excard.com.my/paper/chipboard",
+   "https://www.excard.com.my/paper/colour-paper",
+   "https://www.excard.com.my/paper/conqueror-paper",
+   "https://www.excard.com.my/paper/cotton-canvas",
+   "https://www.excard.com.my/paper/frosted-plastic",
+   "https://www.excard.com.my/paper/gloss-art-card",
+   "https://www.excard.com.my/paper/gloss-art-paper",
+   "https://www.excard.com.my/paper/gloss-pvc-card",
+   "https://www.excard.com.my/paper/hologram",
+   "https://www.excard.com.my/paper/linen",
+   "https://www.excard.com.my/paper/magnetic-sheet",
+   "https://www.excard.com.my/paper/matt-art-paper",
+   "https://www.excard.com.my/paper/metal-ice-paper",
+   "https://www.excard.com.my/paper/simili-paper",
+   "https://www.excard.com.my/paper/metalised-pet-film",
+   "https://www.excard.com.my/paper/matte-silver-polyester",
+   "https://www.excard.com.my/product-finishing",
+   "https://www.excard.com.my/finishing/gloss-lamination",
+   "https://www.excard.com.my/finishing/gloss-water-based-varnish",
+   "https://www.excard.com.my/finishing/matt-lamination",
+   "https://www.excard.com.my/finishing/uv-varnish"
+  ]
+ },
+ "products": [
+  {
+   "slug": "business-card",
+   "fetched": true,
+   "title": "Business Card Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Business Cards Specifications",
+    "Excard Editor",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [
+    "180"
+   ],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "static-cling-window-sticker",
+   "fetched": true,
+   "title": "Custom Window Sticker Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Static Cling Window Stickers(Car Stickers) Components",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "car-sticker",
+   "fetched": true,
+   "title": "Custom Window Sticker Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Static Cling Window Stickers(Car Stickers) Components",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "desk-calendar-hard-stand",
+   "fetched": true,
+   "title": "Hard Stand Calendar Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Desk Calendars (Hard Stand) Components",
+    "Desk Calendars (Hard Stand) Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "150mmx215mm",
+    "215mmx150mm",
+    "215mmx154mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "desk-calendar-soft-stand",
+   "fetched": true,
+   "title": "Soft Stand Calendar Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Desk Calendars (Soft Stand) Components",
+    "Desk Calendars (Soft Stand) Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "215mmx150mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "wall-calendar",
+   "fetched": true,
+   "title": "Wall Calendar 2026 Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Wall Calendars Components",
+    "Wall Calendars Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv",
+    "Uv Varnish"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "150mmx150mm",
+    "206mmx230mm",
+    "260mmx265mm",
+    "300mmx300mm",
+    "300mmx150mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "wire-o-wall-calendar",
+   "fetched": true,
+   "title": "Wire-O Calendar Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Wire-O Calendars Components",
+    "Wire-O Calendars Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "420mmx297mm",
+    "210mmx297mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "kad-kahwin",
+   "fetched": true,
+   "title": "Kad Kahwin - Custom Wedding Card Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Wedding Cards Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "kotak-cenderahati",
+   "fetched": true,
+   "title": "Custom Gift Box Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Gift Boxes Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv",
+    "Uv Varnish"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "85mmx85mm",
+    "165mmx60mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "kad-terima-kasih",
+   "fetched": true,
+   "title": "Custom Thank You Card Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Thank You Cards (Kad Terima Kasih) Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "banner",
+   "fetched": true,
+   "title": "Custom Banner Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Banners Components",
+    "Banners Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "bill-book",
+   "fetched": true,
+   "title": "Bill Book Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Bill Books Components",
+    "Bill Books Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "button-badge",
+   "fetched": true,
+   "title": "Button Badge Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Button Badges Specifications",
+    "Excard Editor",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "45mmx69mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "bunting",
+   "fetched": true,
+   "title": "Custom Bunting Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Buntings Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [
+    "180"
+   ],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "booklet",
+   "fetched": true,
+   "title": "Booklet Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Booklets (Offset) Components",
+    "Booklets (Offset) Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv",
+    "Uv Varnish"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "bookmark",
+   "fetched": true,
+   "title": "Bookmark Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Bookmarks Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [
+    "180"
+   ],
+   "standard_sizes": [
+    "50mmx150mm",
+    "60mmx170mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "computer-form",
+   "fetched": true,
+   "title": "Computer Form Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Computer Forms Components",
+    "Computer Forms Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "242mmx280mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "canvas-tote-bag",
+   "fetched": true,
+   "title": "Custom Tote Bag Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Canvas Tote Bags Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "360mmx400mm",
+    "360mmx320mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "envelope",
+   "fetched": true,
+   "title": "Custom Envelope Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Envelopes Components",
+    "Envelopes Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "folder",
+   "fetched": true,
+   "title": "Custom Folder Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Folders Components",
+    "Folders Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "l-shape-folder",
+   "fetched": true,
+   "title": "Custom Plastic Folder Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "L Shape Plastic Folders Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [
+    "180",
+    "200"
+   ],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "hand-fan",
+   "fetched": true,
+   "title": "Custom Hand Fan Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Hand Fans Components",
+    "Hand Fans Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "121mmx26mm",
+    "178mmx165mm",
+    "178mmx245mm",
+    "234mmx245mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "hanger",
+   "fetched": true,
+   "title": "Custom Hanger Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Hangers Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "88mmx220mm",
+    "110mmx240mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "hard-cover-menu",
+   "fetched": true,
+   "title": "Custom Hard Cover Menu Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "220mmx307mm",
+    "210mmx297mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "label-sticker-with-hot-stamping",
+   "fetched": true,
+   "title": "Custom Hot Stamping Label Sticker Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Label Stickers with Hot Stamping Specifications",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [
+    "4C"
+   ],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "letterhead",
+   "fetched": true,
+   "title": "Custom Letterhead Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Letterheads Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "loose-sheet",
+   "fetched": true,
+   "title": "Custom Flyer Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv",
+    "Uv Varnish"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "flyer",
+   "fetched": true,
+   "title": "Custom Flyer Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv",
+    "Uv Varnish"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "brochure",
+   "fetched": true,
+   "title": "Custom Flyer Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv",
+    "Uv Varnish"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "customprint",
+   "fetched": true,
+   "title": "Custom Flyer Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv",
+    "Uv Varnish"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "Wire-O-Notebook",
+   "fetched": true,
+   "title": "Custom Wire-O Notebook Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Wire-O Notebooks Components",
+    "Wire-O Notebooks Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [
+    "200"
+   ],
+   "standard_sizes": [
+    "148mmx210mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "magnet",
+   "fetched": true,
+   "title": "Custom Magnet Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Magnets Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Soft Touch Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "mask-keeper",
+   "fetched": true,
+   "title": "Custom Mask Keeper Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Mask Keepers Specifications",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [
+    "180"
+   ],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "money-packet",
+   "fetched": true,
+   "title": "Custom Money Packet Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Money Packet Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Matte Lamination",
+    "Soft Touch Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "154mmx79.5mm",
+    "79.5mmx154mm",
+    "167mmx85mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "mug",
+   "fetched": true,
+   "title": "Custom Mug Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Mugs Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "81mmx95mm",
+    "60mmx100mm",
+    "65mmx115mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "non-woven-bag",
+   "fetched": true,
+   "title": "Custom Non Woven Bag Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Non Woven Bags Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "200mmx200mm",
+    "280mmx330mm",
+    "350mmx350mm",
+    "420mmx320mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "notepad",
+   "fetched": true,
+   "title": "Custom Notepad Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Notepads Components",
+    "Notepads Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "paper-bag",
+   "fetched": true,
+   "title": "Custom Paper Bag Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Paper Bags Components",
+    "Paper Bags Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "papan-kopi",
+   "fetched": true,
+   "title": "Custom Sachet Board Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Sachet Boards Components",
+    "Sachet Boards Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "537mmx334mm",
+    "52mmx38mm",
+    "622mmx346mm",
+    "64mmx40mm",
+    "547mmx346mm",
+    "61mmx38.5mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "pillow",
+   "fetched": true,
+   "title": "Custom Pillow Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Pillows Specifications",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "pre-inked-stamp",
+   "fetched": true,
+   "title": "Custom Stamp Chops",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Stamp Chops Specifications",
+    "Excard Editor",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "pvc-card",
+   "fetched": true,
+   "title": "Custom PVC Card Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "PVC Cards Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "Stamp-chop",
+   "fetched": true,
+   "title": "Custom Stamp Chops",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Stamp Chops Specifications",
+    "Excard Editor",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "sachet-board",
+   "fetched": true,
+   "title": "Custom Sachet Board Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Sachet Boards Components",
+    "Sachet Boards Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "537mmx334mm",
+    "52mmx38mm",
+    "622mmx346mm",
+    "64mmx40mm",
+    "547mmx346mm",
+    "61mmx38.5mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "standing-pouch",
+   "fetched": true,
+   "title": "Custom Standing Pouch Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Standing Pouch Packaging Components",
+    "Standing Pouch Packaging Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "100mmx160mm",
+    "190mmx280mm",
+    "135mmx190mm",
+    "155mmx220mm",
+    "175mmx260mm",
+    "220mmx300mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "sublimation-shirt",
+   "fetched": true,
+   "title": "Custom T-Shirt Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Sublimation Shirts Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "tent-card",
+   "fetched": true,
+   "title": "Custom Tent Card Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Tent Cards Specifications",
+    "Explore Ideas",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "86mmx105mm",
+    "140mmx105mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "voucher",
+   "fetched": true,
+   "title": "Custom Voucher Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Vouchers Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Gloss Water Based Varnish",
+    "Spot Uv",
+    "Uv Varnish"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "arch-file",
+   "fetched": true,
+   "title": "Arch File Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Arch Files Components",
+    "Arch Files Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "wobbler",
+   "fetched": true,
+   "title": "Custom Wobbler Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Wobblers Components",
+    "Wobblers Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "89mmx54mm",
+    "108mmx89mm",
+    "180mmx108mm",
+    "54mmx89mm",
+    "89mmx108mm",
+    "108mmx180mm"
+   ],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "roll-up-stand",
+   "fetched": true,
+   "title": "Custom Roll-Up Stand Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Roll Up Stands Components",
+    "Roll Up Stands Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv"
+   ],
+   "min_max": [],
+   "thickness_micron": [
+    "180"
+   ],
+   "standard_sizes": [],
+   "has_template": true,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  },
+  {
+   "slug": "roll-form-sticker",
+   "fetched": true,
+   "title": "Roll Form Sticker Printing",
+   "tabs": [
+    "Product Intro",
+    "Product Spec",
+    "Artwork Spec",
+    "Artwork Specification",
+    "Template",
+    "Price List",
+    "Delivery",
+    "FAQ"
+   ],
+   "spec_sections": [
+    "Roll Form Stickers Components",
+    "Roll Form Stickers Specifications",
+    "Explore Ideas",
+    "Frequently Asked Questions",
+    "You may also be interested"
+   ],
+   "materials_hint": false,
+   "print_colours": [],
+   "finishing": [
+    "Gloss Lamination",
+    "Spot Uv",
+    "Uv Varnish"
+   ],
+   "min_max": [],
+   "thickness_micron": [],
+   "standard_sizes": [
+    "20mmx20mm",
+    "300mmx330mm"
+   ],
+   "has_template": false,
+   "has_pdf": true,
+   "has_faq": true,
+   "has_artwork_spec": true,
+   "has_price_list": true
+  }
+ ]
+}

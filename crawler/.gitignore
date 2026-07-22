@@ -8,3 +8,6 @@ output/*
 !output/spec_content/
 # crawled production facts (min/max limits, thickness) folded into product pages — keep tracked
 !output/spec_facts/
+# supplier site intelligence + option-parity gap backlog — keep tracked (small, reviewable)
+!output/excard_intelligence.json
+!output/option_gap_audit.json
