@@ -24,23 +24,6 @@
    }
   ]
  },
- "108": {
-  "name": "L-Shape Plastic Folder — Digital",
-  "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   }
-  ]
- },
  "119": {
   "name": "Arch File — Digital",
   "missing": [
@@ -50,38 +33,6 @@
      "Simili 140gsm"
     ],
     "n": 1
-   }
-  ]
- },
- "122": {
-  "name": "Wire-O Wall Calendar — Litho",
-  "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   }
-  ]
- },
- "124": {
-  "name": "Bunting — Litho",
-  "missing": [
-   {
-    "control": "rblCategory",
-    "options": [
-     "Bunting",
-     "Bunting (Gear X Stand)",
-     "Bunting (Round Base Stand)",
-     "Bunting (Tripod Stand)"
-    ],
-    "n": 4
    }
   ]
  },
@@ -97,52 +48,9 @@
    }
   ]
  },
- "128": {
-  "name": "Canvas Tote Bag — Litho",
-  "missing": [
-   {
-    "control": "rblCategory",
-    "options": [
-     "Silkscreen Tote Bag ( 1C )",
-     "Heat Transfer Tote Bag ( 4C )",
-     "DTF Tote Bag With Zip"
-    ],
-    "n": 3
-   }
-  ]
- },
- "131": {
-  "name": "Pillow — Litho",
-  "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   }
-  ]
- },
  "135": {
   "name": "Magnet — Digital",
   "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   },
    {
     "control": "ddlfinishing",
     "options": [
@@ -157,16 +65,6 @@
  "138": {
   "name": "Money Packet — Litho",
   "missing": [
-   {
-    "control": "rblCategory",
-    "options": [
-     "Standard",
-     "Premium",
-     "Hot Stamping",
-     "Pouch"
-    ],
-    "n": 4
-   },
    {
     "control": "rblType",
     "options": [
@@ -208,16 +106,6 @@
   "name": "Bunting — Gear X Stand",
   "missing": [
    {
-    "control": "rblCategory",
-    "options": [
-     "Bunting",
-     "Bunting (Gear X Stand)",
-     "Bunting (Round Base Stand)",
-     "Bunting (Tripod Stand)"
-    ],
-    "n": 4
-   },
-   {
     "control": "ddlSize",
     "options": [
      "2ft x 5ft",
@@ -241,16 +129,6 @@
   "name": "Bunting — Round Base Stand",
   "missing": [
    {
-    "control": "rblCategory",
-    "options": [
-     "Bunting",
-     "Bunting (Gear X Stand)",
-     "Bunting (Round Base Stand)",
-     "Bunting (Tripod Stand)"
-    ],
-    "n": 4
-   },
-   {
     "control": "ddlFinishing",
     "options": [
      "Come With PVC Pipe",
@@ -265,16 +143,6 @@
   "name": "Bunting — Tripod Stand",
   "missing": [
    {
-    "control": "rblCategory",
-    "options": [
-     "Bunting",
-     "Bunting (Gear X Stand)",
-     "Bunting (Round Base Stand)",
-     "Bunting (Tripod Stand)"
-    ],
-    "n": 4
-   },
-   {
     "control": "ddlFinishing",
     "options": [
      "Come With PVC Pipe",
@@ -288,28 +156,6 @@
  "163": {
   "name": "Exclusive Leather Cover Wire-O Notebook — Litho",
   "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   },
-   {
-    "control": "rblOrderDesc",
-    "options": [
-     "Hard Cover",
-     "VDP Hard Cover",
-     "Soft Cover",
-     "Exclusive Leather Cover"
-    ],
-    "n": 4
-   },
    {
     "control": "ddlCoverLamination",
     "options": [
@@ -336,28 +182,6 @@
   "name": "Hard Cover Perfect Bind Notebook — Litho",
   "missing": [
    {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   },
-   {
-    "control": "rblOrderDesc",
-    "options": [
-     "Hard Cover",
-     "VDP Hard Cover",
-     "Soft Cover",
-     "Exclusive Leather Cover"
-    ],
-    "n": 4
-   },
-   {
     "control": "ddlCoverHSColourNum",
     "options": [
      "1C (Front Cover)",
@@ -382,16 +206,6 @@
   "name": "Premium Money Packet — Litho",
   "missing": [
    {
-    "control": "rblCategory",
-    "options": [
-     "Standard",
-     "Premium",
-     "Hot Stamping",
-     "Pouch"
-    ],
-    "n": 4
-   },
-   {
     "control": "rblType",
     "options": [
      "Custom Made Money Packet",
@@ -405,16 +219,6 @@
   "name": "Hot Stamping Money Packet — Litho",
   "missing": [
    {
-    "control": "rblCategory",
-    "options": [
-     "Standard",
-     "Premium",
-     "Hot Stamping",
-     "Pouch"
-    ],
-    "n": 4
-   },
-   {
     "control": "rblType",
     "options": [
      "Custom Made Money Packet",
@@ -427,16 +231,6 @@
  "169": {
   "name": "Envelope Money Packet — Litho",
   "missing": [
-   {
-    "control": "rblCategory",
-    "options": [
-     "Standard",
-     "Premium",
-     "Hot Stamping",
-     "Pouch"
-    ],
-    "n": 4
-   },
    {
     "control": "rblType",
     "options": [
@@ -706,38 +500,9 @@
    }
   ]
  },
- "116": {
-  "name": "Static Cling Window Sticker — Digital",
-  "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   }
-  ]
- },
  "114": {
   "name": "Kad Kahwin — Digital",
   "missing": [
-   {
-    "control": "rblFoldingType",
-    "options": [
-     "Not Required",
-     "1Fa – Landscape",
-     "2Fa – Landscape",
-     "2Fb – Landscape",
-     "2Fd – Landscape",
-     "1Fa – Portrait"
-    ],
-    "n": 6
-   },
    {
     "control": "ddlFrontCoverHSColour1",
     "options": [
@@ -754,50 +519,6 @@
    }
   ]
  },
- "112": {
-  "name": "Wire-O Notebook — Litho",
-  "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   },
-   {
-    "control": "rblOrderDesc",
-    "options": [
-     "Hard Cover",
-     "VDP Hard Cover",
-     "Soft Cover",
-     "Exclusive Leather Cover"
-    ],
-    "n": 4
-   }
-  ]
- },
- "110": {
-  "name": "Voucher — Litho",
-  "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   }
-  ]
- },
  "24": {
   "name": "Bill-Book — Litho (NCR Carbonless)",
   "missing": [
@@ -811,89 +532,9 @@
    }
   ]
  },
- "60": {
-  "name": "Label Sticker — Digital",
-  "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   }
-  ]
- },
- "61": {
-  "name": "Label Sticker — Letterpress (Hot Stamping)",
-  "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   }
-  ]
- },
- "21": {
-  "name": "Loose Sheet — Litho (Offset)",
-  "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   }
-  ]
- },
- "50": {
-  "name": "Loose Sheet — Digital",
-  "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   }
-  ]
- },
  "19": {
   "name": "Booklet — Litho (Offset)",
   "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   },
    {
     "control": "rdbidning",
     "options": [
@@ -907,18 +548,6 @@
  "37": {
   "name": "Booklet — Digital",
   "missing": [
-   {
-    "control": "ddlProduct",
-    "options": [
-     "3 Side Seal Packaging",
-     "Arch File",
-     "Banner",
-     "Bill-Book",
-     "Booklet",
-     "Booklet"
-    ],
-    "n": 79
-   },
    {
     "control": "rdbidning",
     "options": [

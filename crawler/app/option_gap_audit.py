@@ -22,7 +22,8 @@ AUDIT = OUT / "option_audit"
 
 # controls handled elsewhere or not customer-facing options
 SKIP = re.compile(r"country|courier|quantity|qty|review|favourite|rush|track|customsize|"
-                  r"^txt|^chk|numberfr|numberto|vdp|k100|m100|eyelet|seal|fastener|alquran", re.I)
+                  r"^txt|^chk|numberfr|numberto|vdp|k100|m100|eyelet|seal|fastener|alquran|"
+                  r"^ddlProduct$", re.I)   # ddlProduct = the site's product picker, not an option
 # our field key/label aliases for supplier control names that differ
 ALIASES = {"cardtype": "category", "printmethod": "method", "product": "model",
            "type": "category", "bagcolour": "bag_colour", "handlecolour": "handle_colour"}
@@ -34,6 +35,17 @@ def _norm(s):
 
 def audit():
     data = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))["products"]
+    # Names of every product we model — used to spot "product switcher" controls (e.g. a Bunting
+    # page whose rblCategory lists Bunting / Gear X Stand / Round Base / Tripod, which we model
+    # as separate products). Those aren't options, so they aren't parity gaps.
+    catalogue = {_norm(re.split(r"[—(]", p["name"])[0]) for p in data}
+
+    def is_product_switcher(opts):
+        if len(opts) < 2:
+            return False
+        hits = sum(1 for o in opts if any(c and (c in _norm(o) or _norm(o) in c) for c in catalogue))
+        return hits >= max(2, len(opts) // 2)
+
     gaps = {}
     for p in data:
         slug = _base_slug(p["name"])
@@ -53,6 +65,8 @@ def audit():
             opts = [o for o in (c.get("options") or []) if not str(o).strip().startswith(("-", "—"))]
             if not opts or SKIP.search(nm):
                 continue
+            if is_product_switcher(opts):
+                continue                                   # a product picker, not an option
             ctrl = _norm(re.sub(r"^(rbl|ddl|combo)", "", nm))
             ctrl = ALIASES.get(ctrl, ctrl)
             if not ctrl:
