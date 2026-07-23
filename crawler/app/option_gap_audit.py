@@ -23,12 +23,15 @@ AUDIT = OUT / "option_audit"
 # controls handled elsewhere or not customer-facing options
 SKIP = re.compile(r"country|courier|quantity|qty|review|favourite|rush|track|customsize|"
                   r"^txt|^chk|numberfr|numberto|vdp|k100|m100|eyelet|seal|fastener|alquran|"
-                  r"^ddlProduct$", re.I)   # ddlProduct = the site's product picker, not an option
+                  r"^ddlProduct$|"                       # the site's product picker, not an option
+                  r"hotstampingcolour|hscolour|coverhs|hssize|debosssize",  # HS foil colour/size:
+                  re.I)                                  # quoted-separately foil detail, not a price axis
 # our field key/label aliases for supplier control names that differ
 ALIASES = {"cardtype": "category", "printmethod": "method", "product": "model",
            "type": "category", "bagcolour": "bag_colour", "handlecolour": "handle_colour",
            # covered by an optionsKey-driven or cascade field under a different name
-           "mould": "stamptype", "shape": "category", "rdbidning": "binding", "bidning": "binding"}
+           "mould": "stamptype", "shape": "category", "rdbidning": "binding", "bidning": "binding",
+           "coverlamination": "finishingcover", "addcontent": "additionalcontent"}
 
 
 def _norm(s):
@@ -42,6 +45,18 @@ _VERIFIED_NOT_OPTIONS = {
     # Envelope Money Packet: model/paper/packing/mix-design return None from CheckPrice
     # (only the base Model/Paper/Packing is valid); the metrics vary only by Finishing.
     169: {"model", "paper", "packing", "packingmethod", "mixdesign", "package"},
+    # Bunting stands: their price metrics vary only by Size/Material/Printing/Lamination (all
+    # exposed). The "Come With PVC Pipe/Wood" fitting is a plain-bunting template control — the
+    # chosen STAND is the fitting — so it doesn't apply here.
+    160: {"finishing", "size"}, 161: {"finishing"}, 162: {"finishing"},
+    # Magnet: our "Lamination" field covers ddlfinishing (values differ only by the spelling
+    # "Laminate" vs "Lamination").
+    135: {"finishing"},
+    # Business Card: "creasing" belongs to the folded-card sub-products (already on request).
+    1: {"creasing"},
+    # Kraft Paper Bag: ddlPaper lists Gloss Art Card/Paper (plain paper-bag template values);
+    # the kraft product's material axis (Brown/White Kraft) is what actually applies + is exposed.
+    178: {"paper"},
 }
 
 

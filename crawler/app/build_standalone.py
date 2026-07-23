@@ -532,6 +532,13 @@ def build_data():
             {"key": "paper", "label": "Material", "addon": True, "depends": [], "options": [
                 "Mirror Kote", "Transparent OPP", "White PP", "Printing Paper", "Synthetic Paper", "Hologram"]},
             {"key": "core", "label": "Paper Core", "addon": True, "depends": [], "options": ["25mm", "40mm", "76mm"]},
+            {"key": "colour", "label": "Print colour (spot)", "addon": True, "depends": [],
+             "options": ["EX BLK 01", "EX CYN 01", "EX MAG 01", "EX WHT 01"]},
+            {"key": "lamination", "label": "Lamination", "addon": True, "depends": [],
+             "options": ["Not Required", "Matte Lamination", "Gloss Lamination", "UV Varnish"]},
+            {"key": "hot_stamping", "label": "Hot stamping", "addon": True, "depends": [],
+             "options": ["Not Required", "1C (Front)"]},
+            {"key": "sample_proof", "label": "Sample proof", "addon": True, "depends": [], "options": ["No", "Yes"]},
             {"key": "quantity_hint", "label": "Available quantities (pcs)", "addon": True, "depends": [],
              "options": ["1000", "5000", "10000", "20000", "50000", "100000"]}],
          "note": "No automated pricing available (legacy roll-form order widget). Contact us directly for a quote."},
@@ -1079,6 +1086,20 @@ _MONEY_DESIGN_SRC = {"key": "design_source", "label": "Design",
 for _mp in (167, 168, 169):  # Premium / Hot Stamping / Envelope money packets: design-source toggle
     _NEUTRAL_FIELDS[_mp] = [dict(_MONEY_DESIGN_SRC)]
 
+_NEUTRAL_FIELDS[119] = [  # Arch File: fixed cover spec on the order form (single-value, price-neutral)
+    {"key": "cover_paper", "label": "Cover paper", "options": ["Simili 140gsm"],
+     "note": "Standard cover paper (fixed spec)."},
+    {"key": "cover_print", "label": "Cover print", "options": ["1C"],
+     "note": "Single-colour cover print (fixed spec)."},
+]
+
+_NEUTRAL_FIELDS[164] = [  # Hard Cover Perfect Bind Notebook: extra content sheets aren't in the
+                         # priced metrics (base content only) -> offer the option, extras on request.
+    {"key": "add_content", "label": "Additional content", "neutral": False,
+     "options": ["Base content only", "Add 4 sheets", "Add 8 sheets", "Add 12 sheets"],
+     "note": "Base content is included; extra content sheets are quoted separately."},
+]
+
 _NEUTRAL_FIELDS[178] = [  # Kraft Paper Bag: lamination + rope colour on the order form but not in
                          # the WM price metrics (which vary by model/size/material/print colour).
     {"key": "lamination", "label": "Lamination", "neutral": False,
@@ -1113,6 +1134,8 @@ _NEUTRAL_FIELDS[114] = [  # Kad Kahwin: category drives contact; hot-stamping/en
 # Configs exposed in the UI for option parity but outside the exact sampled axes
 # (combinatorial sub-options / different sub-products) → priced "on request".
 _CONTACT_WHEN = {
+    164: [{"field": "add_content", "values": ["Add 4 sheets", "Add 8 sheets", "Add 12 sheets"],
+           "note": "Additional content sheets are quoted separately — please contact us for a quote."}],
     178: [{"field": "lamination", "values": ["Matte Lamination + Spot UV"],
            "note": "Spot UV on the kraft bag is quoted separately — please contact us for a quote."}],
     24: [{"field": "papermaterials", "values": ["Normal Paper"],
