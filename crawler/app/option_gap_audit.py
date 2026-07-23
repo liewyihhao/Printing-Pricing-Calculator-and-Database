@@ -26,7 +26,9 @@ SKIP = re.compile(r"country|courier|quantity|qty|review|favourite|rush|track|cus
                   r"^ddlProduct$", re.I)   # ddlProduct = the site's product picker, not an option
 # our field key/label aliases for supplier control names that differ
 ALIASES = {"cardtype": "category", "printmethod": "method", "product": "model",
-           "type": "category", "bagcolour": "bag_colour", "handlecolour": "handle_colour"}
+           "type": "category", "bagcolour": "bag_colour", "handlecolour": "handle_colour",
+           # covered by an optionsKey-driven or cascade field under a different name
+           "mould": "stamptype", "shape": "category", "rdbidning": "binding", "bidning": "binding"}
 
 
 def _norm(s):
@@ -62,7 +64,9 @@ def audit():
         miss = []
         for c in aud.get("controls", []):
             nm = c.get("name", "")
-            opts = [o for o in (c.get("options") or []) if not str(o).strip().startswith(("-", "—"))]
+            opts = [o for o in (c.get("options") or [])
+                    if str(o).strip() and not str(o).strip().startswith(("-", "—"))
+                    and not re.fullmatch(r"n/?a|none|nil|null", str(o).strip(), re.I)]
             if not opts or SKIP.search(nm):
                 continue
             if is_product_switcher(opts):

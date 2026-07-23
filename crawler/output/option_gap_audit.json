@@ -12,18 +12,6 @@
    }
   ]
  },
- "104": {
-  "name": "Notepad — Litho",
-  "missing": [
-   {
-    "control": "rblModel",
-    "options": [
-     ""
-    ],
-    "n": 1
-   }
-  ]
- },
  "119": {
   "name": "Arch File — Digital",
   "missing": [
@@ -31,18 +19,6 @@
     "control": "ddlCoverPaper",
     "options": [
      "Simili 140gsm"
-    ],
-    "n": 1
-   }
-  ]
- },
- "127": {
-  "name": "Paper Bag — Litho",
-  "missing": [
-   {
-    "control": "ddlFrontCoverHSColour1",
-    "options": [
-     "N/A"
     ],
     "n": 1
    }
@@ -59,46 +35,6 @@
      "Soft Touch Laminate (Front)"
     ],
     "n": 3
-   }
-  ]
- },
- "138": {
-  "name": "Money Packet — Litho",
-  "missing": [
-   {
-    "control": "rblType",
-    "options": [
-     "Custom Made Money Packet",
-     "Ready Designed with Editor"
-    ],
-    "n": 2
-   }
-  ]
- },
- "141": {
-  "name": "Stamp Chop",
-  "missing": [
-   {
-    "control": "rblMould",
-    "options": [
-     "Pre Inked Stamp",
-     "Index Rubber Stamp",
-     "Self Inked Stamp",
-     "Stock Stamp"
-    ],
-    "n": 4
-   },
-   {
-    "control": "rblShape",
-    "options": [
-     "RECTANGLE",
-     "ROUND",
-     "OVAL",
-     "SQUARE",
-     "KEY CHAIN",
-     "RECTANGLE"
-    ],
-    "n": 12
    }
   ]
  },
@@ -202,43 +138,9 @@
    }
   ]
  },
- "167": {
-  "name": "Premium Money Packet — Litho",
-  "missing": [
-   {
-    "control": "rblType",
-    "options": [
-     "Custom Made Money Packet",
-     "Ready Designed with Editor"
-    ],
-    "n": 2
-   }
-  ]
- },
- "168": {
-  "name": "Hot Stamping Money Packet — Litho",
-  "missing": [
-   {
-    "control": "rblType",
-    "options": [
-     "Custom Made Money Packet",
-     "Ready Designed with Editor"
-    ],
-    "n": 2
-   }
-  ]
- },
  "169": {
   "name": "Envelope Money Packet — Litho",
   "missing": [
-   {
-    "control": "rblType",
-    "options": [
-     "Custom Made Money Packet",
-     "Ready Designed with Editor"
-    ],
-    "n": 2
-   },
    {
     "control": "rblModel",
     "options": [
@@ -247,14 +149,6 @@
      "MP 104"
     ],
     "n": 3
-   },
-   {
-    "control": "rblMixDesign",
-    "options": [
-     "No",
-     "Yes"
-    ],
-    "n": 2
    },
    {
     "control": "ddlPaper",
@@ -320,13 +214,6 @@
      "300mm x 200mm"
     ],
     "n": 8
-   },
-   {
-    "control": "ddlFrontCoverHSColour1",
-    "options": [
-     "N/A"
-    ],
-    "n": 1
    }
   ]
  },
@@ -379,25 +266,6 @@
    }
   ]
  },
- "114": {
-  "name": "Kad Kahwin — Digital",
-  "missing": [
-   {
-    "control": "ddlFrontCoverHSColour1",
-    "options": [
-     "N/A"
-    ],
-    "n": 1
-   },
-   {
-    "control": "ddlFrontCoverHSColour2",
-    "options": [
-     "N/A"
-    ],
-    "n": 1
-   }
-  ]
- },
  "24": {
   "name": "Bill-Book — Litho (NCR Carbonless)",
   "missing": [
@@ -406,32 +274,6 @@
     "options": [
      "First Layer Only",
      "All Layers"
-    ],
-    "n": 2
-   }
-  ]
- },
- "19": {
-  "name": "Booklet — Litho (Offset)",
-  "missing": [
-   {
-    "control": "rdbidning",
-    "options": [
-     "Saddle Stitch",
-     "Perfect Binding"
-    ],
-    "n": 2
-   }
-  ]
- },
- "37": {
-  "name": "Booklet — Digital",
-  "missing": [
-   {
-    "control": "rdbidning",
-    "options": [
-     "Saddle Stitch",
-     "Perfect Binding"
     ],
     "n": 2
    }

@@ -246,6 +246,9 @@ def build_data():
          "options": ["Loose", "Pad (100 pcs per pad)"]},
     ]
     MONEY_PACKET_FIELDS = [
+        {"key": "design_source", "label": "Design", "addon": True, "depends": [],
+         "options": ["Custom Made Money Packet", "Ready Designed with Editor"],
+         "note": "Upload your own design, or start from a ready-made design in the editor — the print price is the same."},
         {"key": "model", "label": "Model (MP 101=154x79.5mm · MP 103=79.5x154mm · MP 104=85x167mm)", "addon": True, "depends": [],
          "options": ["MP 101", "MP 103", "MP 104"]},
         {"key": "package", "label": "Package (number of designs)", "addon": True, "depends": [],
@@ -1066,6 +1069,12 @@ _NEUTRAL_FIELDS[129] = [  # Mug: single-option controls on the supplier's form (
     {"key": "packing", "label": "Packing (included)", "options": ["Individual Blank Box Packing"],
      "note": "Every mug is individually packed in a blank box."},
 ]
+
+_MONEY_DESIGN_SRC = {"key": "design_source", "label": "Design",
+    "options": ["Custom Made Money Packet", "Ready Designed with Editor"],
+    "note": "Upload your own design, or start from a ready-made design in the editor — the print price is the same."}
+for _mp in (167, 168, 169):  # Premium / Hot Stamping / Envelope money packets: design-source toggle
+    _NEUTRAL_FIELDS[_mp] = [dict(_MONEY_DESIGN_SRC)]
 
 _NEUTRAL_FIELDS[114] = [  # Kad Kahwin: category drives contact; hot-stamping/envelope quoted separately
     {"key": "category", "label": "Category", "neutral": False,
