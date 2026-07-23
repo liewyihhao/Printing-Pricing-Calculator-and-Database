@@ -35,6 +35,16 @@ def _norm(s):
     return re.sub(r"[^a-z0-9]", "", str(s).lower())
 
 
+# Controls confirmed NOT to be real options for a product — verified via CheckPrice/metrics
+# (they're artefacts of a shared order-form template that lists a superset of controls).
+# Keyed by product id -> set of normalized control names to ignore.
+_VERIFIED_NOT_OPTIONS = {
+    # Envelope Money Packet: model/paper/packing/mix-design return None from CheckPrice
+    # (only the base Model/Paper/Packing is valid); the metrics vary only by Finishing.
+    169: {"model", "paper", "packing", "packingmethod", "mixdesign", "package"},
+}
+
+
 def audit():
     data = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))["products"]
     # Names of every product we model — used to spot "product switcher" controls (e.g. a Bunting
@@ -73,7 +83,7 @@ def audit():
                 continue                                   # a product picker, not an option
             ctrl = _norm(re.sub(r"^(rbl|ddl|combo)", "", nm))
             ctrl = ALIASES.get(ctrl, ctrl)
-            if not ctrl:
+            if not ctrl or ctrl in _VERIFIED_NOT_OPTIONS.get(p["id"], set()):
                 continue
             if any(ctrl in o or o in ctrl for o in ours):
                 continue                                   # covered by a matching field name

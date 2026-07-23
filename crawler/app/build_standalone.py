@@ -988,6 +988,9 @@ _NEUTRAL_FIELDS = {
          "note": "Numbering is free. 4–7 digit sequential numbering in red; enter the start number on the order."},
         {"key": "last_layer_perforation", "label": "Last Layer Perforation",
          "options": ["No", "Yes"], "note": "Compulsory perforation for one layer in Book type; price-neutral."},
+        {"key": "back_print_layer", "label": "Back printing",
+         "options": ["First Layer Only", "All Layers"],
+         "note": "Which layers carry the back print — price-neutral (verified via CheckPrice)."},
     ],
 }
 
@@ -1076,6 +1079,16 @@ _MONEY_DESIGN_SRC = {"key": "design_source", "label": "Design",
 for _mp in (167, 168, 169):  # Premium / Hot Stamping / Envelope money packets: design-source toggle
     _NEUTRAL_FIELDS[_mp] = [dict(_MONEY_DESIGN_SRC)]
 
+_NEUTRAL_FIELDS[178] = [  # Kraft Paper Bag: lamination + rope colour on the order form but not in
+                         # the WM price metrics (which vary by model/size/material/print colour).
+    {"key": "lamination", "label": "Lamination", "neutral": False,
+     "options": ["Gloss Lamination", "Matte Lamination", "Matte Lamination + Spot UV"],
+     "note": "Gloss/Matte lamination is included; adding Spot UV is quoted separately."},
+    {"key": "rope_colour", "label": "Rope Colour",
+     "options": ["Black", "Blue", "Gold", "Green", "Red", "Silver"],
+     "note": "Rope/handle colour is selectable free of charge (price-neutral)."},
+]
+
 _NEUTRAL_FIELDS[114] = [  # Kad Kahwin: category drives contact; hot-stamping/envelope quoted separately
     {"key": "category", "label": "Category", "neutral": False,
      "options": ["Standard Kad Kahwin", "Custom Die Cut Kad Kahwin"],
@@ -1100,6 +1113,8 @@ _NEUTRAL_FIELDS[114] = [  # Kad Kahwin: category drives contact; hot-stamping/en
 # Configs exposed in the UI for option parity but outside the exact sampled axes
 # (combinatorial sub-options / different sub-products) → priced "on request".
 _CONTACT_WHEN = {
+    178: [{"field": "lamination", "values": ["Matte Lamination + Spot UV"],
+           "note": "Spot UV on the kraft bag is quoted separately — please contact us for a quote."}],
     24: [{"field": "papermaterials", "values": ["Normal Paper"],
           "note": "Normal (non-carbonless) paper — each layer's paper is chosen independently, "
                   "so this is quoted on request. Please contact us for a quote."}],

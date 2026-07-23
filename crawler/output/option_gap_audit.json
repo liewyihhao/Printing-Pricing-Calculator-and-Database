@@ -138,39 +138,6 @@
    }
   ]
  },
- "169": {
-  "name": "Envelope Money Packet — Litho",
-  "missing": [
-   {
-    "control": "rblModel",
-    "options": [
-     "MP 101",
-     "MP 103",
-     "MP 104"
-    ],
-    "n": 3
-   },
-   {
-    "control": "ddlPaper",
-    "options": [
-     "Gloss Art Paper 130gsm",
-     "Linen 140gsm",
-     "Art Paper 157gsm"
-    ],
-    "n": 3
-   },
-   {
-    "control": "rblPacking",
-    "options": [
-     "5pcs / Pack",
-     "6pcs / Pack",
-     "8pcs / Pack",
-     "10pcs / Pack"
-    ],
-    "n": 4
-   }
-  ]
- },
  "178": {
   "name": "Kraft Paper Bag — Litho",
   "missing": [
@@ -181,27 +148,6 @@
      "Gloss Art Paper 157gsm"
     ],
     "n": 2
-   },
-   {
-    "control": "ddlLamination",
-    "options": [
-     "Gloss Lamination",
-     "Matte Lamination",
-     "Matte Lamination + Spot UV"
-    ],
-    "n": 3
-   },
-   {
-    "control": "ddlRopeColour",
-    "options": [
-     "Black",
-     "Blue",
-     "Gold",
-     "Green",
-     "Red",
-     "Silver"
-    ],
-    "n": 7
    },
    {
     "control": "ddlCoverHotStampingColour",
@@ -261,19 +207,6 @@
     "options": [
      "Gold",
      "Silver"
-    ],
-    "n": 2
-   }
-  ]
- },
- "24": {
-  "name": "Bill-Book — Litho (NCR Carbonless)",
-  "missing": [
-   {
-    "control": "backPrintLayer",
-    "options": [
-     "First Layer Only",
-     "All Layers"
     ],
     "n": 2
    }
