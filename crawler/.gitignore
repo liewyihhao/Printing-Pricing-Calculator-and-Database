@@ -11,3 +11,4 @@ output/*
 # supplier site intelligence + option-parity gap backlog — keep tracked (small, reviewable)
 !output/excard_intelligence.json
 !output/option_gap_audit.json
+!output/parity_full_audit.json

@@ -1106,7 +1106,7 @@ _NEUTRAL_FIELDS[178] = [  # Kraft Paper Bag: lamination + rope colour on the ord
      "options": ["Gloss Lamination", "Matte Lamination", "Matte Lamination + Spot UV"],
      "note": "Gloss/Matte lamination is included; adding Spot UV is quoted separately."},
     {"key": "rope_colour", "label": "Rope Colour",
-     "options": ["Black", "Blue", "Gold", "Green", "Red", "Silver"],
+     "options": ["Black", "Blue", "Gold", "Green", "Red", "Silver", "White"],
      "note": "Rope/handle colour is selectable free of charge (price-neutral)."},
 ]
 
