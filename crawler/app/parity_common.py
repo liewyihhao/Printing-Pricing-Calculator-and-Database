@@ -33,6 +33,11 @@ ALIASES = {"cardtype": "category", "printmethod": "method", "product": "model",
            "roundcornerenable": "round_corner", "papertype": "paper", "cardsize": "size",
            "printcolour": "printcolour", "holepunching": "holepunching"}
 
+# Page chrome / delivery / nav / product-switcher / quantity — never a product option at ANY
+# position (used to keep excard_dom_controls to the real configuration section).
+_CHROME = re.compile(r"country|courier|favourite|rush|track|review|customsize|customqty|"
+                     r"comboqty|otherorder|^ddlProduct$|^txt", re.I)
+
 # Controls verified (via CheckPrice / price-metrics) NOT to be real options for a product —
 # artefacts of a shared order-form template that lists a superset of controls.
 VERIFIED_NOT_OPTIONS = {
@@ -104,6 +109,35 @@ def excard_controls(product):
     return out
 
 
+def excard_dom_controls(product):
+    """ALL configuration-section controls in supplier DOM (visual) order — for SEQUENCING our
+    fields to the same top-to-bottom order the customer sees on the supplier's form.
+
+    Unlike excard_controls (which keeps only the real priceable option axes, for the presence/
+    value audit), this keeps single-option selects and checkbox/finishing controls too: they
+    still occupy a visual position, so a field that maps to one must sort there. Only page chrome,
+    delivery, nav, the product switcher and the quantity control are dropped."""
+    aud = audit_for(product)
+    if not aud:
+        return []
+    out = []
+    for c in aud.get("controls", []):
+        nm = c.get("name", "")
+        if not nm or _CHROME.search(nm):
+            continue
+        opts = [o for o in (c.get("options") or [])
+                if str(o).strip() and not str(o).strip().startswith(("-", "—"))
+                and not _JUNK_OPT.fullmatch(str(o).strip())]
+        if _is_product_switcher(opts):
+            continue
+        ctrl = norm(re.sub(r"^(rbl|ddl|combo|rdb|rb|chk)", "", nm))
+        ctrl = norm(ALIASES.get(ctrl, ctrl))
+        if not ctrl or ctrl in VERIFIED_NOT_OPTIONS.get(product["id"], set()):
+            continue
+        out.append({"idx": len(out), "name": nm, "ctrl": ctrl, "options": opts})
+    return out
+
+
 def _field_keys(f):
     return norm(f.get("key", "")), norm(f.get("label", ""))
 
@@ -125,6 +159,42 @@ def match_field_to_control(f, controls):
             best_score, best = score, c
     # accept on a name match (score >= 2) or a solid value overlap (Jaccard >= 0.34)
     return best if best_score >= 2.0 or best_score >= 0.34 else None
+
+
+def seq_match(fields, controls):
+    """field index -> control DOM idx, matched PRECISELY for SEQUENCING: exact (aliased) control
+    name == our field key first, then exact label, then a strong value overlap. One control maps to
+    at most one field, so a loose substring can't pull a field to the wrong control (e.g. our
+    'colour' labelled "Print Colour" must land on 'ddlPrintColour', not 'ddlContentPrintColour').
+    Used by field_order (to sequence) and parity_full_audit (to check the shipped sequence) — one
+    reference, so they always agree."""
+    finfo = [(norm(f.get("key", "")), norm(f.get("label", "")),
+              {norm(v) for v in (f.get("options") or []) if norm(v)}) for f in fields]
+    used, matched = set(), {}
+    for use_label in (False, True):                  # pass 1a: exact key, then 1b: exact label
+        for i, (fk, fl, _fv) in enumerate(finfo):
+            if i in matched:
+                continue
+            target = fl if use_label else fk
+            for c in controls:
+                if c["idx"] in used or not c["ctrl"]:
+                    continue
+                if c["ctrl"] == target:
+                    matched[i] = c["idx"]; used.add(c["idx"]); break
+    for i, (_fk, _fl, fv) in enumerate(finfo):        # pass 2: strong value overlap
+        if i in matched or not fv:
+            continue
+        best, bestj = None, 0.0
+        for c in controls:
+            if c["idx"] in used:
+                continue
+            cv = {norm(o) for o in c["options"] if norm(o)}
+            j = len(fv & cv) / len(fv | cv) if cv else 0.0
+            if j > bestj:
+                bestj, best = j, c
+        if best and bestj >= 0.5:
+            matched[i] = best["idx"]; used.add(best["idx"])
+    return matched
 
 
 def control_is_covered(c, ours_keys, ourvals):

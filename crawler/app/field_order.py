@@ -19,43 +19,56 @@ import json
 from pathlib import Path
 
 from app.build_specs_page import clean_name
-from app.parity_common import excard_controls, match_field_to_control
+from app.parity_common import excard_dom_controls, seq_match, norm
 
 OUT = Path(__file__).resolve().parent.parent / "output"
 
 
 def reorder_fields(product):
     """Return the product's fields resequenced to the supplier's order (or None to leave as-is)."""
-    controls = excard_controls(product)
+    # Sequence against the FULL DOM control order (incl. single-option / checkbox controls), not
+    # just the priceable axes — so cover/content papers, hot-stamping, jawi, extra-copies etc. take
+    # their true visual position instead of floating up next to the first fields they neighbour.
+    controls = excard_dom_controls(product)
     fields = product.get("fields") or []
     if not controls or len(fields) < 2:
         return None
 
-    matched = {}                                   # field index -> control DOM index
-    for i, f in enumerate(fields):
-        c = match_field_to_control(f, controls)
-        if c is not None:
-            matched[i] = c["idx"]
-
+    matched = seq_match(fields, controls)
     if not matched:
         return None
 
-    # Anchor each field: a MATCHED field takes its supplier control's DOM position; an UNMATCHED
-    # field stays right after the field that precedes it in our current order (so it never floats
-    # away from its neighbours), and a showWhen sub-field trails its parent. This keeps unmatched
-    # extras stable while matched fields (incl. single-option "included" ones) move to the
-    # supplier's sequence.
-    anchor_by = {}
-    for i, f in enumerate(fields):
-        if i in matched:
-            a = float(matched[i])
-        elif f.get("showWhen"):
+    # Anchor each field: a MATCHED field takes its supplier control's DOM position. An UNMATCHED
+    # field (one the supplier form has no separate control for, e.g. booklet cover embossing /
+    # lamination) anchors next to a related field so it lands in the right section, not next to the
+    # first field it happens to follow: (1) a showWhen sub-field trails its parent; (2) otherwise a
+    # field sharing its leading key token (cover_* → the "cover" field) trails that field; (3) else
+    # it stays after its current-order predecessor.
+    def _lead(f):
+        return norm((f.get("key", "").split("_")[0]))
+
+    label_anchor = {}                                            # matched field's label -> position
+    for j in matched:
+        ln = norm(fields[j].get("label", ""))
+        if ln:
+            label_anchor[ln] = float(matched[j])
+
+    anchor_by = {i: float(ci) for i, ci in matched.items()}       # matched: supplier DOM position
+    for i, f in enumerate(fields):                                # unmatched: anchor to a relation
+        if i in anchor_by:
+            continue
+        ln = norm(f.get("label", ""))
+        if f.get("showWhen"):
             pk = f.get("showWhen", {}).get("field")
             pa = next((anchor_by[j] for j, pf in enumerate(fields)
                        if pf.get("key") == pk and j in anchor_by), None)
-            a = (pa if pa is not None else (anchor_by[i - 1] if i else -1.0)) + 1e-3
+            a = (pa if pa is not None else (anchor_by[i - 1] if i - 1 in anchor_by else -1.0)) + 1e-3
+        elif ln in label_anchor:                                  # a twin of a matched field (same
+            a = label_anchor[ln] + 1e-4                           # label, e.g. ex_topeyelet↔topeyelet)
         else:
-            a = (anchor_by[i - 1] if i else -1.0) + 1e-4
+            lead = _lead(f)
+            kin = [anchor_by[j] for j in matched if _lead(fields[j]) == lead and lead]
+            a = (max(kin) if kin else (anchor_by[i - 1] if i - 1 in anchor_by else -1.0)) + 1e-4
         anchor_by[i] = a
 
     # Hard guardrail: a field must NEVER sort before a field it depends on (cascade integrity).

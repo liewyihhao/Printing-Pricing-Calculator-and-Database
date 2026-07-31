@@ -17,7 +17,8 @@ import json, sys
 from pathlib import Path
 
 from app.build_specs_page import clean_name
-from app.parity_common import (excard_controls, match_field_to_control, control_is_covered, norm)
+from app.parity_common import (excard_controls, excard_dom_controls, match_field_to_control,
+                               seq_match, control_is_covered, norm)
 
 OUT = Path(__file__).resolve().parent.parent / "output"
 
@@ -88,9 +89,12 @@ def audit():
             if gap:
                 values.append({"control": c["name"], "field": fields[fi]["key"], "missing_values": gap})
 
-        # order: sequence of matched control indices as they appear in our field order
-        seq = [f2c[i] for i in range(len(fields)) if i in f2c]
-        order_ok = all(seq[k] <= seq[k + 1] for k in range(len(seq) - 1))
+        # order: our fields must follow the supplier's full DOM (visual) sequence — checked against
+        # the SAME reference field_order sequences to (excard_dom_controls + seq_match), so the
+        # audit and the sequencer never disagree. Cascade products are still reported separately.
+        dmatch = seq_match(fields, excard_dom_controls(p))
+        dseq = [dmatch[i] for i in range(len(fields)) if i in dmatch]
+        order_ok = all(dseq[k] <= dseq[k + 1] for k in range(len(dseq) - 1))
         is_cascade = any(f.get("depends") for f in fields)
 
         if presence or values or not order_ok:
