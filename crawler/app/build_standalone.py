@@ -722,19 +722,30 @@ def build_data():
 
 
 def _attach_images(data):
-    """Bake Excard option images into image-bearing fields (envelope mould / folder mould)."""
+    """Bake supplier option images onto image-bearing fields. Two sources:
+    - option_images.json  : legacy envelope / folder mould families (by engine)
+    - option_images_full.json : per-product per-field option pictures captured by
+      app.option_image_crawl ({product_id: {field_key: {option: url}}}) — the complete set."""
     imgs = _load("option_images.json")
-    if not imgs:
-        return
-    # map engine -> image family
     fam_by_engine = {"envelope": "envelope", "folder": "folder"}
     for prod in data["products"]:
         fam = fam_by_engine.get(prod.get("engine"))
-        if not fam or fam not in imgs:
+        if imgs and fam and fam in imgs:
+            for fld in prod["fields"]:
+                if fld["key"] in imgs[fam]:
+                    fld["images"] = imgs[fam][fld["key"]]
+
+    full = _load("option_images_full.json", {})
+    for prod in data["products"]:
+        pmap = full.get(str(prod["id"]))
+        if not pmap:
             continue
         for fld in prod["fields"]:
-            if fld["key"] in imgs[fam]:
-                fld["images"] = imgs[fam][fld["key"]]
+            fimgs = pmap.get(fld["key"])
+            if fimgs:
+                merged = dict(fld.get("images") or {})
+                merged.update(fimgs)
+                fld["images"] = merged
 
 
 # our product id -> captured Excard ordering slug (output/v4_options/<slug>_options.json)
@@ -1348,13 +1359,13 @@ def main():
     _drop_unsampled(data)
     _wire_pricelist_products(data)
     _attach_configurators(data)
-    _attach_images(data)
     _attach_excard_parity(data)
     # Mirror the supplier's single-option controls (included processes, fixed specs) as
     # display-only fields — trivially price-neutral, required for full option parity.
     from app.auto_parity import attach as _attach_auto_parity
     _t, _a = _attach_auto_parity(data)
     print(f"option parity: +{_a} single-option controls across {_t} products")
+    _attach_images(data)     # after auto_parity, so images can attach to inc_* single-option fields
     _apply_ref_markup(data)
     _embed_images(data)
     from app.field_order import reorder as _reorder_fields

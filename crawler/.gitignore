@@ -12,3 +12,5 @@ output/*
 !output/excard_intelligence.json
 !output/option_gap_audit.json
 !output/parity_full_audit.json
+!output/option_images_full.json
+!output/option_images_scan.json

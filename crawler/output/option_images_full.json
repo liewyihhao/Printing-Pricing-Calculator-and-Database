@@ -1,0 +1,277 @@
+{
+ "129": {
+  "model": {
+   "11OZ": "https://www.excard.com.my/images/member/order_mug/11oz.jpg",
+   "15OZ": "https://www.excard.com.my/images/member/order_mug/15oz.jpg",
+   "12OZ": "https://www.excard.com.my/images/member/order_mug/12oz.jpg"
+  }
+ },
+ "140": {
+  "model": {
+   "TC 003": "https://www.excard.com.my/images/member/order_tc/TC003.jpg",
+   "TC 004": "https://www.excard.com.my/images/member/order_tc/TC004.jpg"
+  }
+ },
+ "106": {
+  "model": {
+   "OE4496NW — 114x248mm (Best Seller)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/OE4496NW.jpg",
+   "OE4496W — 114x248mm (window)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/OE4496NW.jpg",
+   "OE9013NW — 229x324mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/OE9013NW.jpg",
+   "EV4090NW — 102x229mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/EV4090NW.jpg",
+   "EV4090W — 102x229mm (window)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/EV4090NW.jpg",
+   "EV4286NW — 110x220mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/EV4286NW.jpg",
+   "EV4286W — 110x220mm (window)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/EV4286NW.jpg",
+   "EV4496NW — 114x248mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/EV4496NW.jpg",
+   "EV4496W — 114x248mm (window)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/EV4496NW.jpg",
+   "EV6390NW — 162x229mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/EV6390NW.jpg",
+   "EV7010NW — 178x254mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/EV7010NW.jpg",
+   "EV9013NW — 229x324mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/EV9013NW.jpg",
+   "EV1015NW — 254x381mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/EV1015NW.jpg",
+   "IS4286NW — 110x220mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/IS4286NW.jpg",
+   "IS6390NW — 162x229mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/IS6390NW.jpg",
+   "OP8642NW — 220x110mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/OP8642NW.jpg",
+   "OP6344NW — 162x114mm": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/envelope/OP6344NW.jpg"
+  }
+ },
+ "107": {
+  "model": {
+   "FPF 001": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/folder/FPF+001.jpg",
+   "FPF 004": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/folder/FPF+004.jpg",
+   "FPF 005": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/folder/FPF+005.jpg",
+   "FPF 014": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/folder/FPF+014.jpg",
+   "FPF 015": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/folder/FPF+015.jpg",
+   "FPF 016": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/folder/FPF+016.jpg"
+  }
+ },
+ "122": {
+  "inc_mould": {
+   "WWC 001": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/calendar/wire-o/WWC+001.jpg"
+  }
+ },
+ "126": {
+  "model": {
+   "W01P": "https://www.excard.com.my/images/member/order_wobbler/W01P.jpg",
+   "W02P": "https://www.excard.com.my/images/member/order_wobbler/W02P.jpg",
+   "W03P": "https://www.excard.com.my/images/member/order_wobbler/W03P.jpg"
+  }
+ },
+ "127": {
+  "model": {
+   "PBG 001": "https://www.excard.com.my/images/member/order_pb/PBG%20001.jpg",
+   "PBG 002": "https://www.excard.com.my/images/member/order_pb/PBG%20002.jpg",
+   "PBG 004": "https://www.excard.com.my/images/member/order_pb/PBG%20004.jpg",
+   "PBG 005": "https://www.excard.com.my/images/member/order_pb/PBG%20005.jpg",
+   "PBG 003": "https://www.excard.com.my/images/member/order_pb/PBG%20003.jpg",
+   "PBG 006": "https://www.excard.com.my/images/member/order_pb/PBG%20006.jpg",
+   "PBG 007": "https://www.excard.com.my/images/member/order_pb/PBG%20007.jpg"
+  }
+ },
+ "128": {
+  "model": {
+   "CT8-A3": "https://www.excard.com.my/images/member/order-canvas-tote-bag/CT8-A3.jpg",
+   "CTD12-A3": "https://www.excard.com.my/images/member/order-canvas-tote-bag/CT8-A3.jpg"
+  }
+ },
+ "133": {
+  "model": {
+   "PFS 001": "https://www.excard.com.my/images/member/order_handfan/PFS001.jpg",
+   "PFS 002": "https://www.excard.com.my/images/member/order_handfan/PFS002.jpg",
+   "PFS 003": "https://www.excard.com.my/images/member/order_handfan/PFS003.jpg",
+   "PFM 001": "https://www.excard.com.my/images/member/order_handfan/PFM001.jpg",
+   "PFL 001": "https://www.excard.com.my/images/member/order_handfan/PFL001.jpg"
+  }
+ },
+ "134": {
+  "model": {
+   "H01": "https://www.excard.com.my/images/member/order_hanger/H01.jpg",
+   "H02": "https://www.excard.com.my/images/member/order_hanger/H02.jpg",
+   "H03": "https://www.excard.com.my/images/member/order_hanger/H03.jpg"
+  }
+ },
+ "138": {
+  "model": {
+   "MP 101": "https://www.excard.com.my/images/member/order_mp/MP101.jpg",
+   "MP 103": "https://www.excard.com.my/images/member/order_mp/MP103.jpg",
+   "MP 104": "https://www.excard.com.my/images/member/order_mp/MP104.jpg"
+  }
+ },
+ "139": {
+  "model": {
+   "WN-B5": "https://www.excard.com.my/images/member/order-non-woven-bag/WN-B5.jpg",
+   "WS-A4": "https://www.excard.com.my/images/member/order-non-woven-bag/WS-A4.jpg",
+   "WS-A3P": "https://www.excard.com.my/images/member/order-non-woven-bag/WS-A3P.jpg",
+   "WS-A3L": "https://www.excard.com.my/images/member/order-non-woven-bag/WS-A3L.jpg",
+   "WH-A4": "https://www.excard.com.my/images/member/order-non-woven-bag/WS-A4.jpg"
+  }
+ },
+ "144": {
+  "model": {
+   "CLB-S": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/cooler-bag/CLB-S.jpg",
+   "CLB-D": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/cooler-bag/CLB-D.jpg"
+  }
+ },
+ "147": {
+  "model": {
+   "LNWB-S": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/laminated-non-woven-bag/LNWB-S.jpg",
+   "LNWB-B": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/laminated-non-woven-bag/LNWB-B.jpg"
+  },
+  "bagcolour": {
+   "White (LNWB-S)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/laminated-non-woven-bag/LNWB-S.jpg",
+   "White (LNWB-B)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/laminated-non-woven-bag/LNWB-B.jpg",
+   "Apple Green (LNWB-S)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/laminated-non-woven-bag/LNWB-S.jpg",
+   "Apple Green (LNWB-B)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/laminated-non-woven-bag/LNWB-B.jpg",
+   "Khaki (LNWB-S)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/laminated-non-woven-bag/LNWB-S.jpg",
+   "Khaki (LNWB-B)": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/laminated-non-woven-bag/LNWB-B.jpg"
+  }
+ },
+ "148": {
+  "model": {
+   "rPET - B5": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/rpet-non-woven-bag/rPET+-+B5.jpg",
+   "rPET - A4": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/rpet-non-woven-bag/rPET+-+A4.jpg",
+   "rPET - A3L": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/rpet-non-woven-bag/rPET+-+A3L.jpg"
+  }
+ },
+ "151": {
+  "model": {
+   "BKSP01": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-standing-pouch/BKSP01.jpg",
+   "BKSP02": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-standing-pouch/BKSP02.jpg",
+   "BKSP03": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-standing-pouch/BKSP03.jpg",
+   "WKSP01": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-standing-pouch/WKSP01.jpg",
+   "WKSP02": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-standing-pouch/WKSP02.jpg",
+   "WKSP03": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-standing-pouch/WKSP03.jpg"
+  }
+ },
+ "154": {
+  "packingmaterial": {
+   "B Flute": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/foamboard/B-flute.jpg",
+   "AB Flute": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/foamboard/B-flute.jpg"
+  }
+ },
+ "156": {
+  "model": {
+   "M1": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/foldable-pop-display/M1.jpg",
+   "M2": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/foldable-pop-display/M2.jpg",
+   "M3": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/foldable-pop-display/M3.jpg",
+   "M4": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/foldable-pop-display/M4.jpg"
+  }
+ },
+ "157": {
+  "model": {
+   "POP M1": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/pop-display/POP_M1.jpg",
+   "POP M2": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/pop-display/POP_M2.jpg",
+   "POP M3": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/pop-display/POP_M3.jpg",
+   "POP M4": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/pop-display/POP_M4.jpg"
+  }
+ },
+ "163": {
+  "printcolourcover": {
+   "Exclusive Leather Grey": "https://www.excard.com.my/images/member/order-wireo-notebook/grey.jpg"
+  },
+  "finishingcover": {
+   "Deboss": "https://www.excard.com.my/images/member/order-wireo-notebook/deboss.jpg"
+  }
+ },
+ "166": {
+  "model": {
+   "c3ub": "https://www.excard.com.my/images/member/order_greeting_card/c3ub.jpg",
+   "c4ub": "https://www.excard.com.my/images/member/order_greeting_card/c4ub.jpg",
+   "c4uc": "https://www.excard.com.my/images/member/order_greeting_card/c4uc.jpg",
+   "c6ud": "https://www.excard.com.my/images/member/order_greeting_card/c6ud.jpg",
+   "c6ue": "https://www.excard.com.my/images/member/order_greeting_card/c6ue.jpg",
+   "c8ud": "https://www.excard.com.my/images/member/order_greeting_card/c8ud.jpg"
+  }
+ },
+ "167": {
+  "model": {
+   "MP 101": "https://www.excard.com.my/images/member/order_mp/MP101.jpg",
+   "MP 103": "https://www.excard.com.my/images/member/order_mp/MP103.jpg",
+   "MP 104": "https://www.excard.com.my/images/member/order_mp/MP104.jpg"
+  }
+ },
+ "168": {
+  "model": {
+   "MP 101": "https://www.excard.com.my/images/member/order_mp/MP101.jpg",
+   "MP 103": "https://www.excard.com.my/images/member/order_mp/MP103.jpg",
+   "MP 104": "https://www.excard.com.my/images/member/order_mp/MP104.jpg"
+  }
+ },
+ "174": {
+  "model": {
+   "PB LANYARD 01": "https://www.excard.com.my/images/member/order_lanyard/PB_LANYARD_01.jpg",
+   "PB LANYARD 02 BUCKLE": "https://www.excard.com.my/images/member/order_lanyard/PB_LANYARD_02_BUCKLE.jpg",
+   "PB LANYARD 01 CLIP": "https://www.excard.com.my/images/member/order_lanyard/PB_LANYARD_01.jpg"
+  }
+ },
+ "179": {
+  "model": {
+   "GB 001": "https://www.excard.com.my/images/member/order-kotak-cenderahati/GB_001.jpg",
+   "GB 005": "https://www.excard.com.my/images/member/order-kotak-cenderahati/GB_005.jpg"
+  }
+ },
+ "180": {
+  "model": {
+   "Corporate with Collar": "https://www.excard.com.my/images/member/order_shirt/Corporate%20with%20Collar,Short%20Sleeve.JPG"
+  },
+  "sleeve": {
+   "Short Sleeve": "https://www.excard.com.my/images/member/order_shirt/Corporate%20with%20Collar,Short%20Sleeve.JPG"
+  }
+ },
+ "181": {
+  "model": {
+   "Jacket": "https://www.excard.com.my/images/member/order_shirt/Jacket,Long%20Sleeve.JPG"
+  },
+  "sleeve": {
+   "Long Sleeve": "https://www.excard.com.my/images/member/order_shirt/Jacket,Long%20Sleeve.JPG"
+  }
+ },
+ "183": {
+  "model": {
+   "Sweat Shirt": "https://www.excard.com.my/images/member/order_shirt/Sweat%20Shirt,Long%20Sleeve.JPG"
+  },
+  "sleeve": {
+   "Long Sleeve": "https://www.excard.com.my/images/member/order_shirt/Sweat%20Shirt,Long%20Sleeve.JPG"
+  }
+ },
+ "109": {
+  "model": {
+   "BM-B": "https://www.excard.com.my/images/member/order_bookmark/BMB.png",
+   "BM-C": "https://www.excard.com.my/images/member/order_bookmark/BMC.png",
+   "BM-D": "https://www.excard.com.my/images/member/order_bookmark/BMD.png",
+   "BM-E": "https://www.excard.com.my/images/member/order_bookmark/BME.png"
+  }
+ },
+ "24": {
+  "orientation": {
+   "Landscape": "https://v4.excard.com.my/images/member/order_bizdoc/book_landscape_side.jpg"
+  },
+  "binding": {
+   "Book": "https://v4.excard.com.my/images/member/order_bizdoc/book_landscape_side.jpg"
+  }
+ },
+ "150": {
+  "model": {
+   "Model 1": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/3-side-seal/3SS-M1-100-x-160.jpg",
+   "Model 2": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/3-side-seal/3SS-M2-135-x-190.jpg",
+   "Model 3": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/3-side-seal/3SS-M3-155-x-230.jpg",
+   "Model 4": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/3-side-seal/3SS-M4-190-x-280.jpg"
+  }
+ },
+ "153": {
+  "model": {
+   "Model 1": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/vacuum-bag-packaging/VBP-M1-100-x-160.jpg",
+   "Model 2": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/vacuum-bag-packaging/VBP-M2-135-x-190.jpg",
+   "Model 3": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/vacuum-bag-packaging/VBP-M3-155-x-230.jpg",
+   "Model 4": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/vacuum-bag-packaging/VBP-M4-190-x-280.jpg"
+  }
+ },
+ "178": {
+  "model": {
+   "BKPH01": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-paper-bag/BKPH01.jpg",
+   "BKPH02": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-paper-bag/BKPH02.jpg",
+   "BKPH03": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-paper-bag/BKPH03.jpg",
+   "WKPH01": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-paper-bag/WKPH01.jpg",
+   "WKPH02": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-paper-bag/WKPH02.jpg",
+   "WKPH03": "https://excardv4.s3.ap-southeast-1.amazonaws.com/diagram/kraft-paper-bag/WKPH03.jpg"
+  }
+ }
+}
