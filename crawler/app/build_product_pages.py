@@ -7,11 +7,11 @@ Each page:
   * lists the full customisation options (mirrored from the order form, same data as specs.html),
   * offers print-ready templates from ui/templates/<slug>/ (drop your own rights-cleared files
     there — the page auto-lists whatever is present, else shows a "request a template" note),
-  * funnels to the price simulator (../calculator_standalone.html?product=<id>) and to Excard's
-    order form ("Place order").
+  * funnels every CTA to Printoka's own price simulator / order flow
+    (../calculator_standalone.html?product=<id>) — never to any supplier URL.
 
-Data source: output/calculator_data.json. Order URLs: excard product pages (from
-output/excard_catalogue.json built_as) with a v4 ordering-slug fallback.
+Data source: output/calculator_data.json. Educational diagram images (spec_content "images"
+sections) are embedded as cached data: URIs so no supplier URL ever appears in a customer page.
 
   python -m app.build_product_pages
 """
@@ -31,6 +31,17 @@ PDIR = UI / "products"
 TDIR = UI / "templates"
 
 CAT_LABEL = {k: l for k, l, _ in CATEGORIES}
+
+# Cached supplier images as self-contained data: URIs (app.img_cache). Educational diagram images
+# in spec_content "images" sections resolve through this — we NEVER emit a supplier URL into a
+# customer page (supplier confidentiality + the `grep excard` invariant), only the embedded bytes.
+_IMG_CACHE = json.loads((OUT / "img_data_uris.json").read_text(encoding="utf-8")) \
+    if (OUT / "img_data_uris.json").is_file() else {}
+
+
+def _data_uri(url: str):
+    v = _IMG_CACHE.get(url or "")
+    return v if isinstance(v, str) and v.startswith("data:") else None
 
 
 def _rich_spec(slug: str) -> str:
@@ -93,6 +104,19 @@ def _sections_html(secs) -> str:
             body = f'<table class="kv"><tbody>{rows}</tbody></table>'
         elif t == "list":
             body = f'<ul class="spec-list">{"".join(f"<li>{html.escape(x)}</li>" for x in sec.get("items", []))}</ul>'
+        elif t == "images":
+            figs = []
+            for it in sec.get("images", []):
+                du = _data_uri(it.get("url", ""))
+                if not du:                       # skip uncached images — never emit a supplier URL
+                    continue
+                cap = html.escape(it.get("caption", ""))
+                alt = html.escape(it.get("alt", it.get("caption", "")))
+                figs.append(f'<figure class="dimg"><img src="{du}" alt="{alt}" loading="lazy">'
+                            + (f'<figcaption>{cap}</figcaption>' if cap else "") + "</figure>")
+            if not figs:                          # nothing embeddable → drop the whole section
+                continue
+            body = f'<div class="dimgs">{"".join(figs)}</div>'
         else:
             body = f'<p class="about">{html.escape(sec.get("text",""))}</p>'
         note = f'<p class="rich-note">{html.escape(sec["note"])}</p>' if sec.get("note") else ""
@@ -349,6 +373,12 @@ _STYLE = r"""
   .rich-note{font-size:12.5px;color:var(--faint);margin-top:8px}
   .spec-list{margin:0;padding-left:18px;color:var(--muted);font-size:13.5px;line-height:1.8}
   .spec-list li{margin-bottom:2px}
+  /* educational diagram images */
+  .dimgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+  .dimg{margin:0;border:1px solid var(--hair);border-radius:9px;overflow:hidden;background:#fff}
+  .dimg img{display:block;width:100%;height:auto;background:#f6fbfd}
+  .dimg figcaption{padding:9px 12px;font-size:12.5px;font-weight:600;color:var(--teal);
+    border-top:1px solid var(--line)}
   @media(max-width:560px){.spectable th,.kv th{width:120px}.tabs .wrap{gap:18px;overflow-x:auto}}
   /* hero art */
   .hero-flex{display:flex;gap:26px;align-items:center;flex-wrap:wrap}

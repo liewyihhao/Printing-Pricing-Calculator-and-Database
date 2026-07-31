@@ -9,6 +9,28 @@
      "v": "Not Required, Matte Lamination (Front), Matte Lamination (Both), Matte Lamination (Front) + Spot UV (Front), Matte Lamination (Both) + Spot UV (Front), Gloss Lamination (Front)…"
     }
    ]
+  },
+  {
+   "title": "Binding methods",
+   "type": "images",
+   "images": [
+    {
+     "url": "https://files.excard.com.my/files/content/products/spec-model/softcover-saddle-stitch.webp",
+     "caption": "Softcover — Saddle Stitch",
+     "alt": "Saddle-stitched softcover booklet: folded sheets stapled through the spine"
+    },
+    {
+     "url": "https://files.excard.com.my/files/content/products/spec-model/softcover-perfect-binding.webp",
+     "caption": "Softcover — Perfect Binding",
+     "alt": "Perfect-bound softcover booklet: pages glued into a wrap-around cover with a flat spine"
+    },
+    {
+     "url": "https://files.excard.com.my/files/content/products/spec-model/hardcover-perfect-binding.webp",
+     "caption": "Hardcover — Perfect Binding",
+     "alt": "Perfect-bound hardcover book: pages glued into a rigid board cover"
+    }
+   ],
+   "note": "Saddle stitch suits thinner booklets (total pages in multiples of 4); perfect binding gives a flat, printable spine for thicker books. Pick your binding when you configure the booklet."
   }
  ],
  "artwork": [

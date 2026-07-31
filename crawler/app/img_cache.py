@@ -20,6 +20,7 @@ CACHE = OUT / "img_data_uris.json"
 V4 = OUT / "v4_options"
 _CTX = ssl._create_unverified_context()
 MAX_PX = 240
+MAX_PX_DIAGRAM = 560          # educational spec-diagram images: larger so labels stay legible
 
 
 def _all_urls():
@@ -46,21 +47,39 @@ def _all_urls():
     return urls
 
 
+def _spec_diagram_urls():
+    """Educational diagram image URLs referenced by spec_content "images" sections (booklet
+    binding methods, etc.). Cached larger than option thumbnails so their labels stay readable."""
+    urls = set()
+    for f in (OUT / "spec_content").glob("*.json"):
+        try:
+            d = json.loads(f.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        for key in ("sections", "artwork", "templates"):
+            for sec in d.get(key, []) or []:
+                if sec.get("type") == "images":
+                    for it in sec.get("images", []):
+                        if it.get("url"):
+                            urls.add(it["url"])
+    return urls
+
+
 def _download(url):
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=25, context=_CTX) as r:
         return r.read()
 
 
-def _to_datauri(raw):
+def _to_datauri(raw, max_px=MAX_PX):
     from PIL import Image
     im = Image.open(io.BytesIO(raw))
     im.load()
     has_alpha = im.mode in ("RGBA", "LA", "P")
     im = im.convert("RGBA") if has_alpha else im.convert("RGB")
     w, h = im.size
-    if max(w, h) > MAX_PX:
-        s = MAX_PX / max(w, h)
+    if max(w, h) > max_px:
+        s = max_px / max(w, h)
         im = im.resize((max(1, int(w * s)), max(1, int(h * s))), Image.LANCZOS)
     buf = io.BytesIO()
     if has_alpha:
@@ -74,14 +93,16 @@ def _to_datauri(raw):
 
 def refresh(force=False):
     cache = json.loads(CACHE.read_text(encoding="utf-8")) if CACHE.is_file() else {}
-    urls = _all_urls()
-    todo = [u for u in urls if force or u not in cache]
-    print(f"img_cache: {len(urls)} option-image URLs, {len(todo)} to fetch "
+    # (url-set, thumbnail size) groups — option images small, educational diagrams larger.
+    groups = [(_all_urls(), MAX_PX), (_spec_diagram_urls(), MAX_PX_DIAGRAM)]
+    n_urls = len(set().union(*[g[0] for g in groups]))
+    todo = [(u, mp) for urls, mp in groups for u in urls if force or u not in cache]
+    print(f"img_cache: {n_urls} image URLs, {len(todo)} to fetch "
           f"({len(cache)} already cached)", file=sys.stderr)
     ok = fail = 0
-    for i, u in enumerate(sorted(todo), 1):
+    for i, (u, mp) in enumerate(sorted(todo), 1):
         try:
-            cache[u] = _to_datauri(_download(u))
+            cache[u] = _to_datauri(_download(u), mp)
             ok += 1
         except Exception as e:  # noqa: BLE001
             fail += 1
