@@ -59,6 +59,13 @@ async def _collect(page, slug):
     return out
 
 
+# Supplier image filenames sometimes drift from the option label they picture (their file naming
+# vs our parity-correct select value). Expand variants across the known drifts so the real
+# per-option picture still attaches. Keep the option label itself untouched (parity).
+#   dtf<->dtp : "UV DTF Stickering" option is filed as "UV-DTP-Stickering.png" (Leather Wire-O #163)
+_FILENAME_SYNONYMS = [("dtf", "dtp")]
+
+
 def _variants(option):
     """Normalized tokens an option value might appear as in an image file name:
     the value itself, plus "model 1" -> "m1" and any embedded code like "BBD32P"/"3SS-M2"."""
@@ -69,6 +76,12 @@ def _variants(option):
         vs.add("m" + m.group(1))
     for tok in re.findall(r"[a-z]{1,4}[- ]?[0-9]{1,3}[a-z]*", option, re.I):
         vs.add(_norm(tok))
+    for a, b in _FILENAME_SYNONYMS:            # tolerate supplier filename spelling drift
+        for v in list(vs):
+            if a in v:
+                vs.add(v.replace(a, b))
+            if b in v:
+                vs.add(v.replace(b, a))
     return {v for v in vs if len(v) >= 2}
 
 

@@ -53,7 +53,10 @@ def audit():
     scan = json.loads((OUT / "option_images_scan.json").read_text(encoding="utf-8")) \
         if (OUT / "option_images_scan.json").is_file() else {}
     for pid_s, s in scan.items():
-        found, mapped = s.get("imgs_found", 0), s.get("mapped", 0)
+        found = s.get("imgs_found", 0)
+        # Use the LIVE mapped count from option_images_full.json (ground truth) rather than the
+        # scan's recorded count, so a targeted re-crawl (which doesn't rewrite the scan) is honoured.
+        mapped = sum(len(v) for v in full.get(pid_s, {}).values())
         if found > mapped and pid_s not in {str(x) for x in VERIFIED_NO_MAP}:
             coverage.append((int(pid_s), f"{clean_name(by_id[int(pid_s)]['name'])} "
                                          f"({found} imgs found, {mapped} mapped)"))
@@ -68,7 +71,12 @@ def audit():
 #                       options to attach to)
 #   108 L-Shape Folder / 146 Heat Transfer Tote — a single model picture, but we expose no Model
 #                       field for these (one model)
-VERIFIED_NO_MAP = {132, 158, 141, 108, 146}
+#   149 Toast Bag / 175 Premium Desk Calendar / 177 Food Tray — a single product hero/diagram
+#                       image (diagram/<slug>/…), not a per-option picture; no Model field
+#   114 Kad Kahwin    — page banner only (diagram/kad-kahwin/ban.jpg)
+#   169 Envelope Money Packet — one ready-design template preview (diagram/money-packet/PFD-24-001);
+#                       the design picker is a JS ready-editor, not a static selectable option
+VERIFIED_NO_MAP = {132, 158, 141, 108, 146, 149, 175, 177, 114, 169}
 
 
 if __name__ == "__main__":
