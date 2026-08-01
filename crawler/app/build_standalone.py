@@ -867,6 +867,15 @@ def _attach_excard_parity(data):
                 hits = sum(1 for v in vals if any(_val_match(v, o) for o in opts))
                 if hits > best_hits:
                     best, best_hits = fld, hits
+            # Fall back to an exact NAME match: a field whose key/label already IS this dimension
+            # (e.g. a pricelist axis "topeyelet" for Excard's "Top Eyelet"). Prevents a duplicate
+            # ex_<dim> field being appended next to an identically-named one (Banner eyelets).
+            if best is None or best_hits < max(1, 0.5 * len(vals)):
+                nd = _norm(dim)
+                named = next((fld for fld in prod["fields"]
+                              if _norm(fld.get("key", "")) == nd or _norm(fld.get("label", "")) == nd), None)
+                if named is not None:
+                    best, best_hits = named, len(vals)
             if best is not None and best_hits >= max(1, 0.5 * len(vals)):
                 # same dimension -> union in any Excard values this field is missing
                 opts = best.setdefault("options", list(best.get("images", {}).keys()))
