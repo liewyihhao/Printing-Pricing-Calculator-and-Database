@@ -14,3 +14,8 @@ output/*
 !output/parity_full_audit.json
 !output/option_images_full.json
 !output/option_images_scan.json
+# JS-rendered loose-sheet folding-code diagrams (captured PNGs) + their field mapping — keep
+# tracked so a fresh rebuild can re-embed them (they feed img_cache + build_standalone)
+!output/fold_images.json
+!output/fold_diagrams/
+!output/fold_diagrams/**

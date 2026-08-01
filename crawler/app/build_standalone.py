@@ -124,7 +124,8 @@ def build_data():
         {"key": "hot_stamping", "label": "Hot stamping", "addon": True, "depends": [],
          "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"]},
         {"key": "fold", "label": "Folding", "addon": True, "depends": [],
-         "options": ["None", "1Fa", "2Fa", "2Fb", "2Fc", "3Fa", "3Fb", "4Fa", "4Fb"]},
+         "options": ["None", "1Fa", "2Fa", "2Fb", "2Fc",
+                     "3Fa", "3Fb", "3Fd", "4Fa", "4Fb"]},
         {"key": "punch", "label": "Hole punching", "addon": True, "depends": [], "options": ["No", "3mm", "6mm"]},
         # Lamination / Round Corner / Perforation — from Excard's Loose Sheet (www /spec/Litho/Loose_Sheet)
         # spec page (option labels documented there; the form's progressive UI did not expose them to capture).
@@ -735,17 +736,21 @@ def _attach_images(data):
                 if fld["key"] in imgs[fam]:
                     fld["images"] = imgs[fam][fld["key"]]
 
+    # option_images_full.json = crawled <img> option pictures; fold_images.json = the JS-rendered
+    # loose-sheet Folding-Code dieline diagrams captured by app.fold_capture (both {pid:{field:{opt:key}}}).
     full = _load("option_images_full.json", {})
-    for prod in data["products"]:
-        pmap = full.get(str(prod["id"]))
-        if not pmap:
-            continue
-        for fld in prod["fields"]:
-            fimgs = pmap.get(fld["key"])
-            if fimgs:
-                merged = dict(fld.get("images") or {})
-                merged.update(fimgs)
-                fld["images"] = merged
+    fold = _load("fold_images.json", {})
+    for src in (full, fold):
+        for prod in data["products"]:
+            pmap = src.get(str(prod["id"]))
+            if not pmap:
+                continue
+            for fld in prod["fields"]:
+                fimgs = pmap.get(fld["key"])
+                if fimgs:
+                    merged = dict(fld.get("images") or {})
+                    merged.update(fimgs)
+                    fld["images"] = merged
 
 
 # our product id -> captured Excard ordering slug (output/v4_options/<slug>_options.json)
@@ -1057,12 +1062,19 @@ _LOOSE_ENV = ["- Not Required -", "108mm x 159mm - Pink A6", "110mm x 220mm - Wh
 # Loose Sheet Litho (21) + brochure/flyer/customprint aliases came from a www price-list crawl
 # (size×paper×lamination×colour) with no CheckPrice API. Package ganging and Envelope are on
 # the Excard form but weren't in the crawl and can't be API-verified → expose + price on request.
+_LOOSE_FOLD_OPTS = ["None", "1Fa", "2Fa", "2Fb", "2Fc",
+                    "3Fa", "3Fb", "3Fd", "4Fa", "4Fb"]
 for _lsid in (21, 101, 102, 103):
     _NEUTRAL_FIELDS[_lsid] = [
         {"key": "package", "label": "Package (ganging)", "neutral": False, "options": list(_LOOSE_PKG),
          "note": "Normal is priced exactly; ganged (N-in-1) runs are quoted on request."},
         {"key": "envelope", "label": "Envelope", "neutral": False, "options": list(_LOOSE_ENV),
          "note": "Envelopes are quoted separately/on request."},
+        # Optional Finishing — Folding (with the supplier's fold-code dieline diagrams). Display-only
+        # here; the folding service is quoted separately (not in the price-list crawl). img wired
+        # from fold_images.json by _attach_images.
+        {"key": "fold", "label": "Folding", "neutral": True, "options": list(_LOOSE_FOLD_OPTS),
+         "note": "Optional finishing — folding is quoted separately."},
     ]
 
 _NEUTRAL_FIELDS[123] = [  # Banner: expose Standard/Custom size type (custom → on request)

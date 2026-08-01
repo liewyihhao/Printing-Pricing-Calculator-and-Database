@@ -24,13 +24,24 @@ def audit():
     data = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))["products"]
     full = json.loads((OUT / "option_images_full.json").read_text(encoding="utf-8")) \
         if (OUT / "option_images_full.json").is_file() else {}
+    # fold_images.json = the JS-rendered loose-sheet Folding-Code dieline diagrams (app.fold_capture)
+    # — same {pid:{field:{opt:key}}} shape, so audit them for embedding alongside the crawled images.
+    fold = json.loads((OUT / "fold_images.json").read_text(encoding="utf-8")) \
+        if (OUT / "fold_images.json").is_file() else {}
     by_id = {p["id"]: p for p in data}
 
     not_embedded = {}      # pid -> [(field, option)]
     coverage = []          # products with a pic-like control but no crawled images
     wired_ok = 0
 
-    for pid_s, fmap in full.items():
+    merged = {}                       # deep-merge crawled + fold images: {pid: {field: {opt: key}}}
+    for src in (full, fold):
+        for pid_s, fmap in src.items():
+            dst = merged.setdefault(pid_s, {})
+            for fkey, opts in fmap.items():
+                dst.setdefault(fkey, {}).update(opts)
+
+    for pid_s, fmap in merged.items():
         pid = int(pid_s)
         p = by_id.get(pid)
         if not p:

@@ -65,6 +65,17 @@ def _spec_diagram_urls():
     return urls
 
 
+def _fold_diagram_files():
+    """Local fold-diagram PNGs captured by app.fold_capture (output/fold_diagrams/<slug>/<code>.png).
+    Keyed by their posix relative path so option_images can reference them like any other image."""
+    out = {}
+    base = OUT / "fold_diagrams"
+    if base.is_dir():
+        for f in base.rglob("*.png"):
+            out[f.relative_to(OUT).as_posix()] = f
+    return out
+
+
 def _download(url):
     req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
     with urllib.request.urlopen(req, timeout=25, context=_CTX) as r:
@@ -97,8 +108,9 @@ def refresh(force=False):
     groups = [(_all_urls(), MAX_PX), (_spec_diagram_urls(), MAX_PX_DIAGRAM)]
     n_urls = len(set().union(*[g[0] for g in groups]))
     todo = [(u, mp) for urls, mp in groups for u in urls if force or u not in cache]
-    print(f"img_cache: {n_urls} image URLs, {len(todo)} to fetch "
-          f"({len(cache)} already cached)", file=sys.stderr)
+    local = {k: p for k, p in _fold_diagram_files().items() if force or k not in cache}
+    print(f"img_cache: {n_urls} image URLs + {len(_fold_diagram_files())} local fold diagrams; "
+          f"{len(todo)} urls + {len(local)} local to embed ({len(cache)} already cached)", file=sys.stderr)
     ok = fail = 0
     for i, (u, mp) in enumerate(sorted(todo), 1):
         try:
@@ -109,6 +121,13 @@ def refresh(force=False):
             print(f"  FAIL {u} :: {str(e)[:60]}", file=sys.stderr)
         if i % 20 == 0:
             print(f"  {i}/{len(todo)}", file=sys.stderr)
+    for k, path in sorted(local.items()):           # local fold-diagram PNGs (read from disk)
+        try:
+            cache[k] = _to_datauri(path.read_bytes(), MAX_PX_DIAGRAM)
+            ok += 1
+        except Exception as e:  # noqa: BLE001
+            fail += 1
+            print(f"  FAIL {k} :: {str(e)[:60]}", file=sys.stderr)
     CACHE.write_text(json.dumps(cache, ensure_ascii=False), encoding="utf-8")
     kb = CACHE.stat().st_size / 1024
     print(f"img_cache: +{ok} cached, {fail} failed; total {len(cache)} images, {kb/1024:.1f} MB",
