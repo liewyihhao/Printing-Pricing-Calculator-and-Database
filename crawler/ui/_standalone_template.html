@@ -991,6 +991,9 @@ function selectProduct(id){
   $("fields").innerHTML = S.fields.map(f=> f.type==="number"
     ? `<div id="fw_${f.key}"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
         <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" placeholder="${f.placeholder||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">${noteHtml(f)}</div>`
+    : f.swatch
+    ? `<div id="fw_${f.key}" class="md:col-span-2"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
+        <div id="f_${f.key}" class="swgrid grid grid-cols-4 sm:grid-cols-6 gap-2"></div>${noteHtml(f)}</div>`
     : f.images
     ? `<div id="fw_${f.key}" class="md:col-span-2"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
         <div id="f_${f.key}" class="imggrid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2"></div>${noteHtml(f)}</div>`
@@ -998,6 +1001,7 @@ function selectProduct(id){
         <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"><option value="">—</option></select>${noteHtml(f)}</div>`).join("");
   S.fields.forEach((f,i)=>{ const el=$(`f_${f.key}`);
     if(f.type==="number") el.oninput=()=>{ const v=el.value; if(v)S.values[f.key]=v; else delete S.values[f.key]; updateFieldVis(); clearTimeout(S.t2); S.t2=setTimeout(quote,350); };
+    else if(f.swatch) renderSwatchGrid(f);
     else if(f.images) renderImageGrid(f);
     else el.onchange=()=>onChange(i); });
   updateFieldVis();
@@ -1046,6 +1050,26 @@ function renderImageGrid(f){
       <div class="text-[10.5px] text-slate-600 truncate">${cap}</div></button>`; }).join("");
   grid.querySelectorAll(".imgcard").forEach(b=>b.onclick=()=>{ S.values[f.key]=b.dataset.val; renderImageGrid(f); enforceValidity(); quote(); });
 }
+// Colour-swatch picker (hot-stamping foil colour, stamp ink colour, rope colour …). Metallics
+// use a subtle gradient so Gold/Silver read as foil rather than flat yellow/grey.
+const SWATCH_COLOURS={gold:'linear-gradient(135deg,#f7e08a,#c9a227)',silver:'linear-gradient(135deg,#f1f1f1,#b4b4b4)',
+  'rose gold':'linear-gradient(135deg,#f6c9b8,#c98a76)',copper:'linear-gradient(135deg,#e3a17a,#a5673f)',
+  bronze:'linear-gradient(135deg,#d9a066,#8c6b3f)',black:'#1a1a1a',white:'#ffffff',blue:'#1e77d3',
+  'sky blue':'#5bc0de',navy:'#1a2b6b',green:'#2e8b3d',red:'#d01f33',maroon:'#7d1f2b',yellow:'#f6d117',
+  orange:'#f08a24',pink:'#ef8fb3',purple:'#7b3fa0',violet:'#7b3fa0',brown:'#7a4a24',grey:'#9aa0a6',gray:'#9aa0a6'};
+function swatchCss(name){ return SWATCH_COLOURS[String(name).toLowerCase().replace(/\s*\(.*?\)\s*/g,'').trim()]||null; }
+function renderSwatchGrid(f){
+  const grid=$(`f_${f.key}`); const opts=f.options||[];
+  if(!S.values[f.key]) S.values[f.key]=opts[0];
+  grid.innerHTML=opts.map(o=>{ const css=swatchCss(o), active=S.values[f.key]===o;
+    const dot=css
+      ? `<span style="display:block;width:100%;height:30px;border-radius:6px;background:${css};${/white/i.test(o)?'box-shadow:inset 0 0 0 1px #d7dbe0;':''}"></span>`
+      : `<span style="display:block;width:100%;height:30px;border-radius:6px;background:repeating-linear-gradient(45deg,#f8fafc,#f8fafc 4px,#eef1f4 4px,#eef1f4 8px);border:1px dashed #cbd5e1"></span>`;
+    return `<button type="button" data-val="${o.replace(/"/g,'&quot;')}" title="${o.replace(/"/g,'&quot;')}"
+      class="swcard rounded-lg border ${active?'border-indigo-500 ring-2 ring-indigo-200':'hairline'} bg-white p-1.5 flex flex-col items-center gap-1">
+      ${dot}<div class="text-[10.5px] text-slate-600 truncate w-full text-center">${o}</div></button>`; }).join("");
+  grid.querySelectorAll(".swcard").forEach(b=>b.onclick=()=>{ S.values[f.key]=b.dataset.val; renderSwatchGrid(f); enforceValidity(); quote(); });
+}
 // Enforce valid-combination constraints: restrict each dependent dropdown to the
 // values allowed for the current primary selection (e.g. only papers/sizes valid for a model).
 function enforceValidity(){
@@ -1086,6 +1110,7 @@ function populateFrom(start){
   for(let i=start;i<S.fields.length;i++){ const f=S.fields[i], sel=$(`f_${f.key}`);
     if(f.type==="number"){ if(!S.values[f.key]) S.values[f.key]=sel.value||f.default; if(!sel.value) sel.value=S.values[f.key]; continue; }
     if(f.images){ if(!S.values[f.key]) S.values[f.key]=(f.options||Object.keys(f.images))[0]; continue; }
+    if(f.swatch){ if(!S.values[f.key]) S.values[f.key]=f.options[0]; continue; }
     if(f.options){ fillSelect(sel,f.options,true); sel.disabled=false;
       if(!f.options.includes(S.values[f.key])) S.values[f.key]=f.options[0]; sel.value=S.values[f.key]; continue; }
     const ready=f.depends.every(d=>S.values[d]);

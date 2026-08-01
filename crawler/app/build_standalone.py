@@ -1287,6 +1287,30 @@ def _wire_pricelist_products(data):
         print("  [pricelist KPI2]", done)
 
 
+# Colour names our UI renders as swatches (matches SWATCH_COLOURS in _standalone_template.html).
+_SWATCH_COLOURS = {"gold", "silver", "rose gold", "copper", "bronze", "black", "white", "blue",
+                   "sky blue", "navy", "green", "red", "maroon", "yellow", "orange", "pink",
+                   "purple", "violet", "brown", "grey", "gray"}
+_SWATCH_SKIP = {"not required", "notrequired", "none", "-", "", "required", "not require"}
+
+
+def _mark_colour_swatches(data):
+    """Flag colour-picker fields (hot-stamping foil colour, stamp ink colour, rope colour) so the
+    calculator renders colour swatches instead of a plain dropdown — mirroring the supplier's own
+    'Select Colour' picker. A field qualifies when every real option is a recognised colour name."""
+    n = 0
+    for p in data["products"]:
+        for f in p.get("fields", []):
+            if f.get("images") or f.get("type") == "number":
+                continue
+            reals = [o for o in (f.get("options") or []) if str(o).strip().lower() not in _SWATCH_SKIP]
+            if len(reals) >= 2 and all(str(o).strip().lower() in _SWATCH_COLOURS for o in reals):
+                f["swatch"] = True
+                n += 1
+    if n:
+        print(f"colour swatches: {n} colour-picker fields")
+
+
 def _embed_images(data):
     """Replace option-diagram image URLs with self-contained base64 data URIs
     (output/img_data_uris.json), so the file embeds its images and carries no
@@ -1378,6 +1402,7 @@ def main():
     _t, _a = _attach_auto_parity(data)
     print(f"option parity: +{_a} single-option controls across {_t} products")
     _attach_images(data)     # after auto_parity, so images can attach to inc_* single-option fields
+    _mark_colour_swatches(data)   # render foil/ink/rope colour pickers as colour swatches
     _apply_ref_markup(data)
     _embed_images(data)
     from app.field_order import reorder as _reorder_fields
