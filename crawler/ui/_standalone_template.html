@@ -22,6 +22,9 @@ tailwind.config = { theme: { extend: {
   .brand-gradient{background:linear-gradient(99deg,#0d6385 0%,#005b7f 60%,#00485f 100%)}
   .gold-btn{background:#fdb913;color:#3a2c00}.gold-btn:hover{background:#e9a800}
   .hairline{border-color:#e6e9ee}
+  .sechead{background:linear-gradient(90deg,#0d6385,#00b3c4);color:#fff;font-size:12px;font-weight:600;
+    letter-spacing:.03em;text-transform:uppercase;border-radius:7px;padding:7px 12px;margin:14px 0 2px}
+  .sechead:first-child{margin-top:0}
   .fieldsel{transition:border .12s,box-shadow .12s}
   .fieldsel:focus{outline:none;border-color:rgba(0,91,127,.55);box-shadow:0 0 0 3px rgba(0,91,127,.16)}
   .fieldsel:disabled{background:#f8fafd;color:#9aa7ba;cursor:not-allowed}
@@ -988,7 +991,7 @@ function selectProduct(id){
     return;
   }
   const noteHtml = f => f.note ? `<p class="text-[11px] text-slate-400 mt-1">${f.note}</p>` : "";
-  $("fields").innerHTML = S.fields.map(f=> f.type==="number"
+  const fieldHtml = f => f.type==="number"
     ? `<div id="fw_${f.key}"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
         <input id="f_${f.key}" type="number" min="${f.min||1}" max="${f.max||1000000}" step="1" value="${f.default||''}" placeholder="${f.placeholder||''}" class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]">${noteHtml(f)}</div>`
     : f.swatch
@@ -998,7 +1001,15 @@ function selectProduct(id){
     ? `<div id="fw_${f.key}" class="md:col-span-2"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
         <div id="f_${f.key}" class="imggrid grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2"></div>${noteHtml(f)}</div>`
     : `<div id="fw_${f.key}"><label class="block text-[13px] font-medium text-slate-600 mb-1.5">${f.label}</label>
-        <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"><option value="">—</option></select>${noteHtml(f)}</div>`).join("");
+        <select id="f_${f.key}" disabled class="fieldsel w-full rounded-lg border hairline bg-white px-3 py-2 text-[13.5px]"><option value="">—</option></select>${noteHtml(f)}</div>`;
+  // Group fields under section headers (General / Optional Finishing / Add On).
+  // Display order groups by section; the interaction/cascade logic still keys off S.fields.
+  const SECT={general:"General",finishing:"Optional Finishing",addon:"Add On"}, RANK={general:0,finishing:1,addon:2};
+  const disp=[...S.fields].map((f,i)=>[f,i]).sort((a,b)=>(RANK[a[0].section||'general']-RANK[b[0].section||'general'])||(a[1]-b[1]));
+  let curSec=null;
+  $("fields").innerHTML = disp.map(([f])=>{ const sec=f.section||'general'; let h="";
+    if(sec!==curSec){ curSec=sec; h=`<div class="sechead">${SECT[sec]}</div>`; }
+    return h+fieldHtml(f); }).join("");
   S.fields.forEach((f,i)=>{ const el=$(`f_${f.key}`);
     if(f.type==="number") el.oninput=()=>{ const v=el.value; if(v)S.values[f.key]=v; else delete S.values[f.key]; updateFieldVis(); clearTimeout(S.t2); S.t2=setTimeout(quote,350); };
     else if(f.swatch) renderSwatchGrid(f);

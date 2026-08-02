@@ -1320,6 +1320,41 @@ def _mark_colour_swatches(data):
         print(f"colour swatches: {n} colour-picker fields")
 
 
+# --- Excard-style config sections: General / Optional Finishing / Add On -------------------
+# Fields are grouped under the same section headers the supplier's order form uses. Classification
+# is by field key/label keyword; the core product spec falls through to "general".
+_SEC_FINISHING = ("lamination", "folding", "hot stamp", "hot_stamp", "hotstamp", "emboss",
+                  "deboss", "spot uv", "spot_uv", "spotuv", "silkscreen", "varnish",
+                  "round corner", "round_corner", "roundcorner", "hole", "punch", "perforat",
+                  "creas", "die cut", "die-cut", "diecut", "gilding", "protective layer",
+                  "finishing")
+_SEC_ADDON = ("envelope", "extra", "rope", "fitting", "ribbon", "insert", "cd seal", "cdseal",
+              "fastener", "header paper", "header size", "headerpaper", "headersize", "vdp",
+              "numbering", "packing method", "packingmethod", "jawi", "eyelet")
+
+
+def _section_of(f):
+    s = ((f.get("key") or "") + " " + (f.get("label") or "")).lower()
+    if any(t in s for t in _SEC_FINISHING):
+        return "finishing"
+    if any(t in s for t in _SEC_ADDON):
+        return "addon"
+    return "general"
+
+
+def _assign_sections(data):
+    """Tag every field with the Excard order-form section it belongs to, so the calculator can
+    render General / Optional Finishing / Add On headers like the supplier's form."""
+    from collections import Counter
+    tally = Counter()
+    for p in data["products"]:
+        for f in p.get("fields", []):
+            sec = _section_of(f)
+            f["section"] = sec
+            tally[sec] += 1
+    print(f"config sections: {dict(tally)}")
+
+
 def _embed_images(data):
     """Replace option-diagram image URLs with self-contained base64 data URIs
     (output/img_data_uris.json), so the file embeds its images and carries no
@@ -1412,6 +1447,7 @@ def main():
     print(f"option parity: +{_a} single-option controls across {_t} products")
     _attach_images(data)     # after auto_parity, so images can attach to inc_* single-option fields
     _mark_colour_swatches(data)   # render foil/ink/rope colour pickers as colour swatches
+    _assign_sections(data)        # tag fields with Excard sections (General/Finishing/Add On)
     _apply_ref_markup(data)
     _embed_images(data)
     from app.field_order import reorder as _reorder_fields
