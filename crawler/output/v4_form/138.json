@@ -1,0 +1,177 @@
+{
+ "rows": [
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "",
+   "label": "",
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$rblCategory",
+   "label": "Standard",
+   "options": [
+    "Standard",
+    "Premium",
+    "Hot Stamping",
+    "Pouch"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$rblType",
+   "label": "Custom Made Money Packet",
+   "options": [
+    "Custom Made Money Packet",
+    "Ready Designed with Editor"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_spec_controller$order_spec_standard$rblMixDesign",
+   "label": "No",
+   "options": [
+    "No",
+    "Yes"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlPaper",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "Gloss Art Paper 130gsm",
+    "Linen 140gsm",
+    "Art Paper 157gsm"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_spec_controller$order_spec_standard$rblPacking",
+   "label": "5pcs / Pack",
+   "options": [
+    "5pcs / Pack",
+    "6pcs / Pack",
+    "8pcs / Pack",
+    "10pcs / Pack"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlQuantity",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "600",
+    "1250",
+    "2500",
+    "5000",
+    "10000",
+    "15000",
+    "20000",
+    "25000",
+    "30000",
+    "40000",
+    "50000",
+    "60000",
+    "70000",
+    "80000",
+    "90000",
+    "100000"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "DELIVERY"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOrderCountryCode",
+   "label": "West Malaysia",
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOtherOrderCountryCode",
+   "label": "Others Countries",
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "label": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_price$rblCourier",
+   "label": "Appointed Courier (Free Shipping)",
+   "options": [
+    "Appointed Courier (Free Shipping)",
+    "GDex (Fee applies)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "NET PRICE FOR DEAL"
+  }
+ ],
+ "cards": [],
+ "sectionCount": 2,
+ "slug": "money-packet",
+ "id": 138,
+ "name": "Money Packet — Litho"
+}

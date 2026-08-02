@@ -1,0 +1,136 @@
+{
+ "rows": [
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "",
+   "label": "",
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlPrintColour",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "4C (Front)",
+    "4C (Both)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlQuantityLast",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "50",
+    "100",
+    "150",
+    "200",
+    "250",
+    "300",
+    "350",
+    "400",
+    "450",
+    "500",
+    "550",
+    "600",
+    "650",
+    "700",
+    "750",
+    "800",
+    "850",
+    "900",
+    "950",
+    "1000"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "DELIVERY"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOrderCountryCode",
+   "label": "West Malaysia",
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOtherOrderCountryCode",
+   "label": "Others Countries",
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "label": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_price$rblCourier",
+   "label": "Appointed Courier (Free Shipping)",
+   "options": [
+    "Appointed Courier (Free Shipping)",
+    "GDex (Fee applies)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "NET PRICE FOR DEAL"
+  }
+ ],
+ "cards": [],
+ "sectionCount": 2,
+ "slug": "cooler-bag",
+ "id": 144,
+ "name": "Cooler Bag — Litho"
+}

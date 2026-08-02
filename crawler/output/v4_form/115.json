@@ -1,0 +1,180 @@
+{
+ "rows": [
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "",
+   "label": "",
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlSize",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "40mm x 70mm",
+    "40mm x 86mm",
+    "52mm x 52mm"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlPaper",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "Gloss Art Card 230gsm (2 sides coated)",
+    "Gloss Art Card 260gsm (2 sides coated)",
+    "Gloss Art Card 310gsm (2 sides coated)",
+    "Gloss Art Card 360gsm (2 sides coated)",
+    "Super White 240gsm",
+    "Vellum 220gsm",
+    "Metal Ice 250gsm"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlPrintColour",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "4C (Front)",
+    "4C (Both)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlLamination",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "Not Required",
+    "Gloss Lamination (Front)",
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Front)",
+    "Matte Lamination (Both)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlQuantity",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "50",
+    "100",
+    "150",
+    "200",
+    "250",
+    "300",
+    "350",
+    "400",
+    "450",
+    "500",
+    "Other"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "Optional Finishing"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_spec_controller$order_spec_standard$rblHolePunch",
+   "label": "Not Required",
+   "options": [
+    "Not Required",
+    "Hole Punching (3mm)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "DELIVERY"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOrderCountryCode",
+   "label": "West Malaysia",
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOtherOrderCountryCode",
+   "label": "Others Countries",
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "label": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_price$rblCourier",
+   "label": "Appointed Courier (Free Shipping)",
+   "options": [
+    "Appointed Courier (Free Shipping)",
+    "GDex (Fee applies)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "NET PRICE FOR DEAL"
+  }
+ ],
+ "cards": [],
+ "sectionCount": 3,
+ "slug": "kad-terima-kasih",
+ "id": 115,
+ "name": "Kad Terima Kasih — Digital"
+}

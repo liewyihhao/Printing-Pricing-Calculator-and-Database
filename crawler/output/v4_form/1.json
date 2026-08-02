@@ -1,0 +1,289 @@
+{
+ "rows": [
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "",
+   "label": "",
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "General"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "cardType",
+   "label": "Category *",
+   "options": [
+    "Standard Card",
+    "Thin Fold",
+    "Fat Fold",
+    "Custom Die-Cut",
+    "Plastic Card"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "cardSize",
+   "label": "Size *",
+   "options": [
+    "-- Select Size --",
+    "54mm × 89mm",
+    "52mm × 86mm",
+    "50mm × 89mm",
+    "54mm × 86mm",
+    "Other (Custom Size)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "orientation",
+   "label": "Orientation *",
+   "options": [
+    "Landscape",
+    "Portrait"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "paperType",
+   "label": "Paper *",
+   "options": [
+    "-- Select Paper --",
+    "Gloss Art Card 250gsm (2 side coated)",
+    "Gloss Art Card 310gsm (2 side coated)",
+    "Gloss Art Card 360gsm (2 side coated)",
+    "Matte Art Card 250gsm",
+    "Linen 240gsm",
+    "Metal Ice 250gsm",
+    "Synthetic Paper 180micron (0.18mm)",
+    "Super White 250gsm",
+    "Suwen 240gsm"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "printColour",
+   "label": "Print Colour *",
+   "options": [
+    "4C (Both)",
+    "4C (Front)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "cardLamination",
+   "label": "Paper Lamination *",
+   "options": [
+    "-- Select Paper Lamination --",
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Both)",
+    "Gloss Water Based Varnish (Both)(Free)",
+    "Soft Touch Lamination (Both)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "silkscreenSpotUV",
+   "label": "Silkscreen Spot UV *",
+   "options": [
+    "No Required"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "quantity",
+   "label": "Quantity *",
+   "options": [
+    "-- Select Quantity --",
+    "50",
+    "100",
+    "200",
+    "300 — Best Seller",
+    "400",
+    "500 — Best Seller",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1,000 — Best Seller",
+    "2,000",
+    "3,000",
+    "4,000",
+    "5,000",
+    "6,000",
+    "7,000",
+    "8,000",
+    "9,000",
+    "10,000"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "package",
+   "label": "Package *",
+   "options": [
+    "Normal (1 Design)",
+    "2 In 1 (2 Designs)",
+    "3 In 1 (3 Designs)",
+    "4 In 1 (4 Designs)",
+    "5 In 1 (5 Designs)",
+    "6 In 1 (6 Designs)",
+    "7 In 1 (7 Designs)",
+    "8 In 1 (8 Designs)",
+    "9 In 1 (9 Designs)",
+    "10 In 1 (10 Designs)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "Optional Finishing"
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "hotStampingEnable",
+   "label": "Hot Stamping",
+   "options": [
+    "No Hot Stamping",
+    "1C (Front)",
+    "1C (Back)",
+    "1C (Front) + 1C (Back)",
+    "1C (Front) + 2C (Back)",
+    "2C (Front)",
+    "2C (Back)",
+    "2C (Front) + 1C (Back)",
+    "2C (Front) + 2C (Back)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "roundCornerEnable",
+   "label": "Round Corner",
+   "options": [
+    "No Round Corner",
+    "Required Round Corner"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "holePunching",
+   "label": "Hole Punching",
+   "options": [
+    "No Hole Punching",
+    "Hole Punching - Diameter 3mm",
+    "Hole Punching - Diameter 5mm"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "embossing",
+   "label": "Embossing",
+   "options": [
+    "Not Required",
+    "Embossing Front",
+    "Embossing Back"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "DELIVERY"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOrderCountryCode",
+   "label": "West Malaysia",
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOtherOrderCountryCode",
+   "label": "Others Countries",
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "label": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_price$rblCourier",
+   "label": "Appointed Courier (Free Shipping)",
+   "options": [
+    "Appointed Courier (Free Shipping)",
+    "GDex (Fee applies)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "NET PRICE FOR DEAL"
+  }
+ ],
+ "cards": [],
+ "sectionCount": 4,
+ "slug": "business-card",
+ "id": 1,
+ "name": "Business Card"
+}

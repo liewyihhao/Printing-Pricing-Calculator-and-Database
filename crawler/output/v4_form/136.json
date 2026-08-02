@@ -1,0 +1,167 @@
+{
+ "rows": [
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "",
+   "label": "",
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$rblType",
+   "label": "Cover + Content",
+   "options": [
+    "Cover + Content",
+    "Cover only",
+    "Content only"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlFinishing",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "Gloss Lamination (Both)",
+    "Matte Lamination (Both)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlQuantity",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "150",
+    "200",
+    "250",
+    "300",
+    "350",
+    "400",
+    "450",
+    "500"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "Front & Back Cover"
+  },
+  {
+   "kind": "section",
+   "name": "Content"
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlContentPage",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "12",
+    "16",
+    "20",
+    "24",
+    "28",
+    "32"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "DELIVERY"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOrderCountryCode",
+   "label": "West Malaysia",
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOtherOrderCountryCode",
+   "label": "Others Countries",
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "label": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_price$rblCourier",
+   "label": "Appointed Courier (Free Shipping)",
+   "options": [
+    "Appointed Courier (Free Shipping)",
+    "GDex (Fee applies)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "NET PRICE FOR DEAL"
+  }
+ ],
+ "cards": [],
+ "sectionCount": 4,
+ "slug": "hard-cover-menu",
+ "id": 136,
+ "name": "Hard Cover Menu — Digital"
+}

@@ -1,0 +1,344 @@
+{
+ "1": {
+  "name": "Business Card",
+  "presence": [],
+  "values": [
+   {
+    "control": "Paper Lamination *",
+    "field": "lamination",
+    "missing": [
+     "Soft Touch Lamination (Both)"
+    ]
+   }
+  ],
+  "sections": [
+   {
+    "control": "Paper Lamination *",
+    "field": "lamination",
+    "supplier_section": "general",
+    "our_section": "finishing"
+   },
+   {
+    "control": "Silkscreen Spot UV *",
+    "field": "silkscreen_spot_uv",
+    "supplier_section": "general",
+    "our_section": "finishing"
+   }
+  ]
+ },
+ "101": {
+  "name": "Brochure",
+  "presence": [],
+  "values": [
+   {
+    "control": "Size *",
+    "field": "size",
+    "missing": [
+     "A6 (105mm × 148mm)"
+    ]
+   },
+   {
+    "control": "Paper *",
+    "field": "paper",
+    "missing": [
+     "Simili Paper 80gsm - Best Seller",
+     "Simili Paper 100gsm - Best Seller",
+     "Simili Paper 140gsm - Best Seller",
+     "Gloss Art Paper 80gsm - Best Seller (NEW)"
+    ]
+   },
+   {
+    "control": "Folding Type *",
+    "field": "fold",
+    "missing": [
+     "Required"
+    ]
+   },
+   {
+    "control": "Envelope",
+    "field": "envelope",
+    "missing": [
+     "Cream A7 (133mm × 102mm)",
+     "White A6 (162mm × 114mm)",
+     "Pink A6 (108mm × 159mm)",
+     "Pink A5 (162mm × 229mm)",
+     "White A5 (162mm × 229mm)",
+     "Pink DL (215mm × 114mm)",
+     "White DL (110mm × 220mm)"
+    ]
+   }
+  ],
+  "sections": []
+ },
+ "102": {
+  "name": "Flyer",
+  "presence": [],
+  "values": [
+   {
+    "control": "Size *",
+    "field": "size",
+    "missing": [
+     "A6 (105mm × 148mm)"
+    ]
+   },
+   {
+    "control": "Paper *",
+    "field": "paper",
+    "missing": [
+     "Simili Paper 80gsm - Best Seller",
+     "Simili Paper 100gsm - Best Seller",
+     "Simili Paper 140gsm - Best Seller",
+     "Gloss Art Paper 80gsm - Best Seller (NEW)"
+    ]
+   },
+   {
+    "control": "Folding Type *",
+    "field": "fold",
+    "missing": [
+     "Required"
+    ]
+   },
+   {
+    "control": "Envelope",
+    "field": "envelope",
+    "missing": [
+     "Cream A7 (133mm × 102mm)",
+     "White A6 (162mm × 114mm)",
+     "Pink A6 (108mm × 159mm)",
+     "Pink A5 (162mm × 229mm)",
+     "White A5 (162mm × 229mm)",
+     "Pink DL (215mm × 114mm)",
+     "White DL (110mm × 220mm)"
+    ]
+   }
+  ],
+  "sections": []
+ },
+ "103": {
+  "name": "Customprint",
+  "presence": [],
+  "values": [
+   {
+    "control": "Size *",
+    "field": "size",
+    "missing": [
+     "A6 (105mm × 148mm)"
+    ]
+   },
+   {
+    "control": "Paper *",
+    "field": "paper",
+    "missing": [
+     "Simili Paper 80gsm - Best Seller",
+     "Simili Paper 100gsm - Best Seller",
+     "Simili Paper 140gsm - Best Seller",
+     "Gloss Art Paper 80gsm - Best Seller (NEW)"
+    ]
+   },
+   {
+    "control": "Folding Type *",
+    "field": "fold",
+    "missing": [
+     "Required"
+    ]
+   },
+   {
+    "control": "Envelope",
+    "field": "envelope",
+    "missing": [
+     "Cream A7 (133mm × 102mm)",
+     "White A6 (162mm × 114mm)",
+     "Pink A6 (108mm × 159mm)",
+     "Pink A5 (162mm × 229mm)",
+     "White A5 (162mm × 229mm)",
+     "Pink DL (215mm × 114mm)",
+     "White DL (110mm × 220mm)"
+    ]
+   }
+  ],
+  "sections": []
+ },
+ "154": {
+  "name": "Foamboard — Digital",
+  "presence": [],
+  "values": [],
+  "sections": [
+   {
+    "control": "Not Required",
+    "field": "butterflystand",
+    "supplier_section": "addon",
+    "our_section": "general"
+   }
+  ]
+ },
+ "180": {
+  "name": "Corporate Shirt — Digital",
+  "presence": [
+   {
+    "section": "general",
+    "control": "Fabric",
+    "options": [
+     "Polysoft 150gsm"
+    ]
+   }
+  ],
+  "values": [],
+  "sections": []
+ },
+ "181": {
+  "name": "Jacket — Digital",
+  "presence": [
+   {
+    "section": "general",
+    "control": "Fabric",
+    "options": [
+     "Lycra 270gsm"
+    ]
+   }
+  ],
+  "values": [],
+  "sections": []
+ },
+ "183": {
+  "name": "Sweatshirt & Hoodies — Digital",
+  "presence": [
+   {
+    "section": "general",
+    "control": "Fabric",
+    "options": [
+     "Lycra 270gsm"
+    ]
+   }
+  ],
+  "values": [],
+  "sections": []
+ },
+ "21": {
+  "name": "Loose Sheet — Litho (Offset)",
+  "presence": [],
+  "values": [
+   {
+    "control": "Size *",
+    "field": "size",
+    "missing": [
+     "A6 (105mm × 148mm)"
+    ]
+   },
+   {
+    "control": "Paper *",
+    "field": "paper",
+    "missing": [
+     "Simili Paper 80gsm - Best Seller",
+     "Simili Paper 100gsm - Best Seller",
+     "Simili Paper 140gsm - Best Seller",
+     "Gloss Art Paper 80gsm - Best Seller (NEW)"
+    ]
+   },
+   {
+    "control": "Folding Type *",
+    "field": "fold",
+    "missing": [
+     "Required"
+    ]
+   },
+   {
+    "control": "Envelope",
+    "field": "envelope",
+    "missing": [
+     "Cream A7 (133mm × 102mm)",
+     "White A6 (162mm × 114mm)",
+     "Pink A6 (108mm × 159mm)",
+     "Pink A5 (162mm × 229mm)",
+     "White A5 (162mm × 229mm)",
+     "Pink DL (215mm × 114mm)",
+     "White DL (110mm × 220mm)"
+    ]
+   }
+  ],
+  "sections": []
+ },
+ "24": {
+  "name": "Bill-Book — Litho (NCR Carbonless)",
+  "presence": [],
+  "values": [
+   {
+    "control": "Binding Location *",
+    "field": "binding",
+    "missing": [
+     "Left Binding",
+     "Top Binding"
+    ]
+   },
+   {
+    "control": "Hole Punching",
+    "field": "holepunching",
+    "missing": [
+     "Yes — Hole Punching (Diameter 6mm)"
+    ]
+   }
+  ],
+  "sections": [
+   {
+    "control": "Numbering",
+    "field": "numbering",
+    "supplier_section": "finishing",
+    "our_section": "addon"
+   }
+  ]
+ },
+ "50": {
+  "name": "Loose Sheet — Digital",
+  "presence": [],
+  "values": [
+   {
+    "control": "Folding Type *",
+    "field": "fold",
+    "missing": [
+     "Required"
+    ]
+   },
+   {
+    "control": "Envelope",
+    "field": "envelope",
+    "missing": [
+     "Cream A7 (133mm × 102mm)",
+     "White A6 (162mm × 114mm)",
+     "Pink A6 (108mm × 159mm)",
+     "Pink A5 (162mm × 229mm)",
+     "White A5 (162mm × 229mm)",
+     "Pink DL (215mm × 114mm)",
+     "White DL (110mm × 220mm)"
+    ]
+   }
+  ],
+  "sections": []
+ },
+ "60": {
+  "name": "Label Sticker — Digital",
+  "presence": [
+   {
+    "section": "finishing",
+    "control": "Easy Peel *",
+    "options": [
+     "Yes"
+    ]
+   }
+  ],
+  "values": [],
+  "sections": []
+ },
+ "61": {
+  "name": "Label Sticker — Letterpress (Hot Stamping)",
+  "presence": [
+   {
+    "section": "finishing",
+    "control": "Easy Peel *",
+    "options": [
+     "Yes"
+    ]
+   }
+  ],
+  "values": [],
+  "sections": []
+ }
+}

@@ -1344,15 +1344,25 @@ def _section_of(f):
 
 def _assign_sections(data):
     """Tag every field with the Excard order-form section it belongs to, so the calculator can
-    render General / Optional Finishing / Add On headers like the supplier's form."""
+    render General / Optional Finishing / Add On headers like the supplier's form. Prefer the EXACT
+    per-product section captured from the live v4 form (output/field_sections.json); fall back to
+    the keyword heuristic for fields/products the capture didn't cover."""
     from collections import Counter
+    cap_path = OUT / "field_sections.json"
+    captured = json.loads(cap_path.read_text(encoding="utf-8")) if cap_path.is_file() else {}
     tally = Counter()
+    exact = 0
     for p in data["products"]:
+        cmap = captured.get(str(p["id"]), {})
         for f in p.get("fields", []):
-            sec = _section_of(f)
+            sec = cmap.get(f.get("key"))
+            if sec:
+                exact += 1
+            else:
+                sec = _section_of(f)
             f["section"] = sec
             tally[sec] += 1
-    print(f"config sections: {dict(tally)}")
+    print(f"config sections: {dict(tally)} ({exact} from live-form capture)")
 
 
 def _embed_images(data):

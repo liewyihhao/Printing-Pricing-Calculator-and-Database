@@ -19,3 +19,9 @@ output/*
 !output/fold_images.json
 !output/fold_diagrams/
 !output/fold_diagrams/**
+# Live v4 SPA form capture (ground truth for SPA-only controls/sections) + derived section map.
+# field_sections.json is required at build time (build_standalone reads it), so keep it tracked.
+!output/v4_form/
+!output/v4_form/**
+!output/field_sections.json
+!output/v4_parity_report.json

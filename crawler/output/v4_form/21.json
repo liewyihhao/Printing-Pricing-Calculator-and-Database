@@ -1,0 +1,283 @@
+{
+ "rows": [
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "",
+   "label": "",
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "General"
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "size",
+   "label": "Size *",
+   "options": [
+    "-- Select Size --",
+    "A1 (594mm × 840mm)",
+    "A2 (420mm × 594mm)",
+    "A3 (297mm × 420mm)",
+    "A4 (210mm × 297mm)",
+    "A5 (148mm × 210mm)",
+    "A6 (105mm × 148mm)",
+    "3 × A4 (297mm × 630mm)",
+    "4 × A4 (297mm × 840mm)",
+    "4 × A5 (210mm × 594mm)",
+    "Custom Size"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "paperType",
+   "label": "Paper *",
+   "options": [
+    "-- Select Paper --",
+    "Simili Paper 80gsm - Best Seller",
+    "Simili Paper 100gsm - Best Seller",
+    "Simili Paper 140gsm - Best Seller",
+    "Gloss Art Paper 80gsm - Best Seller (NEW)",
+    "Gloss Art Paper 100gsm - Best Seller",
+    "Gloss Art Paper 128gsm - Best Seller",
+    "Gloss Art Paper 150gsm - Best Seller",
+    "Matte Art Paper 130gsm - Best Seller",
+    "Gloss Art Card 250gsm (2 sides coated) - Best Seller"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "printColour",
+   "label": "Print Colour *",
+   "options": [
+    "-- Select Print Colour --",
+    "4C (Front)",
+    "4C (Both)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "quantityBestSeller",
+   "label": "Quantity *",
+   "options": [
+    "-- Select Quantity --",
+    "100",
+    "200",
+    "250",
+    "300",
+    "400",
+    "500",
+    "600",
+    "700",
+    "800",
+    "900",
+    "1,000",
+    "1,500",
+    "2,000",
+    "2,500",
+    "3,000",
+    "3,500",
+    "4,000",
+    "4,500",
+    "5,000",
+    "6,000",
+    "7,000",
+    "8,000",
+    "9,000",
+    "10,000",
+    "11,000",
+    "12,000",
+    "13,000",
+    "14,000",
+    "15,000",
+    "16,000",
+    "17,000",
+    "18,000",
+    "19,000",
+    "20,000",
+    "24,000",
+    "25,000",
+    "28,000",
+    "30,000",
+    "32,000",
+    "35,000",
+    "36,000",
+    "40,000",
+    "44,000",
+    "45,000",
+    "48,000",
+    "50,000",
+    "52,000",
+    "55,000",
+    "56,000",
+    "60,000",
+    "64,000",
+    "65,000",
+    "68,000",
+    "70,000",
+    "72,000",
+    "75,000",
+    "76,000",
+    "80,000",
+    "84,000",
+    "85,000",
+    "88,000",
+    "90,000",
+    "92,000",
+    "95,000",
+    "96,000",
+    "100,000",
+    "120,000",
+    "140,000",
+    "150,000",
+    "160,000",
+    "180,000",
+    "200,000"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "package",
+   "label": "Package *",
+   "options": [
+    "Normal",
+    "2 in 1",
+    "3 in 1",
+    "4 in 1",
+    "5 in 1",
+    "6 in 1",
+    "7 in 1",
+    "8 in 1",
+    "9 in 1",
+    "10 in 1"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "Optional Finishing"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "folding",
+   "label": "Folding Type *",
+   "options": [
+    "Not Required",
+    "Required"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "Add On"
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "envelope",
+   "label": "Envelope",
+   "options": [
+    "Not Required",
+    "Cream A7 (133mm × 102mm)",
+    "White A6 (162mm × 114mm)",
+    "Pink A6 (108mm × 159mm)",
+    "Pink A5 (162mm × 229mm)",
+    "White A5 (162mm × 229mm)",
+    "Pink DL (215mm × 114mm)",
+    "White DL (110mm × 220mm)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "DELIVERY"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOrderCountryCode",
+   "label": "West Malaysia",
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOtherOrderCountryCode",
+   "label": "Others Countries",
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "label": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_price$rblCourier",
+   "label": "Appointed Courier (Free Shipping)",
+   "options": [
+    "Appointed Courier (Free Shipping)",
+    "GDex (Fee applies)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "NET PRICE FOR DEAL"
+  }
+ ],
+ "cards": [],
+ "sectionCount": 5,
+ "slug": "lo-loose-sheet",
+ "id": 21,
+ "name": "Loose Sheet — Litho (Offset)"
+}

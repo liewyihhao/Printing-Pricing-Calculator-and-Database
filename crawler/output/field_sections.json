@@ -1,0 +1,101 @@
+{
+ "1": {
+  "category": "general",
+  "size": "general",
+  "orientation": "general",
+  "paper": "general",
+  "printcolour": "general",
+  "lamination": "general",
+  "silkscreen_spot_uv": "general",
+  "package": "general",
+  "hot_stamping": "finishing",
+  "round_corner": "finishing",
+  "holepunching": "finishing",
+  "embossing": "finishing"
+ },
+ "101": {
+  "size": "general",
+  "paper": "general",
+  "colour": "general",
+  "package": "general",
+  "fold": "finishing",
+  "envelope": "addon"
+ },
+ "102": {
+  "size": "general",
+  "paper": "general",
+  "colour": "general",
+  "package": "general",
+  "fold": "finishing",
+  "envelope": "addon"
+ },
+ "103": {
+  "size": "general",
+  "paper": "general",
+  "colour": "general",
+  "package": "general",
+  "fold": "finishing",
+  "envelope": "addon"
+ },
+ "109": {
+  "roundcorner": "finishing",
+  "holepunch": "finishing"
+ },
+ "113": {
+  "hole_punch": "finishing"
+ },
+ "114": {
+  "hot_stamping": "finishing",
+  "envelope": "addon"
+ },
+ "115": {
+  "holepunch": "finishing"
+ },
+ "126": {
+  "roundcorner": "finishing"
+ },
+ "154": {
+  "butterflystand": "addon"
+ },
+ "180": {
+  "model": "general",
+  "sleeve": "general"
+ },
+ "181": {
+  "model": "general",
+  "sleeve": "general"
+ },
+ "182": {
+  "category": "general",
+  "model": "general",
+  "sleeve": "general",
+  "fabric": "general"
+ },
+ "183": {
+  "model": "general",
+  "sleeve": "general"
+ },
+ "21": {
+  "size": "general",
+  "paper": "general",
+  "colour": "general",
+  "package": "general",
+  "fold": "finishing",
+  "envelope": "addon"
+ },
+ "24": {
+  "size": "general",
+  "binding": "general",
+  "orientation": "general",
+  "numbering": "finishing",
+  "holepunching": "finishing"
+ },
+ "50": {
+  "size": "general",
+  "paper": "general",
+  "colour": "general",
+  "package": "general",
+  "fold": "finishing",
+  "envelope": "addon"
+ }
+}

@@ -1,0 +1,429 @@
+{
+ "rows": [
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "",
+   "label": "",
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "General"
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "billbookSize",
+   "label": "Size *",
+   "options": [
+    "-- Select Size --",
+    "145mm × 210mm",
+    "(A4) 210mm × 297mm",
+    "(B5) 176mm × 250mm",
+    "(B4) 250mm × 353mm",
+    "90mm × 140mm",
+    "90mm × 177mm",
+    "95mm × 210mm",
+    "95mm × 225mm",
+    "105mm × 145mm",
+    "105mm × 175mm",
+    "107mm × 190mm",
+    "110mm × 210mm",
+    "120mm × 210mm",
+    "120mm × 230mm",
+    "125mm × 175mm",
+    "135mm × 210mm",
+    "145mm × 148mm",
+    "145mm × 190mm",
+    "148mm × 190mm",
+    "148mm × 291mm",
+    "160mm × 240mm",
+    "165mm × 210mm",
+    "170mm × 190mm",
+    "173mm × 206mm",
+    "180mm × 280mm",
+    "190mm × 210mm",
+    "190mm × 270mm",
+    "190mm × 290mm",
+    "190mm × 297mm",
+    "192mm × 268mm",
+    "194mm × 205mm",
+    "206mm × 240mm",
+    "206mm × 330mm",
+    "210mm × 270mm",
+    "210mm × 291mm",
+    "291mm × 420mm",
+    "(F3) 330mm × 420mm",
+    "Other (Custom Size)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "bindingType",
+   "label": "Binding Type *",
+   "options": [
+    "Book",
+    "Pad"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "orientation",
+   "label": "Orientation *",
+   "options": [
+    "Landscape",
+    "Portrait"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "bindingLocation",
+   "label": "Binding Location *",
+   "options": [
+    "Left Binding",
+    "Top Binding"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "Layers Configuration"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "paperMaterials",
+   "label": "Paper Materials *",
+   "options": [
+    "NCR (Carbonize Paper)",
+    "Normal Paper"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "layers",
+   "label": "Paper Material + Layers *",
+   "options": [
+    "-- Select Paper Material + Layers --",
+    "NCR - 2 Layers",
+    "NCR - 3 Layers",
+    "NCR - 4 Layers",
+    "NCR - 5 Layers",
+    "NCR - 6 Layers"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "isLastLayerPerforation",
+   "label": "Last Layer Perforation *",
+   "options": [
+    "No",
+    "Yes"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "isDifferentArtwork",
+   "label": "Different Artwork per Layer *",
+   "options": [
+    "No — Same Artwork",
+    "Yes — Different Artwork"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "isCopyChange",
+   "label": "Copy Change",
+   "options": [
+    "No Copy Change",
+    "Yes — Add Copy Change"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "paperLayer1",
+   "label": "",
+   "options": [
+    "NCR White 50gsm",
+    "NCR Green 50gsm",
+    "NCR Blue 50gsm",
+    "NCR Yellow 50gsm",
+    "NCR Pink 50gsm"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "paperLayer2",
+   "label": "",
+   "options": [
+    "NCR White 50gsm",
+    "NCR Green 50gsm",
+    "NCR Blue 50gsm",
+    "NCR Yellow 50gsm",
+    "NCR Pink 50gsm"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "Print Color"
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "printColour",
+   "label": "Print Colour *",
+   "options": [
+    "-- Select Print Colour --",
+    "1C (Front)",
+    "2C (Front)",
+    "4C (Front)",
+    "1C (Both)",
+    "2C (Front) / 1C (Back)",
+    "4C (Front) / 1C (Back)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "Quantity"
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "quantity",
+   "label": "Quantity (Books / Pads) *",
+   "options": [
+    "-- Select Quantity --",
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "260",
+    "270",
+    "280",
+    "290",
+    "300",
+    "310",
+    "320",
+    "330",
+    "340",
+    "350",
+    "360",
+    "370",
+    "380",
+    "390",
+    "400",
+    "410",
+    "420",
+    "430",
+    "440",
+    "450",
+    "460",
+    "470",
+    "480",
+    "490",
+    "500",
+    "510",
+    "520",
+    "530",
+    "540",
+    "550",
+    "560",
+    "570",
+    "580",
+    "590",
+    "600",
+    "610",
+    "620",
+    "630",
+    "640",
+    "650",
+    "660",
+    "670",
+    "680",
+    "690",
+    "700",
+    "710",
+    "720",
+    "730",
+    "740",
+    "750",
+    "760",
+    "770",
+    "780",
+    "790",
+    "800",
+    "810",
+    "820",
+    "830",
+    "840",
+    "850",
+    "860",
+    "870",
+    "880",
+    "890",
+    "900",
+    "910",
+    "920",
+    "930",
+    "940",
+    "950",
+    "960",
+    "970",
+    "980",
+    "990",
+    "1,000"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "sets",
+   "label": "Sets per Book/Pad *",
+   "options": [
+    "50 Sets",
+    "100 Sets"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "Finishing"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "isNumbering",
+   "label": "Numbering",
+   "options": [
+    "No Numbering",
+    "Yes — Add Numbering"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "holePunch",
+   "label": "Hole Punching",
+   "options": [
+    "No Hole Punching",
+    "Yes — Hole Punching (Diameter 6mm)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "DELIVERY"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOrderCountryCode",
+   "label": "West Malaysia",
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOtherOrderCountryCode",
+   "label": "Others Countries",
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "label": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_price$rblCourier",
+   "label": "Appointed Courier (Free Shipping)",
+   "options": [
+    "Appointed Courier (Free Shipping)",
+    "GDex (Fee applies)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "NET PRICE FOR DEAL"
+  }
+ ],
+ "cards": [],
+ "sectionCount": 7,
+ "slug": "bill-book",
+ "id": 24,
+ "name": "Bill-Book — Litho (NCR Carbonless)"
+}

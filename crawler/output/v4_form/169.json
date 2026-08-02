@@ -1,0 +1,196 @@
+{
+ "rows": [
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "",
+   "label": "",
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$rblCategory",
+   "label": "Standard",
+   "options": [
+    "Standard",
+    "Premium",
+    "Hot Stamping",
+    "Pouch"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlFinishing",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "Matte Lamination",
+    "Soft Touch Lamination"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_spec_controller$order_spec_standard$ddlQuantity",
+   "label": "ctl00$mainContent$order_spec_controller$order_spec_standard$",
+   "options": [
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "260",
+    "270",
+    "280",
+    "290",
+    "300",
+    "350",
+    "400",
+    "450",
+    "500",
+    "550",
+    "600",
+    "650",
+    "700",
+    "750",
+    "800",
+    "850",
+    "900",
+    "950",
+    "1000",
+    "1500",
+    "2000",
+    "2500",
+    "3000",
+    "3500",
+    "4000",
+    "4500",
+    "5000",
+    "5500",
+    "6000",
+    "6500",
+    "7000",
+    "7500",
+    "8000",
+    "8500",
+    "9000",
+    "9500",
+    "10000",
+    "10500",
+    "11000",
+    "11500",
+    "12000",
+    "12500",
+    "13000",
+    "13500",
+    "14000",
+    "14500",
+    "15000"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "DELIVERY"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOrderCountryCode",
+   "label": "West Malaysia",
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOtherOrderCountryCode",
+   "label": "Others Countries",
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "label": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "mainContent$order_price$rblCourier",
+   "label": "Appointed Courier (Free Shipping)",
+   "options": [
+    "Appointed Courier (Free Shipping)",
+    "GDex (Fee applies)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "NET PRICE FOR DEAL"
+  }
+ ],
+ "cards": [],
+ "sectionCount": 2,
+ "slug": "envelope-money-packet",
+ "id": 169,
+ "name": "Envelope Money Packet — Litho"
+}

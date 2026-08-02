@@ -1,0 +1,62 @@
+{
+ "rows": [
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "",
+   "label": "",
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "shirt_fabric",
+   "label": "Fabric Type",
+   "options": [
+    "Acrylic Twill"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "SIZE & QUANTITY"
+  },
+  {
+   "kind": "section",
+   "name": "DELIVERY"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOrderCountryCode",
+   "label": "West Malaysia",
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblCourier",
+   "label": "Appointed Courier (Fee applies)",
+   "options": [
+    "Appointed Courier (Fee applies)",
+    "Skynet (Fee applies)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "NET PRICE FOR DEAL"
+  }
+ ],
+ "cards": [],
+ "sectionCount": 3,
+ "slug": "cap",
+ "id": 185,
+ "name": "Cap — DTF"
+}
