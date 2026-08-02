@@ -23,11 +23,13 @@ _V4_SLUG = {
     "loose-sheet": "lo-loose-sheet", "brochure": "lo-loose-sheet", "flyer": "lo-loose-sheet",
     "customprint": "lo-loose-sheet",
 }
-# Per-product-id slug overrides (two products can share a base slug, e.g. desk-calendar variants).
+# Per-product-id slug overrides (two products can share a base slug, e.g. desk-calendar variants),
+# verified from the live product pages' /ordering/<slug> links.
 _V4_SLUG_BY_ID = {
     110: "voucher-pad", 120: "hard-stand-desk-calendar", 121: "soft-stand-desk-calendar",
     145: "dtf-totebag-with-zip", 152: "standing-pouch-spout", 182: "muslimah",
-    19: "bo-booklet", 37: "bo-booklet",
+    19: "booklet-offset-softcover", 37: "booklet-digital-softcover",
+    50: "do-loose-sheet",           # Loose Sheet DIGITAL has its own form (not the litho lo-loose-sheet)
 }
 
 # Gently set every select to its first real option (reveals the cascade + conditional sections)

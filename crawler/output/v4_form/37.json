@@ -1,9 +1,319 @@
 {
- "rows": [],
+ "rows": [
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "",
+   "label": "",
+   "options": [
+    "Track Order",
+    "Product"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "GENERAL"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "coverType",
+   "label": "Cover Type *",
+   "options": [
+    "Softcover",
+    "Hardcover"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "orientation",
+   "label": "Book Orientation *",
+   "options": [
+    "Portrait",
+    "Landscape"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "bookSize",
+   "label": "Book Size *",
+   "options": [
+    "-- Select Book Size --",
+    "(A4) 210mm x 297mm",
+    "(A5) 148mm x 210mm",
+    "(B5) 176mm x 250mm",
+    "(A6) 105mm x 148mm",
+    "(B5+) 190mm x 266mm"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "pages",
+   "label": "Pages (Including cover) *",
+   "options": [
+    "-- Select Pages (Including cover) --",
+    "8 pages",
+    "12 pages",
+    "16 pages",
+    "20 pages",
+    "24 pages",
+    "28 pages",
+    "32 pages",
+    "36 pages",
+    "40 pages",
+    "44 pages",
+    "48 pages",
+    "52 pages",
+    "56 pages",
+    "60 pages",
+    "64 pages",
+    "68 pages",
+    "72 pages",
+    "76 pages",
+    "80 pages"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "COVER"
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "coverPaper",
+   "label": "Cover Paper *",
+   "options": [
+    "-- Select Cover Paper --",
+    "Simili Paper 80gsm",
+    "Simili Paper 100gsm",
+    "Simili Paper 140gsm",
+    "Gloss Art Paper 100gsm",
+    "Gloss Art Paper 128gsm",
+    "Gloss Art Paper 150gsm",
+    "Matte Art Paper 100gsm",
+    "Matte Art Paper 130gsm",
+    "Matte Art Paper 150gsm",
+    "Gloss Art Card 230gsm (2 side coated)",
+    "Gloss Art Card 250gsm (2 side coated)",
+    "Gloss Art Card 310gsm (2 side coated)",
+    "Metal Ice 250gsm",
+    "Super White 240gsm",
+    "Linen 240gsm"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "coverPrintColour",
+   "label": "Cover Print Colour *",
+   "options": [
+    "4C : 4 Colour Outer Only",
+    "4C : 4 Colour Outer & 4 Colour Inner"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "coverLamination",
+   "label": "Lamination / Finishing *",
+   "options": [
+    "No Required"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "hotStampingEnable",
+   "label": "Cover Hot Stamping",
+   "options": [
+    "No Hot Stamping",
+    "Hot Stamping - 1 Colour (Front)",
+    "Hot Stamping - 2 Colours (Front)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "CONTENT"
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "contentPaper",
+   "label": "Content Paper *",
+   "options": [
+    "-- Select Content Paper --",
+    "Simili Paper 80gsm"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "contentPrintColour",
+   "label": "Content Print Colour *",
+   "options": [
+    "-- Select Content Print Colour --",
+    "1C (Both Sides)",
+    "4C (Both Sides)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "contentLamination",
+   "label": "Lamination *",
+   "options": [
+    "No Lamination"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "QUANTITY"
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "quantity",
+   "label": "Quantity *",
+   "options": [
+    "-- Select Quantity --",
+    "10",
+    "20",
+    "30",
+    "40",
+    "50",
+    "60",
+    "70",
+    "80",
+    "90",
+    "100",
+    "110",
+    "120",
+    "130",
+    "140",
+    "150",
+    "160",
+    "170",
+    "180",
+    "190",
+    "200",
+    "210",
+    "220",
+    "230",
+    "240",
+    "250",
+    "260",
+    "270",
+    "280",
+    "290",
+    "300",
+    "310",
+    "320",
+    "330",
+    "340",
+    "350",
+    "360",
+    "370",
+    "380",
+    "390",
+    "400",
+    "410",
+    "420",
+    "430",
+    "440",
+    "450",
+    "460",
+    "470",
+    "480",
+    "490",
+    "500"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "DELIVERY"
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOrderCountryCode",
+   "label": "West Malaysia",
+   "options": [
+    "West Malaysia",
+    "East Malaysia",
+    "Singapore",
+    "Thailand (Bangkok only)"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblOtherOrderCountryCode",
+   "label": "Others Countries",
+   "options": [
+    "Others Countries"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "select",
+   "name": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "label": "ctl00$mainContent$order_price$ddlOtherCountryCode",
+   "options": [
+    "Afghanistan",
+    "Armenia",
+    "Australia",
+    "Bhutan",
+    "Brunei",
+    "Cambodia",
+    "China",
+    "Egypt",
+    "Hong Kong",
+    "Indonesia",
+    "Iran",
+    "Iraq",
+    "Japan",
+    "Kazakhstan",
+    "Kyrgyzstan",
+    "Laos",
+    "Lebanon",
+    "Macau",
+    "Myanmar",
+    "New Zealand",
+    "Pakistan",
+    "Philippines",
+    "Russia",
+    "South Korea",
+    "Syria",
+    "Taiwan",
+    "Tajikistan",
+    "Thailand (excluded Bangkok)",
+    "United States",
+    "Uzbekistan",
+    "Vietnam",
+    "Yemen"
+   ]
+  },
+  {
+   "kind": "control",
+   "ctype": "radio",
+   "name": "ctl00$mainContent$order_price$rblCourier",
+   "label": "Appointed Courier (Fee applies)",
+   "options": [
+    "Appointed Courier (Fee applies)",
+    "Skynet (Fee applies)"
+   ]
+  },
+  {
+   "kind": "section",
+   "name": "NET PRICE FOR DEAL"
+  }
+ ],
  "cards": [],
- "sectionCount": 0,
- "slug": null,
- "error": "no form rendered",
+ "sectionCount": 6,
+ "slug": "booklet-digital-softcover",
  "id": 37,
  "name": "Booklet — Digital"
 }

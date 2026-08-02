@@ -16,10 +16,8 @@ from app.build_specs_page import clean_name
 OUT = Path(__file__).resolve().parent.parent / "output"
 FDIR = OUT / "v4_form"
 
-# supplier section header -> our section key ("skip" = delivery/quantity/chrome, not a config axis)
-_SEC = {"general": "general", "optional finishing": "finishing", "finishing": "finishing",
-        "add on": "addon", "add-on": "addon", "addon": "addon",
-        "delivery": "skip", "net price for deal": "skip", "add name": "skip", "artwork": "skip"}
+# Supplier section headers that are NOT product-config sections (delivery / quantity / chrome).
+_SKIP_SEC = {"delivery", "net price for deal", "add name", "quantity", "artwork", "summary", "add-on info"}
 # control names that are page chrome / delivery / quantity, never a product option
 _SKIP_CTRL = re.compile(r"country|courier|qty|quantity|favourite|rush|track|custom.?size|"
                         r"^ddlproduct$|review|otherorder|^$", re.I)
@@ -27,19 +25,26 @@ _SKIP_CTRL = re.compile(r"country|courier|qty|quantity|favourite|rush|track|cust
 _JUNK = re.compile(r"^\s*-*\s*(please\s*)?select\b|^\s*-{1,}\s*$|^\s*-{2}|not required|^none$|^$", re.I)
 
 
+def sec_label(name):
+    """Normalise a supplier section header to a clean display label (Title Case, known phrases)."""
+    return " ".join(w.capitalize() for w in str(name).strip().split())
+
+
 def _clean_opts(opts):
     return [o for o in (opts or []) if o and not _JUNK.search(o.strip())]
 
 
 def _sec_of_rows(rows):
-    """Walk capture rows, yielding (our_section_key, control_dict) for real config controls.
-    Controls BEFORE the first real section header (product switcher / chrome) are ignored."""
-    cur = "skip"                       # nothing counts until the first General/Finishing/Add-On header
+    """Walk capture rows, yielding (section_label, control_dict) for real config controls, using the
+    supplier's ACTUAL section labels (General / Optional Finishing / Add On / Cover / Content / …).
+    Controls before the first section header, or under a skip section, are ignored."""
+    cur = None                          # nothing counts until the first real config section header
     for r in rows:
         if r.get("kind") == "section":
-            cur = _SEC.get(r["name"].strip().lower(), "skip")
+            nm = r["name"].strip().lower()
+            cur = None if nm in _SKIP_SEC else sec_label(r["name"])
         elif r.get("kind") == "control":
-            if cur == "skip" or _SKIP_CTRL.search(r.get("name", "")):
+            if cur is None or _SKIP_CTRL.search(r.get("name", "")):
                 continue
             yield cur, r
 

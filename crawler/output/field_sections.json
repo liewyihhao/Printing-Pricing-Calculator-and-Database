@@ -1,101 +1,298 @@
 {
  "1": {
-  "category": "general",
-  "size": "general",
-  "orientation": "general",
-  "paper": "general",
-  "printcolour": "general",
-  "lamination": "general",
-  "silkscreen_spot_uv": "general",
-  "package": "general",
-  "hot_stamping": "finishing",
-  "round_corner": "finishing",
-  "holepunching": "finishing",
-  "embossing": "finishing"
+  "fields": {
+   "category": "General",
+   "size": "General",
+   "orientation": "General",
+   "paper": "General",
+   "printcolour": "General",
+   "lamination": "General",
+   "silkscreen_spot_uv": "General",
+   "package": "General",
+   "hot_stamping": "Optional Finishing",
+   "round_corner": "Optional Finishing",
+   "holepunching": "Optional Finishing",
+   "embossing": "Optional Finishing"
+  },
+  "order": [
+   "General",
+   "Optional Finishing"
+  ]
  },
  "101": {
-  "size": "general",
-  "paper": "general",
-  "colour": "general",
-  "package": "general",
-  "fold": "finishing",
-  "envelope": "addon"
+  "fields": {
+   "size": "General",
+   "paper": "General",
+   "colour": "General",
+   "package": "General",
+   "fold": "Optional Finishing",
+   "envelope": "Add On"
+  },
+  "order": [
+   "General",
+   "Optional Finishing",
+   "Add On"
+  ]
  },
  "102": {
-  "size": "general",
-  "paper": "general",
-  "colour": "general",
-  "package": "general",
-  "fold": "finishing",
-  "envelope": "addon"
+  "fields": {
+   "size": "General",
+   "paper": "General",
+   "colour": "General",
+   "package": "General",
+   "fold": "Optional Finishing",
+   "envelope": "Add On"
+  },
+  "order": [
+   "General",
+   "Optional Finishing",
+   "Add On"
+  ]
  },
  "103": {
-  "size": "general",
-  "paper": "general",
-  "colour": "general",
-  "package": "general",
-  "fold": "finishing",
-  "envelope": "addon"
+  "fields": {
+   "size": "General",
+   "paper": "General",
+   "colour": "General",
+   "package": "General",
+   "fold": "Optional Finishing",
+   "envelope": "Add On"
+  },
+  "order": [
+   "General",
+   "Optional Finishing",
+   "Add On"
+  ]
  },
  "109": {
-  "roundcorner": "finishing",
-  "holepunch": "finishing"
+  "fields": {
+   "roundcorner": "Optional Finishing",
+   "holepunch": "Optional Finishing"
+  },
+  "order": [
+   "Optional Finishing"
+  ]
  },
- "113": {
-  "hole_punch": "finishing"
+ "110": {
+  "fields": {
+   "ex_printcolour": "Content",
+   "perforation": "Content"
+  },
+  "order": [
+   "Content"
+  ]
  },
  "114": {
-  "hot_stamping": "finishing",
-  "envelope": "addon"
+  "fields": {
+   "hot_stamping": "Optional Finishing"
+  },
+  "order": [
+   "Optional Finishing",
+   "Add On"
+  ]
  },
  "115": {
-  "holepunch": "finishing"
+  "fields": {
+   "holepunch": "Optional Finishing"
+  },
+  "order": [
+   "Optional Finishing"
+  ]
  },
- "126": {
-  "roundcorner": "finishing"
+ "117": {
+  "fields": {
+   "vdptype": "Other Finishing"
+  },
+  "order": [
+   "Other Finishing"
+  ]
  },
  "154": {
-  "butterflystand": "addon"
+  "fields": {
+   "butterflystand": "Add On"
+  },
+  "order": [
+   "Add On"
+  ]
+ },
+ "163": {
+  "fields": {
+   "innerfrontcontent": "Content",
+   "additionalcontent": "Additional Custom Design"
+  },
+  "order": [
+   "Content",
+   "Additional Custom Design"
+  ]
+ },
+ "164": {
+  "fields": {
+   "innerprintcolour": "Inner Paper"
+  },
+  "order": [
+   "Cover Finishing",
+   "Inner Paper"
+  ]
+ },
+ "175": {
+  "fields": {
+   "standlamination": "Stand"
+  },
+  "order": [
+   "Stand"
+  ]
  },
  "180": {
-  "model": "general",
-  "sleeve": "general"
+  "fields": {
+   "model": "General",
+   "sleeve": "General"
+  },
+  "order": [
+   "General",
+   "Shirt Vdp"
+  ]
  },
  "181": {
-  "model": "general",
-  "sleeve": "general"
+  "fields": {
+   "model": "General",
+   "sleeve": "General"
+  },
+  "order": [
+   "General",
+   "Shirt Vdp"
+  ]
  },
  "182": {
-  "category": "general",
-  "model": "general",
-  "sleeve": "general",
-  "fabric": "general"
+  "fields": {
+   "category": "General",
+   "model": "General",
+   "sleeve": "General",
+   "fabric": "General"
+  },
+  "order": [
+   "General",
+   "Shirt Vdp"
+  ]
  },
  "183": {
-  "model": "general",
-  "sleeve": "general"
+  "fields": {
+   "model": "General",
+   "sleeve": "General"
+  },
+  "order": [
+   "General",
+   "Shirt Vdp"
+  ]
+ },
+ "19": {
+  "fields": {
+   "ordertype": "General",
+   "orientation": "General",
+   "size": "General",
+   "cover": "Cover",
+   "outer_inner": "Cover",
+   "cover_lamination": "Cover",
+   "content": "Content",
+   "colour": "Content"
+  },
+  "order": [
+   "General",
+   "Cover",
+   "Content"
+  ]
  },
  "21": {
-  "size": "general",
-  "paper": "general",
-  "colour": "general",
-  "package": "general",
-  "fold": "finishing",
-  "envelope": "addon"
+  "fields": {
+   "size": "General",
+   "paper": "General",
+   "colour": "General",
+   "package": "General",
+   "fold": "Optional Finishing",
+   "envelope": "Add On"
+  },
+  "order": [
+   "General",
+   "Optional Finishing",
+   "Add On"
+  ]
  },
  "24": {
-  "size": "general",
-  "binding": "general",
-  "orientation": "general",
-  "numbering": "finishing",
-  "holepunching": "finishing"
+  "fields": {
+   "size": "General",
+   "binding": "General",
+   "orientation": "General",
+   "papermaterials": "Layers Configuration",
+   "layers": "Layers Configuration",
+   "last_layer_perforation": "Layers Configuration",
+   "paper_tint": "Layers Configuration",
+   "printcolour": "Print Color",
+   "numbering": "Finishing",
+   "holepunching": "Finishing"
+  },
+  "order": [
+   "General",
+   "Layers Configuration",
+   "Print Color",
+   "Finishing"
+  ]
+ },
+ "37": {
+  "fields": {
+   "ordertype": "General",
+   "orientation": "General",
+   "size": "General",
+   "cover": "Cover",
+   "outer_inner": "Cover",
+   "cover_lamination": "Cover",
+   "hot_stamping": "Cover",
+   "content": "Content",
+   "colour": "Content"
+  },
+  "order": [
+   "General",
+   "Cover",
+   "Content"
+  ]
  },
  "50": {
-  "size": "general",
-  "paper": "general",
-  "colour": "general",
-  "package": "general",
-  "fold": "finishing",
-  "envelope": "addon"
+  "fields": {
+   "size": "General",
+   "paper": "General",
+   "colour": "General",
+   "package": "General",
+   "fold": "Optional Finishing",
+   "hot_stamping": "Optional Finishing",
+   "envelope": "Add On"
+  },
+  "order": [
+   "General",
+   "Optional Finishing",
+   "Add On"
+  ]
+ },
+ "60": {
+  "fields": {
+   "type": "Product Type",
+   "category": "Product Type",
+   "paper": "Product Spec",
+   "colour": "Product Spec",
+   "package": "Product Spec",
+   "finishing": "Product Spec"
+  },
+  "order": [
+   "Product Type",
+   "Product Spec",
+   "Optional Finishing"
+  ]
+ },
+ "61": {
+  "fields": {
+   "category": "Product Type"
+  },
+  "order": [
+   "Product Type",
+   "Product Spec",
+   "Optional Finishing"
+  ]
  }
 }

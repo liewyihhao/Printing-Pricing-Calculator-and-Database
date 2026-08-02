@@ -1334,12 +1334,13 @@ _SEC_ADDON = ("envelope", "extra", "rope", "fitting", "ribbon", "insert", "cd se
 
 
 def _section_of(f):
+    """Heuristic section LABEL for products/fields the live-form capture didn't cover."""
     s = ((f.get("key") or "") + " " + (f.get("label") or "")).lower()
     if any(t in s for t in _SEC_FINISHING):
-        return "finishing"
+        return "Optional Finishing"
     if any(t in s for t in _SEC_ADDON):
-        return "addon"
-    return "general"
+        return "Add On"
+    return "General"
 
 
 def _assign_sections(data):
@@ -1352,8 +1353,12 @@ def _assign_sections(data):
     captured = json.loads(cap_path.read_text(encoding="utf-8")) if cap_path.is_file() else {}
     tally = Counter()
     exact = 0
+    _HEUR_ORDER = ["General", "Optional Finishing", "Add On"]
     for p in data["products"]:
-        cmap = captured.get(str(p["id"]), {})
+        entry = captured.get(str(p["id"])) or {}
+        cmap = entry.get("fields", {})
+        cap_order = list(entry.get("order", []))          # supplier's real section sequence
+        used = []
         for f in p.get("fields", []):
             sec = cmap.get(f.get("key"))
             if sec:
@@ -1361,7 +1366,16 @@ def _assign_sections(data):
             else:
                 sec = _section_of(f)
             f["section"] = sec
+            if sec not in used:
+                used.append(sec)
             tally[sec] += 1
+        # render order: sections in the supplier's captured order first, then any heuristic-only
+        # sections appended in the canonical General -> Optional Finishing -> Add On sequence.
+        def _rank(s):
+            if s in cap_order:
+                return (0, cap_order.index(s))
+            return (1, _HEUR_ORDER.index(s) if s in _HEUR_ORDER else 99)
+        p["sectionOrder"] = sorted(used, key=_rank)
     print(f"config sections: {dict(tally)} ({exact} from live-form capture)")
 
 

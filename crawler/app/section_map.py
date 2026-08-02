@@ -16,18 +16,24 @@ FDIR = OUT / "v4_form"
 
 
 def _match(control, fields):
-    cname, clabel = norm(control.get("name", "")), norm(control.get("label", ""))
+    """Confident field<->control match for SECTION assignment. Deliberately strict: cascade products
+    (Booklet, Loose Sheet) have many near-identical fields (cover vs content paper/colour), so a weak
+    option-overlap match mis-assigns sections. Require a NAME match (label/key) or a strong option
+    overlap; otherwise return None and let the field keep the section heuristic."""
+    clabel = norm(control.get("label", "")); cname = norm(control.get("name", ""))
     copts = {norm(o) for o in (control.get("options") or []) if norm(o)}
     best, best_score = None, 0.0
     for f in fields:
         fk, fl = norm(f.get("key", "")), norm(f.get("label", ""))
-        nm = bool(cname) and (cname in fk or fk in cname or (clabel and clabel in fl) or (cname in fl))
+        # name match on the human LABEL (most reliable) or an exact key match
+        nm = bool(clabel) and bool(fl) and (clabel == fl or clabel in fl or fl in clabel)
+        nm = nm or (bool(cname) and cname == fk)
         fopts = {norm(o) for o in (f.get("options") or []) if norm(o)}
         jac = len(copts & fopts) / len(copts | fopts) if (copts and fopts) else 0.0
         score = (2.0 if nm else 0.0) + jac
         if score > best_score:
             best_score, best = score, f
-    return best if best_score >= 2.0 or best_score >= 0.34 else None
+    return best if best_score >= 2.0 or best_score >= 0.7 else None
 
 
 def build():
@@ -42,15 +48,17 @@ def build():
         if not p or not cap.get("rows") or cap.get("sectionCount", 0) == 0:
             continue
         fields = p.get("fields", [])
-        secmap = {}
-        for sec, c in _sec_of_rows(cap["rows"]):        # sec in general/finishing/addon
+        secmap, order = {}, []
+        for sec, c in _sec_of_rows(cap["rows"]):        # sec = supplier section label
+            if sec not in order:
+                order.append(sec)
             m = _match(c, fields)
             if m is not None:
                 secmap.setdefault(m["key"], sec)         # first (topmost) section wins
         if secmap:
-            out[str(p["id"])] = secmap
+            out[str(p["id"])] = {"fields": secmap, "order": order}
     (OUT / "field_sections.json").write_text(json.dumps(out, indent=1, ensure_ascii=False), encoding="utf-8")
-    total = sum(len(v) for v in out.values())
+    total = sum(len(v["fields"]) for v in out.values())
     print(f"section_map: {total} fields across {len(out)} products -> output/field_sections.json")
     return out
 
