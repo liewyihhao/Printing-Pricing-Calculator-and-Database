@@ -1,18 +1,4 @@
 {
- "1": {
-  "name": "Business Card",
-  "presence": [],
-  "values": [
-   {
-    "control": "Paper Lamination *",
-    "field": "lamination",
-    "missing": [
-     "Soft Touch Lamination (Both)"
-    ]
-   }
-  ],
-  "sections": []
- },
  "101": {
   "name": "Brochure",
   "presence": [],
@@ -55,58 +41,6 @@
   ],
   "sections": []
  },
- "180": {
-  "name": "Corporate Shirt — Digital",
-  "presence": [],
-  "values": [],
-  "sections": [
-   {
-    "control": "Position",
-    "field": "vdp_position",
-    "supplier_section": "Shirt Vdp",
-    "our_section": "Add On"
-   }
-  ]
- },
- "181": {
-  "name": "Jacket — Digital",
-  "presence": [],
-  "values": [],
-  "sections": [
-   {
-    "control": "Position",
-    "field": "vdp_position",
-    "supplier_section": "Shirt Vdp",
-    "our_section": "Add On"
-   }
-  ]
- },
- "182": {
-  "name": "Muslimah Sublimation — Digital",
-  "presence": [],
-  "values": [],
-  "sections": [
-   {
-    "control": "Position",
-    "field": "vdp_position",
-    "supplier_section": "Shirt Vdp",
-    "our_section": "Add On"
-   }
-  ]
- },
- "183": {
-  "name": "Sweatshirt & Hoodies — Digital",
-  "presence": [],
-  "values": [],
-  "sections": [
-   {
-    "control": "Position",
-    "field": "vdp_position",
-    "supplier_section": "Shirt Vdp",
-    "our_section": "Add On"
-   }
-  ]
- },
  "19": {
   "name": "Booklet — Litho (Offset)",
   "presence": [],
@@ -144,32 +78,6 @@
     "field": "cover_lamination",
     "supplier_section": "Content",
     "our_section": "Cover"
-   }
-  ]
- },
- "60": {
-  "name": "Label Sticker — Digital",
-  "presence": [],
-  "values": [],
-  "sections": [
-   {
-    "control": "Sample Proof (1 sheet)",
-    "field": "sample_proof",
-    "supplier_section": "Product Type",
-    "our_section": "Add On"
-   }
-  ]
- },
- "61": {
-  "name": "Label Sticker — Letterpress (Hot Stamping)",
-  "presence": [],
-  "values": [],
-  "sections": [
-   {
-    "control": "Sample Proof (1 sheet)",
-    "field": "sample_proof",
-    "supplier_section": "Product Type",
-    "our_section": "Add On"
    }
   ]
  }
