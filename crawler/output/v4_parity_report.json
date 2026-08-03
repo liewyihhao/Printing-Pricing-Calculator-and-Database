@@ -18,40 +18,10 @@
   "presence": [],
   "values": [
    {
-    "control": "Size *",
-    "field": "size",
-    "missing": [
-     "A6 (105mm × 148mm)"
-    ]
-   },
-   {
     "control": "Paper *",
     "field": "paper",
     "missing": [
-     "Simili Paper 80gsm - Best Seller",
-     "Simili Paper 100gsm - Best Seller",
-     "Simili Paper 140gsm - Best Seller",
      "Gloss Art Paper 80gsm - Best Seller (NEW)"
-    ]
-   },
-   {
-    "control": "Folding Type *",
-    "field": "fold",
-    "missing": [
-     "Required"
-    ]
-   },
-   {
-    "control": "Envelope",
-    "field": "envelope",
-    "missing": [
-     "Cream A7 (133mm × 102mm)",
-     "White A6 (162mm × 114mm)",
-     "Pink A6 (108mm × 159mm)",
-     "Pink A5 (162mm × 229mm)",
-     "White A5 (162mm × 229mm)",
-     "Pink DL (215mm × 114mm)",
-     "White DL (110mm × 220mm)"
     ]
    }
   ],
@@ -62,40 +32,10 @@
   "presence": [],
   "values": [
    {
-    "control": "Size *",
-    "field": "size",
-    "missing": [
-     "A6 (105mm × 148mm)"
-    ]
-   },
-   {
     "control": "Paper *",
     "field": "paper",
     "missing": [
-     "Simili Paper 80gsm - Best Seller",
-     "Simili Paper 100gsm - Best Seller",
-     "Simili Paper 140gsm - Best Seller",
      "Gloss Art Paper 80gsm - Best Seller (NEW)"
-    ]
-   },
-   {
-    "control": "Folding Type *",
-    "field": "fold",
-    "missing": [
-     "Required"
-    ]
-   },
-   {
-    "control": "Envelope",
-    "field": "envelope",
-    "missing": [
-     "Cream A7 (133mm × 102mm)",
-     "White A6 (162mm × 114mm)",
-     "Pink A6 (108mm × 159mm)",
-     "Pink A5 (162mm × 229mm)",
-     "White A5 (162mm × 229mm)",
-     "Pink DL (215mm × 114mm)",
-     "White DL (110mm × 220mm)"
     ]
    }
   ],
@@ -106,40 +46,10 @@
   "presence": [],
   "values": [
    {
-    "control": "Size *",
-    "field": "size",
-    "missing": [
-     "A6 (105mm × 148mm)"
-    ]
-   },
-   {
     "control": "Paper *",
     "field": "paper",
     "missing": [
-     "Simili Paper 80gsm - Best Seller",
-     "Simili Paper 100gsm - Best Seller",
-     "Simili Paper 140gsm - Best Seller",
      "Gloss Art Paper 80gsm - Best Seller (NEW)"
-    ]
-   },
-   {
-    "control": "Folding Type *",
-    "field": "fold",
-    "missing": [
-     "Required"
-    ]
-   },
-   {
-    "control": "Envelope",
-    "field": "envelope",
-    "missing": [
-     "Cream A7 (133mm × 102mm)",
-     "White A6 (162mm × 114mm)",
-     "Pink A6 (108mm × 159mm)",
-     "Pink A5 (162mm × 229mm)",
-     "White A5 (162mm × 229mm)",
-     "Pink DL (215mm × 114mm)",
-     "White DL (110mm × 220mm)"
     ]
    }
   ],
@@ -147,89 +57,60 @@
  },
  "180": {
   "name": "Corporate Shirt — Digital",
-  "presence": [
-   {
-    "section": "Shirt Vdp",
-    "control": "Position",
-    "options": [
-     "Front",
-     "Back",
-     "Both"
-    ]
-   }
-  ],
+  "presence": [],
   "values": [],
-  "sections": []
+  "sections": [
+   {
+    "control": "Position",
+    "field": "vdp_position",
+    "supplier_section": "Shirt Vdp",
+    "our_section": "Add On"
+   }
+  ]
  },
  "181": {
   "name": "Jacket — Digital",
-  "presence": [
-   {
-    "section": "Shirt Vdp",
-    "control": "Position",
-    "options": [
-     "Front",
-     "Back",
-     "Both"
-    ]
-   }
-  ],
+  "presence": [],
   "values": [],
-  "sections": []
+  "sections": [
+   {
+    "control": "Position",
+    "field": "vdp_position",
+    "supplier_section": "Shirt Vdp",
+    "our_section": "Add On"
+   }
+  ]
  },
  "182": {
   "name": "Muslimah Sublimation — Digital",
-  "presence": [
-   {
-    "section": "Shirt Vdp",
-    "control": "Position",
-    "options": [
-     "Front",
-     "Back",
-     "Both"
-    ]
-   }
-  ],
+  "presence": [],
   "values": [],
-  "sections": []
+  "sections": [
+   {
+    "control": "Position",
+    "field": "vdp_position",
+    "supplier_section": "Shirt Vdp",
+    "our_section": "Add On"
+   }
+  ]
  },
  "183": {
   "name": "Sweatshirt & Hoodies — Digital",
-  "presence": [
-   {
-    "section": "Shirt Vdp",
-    "control": "Position",
-    "options": [
-     "Front",
-     "Back",
-     "Both"
-    ]
-   }
-  ],
+  "presence": [],
   "values": [],
-  "sections": []
+  "sections": [
+   {
+    "control": "Position",
+    "field": "vdp_position",
+    "supplier_section": "Shirt Vdp",
+    "our_section": "Add On"
+   }
+  ]
  },
  "19": {
   "name": "Booklet — Litho (Offset)",
   "presence": [],
-  "values": [
-   {
-    "control": "Hot Stamping Colour",
-    "field": "hot_stamping",
-    "missing": [
-     "No Required",
-     "Hot Stamping - 1 Colour (Front)",
-     "Hot Stamping - 2 Colours (Front)"
-    ]
-   },
-   {
-    "control": "Lamination *",
-    "field": "cover_lamination",
-    "missing": [
-     "No Lamination"
-    ]
-   }
-  ],
+  "values": [],
   "sections": [
    {
     "control": "Lamination *",
@@ -244,79 +125,10 @@
   "presence": [],
   "values": [
    {
-    "control": "Size *",
-    "field": "size",
-    "missing": [
-     "A6 (105mm × 148mm)"
-    ]
-   },
-   {
     "control": "Paper *",
     "field": "paper",
     "missing": [
-     "Simili Paper 80gsm - Best Seller",
-     "Simili Paper 100gsm - Best Seller",
-     "Simili Paper 140gsm - Best Seller",
      "Gloss Art Paper 80gsm - Best Seller (NEW)"
-    ]
-   },
-   {
-    "control": "Folding Type *",
-    "field": "fold",
-    "missing": [
-     "Required"
-    ]
-   },
-   {
-    "control": "Envelope",
-    "field": "envelope",
-    "missing": [
-     "Cream A7 (133mm × 102mm)",
-     "White A6 (162mm × 114mm)",
-     "Pink A6 (108mm × 159mm)",
-     "Pink A5 (162mm × 229mm)",
-     "White A5 (162mm × 229mm)",
-     "Pink DL (215mm × 114mm)",
-     "White DL (110mm × 220mm)"
-    ]
-   }
-  ],
-  "sections": []
- },
- "24": {
-  "name": "Bill-Book — Litho (NCR Carbonless)",
-  "presence": [
-   {
-    "section": "Layers Configuration",
-    "control": "Different Artwork per Layer *",
-    "options": [
-     "No — Same Artwork",
-     "Yes — Different Artwork"
-    ]
-   },
-   {
-    "section": "Layers Configuration",
-    "control": "Copy Change",
-    "options": [
-     "No Copy Change",
-     "Yes — Add Copy Change"
-    ]
-   }
-  ],
-  "values": [
-   {
-    "control": "Binding Location *",
-    "field": "binding",
-    "missing": [
-     "Left Binding",
-     "Top Binding"
-    ]
-   },
-   {
-    "control": "Hole Punching",
-    "field": "holepunching",
-    "missing": [
-     "Yes — Hole Punching (Diameter 6mm)"
     ]
    }
   ],
@@ -325,24 +137,7 @@
  "37": {
   "name": "Booklet — Digital",
   "presence": [],
-  "values": [
-   {
-    "control": "Cover Hot Stamping",
-    "field": "hot_stamping",
-    "missing": [
-     "No Hot Stamping",
-     "Hot Stamping - 1 Colour (Front)",
-     "Hot Stamping - 2 Colours (Front)"
-    ]
-   },
-   {
-    "control": "Lamination *",
-    "field": "cover_lamination",
-    "missing": [
-     "No Lamination"
-    ]
-   }
-  ],
+  "values": [],
   "sections": [
    {
     "control": "Lamination *",
@@ -352,165 +147,29 @@
    }
   ]
  },
- "50": {
-  "name": "Loose Sheet — Digital",
-  "presence": [],
-  "values": [
-   {
-    "control": "Folding Type *",
-    "field": "fold",
-    "missing": [
-     "Required"
-    ]
-   },
-   {
-    "control": "Envelope",
-    "field": "envelope",
-    "missing": [
-     "Cream A7 (133mm × 102mm)",
-     "White A6 (162mm × 114mm)",
-     "Pink A6 (108mm × 159mm)",
-     "Pink A5 (162mm × 229mm)",
-     "White A5 (162mm × 229mm)",
-     "Pink DL (215mm × 114mm)",
-     "White DL (110mm × 220mm)"
-    ]
-   }
-  ],
-  "sections": []
- },
  "60": {
   "name": "Label Sticker — Digital",
-  "presence": [
+  "presence": [],
+  "values": [],
+  "sections": [
    {
-    "section": "Product Type",
     "control": "Sample Proof (1 sheet)",
-    "options": [
-     "Yes (1 sheet)"
-    ]
-   },
-   {
-    "section": "Product Spec",
-    "control": "Cutting Method *",
-    "options": [
-     "Cut to Size",
-     "Die-Cutting"
-    ]
+    "field": "sample_proof",
+    "supplier_section": "Product Type",
+    "our_section": "Add On"
    }
-  ],
-  "values": [
-   {
-    "control": "Paper *",
-    "field": "paper",
-    "missing": [
-     "White PP(Polyprophylene)"
-    ]
-   },
-   {
-    "control": "Lamination *",
-    "field": "finishing",
-    "missing": [
-     "Gloss Lamination (Front)",
-     "Matte Lamination (Front)",
-     "Soft Touch Lamination (Front)"
-    ]
-   }
-  ],
-  "sections": []
+  ]
  },
  "61": {
   "name": "Label Sticker — Letterpress (Hot Stamping)",
-  "presence": [
-   {
-    "section": "Product Type",
-    "control": "Sample Proof (1 sheet)",
-    "options": [
-     "Yes (1 sheet)"
-    ]
-   },
-   {
-    "section": "Product Type",
-    "control": "Order Type *",
-    "options": [
-     "Sticker",
-     "CD"
-    ]
-   },
-   {
-    "section": "Product Spec",
-    "control": "Paper *",
-    "options": [
-     "Mirror Kote",
-     "Mirror Kote (Strong Glue)",
-     "Transparent OPP",
-     "White PP(Polyprophylene)",
-     "White PE (Polyethylene)",
-     "Synthetic Paper",
-     "Printing Paper",
-     "Brown Craft Paper"
-    ]
-   },
-   {
-    "section": "Product Spec",
-    "control": "Package *",
-    "options": [
-     "Normal",
-     "2 in 1",
-     "3 in 1",
-     "4 in 1",
-     "5 in 1",
-     "6 in 1",
-     "7 in 1",
-     "8 in 1"
-    ]
-   },
-   {
-    "section": "Product Spec",
-    "control": "Lamination *",
-    "options": [
-     "Gloss Lamination (Front)",
-     "Matte Lamination (Front)",
-     "Soft Touch Lamination (Front)",
-     "Gloss Water Based Varnish",
-     "UV Varnish"
-    ]
-   },
-   {
-    "section": "Product Spec",
-    "control": "Cutting Method *",
-    "options": [
-     "Cut to Size",
-     "Die-Cutting"
-    ]
-   }
-  ],
-  "values": [
-   {
-    "control": "Category *",
-    "field": "category",
-    "missing": [
-     "Rectangle/Square",
-     "Custom Die-Cut",
-     "Multiple Dieline (Available for different size and different shape)",
-     "Kiss Cut (1up/sheet)",
-     "No Cut"
-    ]
-   },
-   {
-    "control": "Print Colour *",
-    "field": "colour",
-    "missing": [
-     "4C",
-     "1C"
-    ]
-   }
-  ],
+  "presence": [],
+  "values": [],
   "sections": [
    {
-    "control": "Print Colour *",
-    "field": "colour",
-    "supplier_section": "Product Spec",
-    "our_section": "Optional Finishing"
+    "control": "Sample Proof (1 sheet)",
+    "field": "sample_proof",
+    "supplier_section": "Product Type",
+    "our_section": "Add On"
    }
   ]
  }

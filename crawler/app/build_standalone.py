@@ -1341,10 +1341,34 @@ _SPA_EXTRA_FIELDS = {
            "section": "Optional Finishing", "note": "Easy-peel backing slit — priced on request."}],
     61:  [{"key": "easy_peel", "label": "Easy Peel", "options": ["Not Required", "Yes"], "addon": True,
            "section": "Optional Finishing", "note": "Easy-peel backing slit — priced on request."}],
-    180: [{"key": "fabric", "label": "Fabric", "options": ["Polysoft 150gsm"], "section": "General"}],
-    181: [{"key": "fabric", "label": "Fabric", "options": ["Lycra 270gsm"], "section": "General"}],
-    183: [{"key": "fabric", "label": "Fabric", "options": ["Lycra 270gsm"], "section": "General"}],
+    180: [{"key": "fabric", "label": "Fabric", "options": ["Polysoft 150gsm"], "section": "General"},
+          {"key": "vdp_position", "label": "Personalisation (VDP) Position", "addon": True,
+           "options": ["Not Required", "Front", "Back", "Both"], "section": "Add On",
+           "note": "Variable-data personalisation position — priced on request."}],
+    181: [{"key": "fabric", "label": "Fabric", "options": ["Lycra 270gsm"], "section": "General"},
+          {"key": "vdp_position", "label": "Personalisation (VDP) Position", "addon": True,
+           "options": ["Not Required", "Front", "Back", "Both"], "section": "Add On",
+           "note": "Variable-data personalisation position — priced on request."}],
+    183: [{"key": "fabric", "label": "Fabric", "options": ["Lycra 270gsm"], "section": "General"},
+          {"key": "vdp_position", "label": "Personalisation (VDP) Position", "addon": True,
+           "options": ["Not Required", "Front", "Back", "Both"], "section": "Add On",
+           "note": "Variable-data personalisation position — priced on request."}],
+    182: [{"key": "vdp_position", "label": "Personalisation (VDP) Position", "addon": True,
+           "options": ["Not Required", "Front", "Back", "Both"], "section": "Add On",
+           "note": "Variable-data personalisation position — priced on request."}],
+    24:  [{"key": "diff_artwork", "label": "Different Artwork per Layer", "addon": True,
+           "options": ["No — Same Artwork", "Yes — Different Artwork"], "section": "Layers Configuration",
+           "note": "Artwork instruction — no price change."},
+          {"key": "copy_change", "label": "Copy Change", "addon": True,
+           "options": ["No Copy Change", "Yes — Add Copy Change"], "section": "Layers Configuration",
+           "note": "Per-set copy change — priced on request."}],
 }
+# Sample Proof (1 sheet) proof service — shared by both Label Sticker products.
+for _pid in (60, 61):
+    _SPA_EXTRA_FIELDS.setdefault(_pid, []).append(
+        {"key": "sample_proof", "label": "Sample Proof (1 sheet)", "addon": True,
+         "options": ["Not Required", "Yes (1 sheet)"], "section": "Add On",
+         "note": "Physical sample proof — priced on request."})
 
 
 def _attach_spa_extras(data):

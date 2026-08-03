@@ -18,6 +18,15 @@ FDIR = OUT / "v4_form"
 
 # Supplier section headers that are NOT product-config sections (delivery / quantity / chrome).
 _SKIP_SEC = {"delivery", "net price for deal", "add name", "quantity", "artwork", "summary", "add-on info"}
+
+# Shared-form template artefacts — controls the supplier form lists for a product but that aren't a
+# real option for IT (verified). Label-Sticker Letterpress (foil on limited stock) shares the digital
+# label form, so its print Paper/Package/Lamination/Cutting/Order-Type/Print-Colour aren't used;
+# Label-Sticker Digital's "Cutting Method" is subsumed by our shape category (Cut-to-Size == Rect).
+_NOT_OPTIONS = {
+    61: {"order type", "paper", "package", "lamination", "cutting method", "print colour", "category"},
+    60: {"cutting method"},
+}
 # control names that are page chrome / delivery / quantity / legacy ASP.NET internals — never a
 # real product option axis
 _SKIP_CTRL = re.compile(r"country|courier|qty|quantity|favourite|rush|track|custom.?size|"
@@ -33,6 +42,30 @@ def sec_label(name):
 
 def _clean_opts(opts):
     return [o for o in (opts or []) if o and not _JUNK.search(o.strip())]
+
+
+# Notation-tolerant token set: unifies supplier vs our wording so genuine matches aren't flagged
+# as gaps — swapped dimensions (105×148 == 148×105), filler words (Paper / Best Seller / (NEW) /
+# 2-sides-coated), and any "No X" / "None" negative == our "Not Required".
+_NEG = re.compile(r"not required|no required|not require|^\s*none\s*$|no lamination|no hot ?stamping|"
+                  r"no fold(ing)?|no cutting|not ?applicable", re.I)
+_FILLER = re.compile(r"best ?seller|2 ?sides? ?coated|\bpaper\b|\bnew\b|\bcolour\b|\bcolor\b", re.I)
+
+
+def _canon(s):
+    """Order-insensitive token set for a value (words >= 2 chars + numbers), after negatives and
+    filler words are normalised. Two values with the same set are the same option in different
+    wording (e.g. 'Pink A6 (108mm × 159mm)' == '108mm x 159mm - Pink A6', or
+    'Hot Stamping - 1 Colour (Front)' == '1C (Front)')."""
+    if _NEG.search(str(s)):
+        return frozenset({"__none__"})
+    s = str(s).lower().replace("×", "x")
+    s = re.sub(r"(\d+)\s*c\b|(\d+)\s*colours?", lambda m: (m.group(1) or m.group(2)) + "c", s)  # 1 Colour->1c
+    s = re.sub(r"laminat(e|ion)", "laminat", s)                       # Laminate == Lamination
+    s = re.sub(r"poly\s*p\w*ylene", "pp", s)                          # Polyprop(h)ylene typo
+    s = re.sub(r"hot ?stamping|hole ?punching|diameter|binding|side", " ", s)   # descriptor words
+    s = _FILLER.sub(" ", s)
+    return frozenset(re.findall(r"\d+c|[a-z]{2,}|\d+", s))
 
 
 def _sec_of_rows(rows):
@@ -56,9 +89,15 @@ def reconcile_one(prod, cap):
     for f in fields:
         our.append({"key": norm(f.get("key", "")), "label": norm(f.get("label", "")),
                     "opts": {norm(o) for o in (f.get("options") or []) if norm(o)},
+                    "canon": {_canon(o) for o in (f.get("options") or []) if str(o).strip()},
                     "section": f.get("section", "general"), "raw": f})
+    all_opts = {v for f in our for v in f["opts"]}          # every value selectable anywhere
+    all_canon = {c for f in our for c in f["canon"]}
+    not_options = _NOT_OPTIONS.get(prod.get("id"), set())
     presence, values, section = [], [], []
     for sec, c in _sec_of_rows(cap.get("rows", [])):
+        if (c.get("label", "").rstrip(" *").strip().lower()) in not_options:
+            continue                                        # shared-form template artefact for this product
         cname, clabel = norm(c.get("name", "")), norm(c.get("label", ""))
         copts = {norm(o) for o in _clean_opts(c.get("options"))}
         # match to our field: name/label containment, or strong option overlap
@@ -76,9 +115,13 @@ def reconcile_one(prod, cap):
             continue
         # Skip VALUE diff for dynamic cascade fields (no static options in our data — their values
         # are computed by localOptions from the same supplier cascade, so they can't be "missing").
+        def _present(o):
+            no = norm(o)
+            if any(no == v or no in v or v in no for v in all_opts):   # selectable anywhere on product
+                return True
+            return _canon(o) in all_canon                # notation-tolerant token-set match
         miss = [] if not matched["opts"] else [
-            o for o in _clean_opts(c.get("options")) if norm(o) not in matched["opts"]
-            and not any(norm(o) in v or v in norm(o) for v in matched["opts"])]
+            o for o in _clean_opts(c.get("options")) if not _present(o)]
         if miss:
             values.append({"control": c.get("label") or c.get("name"),
                            "field": matched["raw"].get("key"), "missing": miss[:12]})

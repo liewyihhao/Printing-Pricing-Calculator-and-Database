@@ -68,7 +68,8 @@
   "fields": {
    "model": "General",
    "sleeve": "General",
-   "fabric": "General"
+   "fabric": "General",
+   "vdp_position": "Shirt Vdp"
   },
   "order": [
    "General",
@@ -79,7 +80,8 @@
   "fields": {
    "model": "General",
    "sleeve": "General",
-   "fabric": "General"
+   "fabric": "General",
+   "vdp_position": "Shirt Vdp"
   },
   "order": [
    "General",
@@ -91,7 +93,8 @@
    "category": "General",
    "model": "General",
    "sleeve": "General",
-   "fabric": "General"
+   "fabric": "General",
+   "vdp_position": "Shirt Vdp"
   },
   "order": [
    "General",
@@ -102,7 +105,8 @@
   "fields": {
    "model": "General",
    "sleeve": "General",
-   "fabric": "General"
+   "fabric": "General",
+   "vdp_position": "Shirt Vdp"
   },
   "order": [
    "General",
@@ -149,6 +153,8 @@
    "papermaterials": "Layers Configuration",
    "layers": "Layers Configuration",
    "last_layer_perforation": "Layers Configuration",
+   "diff_artwork": "Layers Configuration",
+   "copy_change": "Layers Configuration",
    "paper_tint": "Layers Configuration",
    "printcolour": "Print Color",
    "numbering": "Finishing",
@@ -197,6 +203,7 @@
  },
  "60": {
   "fields": {
+   "sample_proof": "Product Type",
    "type": "Product Type",
    "category": "Product Type",
    "paper": "Product Spec",
@@ -213,6 +220,7 @@
  },
  "61": {
   "fields": {
+   "sample_proof": "Product Type",
    "category": "Product Type",
    "easy_peel": "Optional Finishing"
   },
