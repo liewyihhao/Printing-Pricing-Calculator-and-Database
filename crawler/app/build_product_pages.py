@@ -257,7 +257,7 @@ def build():
 
     by_cat = {k: [] for k, _l, _k in CATEGORIES}
     for p in prods:
-        by_cat[cat_of(p["name"])].append(p)
+        by_cat[cat_of(p["name"], p["id"])].append(p)
     for k in by_cat:
         by_cat[k].sort(key=lambda p: clean_name(p["name"]))
     cat_meta = [(k, l) for k, l, _ in CATEGORIES if by_cat[k]]
@@ -266,7 +266,7 @@ def build():
     ordered = [p for k, _l in cat_meta for p in by_cat[k]]
     n = 0
     for i, p in enumerate(ordered):
-        cat_key = cat_of(p["name"])
+        cat_key = cat_of(p["name"], p["id"])
         page = _page(p, cat_key, ordered[i - 1] if i else None,
                      ordered[i + 1] if i + 1 < len(ordered) else None)
         (PDIR / f"{slugify(p['name'])}.html").write_text(page, encoding="utf-8")

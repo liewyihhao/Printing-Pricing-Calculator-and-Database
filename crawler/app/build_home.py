@@ -38,7 +38,7 @@ def build():
     # category cards with a representative product's art + count
     by_cat = {k: [] for k, _l, _k in CATEGORIES}
     for p in prods:
-        by_cat[cat_of(p["name"])].append(p)
+        by_cat[cat_of(p["name"], p["id"])].append(p)
     cat_cards = []
     for key, label, _kw in CATEGORIES:
         items = by_cat.get(key) or []

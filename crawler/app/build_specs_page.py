@@ -27,34 +27,62 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "output"
 UI = ROOT / "ui"
 
+# Product categories mirror Excard's own catalogue taxonomy + display order. cat_of() defers to the
+# supplier's exact category for products we can map to the catalogue (authoritative — captures their
+# idiosyncrasies, e.g. Magnet & Hard-Cover Menu in Apparel & Gifts, Arch File in Misc), and falls
+# back to keywords for aliases/unmapped products.
 CATEGORIES = [
-    ("cards", "Cards & Stationery", ["business card", "pvc card", "name card", "letterhead",
-        "envelope", "folder", "kad ", "voucher", "computer form", "bookmark", "money packet",
-        "greeting card", "creative cut", "tent card", "id card", "lanyard", "stamp"]),
-    ("print", "Books & Pads", ["booklet", "notepad", "bill-book", "wire-o notebook", "loose sheet",
-        "brochure", "flyer", "customprint", "menu", "hard cover", "perfect bind"]),
-    ("stickers", "Stickers & Labels", ["sticker", "label", "magnet", "cling", "car sticker", "roll form"]),
-    ("signage", "Marketing & Signage", ["banner", "bunting", "roll-up", "wobbler", "hanger",
-        "standee", "poster", "foamboard", "pop display", "wind flag", "x-ccessories"]),
-    ("packaging", "Packaging & Bags", ["bag", "pouch", "box", "papan kopi", "sachet", "mask keeper",
-        "non-woven", "kotak", "food tray", "packaging"]),
-    ("calendar", "Calendars", ["calendar"]),
-    ("promo", "Promo & Apparel", ["mug", "pillow", "badge", "fan", "hand fan", "button", "canvas",
-        "arch file", "shirt", "jacket", "muslimah", "sweatshirt", "hoodies", "cap", "cooler", "toast"]),
+    ("cards", "Cards", ["business card", "pvc card", "name card", "kad ", "greeting card",
+        "creative cut", "tent card", "id card"]),
+    ("books", "Books & Stationery", ["booklet", "notepad", "bill-book", "notebook", "loose sheet",
+        "brochure", "flyer", "customprint", "menu", "hard cover", "perfect bind", "letterhead",
+        "folder", "arch file", "envelope", "computer form", "voucher", "bookmark"]),
+    ("stickers", "Stickers & Labels", ["sticker", "label", "magnet", "cling", "roll form", "uv dtf"]),
+    ("largeformat", "Large Format", ["banner", "bunting", "roll-up", "wobbler", "foamboard",
+        "pop display", "wind flag", "x-ccessories", "hanger"]),
+    ("packaging", "Packaging & Boxes", ["bag", "pouch", "box", "kotak", "food tray", "non-woven",
+        "papan kopi", "sachet", "mask keeper", "packaging", "vacuum", "seal", "toast"]),
+    ("calendar", "Calendars & Diary", ["calendar", "diary"]),
+    ("apparel", "Apparel & Gifts", ["mug", "pillow", "badge", "button", "fan", "canvas", "cooler",
+        "shirt", "jacket", "muslimah", "sweatshirt", "hoodies", "cap", "lanyard", "stamp"]),
+    ("moneypacket", "Money Packet", ["money packet"]),
+    ("misc", "Misc", []),
 ]
+_CAT_KEY_BY_LABEL = {l: k for k, l, _ in CATEGORIES}
 
 
-def cat_of(name):
-    n = (name or "").lower()
-    for key, _label, kws in CATEGORIES:
-        if key in ("promo",):
+def _excard_cat_by_id():
+    """Map our product id -> our category key, from the supplier catalogue's own category."""
+    f = OUT / "excard_catalogue.json"
+    if not f.is_file():
+        return {}
+    cat = json.loads(f.read_text(encoding="utf-8"))
+    out = {}
+    for it in cat.get("products", []):
+        key = _CAT_KEY_BY_LABEL.get(it.get("category"))
+        if not key:
             continue
-        if any(k in n for k in kws):
-            return key
+        for m in re.findall(r"\((\d+)\)", " ".join(it.get("built_as", []))):
+            out[int(m)] = key
+    return out
+
+
+_EXCARD_CAT_BY_ID = None
+
+
+def cat_of(name, pid=None):
+    global _EXCARD_CAT_BY_ID
+    if _EXCARD_CAT_BY_ID is None:
+        _EXCARD_CAT_BY_ID = _excard_cat_by_id()
+    if pid is not None and pid in _EXCARD_CAT_BY_ID:
+        return _EXCARD_CAT_BY_ID[pid]
+    n = (name or "").lower()
+    if "money packet" in n:                 # specific: beats "envelope"/"packaging" keywords
+        return "moneypacket"
     for key, _label, kws in CATEGORIES:
-        if key == "promo" and any(k in n for k in kws):
-            return "promo"
-    return "print"
+        if kws and any(k in n for k in kws):
+            return key
+    return "misc"
 
 
 SKIP_FIELD = {"custom_w", "custom_h"}
@@ -113,7 +141,7 @@ def build():
     # group
     by_cat = {key: [] for key, _l, _k in CATEGORIES}
     for p in prods:
-        by_cat[cat_of(p["name"])].append(p)
+        by_cat[cat_of(p["name"], p["id"])].append(p)
     for key in by_cat:
         by_cat[key].sort(key=lambda p: clean_name(p["name"]))
 

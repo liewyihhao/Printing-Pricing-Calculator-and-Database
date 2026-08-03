@@ -71,25 +71,15 @@ def _resolve_bizcard_fields(fields: list, selected: dict | None = None) -> list:
             result.append(f)
     return result
 
-_CATS = [
-    ("Cards & Stationery", ["business card", "pvc card", "name card", "letterhead", "envelope",
-                            "folder", "kad ", "voucher", "computer form", "bookmark", "money packet"]),
-    ("Books & Pads", ["booklet", "notepad", "bill-book", "wire-o notebook", "loose sheet",
-                      "brochure", "flyer", "customprint", "menu", "hard cover"]),
-    ("Stickers & Labels", ["sticker", "label", "magnet", "cling", "car sticker"]),
-    ("Marketing & Signage", ["banner", "bunting", "roll-up", "wobbler", "hanger", "standee"]),
-    ("Packaging & Bags", ["bag", "pouch", "box", "papan kopi", "sachet", "mask keeper", "non-woven"]),
-    ("Calendars", ["calendar"]),
-    ("Promo & Gifts", ["mug", "pillow", "badge", "fan", "button", "canvas", "arch file"]),
-]
+# One source of truth for categories: Excard's own catalogue taxonomy (see build_specs_page).
+from app.build_specs_page import cat_of as _cat_of, CATEGORIES as _CATEGORIES  # noqa: E402
+_CAT_LABEL = {k: l for k, l, _ in _CATEGORIES}
 
 
-def _category(name: str) -> str:
-    n = name.lower()
-    for cat, kws in _CATS:
-        if any(k in n for k in kws):
-            return cat
-    return "Other"
+def _category_of(p) -> str:
+    return _CAT_LABEL.get(_cat_of(p.get("name", ""), p.get("id")), "Misc")
+
+
 
 
 def _pricing_type(p) -> str:
@@ -99,7 +89,7 @@ def _pricing_type(p) -> str:
 
 
 def _summary(p):
-    return {"id": p["id"], "name": p["name"], "category": _category(p["name"]),
+    return {"id": p["id"], "name": p["name"], "category": _category_of(p),
             "pricing_type": _pricing_type(p)}
 
 
@@ -133,7 +123,7 @@ def _detail(p):
                 }
         validity = {"primary": "cardType", "fields": ["size", "paper", "colour"], "rules": rules}
 
-    return {"id": p["id"], "name": p["name"], "category": _category(p["name"]),
+    return {"id": p["id"], "name": p["name"], "category": _category_of(p),
             "pricing_type": _pricing_type(p), "markup": p.get("markup", 1.0),
             "fields": fields, "validity": validity,
             "quantity": _quantity_of(p),
