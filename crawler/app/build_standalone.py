@@ -1333,6 +1333,34 @@ _SEC_ADDON = ("envelope", "extra", "rope", "fitting", "ribbon", "insert", "cd se
               "numbering", "packing method", "packingmethod", "jawi", "eyelet")
 
 
+# SPA-only controls the www audit can't see, surfaced by the live v4 capture (v4_reconcile presence
+# gaps). Added as display-only fields so the configurator is option-complete; anything that may add
+# cost is marked priced-on-request (real pricing is the later phase). Section from the live form.
+_SPA_EXTRA_FIELDS = {
+    60:  [{"key": "easy_peel", "label": "Easy Peel", "options": ["Not Required", "Yes"], "addon": True,
+           "section": "Optional Finishing", "note": "Easy-peel backing slit — priced on request."}],
+    61:  [{"key": "easy_peel", "label": "Easy Peel", "options": ["Not Required", "Yes"], "addon": True,
+           "section": "Optional Finishing", "note": "Easy-peel backing slit — priced on request."}],
+    180: [{"key": "fabric", "label": "Fabric", "options": ["Polysoft 150gsm"], "section": "General"}],
+    181: [{"key": "fabric", "label": "Fabric", "options": ["Lycra 270gsm"], "section": "General"}],
+    183: [{"key": "fabric", "label": "Fabric", "options": ["Lycra 270gsm"], "section": "General"}],
+}
+
+
+def _attach_spa_extras(data):
+    """Add the SPA-only controls the www audit misses (Label-Sticker Easy Peel, apparel Fabric)."""
+    added = 0
+    for p in data["products"]:
+        for fd in _SPA_EXTRA_FIELDS.get(p["id"], []):
+            if any(f.get("key") == fd["key"] for f in p.get("fields", [])):
+                continue
+            f = dict(fd); f.setdefault("depends", [])
+            p.setdefault("fields", []).append(f)
+            added += 1
+    if added:
+        print(f"spa extras: +{added} SPA-only display controls")
+
+
 def _section_of(f):
     """Heuristic section LABEL for products/fields the live-form capture didn't cover."""
     s = ((f.get("key") or "") + " " + (f.get("label") or "")).lower()
@@ -1364,7 +1392,7 @@ def _assign_sections(data):
             if sec:
                 exact += 1
             else:
-                sec = _section_of(f)
+                sec = f.get("section") or _section_of(f)   # keep an explicitly-injected section
             f["section"] = sec
             if sec not in used:
                 used.append(sec)
@@ -1469,6 +1497,7 @@ def main():
     from app.auto_parity import attach as _attach_auto_parity
     _t, _a = _attach_auto_parity(data)
     print(f"option parity: +{_a} single-option controls across {_t} products")
+    _attach_spa_extras(data)          # SPA-only controls (Easy Peel, apparel Fabric)
     _attach_images(data)     # after auto_parity, so images can attach to inc_* single-option fields
     _mark_colour_swatches(data)   # render foil/ink/rope colour pickers as colour swatches
     _assign_sections(data)        # tag fields with Excard sections (General/Finishing/Add On)

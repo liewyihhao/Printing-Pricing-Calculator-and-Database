@@ -64,88 +64,11 @@
    "Add On"
   ]
  },
- "109": {
-  "fields": {
-   "roundcorner": "Optional Finishing",
-   "holepunch": "Optional Finishing"
-  },
-  "order": [
-   "Optional Finishing"
-  ]
- },
- "110": {
-  "fields": {
-   "ex_printcolour": "Content",
-   "perforation": "Content"
-  },
-  "order": [
-   "Content"
-  ]
- },
- "114": {
-  "fields": {
-   "hot_stamping": "Optional Finishing"
-  },
-  "order": [
-   "Optional Finishing",
-   "Add On"
-  ]
- },
- "115": {
-  "fields": {
-   "holepunch": "Optional Finishing"
-  },
-  "order": [
-   "Optional Finishing"
-  ]
- },
- "117": {
-  "fields": {
-   "vdptype": "Other Finishing"
-  },
-  "order": [
-   "Other Finishing"
-  ]
- },
- "154": {
-  "fields": {
-   "butterflystand": "Add On"
-  },
-  "order": [
-   "Add On"
-  ]
- },
- "163": {
-  "fields": {
-   "innerfrontcontent": "Content",
-   "additionalcontent": "Additional Custom Design"
-  },
-  "order": [
-   "Content",
-   "Additional Custom Design"
-  ]
- },
- "164": {
-  "fields": {
-   "innerprintcolour": "Inner Paper"
-  },
-  "order": [
-   "Cover Finishing",
-   "Inner Paper"
-  ]
- },
- "175": {
-  "fields": {
-   "standlamination": "Stand"
-  },
-  "order": [
-   "Stand"
-  ]
- },
  "180": {
   "fields": {
    "model": "General",
-   "sleeve": "General"
+   "sleeve": "General",
+   "fabric": "General"
   },
   "order": [
    "General",
@@ -155,7 +78,8 @@
  "181": {
   "fields": {
    "model": "General",
-   "sleeve": "General"
+   "sleeve": "General",
+   "fabric": "General"
   },
   "order": [
    "General",
@@ -177,7 +101,8 @@
  "183": {
   "fields": {
    "model": "General",
-   "sleeve": "General"
+   "sleeve": "General",
+   "fabric": "General"
   },
   "order": [
    "General",
@@ -277,7 +202,8 @@
    "paper": "Product Spec",
    "colour": "Product Spec",
    "package": "Product Spec",
-   "finishing": "Product Spec"
+   "finishing": "Product Spec",
+   "easy_peel": "Optional Finishing"
   },
   "order": [
    "Product Type",
@@ -287,7 +213,8 @@
  },
  "61": {
   "fields": {
-   "category": "Product Type"
+   "category": "Product Type",
+   "easy_peel": "Optional Finishing"
   },
   "order": [
    "Product Type",

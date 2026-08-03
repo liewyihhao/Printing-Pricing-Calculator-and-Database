@@ -18,9 +18,10 @@ FDIR = OUT / "v4_form"
 
 # Supplier section headers that are NOT product-config sections (delivery / quantity / chrome).
 _SKIP_SEC = {"delivery", "net price for deal", "add name", "quantity", "artwork", "summary", "add-on info"}
-# control names that are page chrome / delivery / quantity, never a product option
+# control names that are page chrome / delivery / quantity / legacy ASP.NET internals — never a
+# real product option axis
 _SKIP_CTRL = re.compile(r"country|courier|qty|quantity|favourite|rush|track|custom.?size|"
-                        r"^ddlproduct$|review|otherorder|^$", re.I)
+                        r"^ddlproduct$|review|otherorder|ctl00|order_spec|dnn|__|^$", re.I)
 # placeholder / non-value options: "-- Select Size --", "- Please Select -", "Not Required", etc.
 _JUNK = re.compile(r"^\s*-*\s*(please\s*)?select\b|^\s*-{1,}\s*$|^\s*-{2}|not required|^none$|^$", re.I)
 
