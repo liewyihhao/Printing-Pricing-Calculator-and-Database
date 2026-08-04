@@ -1,46 +1,4 @@
 {
- "101": {
-  "name": "Brochure",
-  "presence": [],
-  "values": [
-   {
-    "control": "Paper *",
-    "field": "paper",
-    "missing": [
-     "Gloss Art Paper 80gsm - Best Seller (NEW)"
-    ]
-   }
-  ],
-  "sections": []
- },
- "102": {
-  "name": "Flyer",
-  "presence": [],
-  "values": [
-   {
-    "control": "Paper *",
-    "field": "paper",
-    "missing": [
-     "Gloss Art Paper 80gsm - Best Seller (NEW)"
-    ]
-   }
-  ],
-  "sections": []
- },
- "103": {
-  "name": "Customprint",
-  "presence": [],
-  "values": [
-   {
-    "control": "Paper *",
-    "field": "paper",
-    "missing": [
-     "Gloss Art Paper 80gsm - Best Seller (NEW)"
-    ]
-   }
-  ],
-  "sections": []
- },
  "19": {
   "name": "Booklet — Litho (Offset)",
   "presence": [],
@@ -53,20 +11,6 @@
     "our_section": "Cover"
    }
   ]
- },
- "21": {
-  "name": "Loose Sheet — Litho (Offset)",
-  "presence": [],
-  "values": [
-   {
-    "control": "Paper *",
-    "field": "paper",
-    "missing": [
-     "Gloss Art Paper 80gsm - Best Seller (NEW)"
-    ]
-   }
-  ],
-  "sections": []
  },
  "37": {
   "name": "Booklet — Digital",
