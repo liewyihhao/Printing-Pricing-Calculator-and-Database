@@ -1395,6 +1395,87 @@ def _section_of(f):
     return "General"
 
 
+def _loose_sheet_exact(data):
+    """Loose Sheet Litho family (21 + Brochure/Flyer/Customprint 101/102/103): replicate Excard's
+    EXACT conditional validity so our valid-combo space matches 1-to-1:
+      - Print Colour: 1C only for Simili paper (Gloss papers are 4C-only)   [validity, primary=paper]
+      - Lamination: shown ONLY for coated Gloss Art Card, in the General section   [showWhen paper]
+      - Folding Type for thin papers vs Creasing Type for card   [showWhen paper]
+      - Hole Punching: not on A1 / 4xA4   [showWhen size]; Hot Stamping + Perforation exposed
+    Structure/labels are exact; lamination option labels + exact per-size prices are refined in a
+    later CheckPrice re-sample (rules-first)."""
+    by_id = {p["id"]: p for p in data["products"]}
+    for pid in (21, 101, 102, 103):
+        p = by_id.get(pid)
+        if not p:
+            continue
+        fields = {f["key"]: f for f in p["fields"]}
+        papers = (fields.get("paper", {}) or {}).get("options", []) or []
+        sizes = (fields.get("size", {}) or {}).get("options", []) or []
+        cards = [pp for pp in papers if "Gloss Art Card" in pp]
+        thin = [pp for pp in papers if "Gloss Art Card" not in pp]
+        similis = [pp for pp in papers if "Simili" in pp]
+
+        # 1) Print Colour restricted by paper (1C only for Simili)
+        col = fields.get("colour")
+        if col and col.get("options"):
+            base = col["options"]
+            only4c = [c for c in base if c.strip().startswith("4C")] or base
+            p["validity"] = {"primary": "paper", "fields": ["colour"],
+                             "rules": {pp: {"colour": (base if pp in similis else only4c)} for pp in papers}}
+
+        # 2) Lamination -> General, only for coated Gloss Art Card
+        lam = fields.get("lamination")
+        if lam:
+            lam["section"] = "General"
+            lam["showWhen"] = {"field": "paper", "values": cards}
+            lam.setdefault("note", "Lamination is available for coated Gloss Art Card only.")
+
+        # 3) Folding (thin papers) vs Creasing (card)
+        fold = fields.get("fold")
+        if fold:
+            fold["label"] = "Folding"
+            fold["showWhen"] = {"field": "paper", "values": thin}
+
+        # 4) Add the finishing controls Excard shows (display-only; folding/finishing quoted
+        #    separately). Creasing = card only; Hole Punching = not A1/4xA4.
+        hole_hide = [s for s in sizes if "A1" in s or "4xA4" in s or "4×A4" in s]
+        extras = [
+            {"key": "creasing", "label": "Creasing", "addon": True, "depends": [], "section": "Optional Finishing",
+             "options": ["Not Required", "Required"], "showWhen": {"field": "paper", "values": cards},
+             "note": "Creasing (for thick card) — quoted separately."},
+            {"key": "hole_punching", "label": "Hole Punching", "addon": True, "depends": [], "section": "Optional Finishing",
+             "options": ["Not Required", "Hole Punching (3mm)", "Hole Punching (6mm)"],
+             "showWhen": {"field": "size", "notValues": hole_hide},
+             "note": "1 hole at centre of the selected edge. Not for A1 / 4xA4, and not with Folding / Creasing / Perforation."},
+            {"key": "hot_stamping", "label": "Hot Stamping", "addon": True, "depends": [], "section": "Optional Finishing",
+             "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"],
+             "note": "1 side only (Front OR Back). Max 2 colours. Block quoted separately."},
+            {"key": "perforation", "label": "Perforation", "addon": True, "depends": [], "section": "Optional Finishing",
+             "options": ["Not Required"] + [f"Perforation - {i} Line" + ("s" if i > 1 else "") for i in range(1, 7)],
+             "note": "1-6 lines, minimum 45mm gap. Not with Folding / Creasing / Hole Punching. Quoted separately."},
+        ]
+        for nf in extras:
+            if nf["key"] not in fields:
+                p["fields"].append(nf)
+                fields[nf["key"]] = nf
+
+        # 5) Exact Excard field order + sections
+        order = ["size", "paper", "colour", "package", "lamination", "custom_w", "custom_h",
+                 "fold", "creasing", "hole_punching", "hot_stamping", "perforation", "envelope"]
+        sec = {"size": "General", "paper": "General", "colour": "General", "package": "General",
+               "lamination": "General", "custom_w": "General", "custom_h": "General",
+               "fold": "Optional Finishing", "creasing": "Optional Finishing",
+               "hole_punching": "Optional Finishing", "hot_stamping": "Optional Finishing",
+               "perforation": "Optional Finishing", "envelope": "Add On"}
+        for f in p["fields"]:
+            if f["key"] in sec:
+                f["section"] = sec[f["key"]]
+        p["fields"].sort(key=lambda f: order.index(f["key"]) if f["key"] in order else 99)
+        p["sectionOrder"] = ["General", "Optional Finishing", "Add On"]
+    print("loose-sheet: applied exact Excard validity (lamination/colour/folding-creasing/hole-punch) to 21,101,102,103")
+
+
 def _assign_sections(data):
     """Tag every field with the Excard order-form section it belongs to, so the calculator can
     render General / Optional Finishing / Add On headers like the supplier's form. Prefer the EXACT
@@ -1530,6 +1611,7 @@ def main():
     from app.field_order import reorder as _reorder_fields
     _fn, _fc = _reorder_fields(data)
     print(f"field order: {_fc}/{_fn} products resequenced to the supplier's option order")
+    _loose_sheet_exact(data)      # exact Excard conditional validity for the loose-sheet family
     _attach_art(data)
     from app.product_quantity import attach as _attach_quantity
     _n, _hit = _attach_quantity(data)
