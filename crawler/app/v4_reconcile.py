@@ -26,6 +26,9 @@ _SKIP_SEC = {"delivery", "net price for deal", "add name", "quantity", "artwork"
 _NOT_OPTIONS = {
     61: {"order type", "paper", "package", "lamination", "cutting method", "print colour", "category"},
     60: {"cutting method"},
+    # Booklet CONTENT "Lamination" is a fixed single value ("No Lamination") — inner content pages
+    # aren't laminated; it's not a real axis (cover lamination is a separate control we do expose).
+    19: {"lamination"}, 37: {"lamination"},
 }
 # control names that are page chrome / delivery / quantity / legacy ASP.NET internals — never a
 # real product option axis
