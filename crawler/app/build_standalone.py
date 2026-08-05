@@ -1446,13 +1446,21 @@ def _loose_sheet_exact(data):
              "note": "Creasing (for thick card) — quoted separately."},
             {"key": "hole_punching", "label": "Hole Punching", "addon": True, "depends": [], "section": "Optional Finishing",
              "options": ["Not Required", "Hole Punching (3mm)", "Hole Punching (6mm)"],
-             "showWhen": {"field": "size", "notValues": hole_hide},
+             # not on A1/4xA4, and mutually exclusive with Folding / Creasing / Perforation
+             "showWhen": {"all": [{"field": "size", "notValues": hole_hide},
+                                  {"field": "fold", "values": ["None"]},
+                                  {"field": "creasing", "values": ["Not Required"]},
+                                  {"field": "perforation", "values": ["Not Required"]}]},
              "note": "1 hole at centre of the selected edge. Not for A1 / 4xA4, and not with Folding / Creasing / Perforation."},
             {"key": "hot_stamping", "label": "Hot Stamping", "addon": True, "depends": [], "section": "Optional Finishing",
              "options": ["Not Required", "1C (Front)", "1C (Back)", "2C (Front)", "2C (Back)"],
              "note": "1 side only (Front OR Back). Max 2 colours. Block quoted separately."},
             {"key": "perforation", "label": "Perforation", "addon": True, "depends": [], "section": "Optional Finishing",
              "options": ["Not Required"] + [f"Perforation - {i} Line" + ("s" if i > 1 else "") for i in range(1, 7)],
+             # mutually exclusive with Folding / Creasing / Hole Punching
+             "showWhen": {"all": [{"field": "fold", "values": ["None"]},
+                                  {"field": "creasing", "values": ["Not Required"]},
+                                  {"field": "hole_punching", "values": ["Not Required"]}]},
              "note": "1-6 lines, minimum 45mm gap. Not with Folding / Creasing / Hole Punching. Quoted separately."},
         ]
         for nf in extras:

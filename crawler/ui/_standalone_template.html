@@ -1102,11 +1102,16 @@ function enforceValidity(){
 // Show/hide fields that only apply for certain values of another field (e.g. hot-stamping
 // foil colour + area only when hot stamping is selected). showWhen = {field, values?, notValues?}.
 // Whether a field is currently applicable given its showWhen parent (no showWhen ⇒ always shown).
+function condMet(c){
+  const el=$(`f_${c.field}`);
+  const cur=(S.values[c.field]!=null && S.values[c.field]!=="")?S.values[c.field]:(el?el.value:"");
+  return c.values ? c.values.indexOf(cur)>=0 : (c.notValues ? c.notValues.indexOf(cur)<0 : true);
+}
+// showWhen = {field, values?|notValues?}  OR  {all:[cond,...]} (every cond must hold, for mutual
+// exclusions like hole-punch vs folding/perforation).
 function fieldShown(f){
   const sw=f.showWhen; if(!sw) return true;
-  const el=$(`f_${sw.field}`);
-  const cur=(S.values[sw.field]!=null && S.values[sw.field]!=="")?S.values[sw.field]:(el?el.value:"");
-  return sw.values ? sw.values.indexOf(cur)>=0 : (sw.notValues ? sw.notValues.indexOf(cur)<0 : true);
+  return sw.all ? sw.all.every(condMet) : condMet(sw);
 }
 function updateFieldVis(){
   for(const f of (S.fields||[])){ const wrap=$(`fw_${f.key}`); if(!f.showWhen||!wrap) continue;
