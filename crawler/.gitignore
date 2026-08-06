@@ -25,3 +25,8 @@ output/*
 !output/v4_form/**
 !output/field_sections.json
 !output/v4_parity_report.json
+
+# Live-form conditional-validity captures — build_standalone/validity_apply read these to
+# generate exact showWhen/validity rules, so keep them tracked.
+!output/validity/
+!output/validity/**

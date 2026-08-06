@@ -1404,6 +1404,7 @@ def _loose_sheet_exact(data):
       - Hole Punching: not on A1 / 4xA4   [showWhen size]; Hot Stamping + Perforation exposed
     Structure/labels are exact; lamination option labels + exact per-size prices are refined in a
     later CheckPrice re-sample (rules-first)."""
+    import re
     by_id = {p["id"]: p for p in data["products"]}
     for pid in (21, 101, 102, 103):
         p = by_id.get(pid)
@@ -1412,9 +1413,20 @@ def _loose_sheet_exact(data):
         fields = {f["key"]: f for f in p["fields"]}
         papers = (fields.get("paper", {}) or {}).get("options", []) or []
         sizes = (fields.get("size", {}) or {}).get("options", []) or []
-        cards = [pp for pp in papers if "Gloss Art Card" in pp]
-        thin = [pp for pp in papers if "Gloss Art Card" not in pp]
         similis = [pp for pp in papers if "Simili" in pp]
+        # Thickness-based rule captured from the live form (exact): lamination on coated card OR any
+        # coated paper >=150gsm (Gloss/Matte Art Paper 150gsm); creasing on card OR Simili >=140gsm
+        # OR Matte >=150gsm; folding on everything else. (Not the simplistic "Gloss Art Card".)
+        def _gsm(s):
+            m = re.search(r"(\d+)\s*gsm", s, re.I)
+            return int(m.group(1)) if m else 0
+        cards = [pp for pp in papers if "Gloss Art Card" in pp]
+        lam_papers = [pp for pp in papers if "Gloss Art Card" in pp
+                      or (("Gloss Art Paper" in pp or "Matte Art Paper" in pp) and _gsm(pp) >= 150)]
+        crease_papers = [pp for pp in papers if "Gloss Art Card" in pp
+                         or ("Simili" in pp and _gsm(pp) >= 140) or ("Matte Art Paper" in pp and _gsm(pp) >= 150)]
+        fold_papers = [pp for pp in papers if pp not in crease_papers]
+        thin = fold_papers
 
         # 1) Print Colour restricted by paper (1C only for Simili)
         col = fields.get("colour")
@@ -1428,7 +1440,7 @@ def _loose_sheet_exact(data):
         lam = fields.get("lamination")
         if lam:
             lam["section"] = "General"
-            lam["showWhen"] = {"field": "paper", "values": cards}
+            lam["showWhen"] = {"field": "paper", "values": lam_papers}
             lam.setdefault("note", "Lamination is available for coated Gloss Art Card only.")
 
         # 3) Folding (thin papers) vs Creasing (card)
@@ -1442,7 +1454,7 @@ def _loose_sheet_exact(data):
         hole_hide = [s for s in sizes if "A1" in s or "4xA4" in s or "4×A4" in s]
         extras = [
             {"key": "creasing", "label": "Creasing", "addon": True, "depends": [], "section": "Optional Finishing",
-             "options": ["Not Required", "Required"], "showWhen": {"field": "paper", "values": cards},
+             "options": ["Not Required", "Required"], "showWhen": {"field": "paper", "values": crease_papers},
              "note": "Creasing (for thick card) — quoted separately."},
             {"key": "hole_punching", "label": "Hole Punching", "addon": True, "depends": [], "section": "Optional Finishing",
              "options": ["Not Required", "Hole Punching (3mm)", "Hole Punching (6mm)"],
@@ -1620,6 +1632,8 @@ def main():
     _fn, _fc = _reorder_fields(data)
     print(f"field order: {_fc}/{_fn} products resequenced to the supplier's option order")
     _loose_sheet_exact(data)      # exact Excard conditional validity for the loose-sheet family
+    from app.validity_apply import apply as _apply_validity
+    _apply_validity(data)         # capture-driven exact showWhen/validity for all flagged products
     _attach_art(data)
     from app.product_quantity import attach as _attach_quantity
     _n, _hit = _attach_quantity(data)
