@@ -1516,6 +1516,34 @@ def _loose_sheet_exact(data):
     print("loose-sheet: applied exact Excard validity (lamination/colour/folding-creasing/hole-punch) to 21,101,102,103")
 
 
+def _sticker_validity(data):
+    """Label / die-cut stickers: the size inputs depend on the chosen shape (Category) — Round shows
+    Diameter, other shapes show Height + Width, and die-cut shapes show the Dieline upload. Add the
+    exact showWhen so invalid combos (e.g. Diameter on a rectangle) can't be entered."""
+    n = 0
+    for p in data["products"]:
+        if p.get("engine") != "sticker":
+            continue
+        fields = {f["key"]: f for f in p["fields"]}
+        cats = (fields.get("category") or {}).get("options") or []
+        if not cats:
+            continue
+        round_cats = [c for c in cats if "Round" in c]
+        dieline_cats = [c for c in cats if "Die-Cut" in c or "Die Cut" in c or "Dieline" in c]
+        if fields.get("diameter") and round_cats:
+            fields["diameter"]["showWhen"] = {"field": "category", "values": round_cats}
+            n += 1
+        for k in ("height", "width"):
+            if fields.get(k) and round_cats:
+                fields[k]["showWhen"] = {"field": "category", "notValues": round_cats}
+                n += 1
+        if fields.get("dielines") and dieline_cats:
+            fields["dielines"]["showWhen"] = {"field": "category", "values": dieline_cats}
+            n += 1
+    if n:
+        print(f"sticker validity: {n} shape-conditional size inputs")
+
+
 def _assign_sections(data):
     """Tag every field with the Excard order-form section it belongs to, so the calculator can
     render General / Optional Finishing / Add On headers like the supplier's form. Prefer the EXACT
@@ -1654,6 +1682,7 @@ def main():
     _loose_sheet_exact(data)      # exact Excard conditional validity for the loose-sheet family
     from app.validity_apply import apply as _apply_validity
     _apply_validity(data)         # capture-driven exact showWhen/validity for all flagged products
+    _sticker_validity(data)       # sticker shape -> size-input conditionals
     _attach_art(data)
     from app.product_quantity import attach as _attach_quantity
     _n, _hit = _attach_quantity(data)
