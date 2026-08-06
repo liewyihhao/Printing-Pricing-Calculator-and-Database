@@ -1474,6 +1474,23 @@ def _loose_sheet_exact(data):
                                   {"field": "creasing", "values": ["Not Required"]},
                                   {"field": "hole_punching", "values": ["Not Required"]}]},
              "note": "1-6 lines, minimum 45mm gap. Not with Folding / Creasing / Hole Punching. Quoted separately."},
+            # --- sub-controls Excard reveals when a finishing option is chosen (display-only) ---
+            {"key": "hs_size", "label": "Hot Stamping — Size", "addon": True, "depends": [], "section": "Optional Finishing",
+             "options": ["90mm x 30mm", "90mm x 70mm", "95mm x 206mm", "101mm x 144mm",
+                         "144mm x 206mm", "194mm x 206mm", "206mm x 294mm"],
+             "showWhen": {"field": "hot_stamping", "notValues": ["Not Required"]},
+             "note": "Hot-stamp block area (1 side only, Front OR Back). Block/foil quoted separately."},
+            {"key": "hs_colour", "label": "Hot Stamping — Foil Colour", "addon": True, "depends": [], "section": "Optional Finishing",
+             "options": ["Gold", "Silver", "Black", "Blue", "Green", "Red"], "swatch": True,
+             "showWhen": {"field": "hot_stamping", "notValues": ["Not Required"]}, "note": "Foil colour (max 2)."},
+            {"key": "perforation_side", "label": "Perforation Side", "addon": True, "depends": [], "section": "Optional Finishing",
+             "options": ["Long edge (landscape)", "Short edge"],
+             "showWhen": {"field": "perforation", "notValues": ["Not Required"]},
+             "note": "Which edge the lines run along; per-panel widths (min 45mm gap) quoted separately."},
+            {"key": "hole_punch_position", "label": "Hole Punch Position", "addon": True, "depends": [], "section": "Optional Finishing",
+             "options": ["Centre of selected edge"],
+             "showWhen": {"field": "hole_punching", "notValues": ["Not Required"]},
+             "note": "1 hole at the centre of the selected edge."},
         ]
         for nf in extras:
             if nf["key"] not in fields:
@@ -1482,12 +1499,15 @@ def _loose_sheet_exact(data):
 
         # 5) Exact Excard field order + sections
         order = ["size", "paper", "colour", "package", "lamination", "custom_w", "custom_h",
-                 "fold", "creasing", "hole_punching", "hot_stamping", "perforation", "envelope"]
+                 "fold", "creasing", "hole_punching", "hole_punch_position",
+                 "hot_stamping", "hs_size", "hs_colour", "perforation", "perforation_side", "envelope"]
         sec = {"size": "General", "paper": "General", "colour": "General", "package": "General",
                "lamination": "General", "custom_w": "General", "custom_h": "General",
                "fold": "Optional Finishing", "creasing": "Optional Finishing",
-               "hole_punching": "Optional Finishing", "hot_stamping": "Optional Finishing",
-               "perforation": "Optional Finishing", "envelope": "Add On"}
+               "hole_punching": "Optional Finishing", "hole_punch_position": "Optional Finishing",
+               "hot_stamping": "Optional Finishing", "hs_size": "Optional Finishing",
+               "hs_colour": "Optional Finishing", "perforation": "Optional Finishing",
+               "perforation_side": "Optional Finishing", "envelope": "Add On"}
         for f in p["fields"]:
             if f["key"] in sec:
                 f["section"] = sec[f["key"]]
