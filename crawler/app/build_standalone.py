@@ -1565,6 +1565,34 @@ def _finishing_subcontrols(data):
         print(f"finishing sub-controls: {n} conditional fields")
 
 
+def _strip_placeholder_options(data):
+    """Clean placeholder options that leaked from the supplier capture: drop '-' / '' entirely, and
+    DEDUPLICATE 'N/A' (keep one — it can be the legitimate 'none' choice, e.g. no lamination). Keeps
+    at least one option."""
+    n = 0
+    for p in data["products"]:
+        for f in p["fields"]:
+            opts = f.get("options")
+            if not opts:
+                continue
+            out, seen_na = [], False
+            for o in opts:
+                s = str(o).strip()
+                if s in ("-", ""):
+                    n += 1
+                    continue
+                if s.upper() == "N/A":
+                    if seen_na:
+                        n += 1
+                        continue
+                    seen_na = True
+                out.append(o)
+            if out and len(out) != len(opts):
+                f["options"] = out
+    if n:
+        print(f"placeholder cleanup: stripped {n} '-' / duplicate-N/A options")
+
+
 def _notebook_content_validity(data):
     """Wire-O notebooks: the additional-content paper choices reveal by sheet count — Add 4 Sheets
     shows Paper 1-4; Add 8 shows Paper 1-8; Add 12 shows Paper 1-12. Add showWhen on
@@ -1804,6 +1832,7 @@ def main():
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
     _notebook_content_validity(data)  # additional-content sheet count -> content-paper visibility
+    _strip_placeholder_options(data)  # remove 'N/A' / '-' placeholder options catalogue-wide
     _attach_art(data)
     from app.product_quantity import attach as _attach_quantity
     _n, _hit = _attach_quantity(data)
