@@ -1565,6 +1565,43 @@ def _finishing_subcontrols(data):
         print(f"finishing sub-controls: {n} conditional fields")
 
 
+def _notebook_content_validity(data):
+    """Wire-O notebooks: the additional-content paper choices reveal by sheet count — Add 4 Sheets
+    shows Paper 1-4; Add 8 shows Paper 1-8; Add 12 shows Paper 1-12. Add showWhen on
+    paper1to4/5to8/9to12 (+ the additional print colour) based on `additionalcontent`, and strip the
+    '-' placeholder options."""
+    import re
+    n = 0
+    for p in data["products"]:
+        fields = {f["key"]: f for f in p["fields"]}
+        ac = fields.get("additionalcontent")
+        if not ac or "paper1to4" not in fields:
+            continue
+        opts = ac.get("options") or []
+
+        def _sheets(o):
+            m = re.search(r"(\d+)\s*sheet", o, re.I)
+            return int(m.group(1)) if m else 0
+        for key, need in (("paper1to4", 1), ("paper5to8", 5), ("paper9to12", 9)):
+            fld = fields.get(key)
+            if not fld:
+                continue
+            fld["options"] = [o for o in (fld.get("options") or []) if str(o).strip() not in ("-", "")]
+            vals = [o for o in opts if _sheets(o) >= need]
+            if vals:
+                fld["showWhen"] = {"field": "additionalcontent", "values": vals}
+                n += 1
+        pc = fields.get("printcolour")                 # additional-content print colour
+        if pc:
+            pc["options"] = [o for o in (pc.get("options") or []) if str(o).strip() not in ("-", "")]
+            nonreq = [o for o in opts if _sheets(o) > 0]
+            if nonreq:
+                pc["showWhen"] = {"field": "additionalcontent", "values": nonreq}
+                n += 1
+    if n:
+        print(f"notebook content validity: {n} conditional fields")
+
+
 def _cover_content_validity(data):
     """Hard Cover Menu etc.: an Order Type of 'Cover + Content' / 'Cover only' / 'Content Only'
     should show only the relevant spec fields — cover paper/size when a cover is ordered, content
@@ -1766,6 +1803,7 @@ def main():
     _sticker_validity(data)       # sticker shape -> size-input conditionals
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
+    _notebook_content_validity(data)  # additional-content sheet count -> content-paper visibility
     _attach_art(data)
     from app.product_quantity import attach as _attach_quantity
     _n, _hit = _attach_quantity(data)
