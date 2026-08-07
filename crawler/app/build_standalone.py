@@ -1565,6 +1565,38 @@ def _finishing_subcontrols(data):
         print(f"finishing sub-controls: {n} conditional fields")
 
 
+def _cover_content_validity(data):
+    """Hard Cover Menu etc.: an Order Type of 'Cover + Content' / 'Cover only' / 'Content Only'
+    should show only the relevant spec fields — cover paper/size when a cover is ordered, content
+    paper/size/pages when content is ordered. Add showWhen + strip 'N/A' placeholder options."""
+    n = 0
+    for p in data["products"]:
+        fields = {f["key"]: f for f in p["fields"]}
+        od = None
+        for cand in ("orderdesc", "ordertype", "order_type"):
+            f = fields.get(cand)
+            if f and any("cover" in str(o).lower() and "content" in str(o).lower() for o in (f.get("options") or [])):
+                od = f
+                break
+        if not od:
+            continue
+        opts = od.get("options") or []
+        cover_vals = [o for o in opts if "cover" in o.lower()]
+        content_vals = [o for o in opts if "content" in o.lower()]
+        for grp, vals in ((("coverpaper", "coversize"), cover_vals), (("contentpaper", "contentsize", "pages"), content_vals)):
+            if not vals or len(vals) >= len(opts):
+                continue
+            for k in grp:
+                fld = fields.get(k)
+                if not fld:
+                    continue
+                fld["options"] = [o for o in (fld.get("options") or []) if str(o).strip().upper() not in ("N/A", "-", "")]
+                fld["showWhen"] = {"field": od["key"], "values": vals}
+                n += 1
+    if n:
+        print(f"cover/content validity: {n} conditional fields")
+
+
 def _sticker_validity(data):
     """Label / die-cut stickers: the size inputs depend on the chosen shape (Category) — Round shows
     Diameter, other shapes show Height + Width, and die-cut shapes show the Dieline upload. Add the
@@ -1733,6 +1765,7 @@ def main():
     _apply_validity(data)         # capture-driven exact showWhen/validity for all flagged products
     _sticker_validity(data)       # sticker shape -> size-input conditionals
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
+    _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
     _attach_art(data)
     from app.product_quantity import attach as _attach_quantity
     _n, _hit = _attach_quantity(data)
