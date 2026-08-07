@@ -1531,6 +1531,40 @@ def _loose_sheet_exact(data):
     print("loose-sheet: applied exact Excard validity (lamination/colour/folding-creasing/hole-punch) to 21,101,102,103")
 
 
+def _finishing_subcontrols(data):
+    """Cover-finishing sub-controls (Exclusive Leather Wire-O Notebook etc.): Deboss reveals its
+    size H/W; UV-DTF Stickering reveals sticker size + position. Add the showWhen + strip the '-'
+    placeholder options so only the relevant sub-controls show for the chosen finishing."""
+    DEBOSS = ("deboss", "debosssizeh", "debosssizew")
+    UVDTF = ("uvdtfstickering", "stickersize", "stickerposition")
+    n = 0
+    for p in data["products"]:
+        fields = {f["key"]: f for f in p["fields"]}
+        fcf = None
+        for cand in ("finishingcover", "coverfinishing", "finishing"):
+            f = fields.get(cand)
+            if f and any("deboss" in str(o).lower() or "dtf" in str(o).lower() for o in (f.get("options") or [])):
+                fcf = f
+                break
+        if not fcf:
+            continue
+        opts = fcf.get("options") or []
+        deboss_vals = [o for o in opts if "deboss" in o.lower()]
+        uv_vals = [o for o in opts if "dtf" in o.lower() or "sticker" in o.lower()]
+        for grp, vals in ((DEBOSS, deboss_vals), (UVDTF, uv_vals)):
+            if not vals:
+                continue
+            for k in grp:
+                fld = fields.get(k)
+                if not fld:
+                    continue
+                fld["options"] = [o for o in (fld.get("options") or []) if str(o).strip() not in ("-", "")]
+                fld["showWhen"] = {"field": fcf["key"], "values": vals}
+                n += 1
+    if n:
+        print(f"finishing sub-controls: {n} conditional fields")
+
+
 def _sticker_validity(data):
     """Label / die-cut stickers: the size inputs depend on the chosen shape (Category) — Round shows
     Diameter, other shapes show Height + Width, and die-cut shapes show the Dieline upload. Add the
@@ -1698,6 +1732,7 @@ def main():
     from app.validity_apply import apply as _apply_validity
     _apply_validity(data)         # capture-driven exact showWhen/validity for all flagged products
     _sticker_validity(data)       # sticker shape -> size-input conditionals
+    _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _attach_art(data)
     from app.product_quantity import attach as _attach_quantity
     _n, _hit = _attach_quantity(data)

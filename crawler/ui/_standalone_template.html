@@ -1061,7 +1061,7 @@ function renderImageGrid(f){
       class="imgcard rounded-lg border ${active?'border-indigo-500 ring-2 ring-indigo-200':'hairline'} bg-white p-1.5 text-left">
       ${img?`<img src="${img}" loading="lazy" class="w-full h-16 object-contain mb-1" alt="${cap}">`:''}
       <div class="text-[10.5px] text-slate-600 truncate">${cap}</div></button>`; }).join("");
-  grid.querySelectorAll(".imgcard").forEach(b=>b.onclick=()=>{ S.values[f.key]=b.dataset.val; renderImageGrid(f); enforceValidity(); quote(); });
+  grid.querySelectorAll(".imgcard").forEach(b=>b.onclick=()=>{ S.values[f.key]=b.dataset.val; renderImageGrid(f); updateFieldVis(); enforceValidity(); quote(); });
 }
 // Colour-swatch picker (hot-stamping foil colour, stamp ink colour, rope colour …). Metallics
 // use a subtle gradient so Gold/Silver read as foil rather than flat yellow/grey.
@@ -1081,7 +1081,7 @@ function renderSwatchGrid(f){
     return `<button type="button" data-val="${o.replace(/"/g,'&quot;')}" title="${o.replace(/"/g,'&quot;')}"
       class="swcard rounded-lg border ${active?'border-indigo-500 ring-2 ring-indigo-200':'hairline'} bg-white p-1.5 flex flex-col items-center gap-1">
       ${dot}<div class="text-[10.5px] text-slate-600 truncate w-full text-center">${o}</div></button>`; }).join("");
-  grid.querySelectorAll(".swcard").forEach(b=>b.onclick=()=>{ S.values[f.key]=b.dataset.val; renderSwatchGrid(f); enforceValidity(); quote(); });
+  grid.querySelectorAll(".swcard").forEach(b=>b.onclick=()=>{ S.values[f.key]=b.dataset.val; renderSwatchGrid(f); updateFieldVis(); enforceValidity(); quote(); });
 }
 // Enforce valid-combination constraints: restrict each dependent dropdown to the
 // values allowed for the current primary selection (e.g. only papers/sizes valid for a model).
