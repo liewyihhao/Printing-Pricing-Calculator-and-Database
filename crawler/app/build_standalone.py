@@ -1690,6 +1690,48 @@ def _sticker_validity(data):
         print(f"sticker validity: {n} shape-conditional size inputs")
 
 
+def _validity_visibility(data):
+    """Derive conditional VISIBILITY from a product's validity block. A constrained field whose
+    valid-option set is non-empty for only a SUBSET of the primary values (e.g. Folder's CD Seal is
+    valid only for 'CD Jacket', Fastener only for 'Document Folder') must be HIDDEN for the other
+    primary values — not shown with a fallback full option list. The engine's enforceValidity()
+    falls back to all base options when a rule is empty, so without a showWhen these fields would
+    stay visible. Add showWhen={primary, values:[primary values where the field is applicable]}.
+
+    Runs after every validity source (pricelist deps, capture-driven, loose-sheet). Only touches
+    fields with no existing showWhen, and only when the applicable set is a proper non-empty subset
+    of the primary field's options (all-values ⇒ always applicable, just option-restricted)."""
+    n = 0
+    for p in data["products"]:
+        V = p.get("validity")
+        if not V or not V.get("rules"):
+            continue
+        primary = V["primary"]
+        fields = {f["key"]: f for f in p["fields"]}
+        pfield = fields.get(primary)
+        if not pfield:
+            continue
+        popts = pfield.get("options") or list((pfield.get("images") or {}).keys())
+        rules = V["rules"]
+        # only consider primary values we actually have rules for (unsampled values fall back to
+        # base and shouldn't force-hide dependent fields)
+        pvs = [pv for pv in popts if pv in rules]
+        if len(pvs) < 2:
+            continue
+        for fk in V.get("fields", []):
+            if fk == primary:            # the driver is always visible; never hide it by its own value
+                continue
+            fld = fields.get(fk)
+            if not fld or fld.get("showWhen"):
+                continue
+            applicable = [pv for pv in pvs if rules.get(pv, {}).get(fk)]
+            if applicable and len(applicable) < len(pvs):
+                fld["showWhen"] = {"field": primary, "values": applicable}
+                n += 1
+    if n:
+        print(f"validity visibility: {n} fields hidden for non-applicable primary values")
+
+
 def _assign_sections(data):
     """Tag every field with the Excard order-form section it belongs to, so the calculator can
     render General / Optional Finishing / Add On headers like the supplier's form. Prefer the EXACT
@@ -1829,6 +1871,7 @@ def main():
     from app.validity_apply import apply as _apply_validity
     _apply_validity(data)         # capture-driven exact showWhen/validity for all flagged products
     _sticker_validity(data)       # sticker shape -> size-input conditionals
+    _validity_visibility(data)    # hide validity-constrained fields for non-applicable primary vals
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
     _notebook_content_validity(data)  # additional-content sheet count -> content-paper visibility
