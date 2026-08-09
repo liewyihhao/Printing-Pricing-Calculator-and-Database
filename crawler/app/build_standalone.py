@@ -1824,6 +1824,26 @@ def _bunting_material_validity(data):
         print(f"bunting material validity: {n} products (Material -> printing/lamination)")
 
 
+def _greeting_card_validity(data):
+    """Greeting Card: Fold Type drives which Models are available (each model belongs to exactly one
+    fold) and which Envelopes (only Half Fold offers a White envelope). Excard's deps-derived
+    validity was loose — it listed C-Fold/Z-Fold-only models (c16ub, c16uc) under 'No Fold'. Re-derive
+    the fold-type rule-set straight from the price curves so the valid model/envelope space is exact."""
+    n = 0
+    for p in data["products"]:
+        if "greeting card" not in p["name"].lower():
+            continue
+        params = data["params"].get(p.get("paramKey"))
+        if not params:
+            continue
+        rs = _curve_driven_ruleset(p, params, "Fold Type")
+        if rs:
+            p["validity"] = rs
+            n += 1
+    if n:
+        print(f"greeting-card validity: {n} products (Fold Type -> model/envelope)")
+
+
 def _money_packet_validity(data):
     """Money packets couple Mix Design and Package (number of designs) 1-to-1: Excard's price
     curves show Mix Design 'No' pairs ONLY with the single-design 'Normal' package, 'Yes' only with
@@ -1997,6 +2017,7 @@ def main():
     _stand_material_validity(data)  # 'Material (Stand)' shown only when a stand is Required
     _validity_visibility(data)    # hide validity-constrained fields for non-applicable primary vals
     _bunting_material_validity(data)  # Material -> printing/lamination valid combos (all bunting)
+    _greeting_card_validity(data)     # Fold Type -> model/envelope valid combos (exact from curves)
     _money_packet_validity(data)  # Mix-Design <-> Package valid-combo coupling (2nd rule-set)
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility

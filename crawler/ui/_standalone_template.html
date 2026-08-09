@@ -1054,8 +1054,8 @@ function fillSelect(sel,opts,noPlaceholder){ const cur=sel.value;
   sel.innerHTML=(noPlaceholder?"":`<option value="">Select…</option>`)+opts.map(o=>`<option>${o}</option>`).join("");
   if(cur&&opts.includes(cur)) sel.value=cur; }
 function renderImageGrid(f){
-  const grid=$(`f_${f.key}`); const opts=f.options||Object.keys(f.images);
-  if(!S.values[f.key]) S.values[f.key]=opts[0];
+  const grid=$(`f_${f.key}`); const opts=allowedOptions(f);
+  if(!opts.includes(S.values[f.key])) S.values[f.key]=opts[0];
   grid.innerHTML=opts.map(o=>{ const img=f.images[o]||"", active=S.values[f.key]===o, cap=o.split(" — ")[0];
     return `<button type="button" data-val="${o.replace(/"/g,'&quot;')}" title="${o.replace(/"/g,'&quot;')}"
       class="imgcard rounded-lg border ${active?'border-indigo-500 ring-2 ring-indigo-200':'hairline'} bg-white p-1.5 text-left">
@@ -1072,8 +1072,8 @@ const SWATCH_COLOURS={gold:'linear-gradient(135deg,#f7e08a,#c9a227)',silver:'lin
   orange:'#f08a24',pink:'#ef8fb3',purple:'#7b3fa0',violet:'#7b3fa0',brown:'#7a4a24',grey:'#9aa0a6',gray:'#9aa0a6'};
 function swatchCss(name){ return SWATCH_COLOURS[String(name).toLowerCase().replace(/\s*\(.*?\)\s*/g,'').trim()]||null; }
 function renderSwatchGrid(f){
-  const grid=$(`f_${f.key}`); const opts=f.options||[];
-  if(!S.values[f.key]) S.values[f.key]=opts[0];
+  const grid=$(`f_${f.key}`); const opts=allowedOptions(f);
+  if(!opts.includes(S.values[f.key])) S.values[f.key]=opts[0];
   grid.innerHTML=opts.map(o=>{ const css=swatchCss(o), active=S.values[f.key]===o;
     const dot=css
       ? `<span style="display:block;width:100%;height:30px;border-radius:6px;background:${css};${/white/i.test(o)?'box-shadow:inset 0 0 0 1px #d7dbe0;':''}"></span>`
@@ -1083,28 +1083,36 @@ function renderSwatchGrid(f){
       ${dot}<div class="text-[10.5px] text-slate-600 truncate w-full text-center">${o}</div></button>`; }).join("");
   grid.querySelectorAll(".swcard").forEach(b=>b.onclick=()=>{ S.values[f.key]=b.dataset.val; renderSwatchGrid(f); updateFieldVis(); enforceValidity(); quote(); });
 }
-// Enforce valid-combination constraints: restrict each dependent dropdown to the
-// values allowed for the current primary selection (e.g. only papers/sizes valid for a model).
-// validity is either one {primary,fields,rules} rule-set OR an array of them (independent drivers,
-// e.g. money packets: model->size AND mix-design->package); a field's allowed set is the
-// intersection across every rule-set that constrains it.
+// The values currently allowed for field f, given the product's validity. validity is either one
+// {primary,fields,rules} rule-set OR an array of them (independent drivers, e.g. money packets:
+// model->size AND mix-design->package); the allowed set is the intersection of the field's base
+// options across every rule-set that constrains it. No validity (or none applies) ⇒ all base opts.
+function allowedOptions(f){
+  const base=f.options||(f.images?Object.keys(f.images):[]);
+  const V=S.prod&&S.prod.validity; if(!V) return base;
+  const list=Array.isArray(V)?V:[V];
+  let allow=base;
+  for(const VV of list){
+    if(!(VV.fields||[]).includes(f.key)) continue;
+    const pv=S.values[VV.primary], rule=pv?VV.rules[pv]:null;
+    if(rule&&rule[f.key]) allow=allow.filter(o=>rule[f.key].includes(o));
+  }
+  return allow.length?allow:base;
+}
+// Enforce valid-combination constraints: restrict each dependent control to allowedOptions() —
+// dropdowns are rebuilt, image / swatch grids are re-rendered (they read allowedOptions too), and a
+// now-invalid selection resets to the first allowed value.
 function enforceValidity(){
   const V=S.prod&&S.prod.validity; if(!V) return;
   const list=Array.isArray(V)?V:[V];
   const constrained=new Set();
   for(const VV of list) for(const fk of (VV.fields||[])) constrained.add(fk);
   for(const f of S.fields){
-    if(!constrained.has(f.key) || f.images || f.type==="number") continue;
+    if(!constrained.has(f.key) || f.type==="number") continue;
+    if(f.images){ renderImageGrid(f); continue; }   // grid reads allowedOptions + resets invalid val
+    if(f.swatch){ renderSwatchGrid(f); continue; }
     const sel=$(`f_${f.key}`); if(!sel) continue;
-    const base=f.options||[];
-    let allow=base;
-    for(const VV of list){
-      if(!(VV.fields||[]).includes(f.key)) continue;
-      const pv=S.values[VV.primary], rule=pv?VV.rules[pv]:null;
-      if(rule&&rule[f.key]) allow=allow.filter(o=>rule[f.key].includes(o));
-    }
-    if(!allow.length) allow=base;
-    const cur=S.values[f.key];
+    const allow=allowedOptions(f), cur=S.values[f.key];
     sel.innerHTML=allow.map(o=>`<option>${o.replace(/</g,"&lt;")}</option>`).join("");
     if(allow.includes(cur)){ sel.value=cur; } else { S.values[f.key]=allow[0]; sel.value=allow[0]; }
   }
