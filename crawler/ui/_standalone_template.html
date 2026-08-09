@@ -1085,14 +1085,24 @@ function renderSwatchGrid(f){
 }
 // Enforce valid-combination constraints: restrict each dependent dropdown to the
 // values allowed for the current primary selection (e.g. only papers/sizes valid for a model).
+// validity is either one {primary,fields,rules} rule-set OR an array of them (independent drivers,
+// e.g. money packets: model->size AND mix-design->package); a field's allowed set is the
+// intersection across every rule-set that constrains it.
 function enforceValidity(){
   const V=S.prod&&S.prod.validity; if(!V) return;
-  const pv=S.values[V.primary], rule=pv?V.rules[pv]:null;
+  const list=Array.isArray(V)?V:[V];
+  const constrained=new Set();
+  for(const VV of list) for(const fk of (VV.fields||[])) constrained.add(fk);
   for(const f of S.fields){
-    if(!V.fields.includes(f.key) || f.images || f.type==="number") continue;
+    if(!constrained.has(f.key) || f.images || f.type==="number") continue;
     const sel=$(`f_${f.key}`); if(!sel) continue;
     const base=f.options||[];
-    let allow = rule&&rule[f.key] ? base.filter(o=>rule[f.key].includes(o)) : base;
+    let allow=base;
+    for(const VV of list){
+      if(!(VV.fields||[]).includes(f.key)) continue;
+      const pv=S.values[VV.primary], rule=pv?VV.rules[pv]:null;
+      if(rule&&rule[f.key]) allow=allow.filter(o=>rule[f.key].includes(o));
+    }
     if(!allow.length) allow=base;
     const cur=S.values[f.key];
     sel.innerHTML=allow.map(o=>`<option>${o.replace(/</g,"&lt;")}</option>`).join("");

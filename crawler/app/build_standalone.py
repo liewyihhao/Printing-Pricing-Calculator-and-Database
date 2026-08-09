@@ -1727,7 +1727,7 @@ def _validity_visibility(data):
     n = 0
     for p in data["products"]:
         V = p.get("validity")
-        if not V or not V.get("rules"):
+        if not isinstance(V, dict) or not V.get("rules"):   # array (multi-driver) handled elsewhere
             continue
         primary = V["primary"]
         fields = {f["key"]: f for f in p["fields"]}
@@ -1753,6 +1753,37 @@ def _validity_visibility(data):
                 n += 1
     if n:
         print(f"validity visibility: {n} fields hidden for non-applicable primary values")
+
+
+def _money_packet_validity(data):
+    """Money packets couple Mix Design and Package (number of designs) 1-to-1: Excard's price
+    curves show Mix Design 'No' pairs ONLY with the single-design 'Normal' package, 'Yes' only with
+    the multi-design packages (Dual / 5 / 6 Design). Enforce that valid-combo space so a customer
+    can't order 'No' + '5 Design'. These axes are price-neutral (same total pcs), so this is purely
+    combination parity. Modelled as a SECOND validity rule-set (primary=mixdesign) appended to the
+    existing model->size/paper/finishing one — the engine's enforceValidity intersects both."""
+    n = 0
+    for p in data["products"]:
+        if "money packet" not in p["name"].lower():
+            continue
+        fields = {f["key"]: f for f in p["fields"]}
+        md = fields.get("mixdesign") or fields.get("ex_mixdesign")
+        pkg = fields.get("package")
+        if not md or not pkg or set(md.get("options") or []) != {"No", "Yes"}:
+            continue
+        pkg_opts = pkg.get("options") or []
+        normal = [o for o in pkg_opts if o.strip().lower() == "normal"]
+        multi = [o for o in pkg_opts if o.strip().lower() != "normal"]
+        if not normal or not multi:
+            continue
+        md_rule = {"primary": md["key"], "fields": [pkg["key"]],
+                   "rules": {"No": {pkg["key"]: normal}, "Yes": {pkg["key"]: multi}}}
+        existing = p.get("validity")
+        rulesets = (existing if isinstance(existing, list) else ([existing] if existing else []))
+        p["validity"] = rulesets + [md_rule]
+        n += 1
+    if n:
+        print(f"money-packet validity: {n} products with Mix-Design<->Package coupling")
 
 
 def _assign_sections(data):
@@ -1896,6 +1927,7 @@ def main():
     _sticker_validity(data)       # sticker shape -> size-input conditionals
     _stand_material_validity(data)  # 'Material (Stand)' shown only when a stand is Required
     _validity_visibility(data)    # hide validity-constrained fields for non-applicable primary vals
+    _money_packet_validity(data)  # Mix-Design <-> Package valid-combo coupling (2nd rule-set)
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
     _notebook_content_validity(data)  # additional-content sheet count -> content-paper visibility
