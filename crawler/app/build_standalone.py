@@ -1690,6 +1690,29 @@ def _sticker_validity(data):
         print(f"sticker validity: {n} shape-conditional size inputs")
 
 
+def _stand_material_validity(data):
+    """Foamboard etc.: the 'Material (Stand)' axis only applies when a stand is ordered. Excard's
+    own price curves confirm it — Butterfly Stand 'Not Required' pairs ONLY with material 'N/A',
+    'Required' pairs only with the real stand materials (E-flute / PP-Hollow). So show the material
+    field only when the stand toggle is 'Required' and drop the 'N/A' placeholder (it's the hidden
+    state, not a selectable material). Pricing is unaffected — for 'Not Required' the lookup resolves
+    to the same curve regardless of the (now hidden) material value."""
+    n = 0
+    for p in data["products"]:
+        fields = {f["key"]: f for f in p["fields"]}
+        mat = next((f for f in p["fields"] if "materialstand" in f["key"].lower()), None)
+        gate = next((f for f in p["fields"]
+                     if ("stand" in f["key"].lower() or "butterfly" in f["key"].lower())
+                     and "Required" in (f.get("options") or []) and "Not Required" in (f.get("options") or [])), None)
+        if not mat or not gate or mat is gate:
+            continue
+        mat["options"] = [o for o in (mat.get("options") or []) if str(o).strip().upper() not in ("N/A", "-", "")]
+        mat["showWhen"] = {"field": gate["key"], "values": ["Required"]}
+        n += 1
+    if n:
+        print(f"stand-material validity: {n} material-of-stand fields gated on stand=Required")
+
+
 def _validity_visibility(data):
     """Derive conditional VISIBILITY from a product's validity block. A constrained field whose
     valid-option set is non-empty for only a SUBSET of the primary values (e.g. Folder's CD Seal is
@@ -1871,6 +1894,7 @@ def main():
     from app.validity_apply import apply as _apply_validity
     _apply_validity(data)         # capture-driven exact showWhen/validity for all flagged products
     _sticker_validity(data)       # sticker shape -> size-input conditionals
+    _stand_material_validity(data)  # 'Material (Stand)' shown only when a stand is Required
     _validity_visibility(data)    # hide validity-constrained fields for non-applicable primary vals
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
