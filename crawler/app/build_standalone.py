@@ -1755,6 +1755,75 @@ def _validity_visibility(data):
         print(f"validity visibility: {n} fields hidden for non-applicable primary values")
 
 
+def _curve_driven_ruleset(p, params, driver_axis):
+    """Derive a validity rule-set for `driver_axis` directly from a pricelist product's price
+    curves: for each driver value, collect the set of valid values of every OTHER axis, and keep
+    only the axes that are actually constrained (their valid set varies by driver value, or is a
+    proper subset of the full set). Curve values ARE our option strings, axis name -> field key via
+    _norm. Returns a {primary,fields,rules} dict or None."""
+    ac = params.get("axis_cols") or []
+    curves = params.get("curves") or {}
+    if driver_axis not in ac or not curves:
+        return None
+    di = ac.index(driver_axis)
+    from collections import defaultdict
+    per = defaultdict(lambda: defaultdict(set))   # driverVal -> axis -> {values}
+    full = defaultdict(set)
+    for k in curves:
+        parts = k.split("|")
+        if len(parts) != len(ac):
+            continue
+        dv = parts[di]
+        for i, a in enumerate(ac):
+            if i == di:
+                continue
+            per[dv][a].add(parts[i])
+            full[a].add(parts[i])
+    fieldkeys = {f["key"] for f in p["fields"]}
+    constrained = []
+    for a in ac:
+        if a == di or _norm(a) not in fieldkeys:
+            continue
+        sets = [frozenset(per[dv].get(a, set())) for dv in per]
+        if len(set(sets)) > 1 or any(len(s) < len(full[a]) for s in sets):
+            constrained.append(a)
+    if not constrained:
+        return None
+    rules = {}
+    for dv in per:
+        rules[dv] = {_norm(a): sorted(per[dv][a]) for a in constrained}
+    return {"primary": _norm(driver_axis), "fields": [_norm(a) for a in constrained], "rules": rules}
+
+
+def _bunting_material_validity(data):
+    """Bunting: Material fully drives Printing (Tarpaulin=720dpi, Synthetic=1440dpi) and restricts
+    Lamination (Tarpaulin can't be laminated -> 'No Required'; Synthetic -> Gloss/Matte). Excard's
+    deps key the litho/round/tripod forms by Size (which constrains nothing), so _build_validity
+    missed it; only the Gear-X form is Material-keyed. Derive the Material rule-set from each
+    product's own curves so all four enforce the same valid combos."""
+    n = 0
+    for p in data["products"]:
+        if "bunting" not in p["name"].lower():
+            continue
+        params = data["params"].get(p.get("paramKey"))
+        if not params:
+            continue
+        rs = _curve_driven_ruleset(p, params, "Material")
+        if not rs:
+            continue
+        existing = p.get("validity")
+        if isinstance(existing, dict) and existing.get("primary") == rs["primary"]:
+            p["validity"] = rs                       # replace the equivalent deps-derived one
+        elif existing:
+            rulesets = existing if isinstance(existing, list) else [existing]
+            p["validity"] = rulesets + [rs]
+        else:
+            p["validity"] = rs
+        n += 1
+    if n:
+        print(f"bunting material validity: {n} products (Material -> printing/lamination)")
+
+
 def _money_packet_validity(data):
     """Money packets couple Mix Design and Package (number of designs) 1-to-1: Excard's price
     curves show Mix Design 'No' pairs ONLY with the single-design 'Normal' package, 'Yes' only with
@@ -1927,6 +1996,7 @@ def main():
     _sticker_validity(data)       # sticker shape -> size-input conditionals
     _stand_material_validity(data)  # 'Material (Stand)' shown only when a stand is Required
     _validity_visibility(data)    # hide validity-constrained fields for non-applicable primary vals
+    _bunting_material_validity(data)  # Material -> printing/lamination valid combos (all bunting)
     _money_packet_validity(data)  # Mix-Design <-> Package valid-combo coupling (2nd rule-set)
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
