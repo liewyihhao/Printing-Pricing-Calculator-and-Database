@@ -1850,29 +1850,59 @@ def _money_packet_validity(data):
     the multi-design packages (Dual / 5 / 6 Design). Enforce that valid-combo space so a customer
     can't order 'No' + '5 Design'. These axes are price-neutral (same total pcs), so this is purely
     combination parity. Modelled as a SECOND validity rule-set (primary=mixdesign) appended to the
-    existing model->size/paper/finishing one — the engine's enforceValidity intersects both."""
+    existing model->size/paper/finishing one — the engine's enforceValidity intersects both.
+
+    Also appends a Paper -> laminate rule-set: across the family only Art Paper 157gsm can be
+    laminated (Matte / Soft Touch); every other paper is 'N/A'. The laminate axis is 'Finishing' on
+    138/167 and 'Lamination' on 168 (whose 'Finishing' is hot stamping). Derived from the curves and
+    intersected with the model rules, so e.g. MP 104 + Linen correctly collapses to N/A."""
     n = 0
     for p in data["products"]:
         if "money packet" not in p["name"].lower():
             continue
         fields = {f["key"]: f for f in p["fields"]}
+        rulesets = []
+        # Mix Design <-> Package
         md = fields.get("mixdesign") or fields.get("ex_mixdesign")
         pkg = fields.get("package")
-        if not md or not pkg or set(md.get("options") or []) != {"No", "Yes"}:
+        if md and pkg and set(md.get("options") or []) == {"No", "Yes"}:
+            pkg_opts = pkg.get("options") or []
+            normal = [o for o in pkg_opts if o.strip().lower() == "normal"]
+            multi = [o for o in pkg_opts if o.strip().lower() != "normal"]
+            if normal and multi:
+                rulesets.append({"primary": md["key"], "fields": [pkg["key"]],
+                                 "rules": {"No": {pkg["key"]: normal}, "Yes": {pkg["key"]: multi}}})
+        # Paper -> laminate (derive from curves, keep only the laminate target field)
+        params = data["params"].get(p.get("paramKey"))
+        ac = (params or {}).get("axis_cols") or []
+        if params and "Paper" in ac:
+            # the laminate axis = the one whose values are the lamination choices (Matte/Soft/N/A);
+            # 'Finishing' on 138/167, but 'Lamination' on 168 (its 'Finishing' is hot stamping)
+            lam_axis = next((a for i, a in enumerate(ac)
+                             if any("lamination" in k.split("|")[i].lower() for k in params["curves"])), None)
+            full = _curve_driven_ruleset(p, params, "Paper")
+            lam_key = _norm(lam_axis) if lam_axis else None
+            if full and lam_key and lam_key in full["fields"]:
+                rulesets.append({"primary": full["primary"], "fields": [lam_key],
+                                 "rules": {dv: {lam_key: r[lam_key]} for dv, r in full["rules"].items() if lam_key in r}})
+                # laminate is purely paper-driven — drop it from any model rule-set (whose partial
+                # list, e.g. MP104 finishing=[Matte,Soft], would empty-intersect Linen's [N/A] and
+                # wrongly fall back to all options) and clear its now-obsolete visibility gate.
+                existing0 = p.get("validity")
+                for rs in (existing0 if isinstance(existing0, list) else ([existing0] if existing0 else [])):
+                    if lam_key in rs.get("fields", []):
+                        rs["fields"] = [k for k in rs["fields"] if k != lam_key]
+                        for r in rs["rules"].values():
+                            r.pop(lam_key, None)
+                fields[lam_key].pop("showWhen", None)
+        if not rulesets:
             continue
-        pkg_opts = pkg.get("options") or []
-        normal = [o for o in pkg_opts if o.strip().lower() == "normal"]
-        multi = [o for o in pkg_opts if o.strip().lower() != "normal"]
-        if not normal or not multi:
-            continue
-        md_rule = {"primary": md["key"], "fields": [pkg["key"]],
-                   "rules": {"No": {pkg["key"]: normal}, "Yes": {pkg["key"]: multi}}}
         existing = p.get("validity")
-        rulesets = (existing if isinstance(existing, list) else ([existing] if existing else []))
-        p["validity"] = rulesets + [md_rule]
+        base = (existing if isinstance(existing, list) else ([existing] if existing else []))
+        p["validity"] = base + rulesets
         n += 1
     if n:
-        print(f"money-packet validity: {n} products with Mix-Design<->Package coupling")
+        print(f"money-packet validity: {n} products (Mix-Design<->Package + Paper->laminate)")
 
 
 def _assign_sections(data):
