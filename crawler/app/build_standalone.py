@@ -1751,15 +1751,32 @@ def _validity_visibility(data):
         print(f"validity visibility: {n} fields hidden for non-applicable primary values")
 
 
+def _axis_field_key(axis, fields):
+    """Map a price-axis name to OUR field key: match on norm(key) first, then norm(label) (some
+    products name the field differently from the axis, e.g. axis 'Print Colour' -> field key
+    'colour' with label 'Print colour'). Returns the field key or None."""
+    n = _norm(axis)
+    for f in fields:
+        if _norm(f.get("key", "")) == n:
+            return f["key"]
+    for f in fields:
+        if _norm(f.get("label", "")) == n:
+            return f["key"]
+    return None
+
+
 def _curve_driven_ruleset(p, params, driver_axis):
     """Derive a validity rule-set for `driver_axis` directly from a pricelist product's price
     curves: for each driver value, collect the set of valid values of every OTHER axis, and keep
     only the axes that are actually constrained (their valid set varies by driver value, or is a
-    proper subset of the full set). Curve values ARE our option strings, axis name -> field key via
-    _norm. Returns a {primary,fields,rules} dict or None."""
+    proper subset of the full set). Curve values ARE our option strings; axis -> field key via
+    _axis_field_key (key or label). Returns a {primary,fields,rules} dict or None."""
     ac = params.get("axis_cols") or []
     curves = params.get("curves") or {}
     if driver_axis not in ac or not curves:
+        return None
+    prim_key = _axis_field_key(driver_axis, p["fields"])
+    if not prim_key:
         return None
     di = ac.index(driver_axis)
     from collections import defaultdict
@@ -1775,20 +1792,22 @@ def _curve_driven_ruleset(p, params, driver_axis):
                 continue
             per[dv][a].add(parts[i])
             full[a].add(parts[i])
-    fieldkeys = {f["key"] for f in p["fields"]}
+    akey = {}   # axis -> field key, for the constrained axes
     constrained = []
     for a in ac:
-        if a == di or _norm(a) not in fieldkeys:
+        fk = _axis_field_key(a, p["fields"]) if a != driver_axis else None
+        if a == driver_axis or not fk or fk == prim_key:
             continue
         sets = [frozenset(per[dv].get(a, set())) for dv in per]
         if len(set(sets)) > 1 or any(len(s) < len(full[a]) for s in sets):
             constrained.append(a)
+            akey[a] = fk
     if not constrained:
         return None
     rules = {}
     for dv in per:
-        rules[dv] = {_norm(a): sorted(per[dv][a]) for a in constrained}
-    return {"primary": _norm(driver_axis), "fields": [_norm(a) for a in constrained], "rules": rules}
+        rules[dv] = {akey[a]: sorted(per[dv][a]) for a in constrained}
+    return {"primary": prim_key, "fields": [akey[a] for a in constrained], "rules": rules}
 
 
 def _bunting_material_validity(data):
@@ -1854,6 +1873,10 @@ _CURVE_VALIDITY = {
     # allows VDP; VDPType then drives the VDP count (1-6 vs N/A).
     116: [("Print Direction", ["Print Colour", "VDPType", "VDP"]), ("VDPType", ["VDP"])],
     117: [("Print Direction", ["Print Colour", "VDPType", "VDP"]), ("VDPType", ["VDP"])],
+    109: [("Paper", ["Lamination"])],          # Bookmark: only Gloss Art Card laminates
+    113: [("Print Colour", ["VDP"])],          # PVC Card: single-side print -> front VDP only
+    126: [("Model Category", ["Model"])],      # Wobbler: Landscape/Portrait split the models
+    179: [("Paper", ["Lamination"])],          # Kotak Cenderahati: lamination set varies by paper
 }
 
 
@@ -1870,7 +1893,7 @@ def _curve_validity_config(data):
             full = _curve_driven_ruleset(p, params, driver)
             if not full:
                 continue
-            keep = {_norm(t) for t in targets}
+            keep = {_axis_field_key(t, p["fields"]) for t in targets}
             fields = [fk for fk in full["fields"] if fk in keep]
             if not fields:
                 continue
