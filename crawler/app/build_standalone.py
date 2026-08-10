@@ -1566,31 +1566,27 @@ def _finishing_subcontrols(data):
 
 
 def _strip_placeholder_options(data):
-    """Clean placeholder options that leaked from the supplier capture: drop '-' / '' entirely, and
-    DEDUPLICATE 'N/A' (keep one — it can be the legitimate 'none' choice, e.g. no lamination). Keeps
-    at least one option."""
+    """Clean options that leaked from the supplier capture: drop '-' / '' entirely, and remove EXACT
+    duplicate values (keep first occurrence) — some shared-form captures repeat a column (e.g. the
+    static-cling / car-sticker VDP field arrives as 'N/A,1..6,1..6'). Keeps at least one option."""
     n = 0
     for p in data["products"]:
         for f in p["fields"]:
             opts = f.get("options")
             if not opts:
                 continue
-            out, seen_na = [], False
+            out, seen = [], set()
             for o in opts:
                 s = str(o).strip()
-                if s in ("-", ""):
+                if s in ("-", "") or s in seen:
                     n += 1
                     continue
-                if s.upper() == "N/A":
-                    if seen_na:
-                        n += 1
-                        continue
-                    seen_na = True
+                seen.add(s)
                 out.append(o)
             if out and len(out) != len(opts):
                 f["options"] = out
     if n:
-        print(f"placeholder cleanup: stripped {n} '-' / duplicate-N/A options")
+        print(f"placeholder cleanup: stripped {n} '-' / duplicate options")
 
 
 def _notebook_content_validity(data):
@@ -1844,6 +1840,52 @@ def _greeting_card_validity(data):
         print(f"greeting-card validity: {n} products (Fold Type -> model/envelope)")
 
 
+# Explicit per-product curve-derived validity for products the deps-based _build_validity left
+# unconstrained. Each (driver_axis, [target_axes]) becomes one rule-set (primary=driver, restricting
+# ONLY the named targets to the values the curves pair with each driver value); multiple entries =>
+# array validity (the engine intersects). Targets are named explicitly — a blind all-axes derivation
+# would add reverse-direction + co-variation noise. Each verified against curve counts before adding.
+_CURVE_VALIDITY = {
+    172: [("category", ["model"]), ("model", ["fabric"])],   # DTF Shirt: Kid has fewer models; model->fabric
+    173: [("model", ["fabric"])],                             # Silkscreen Shirt: model->fabric
+    24:  [("Layers", ["Sets"])],                              # Bill-Book: 100 sets only for 2-layer books
+    115: [("Paper", ["Lamination"])],                         # Kad Terima Kasih: only Gloss Art Card laminates
+    # Static Cling / Car Sticker (shared VDP form): Both-Side needs 4C&White&4C and no VDP; single-side
+    # allows VDP; VDPType then drives the VDP count (1-6 vs N/A).
+    116: [("Print Direction", ["Print Colour", "VDPType", "VDP"]), ("VDPType", ["VDP"])],
+    117: [("Print Direction", ["Print Colour", "VDPType", "VDP"]), ("VDPType", ["VDP"])],
+}
+
+
+def _curve_validity_config(data):
+    by_id = {p["id"]: p for p in data["products"]}
+    n = 0
+    for pid, specs in _CURVE_VALIDITY.items():
+        p = by_id.get(pid)
+        params = data["params"].get(p.get("paramKey")) if p else None
+        if not params:
+            continue
+        rulesets = []
+        for driver, targets in specs:
+            full = _curve_driven_ruleset(p, params, driver)
+            if not full:
+                continue
+            keep = {_norm(t) for t in targets}
+            fields = [fk for fk in full["fields"] if fk in keep]
+            if not fields:
+                continue
+            rules = {dv: {fk: r[fk] for fk in fields if fk in r} for dv, r in full["rules"].items()}
+            rulesets.append({"primary": full["primary"], "fields": fields, "rules": rules})
+        if not rulesets:
+            continue
+        existing = p.get("validity")
+        base = existing if isinstance(existing, list) else ([existing] if existing else [])
+        p["validity"] = base + rulesets
+        n += 1
+    if n:
+        print(f"curve validity config: {n} products (apparel/VDP/bill-book/lamination conditionals)")
+
+
 def _money_packet_validity(data):
     """Money packets couple Mix Design and Package (number of designs) 1-to-1: Excard's price
     curves show Mix Design 'No' pairs ONLY with the single-design 'Normal' package, 'Yes' only with
@@ -2048,6 +2090,7 @@ def main():
     _validity_visibility(data)    # hide validity-constrained fields for non-applicable primary vals
     _bunting_material_validity(data)  # Material -> printing/lamination valid combos (all bunting)
     _greeting_card_validity(data)     # Fold Type -> model/envelope valid combos (exact from curves)
+    _curve_validity_config(data)      # apparel model->fabric, static-cling/car-sticker VDP, etc.
     _money_packet_validity(data)  # Mix-Design <-> Package valid-combo coupling (2nd rule-set)
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
