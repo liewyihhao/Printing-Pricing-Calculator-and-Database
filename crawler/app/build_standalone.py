@@ -1879,6 +1879,11 @@ _CURVE_VALIDITY = {
     179: [("Paper", ["Lamination"])],          # Kotak Cenderahati: lamination set varies by paper
     151: [("Material", ["Material Base Color"])],  # Kraft pouch: Brown Kraft->Brown, White->White
     178: [("Material", ["Material Base Color"])],  # Kraft paper bag: base colour follows material
+    107: [("Paper", ["Lamination"])],          # Folder: 1-side-coated paper -> front-only lamination
+    # Calendars: each Model fixes its header/content/stand specs (finer than the category/type driver)
+    118: [("Model", ["Header Size", "Content Artwork", "Content Size"])],
+    120: [("Model", ["Cover Paper", "Cover Size", "Content Artwork", "Content Paper",
+                     "Content Size", "Stand Paper", "Stand Size"])],
 }
 
 
