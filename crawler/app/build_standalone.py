@@ -1877,7 +1877,34 @@ _CURVE_VALIDITY = {
     113: [("Print Colour", ["VDP"])],          # PVC Card: single-side print -> front VDP only
     126: [("Model Category", ["Model"])],      # Wobbler: Landscape/Portrait split the models
     179: [("Paper", ["Lamination"])],          # Kotak Cenderahati: lamination set varies by paper
+    151: [("Material", ["Material Base Color"])],  # Kraft pouch: Brown Kraft->Brown, White->White
+    178: [("Material", ["Material Base Color"])],  # Kraft paper bag: base colour follows material
 }
+
+
+def _dedupe_validity(data):
+    """Clean _build_validity artifacts: a rule-set must not list its OWN primary among the
+    constrained fields (self-reference — e.g. Wall Calendar category->category, even with an empty
+    set, or Laminated Non-Woven model->model) and must not repeat a field. Remove the primary key
+    and de-duplicate; drop the corresponding self-referential entries from each rule."""
+    n = 0
+    for p in data["products"]:
+        V = p.get("validity")
+        if not V:
+            continue
+        for rs in (V if isinstance(V, list) else [V]):
+            fields, seen, out = rs.get("fields", []), set(), []
+            for fk in fields:
+                if fk != rs["primary"] and fk not in seen:
+                    seen.add(fk)
+                    out.append(fk)
+            if out != fields:
+                rs["fields"] = out
+                for r in rs.get("rules", {}).values():
+                    r.pop(rs["primary"], None)
+                n += 1
+    if n:
+        print(f"validity cleanup: {n} rule-sets de-duped / self-reference removed")
 
 
 def _curve_validity_config(data):
@@ -2115,6 +2142,7 @@ def main():
     _greeting_card_validity(data)     # Fold Type -> model/envelope valid combos (exact from curves)
     _curve_validity_config(data)      # apparel model->fabric, static-cling/car-sticker VDP, etc.
     _money_packet_validity(data)  # Mix-Design <-> Package valid-combo coupling (2nd rule-set)
+    _dedupe_validity(data)        # strip primary-in-own-fields / duplicate fields (build artifacts)
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
     _notebook_content_validity(data)  # additional-content sheet count -> content-paper visibility
