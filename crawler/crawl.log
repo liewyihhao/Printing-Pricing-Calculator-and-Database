@@ -10774,3 +10774,445 @@ Call pid=19 size=A5 (148mm x 210mm)
 12:06:12 [info     ] browser.launched               channel=msedge headless=True
 12:07:11 [info     ] browser.launched               channel=msedge headless=True
 12:29:53 [info     ] browser.launched               channel=msedge headless=True
+00:07:10 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+00:07:10 [info     ] browser.launched               channel=chrome headless=True
+14:46:29 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+14:46:29 [info     ] browser.launched               channel=chrome headless=True
+14:47:23 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+14:47:23 [info     ] browser.launched               channel=chrome headless=True
+15:02:32 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+15:02:32 [info     ] browser.launched               channel=chrome headless=True
+15:14:40 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+15:14:41 [info     ] browser.launched               channel=chrome headless=True
+15:21:59 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+15:21:59 [info     ] browser.launched               channel=chrome headless=True
+11:56:26 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+11:56:27 [info     ] browser.launched               channel=chrome headless=True
+11:56:27 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+11:57:06 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+12:20:11 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+12:20:11 [info     ] browser.launched               channel=chrome headless=True
+12:20:12 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+12:20:50 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+15:15:36 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+15:15:36 [info     ] browser.launched               channel=chrome headless=True
+15:15:36 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+15:15:53 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+15:24:55 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+15:24:55 [info     ] browser.launched               channel=chrome headless=True
+15:24:55 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+15:25:11 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+23:22:22 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+23:22:22 [info     ] browser.launched               channel=chrome headless=True
+23:22:23 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+23:22:40 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+15:49:21 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+15:49:21 [info     ] browser.launched               channel=chrome headless=True
+15:49:22 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+15:49:39 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+12:43:49 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+12:43:49 [info     ] browser.launched               channel=chrome headless=True
+12:43:49 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+12:44:07 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+13:04:57 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+13:04:57 [info     ] browser.launched               channel=chrome headless=True
+13:04:57 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+13:05:16 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+13:05:30 [info     ] pkg.boot                       cookies=['__RequestVerificationToken'] token_len=108
+13:05:46 [info     ] pkg.box                        box=0930 n=136 prog=1/67
+13:05:48 [info     ] pkg.price_err                  box=A001 dims=20x220x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:05:58 [info     ] pkg.price_err                  box=A001 dims=220x220x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:01 [info     ] pkg.price_err                  box=A001A dims=65x220x120 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:03 [info     ] pkg.price_err                  box=A001 dims=60x220x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:03 [info     ] pkg.box                        box=A001 n=120 prog=2/67
+13:06:11 [info     ] pkg.price_err                  box=A001A dims=265x220x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:16 [info     ] pkg.price_err                  box=A001A dims=65x220x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:16 [info     ] pkg.box                        box=A001A n=112 prog=3/67
+13:06:19 [info     ] pkg.price_err                  box=A001X dims=20x220x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:29 [info     ] pkg.price_err                  box=A001X dims=220x220x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:31 [info     ] pkg.price_err                  box=A002AX dims=65x220x120 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:34 [info     ] pkg.price_err                  box=A001X dims=60x220x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:34 [info     ] pkg.box                        box=A001X n=120 prog=4/67
+13:06:39 [info     ] pkg.price_err                  box=A002AX dims=265x220x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:44 [info     ] pkg.price_err                  box=A002AX dims=65x220x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:44 [info     ] pkg.box                        box=A002AX n=112 prog=5/67
+13:06:47 [info     ] pkg.price_err                  box=A002BX dims=50x220x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:57 [info     ] pkg.price_err                  box=A002BX dims=250x220x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:06:58 [info     ] pkg.price_err                  box=A002CX dims=65x220x120 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:04 [info     ] pkg.price_err                  box=A002BX dims=60x220x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:04 [info     ] pkg.box                        box=A002BX n=120 prog=6/67
+13:07:09 [info     ] pkg.price_err                  box=A002CX dims=265x220x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:15 [info     ] pkg.price_err                  box=A002CX dims=65x220x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:15 [info     ] pkg.box                        box=A002CX n=112 prog=7/67
+13:07:20 [info     ] pkg.price_err                  box=A002FX dims=50x220x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:29 [info     ] pkg.price_err                  box=A002X dims=20x220x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:30 [info     ] pkg.price_err                  box=A002FX dims=250x220x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:35 [info     ] pkg.price_err                  box=A002FX dims=60x220x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:35 [info     ] pkg.box                        box=A002FX n=120 prog=8/67
+13:07:38 [info     ] pkg.price_err                  box=A002X dims=220x220x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:43 [info     ] pkg.price_err                  box=A002X dims=60x220x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:43 [info     ] pkg.box                        box=A002X n=120 prog=9/67
+13:07:49 [info     ] pkg.price_err                  box=B037 dims=65x220x120 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:57 [info     ] pkg.price_err                  box=B038 dims=50x220x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:07:58 [info     ] pkg.price_err                  box=B037 dims=265x220x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:08:04 [info     ] pkg.price_err                  box=B037 dims=65x220x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:08:04 [info     ] pkg.box                        box=B037 n=112 prog=10/67
+13:08:07 [info     ] pkg.price_err                  box=B038 dims=250x220x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:08:13 [info     ] pkg.price_err                  box=B038 dims=60x220x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:08:13 [info     ] pkg.box                        box=B038 n=120 prog=11/67
+13:08:21 [info     ] pkg.price_err                  box=B040A dims=50x220x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:08:28 [info     ] pkg.price_err                  box=B042A dims=50x220x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:08:32 [info     ] pkg.price_err                  box=B040A dims=250x220x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:08:38 [info     ] pkg.price_err                  box=B040A dims=60x220x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:08:38 [info     ] pkg.box                        box=B040A n=120 prog=12/67
+13:08:40 [info     ] pkg.price_err                  box=B042A dims=250x220x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:08:45 [info     ] pkg.price_err                  box=B042A dims=60x220x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:08:45 [info     ] pkg.box                        box=B042A n=120 prog=13/67
+13:08:53 [info     ] pkg.price_err                  box=B044X dims=50x250x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:09:03 [info     ] pkg.price_err                  box=B044X dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:09:04 [info     ] pkg.price_err                  box=B048A dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:09:04 [info     ] pkg.box                        box=B044X n=128 prog=14/67
+13:09:06 [info     ] pkg.box                        box=B048A n=136 prog=15/67
+13:09:28 [info     ] pkg.price_err                  box=C001A dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:09:29 [info     ] pkg.box                        box=C001A n=136 prog=16/67
+13:09:30 [info     ] pkg.price_err                  box=B052A dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:09:31 [info     ] pkg.box                        box=B052A n=136 prog=17/67
+13:09:49 [info     ] pkg.price_err                  box=C001AA dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:09:51 [info     ] pkg.box                        box=C001AA n=136 prog=18/67
+13:09:52 [info     ] pkg.price_err                  box=C001AB dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:09:53 [info     ] pkg.box                        box=C001AB n=136 prog=19/67
+13:10:05 [info     ] pkg.price_err                  box=C001AC dims=65x250x120 err=price fail: {'success': False, 'error': 'Size exceed product
+13:10:15 [info     ] pkg.price_err                  box=C001AC dims=265x250x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:10:16 [info     ] pkg.price_err                  box=C001AD dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:10:17 [info     ] pkg.box                        box=C001AD n=136 prog=20/67
+13:10:21 [info     ] pkg.price_err                  box=C001AC dims=65x250x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:10:21 [info     ] pkg.box                        box=C001AC n=112 prog=21/67
+13:10:31 [info     ] pkg.price_err                  box=C001AE dims=65x250x120 err=price fail: {'success': False, 'error': 'Size exceed product
+13:10:40 [info     ] pkg.price_err                  box=C001AE dims=265x250x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:10:42 [info     ] pkg.price_err                  box=C001AX dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:10:43 [info     ] pkg.box                        box=C001AX n=136 prog=22/67
+13:10:45 [info     ] pkg.price_err                  box=C001AE dims=65x250x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:10:45 [info     ] pkg.box                        box=C001AE n=112 prog=23/67
+13:11:01 [info     ] pkg.price_err                  box=C001B dims=65x250x120 err=price fail: {'success': False, 'error': 'Size exceed product
+13:11:03 [info     ] pkg.price_err                  box=C001AY dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:11:04 [info     ] pkg.box                        box=C001AY n=136 prog=24/67
+13:11:09 [info     ] pkg.price_err                  box=C001B dims=265x250x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:11:15 [info     ] pkg.price_err                  box=C001B dims=65x250x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:11:15 [info     ] pkg.box                        box=C001B n=112 prog=25/67
+13:11:28 [info     ] pkg.price_err                  box=C001BX dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:11:29 [info     ] pkg.box                        box=C001BX n=136 prog=26/67
+13:11:36 [info     ] pkg.price_err                  box=C001EX dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:11:37 [info     ] pkg.box                        box=C001EX n=136 prog=27/67
+13:11:49 [info     ] pkg.price_err                  box=C001IX dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:11:50 [info     ] pkg.box                        box=C001IX n=136 prog=28/67
+13:11:51 [info     ] pkg.price_err                  box=C001JX dims=65x250x120 err=price fail: {'success': False, 'error': 'Size exceed product
+13:12:01 [info     ] pkg.price_err                  box=C001JX dims=265x250x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:12:07 [info     ] pkg.price_err                  box=C001JX dims=65x250x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:12:07 [info     ] pkg.box                        box=C001JX n=112 prog=29/67
+13:12:11 [info     ] pkg.price_err                  box=C001M dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:12:12 [info     ] pkg.box                        box=C001M n=136 prog=30/67
+13:12:27 [info     ] pkg.price_err                  box=C001N dims=265x250x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:12:28 [info     ] pkg.box                        box=C001N n=128 prog=31/67
+13:12:34 [info     ] pkg.price_err                  box=C001NX dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:12:35 [info     ] pkg.box                        box=C001NX n=136 prog=32/67
+13:12:48 [info     ] pkg.price_err                  box=C001QX dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:12:49 [info     ] pkg.box                        box=C001QX n=136 prog=33/67
+13:12:55 [info     ] pkg.price_err                  box=C001RX dims=265x250x100 err=price fail: {'success': False, 'error': 'Size exceed product
+13:12:57 [info     ] pkg.box                        box=C001RX n=128 prog=34/67
+13:13:08 [info     ] pkg.price_err                  box=D007A dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+13:13:09 [info     ] pkg.price_err                  box=C017 dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:13:11 [info     ] pkg.box                        box=C017 n=136 prog=35/67
+13:13:22 [info     ] pkg.box                        box=D007A n=136 prog=36/67
+13:13:28 [info     ] pkg.price_err                  box=D040A dims=100x90x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:13:29 [info     ] pkg.box                        box=D030 n=144 prog=37/67
+13:13:34 [info     ] pkg.price_err                  box=D040A dims=120x90x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:13:40 [info     ] pkg.price_err                  box=D040A dims=160x110x80 err=price fail: {'success': False, 'error': 'Size exceed product
+13:13:42 [info     ] pkg.box                        box=D052A n=136 prog=38/67
+13:13:45 [info     ] pkg.price_err                  box=D040A dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+13:13:51 [info     ] pkg.price_err                  box=E005X dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+13:13:52 [info     ] pkg.price_err                  box=D040A dims=150x80x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:13:59 [info     ] pkg.price_err                  box=D040A dims=260x60x40 err=price fail: {'success': False, 'error': 'Size exceed product
+13:14:05 [info     ] pkg.price_err                  box=D040A dims=90x70x80 err=price fail: {'success': False, 'error': 'Size exceed product
+13:14:06 [info     ] pkg.box                        box=E005X n=136 prog=39/67
+13:14:11 [info     ] pkg.price_err                  box=D040A dims=60x60x80 err=price fail: {'success': False, 'error': 'Size exceed product
+13:14:18 [info     ] pkg.price_err                  box=E005Y dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+13:14:18 [info     ] pkg.price_err                  box=D040A dims=60x260x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:14:18 [info     ] pkg.box                        box=D040A n=72 prog=40/67
+13:14:34 [info     ] pkg.box                        box=E013X n=144 prog=41/67
+13:14:34 [info     ] pkg.price_err                  box=E005Y dims=260x260x20 err=price fail: {'success': False, 'error': 'Size exceed product
+13:14:35 [info     ] pkg.box                        box=E005Y n=128 prog=42/67
+13:14:44 [info     ] pkg.price_err                  box=E028A dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+13:14:54 [info     ] pkg.box                        box=E043A n=144 prog=43/67
+13:15:00 [info     ] pkg.price_err                  box=E028A dims=60x260x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:15:00 [info     ] pkg.box                        box=E028A n=128 prog=44/67
+13:15:05 [info     ] pkg.price_err                  box=E049 dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+13:15:18 [info     ] pkg.box                        box=G012 n=128 prog=45/67
+13:15:22 [info     ] pkg.price_err                  box=E049 dims=260x260x20 err=price fail: {'success': False, 'error': 'Size exceed product
+13:15:23 [info     ] pkg.box                        box=E049 n=128 prog=46/67
+13:15:38 [info     ] pkg.price_err                  box=J023A dims=230x230x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:15:39 [info     ] pkg.box                        box=J023A n=136 prog=47/67
+13:15:42 [info     ] pkg.price_err                  box=K003 dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:15:43 [info     ] pkg.box                        box=K003 n=136 prog=48/67
+13:16:03 [info     ] pkg.price_err                  box=K006 dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:16:03 [info     ] pkg.box                        box=K006 n=136 prog=49/67
+13:16:05 [info     ] pkg.price_err                  box=K016 dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:16:07 [info     ] pkg.box                        box=K016 n=136 prog=50/67
+13:16:26 [info     ] pkg.price_err                  box=K016X dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:16:28 [info     ] pkg.box                        box=K016X n=136 prog=51/67
+13:16:31 [info     ] pkg.price_err                  box=K024 dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:16:32 [info     ] pkg.box                        box=K024 n=136 prog=52/67
+13:16:47 [info     ] pkg.price_err                  box=L021 dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:16:48 [info     ] pkg.box                        box=L021 n=136 prog=53/67
+13:16:48 [info     ] pkg.price_err                  box=L044 dims=250x1x40 err=price fail: {'success': False, 'error': 'Size exceed product
+13:16:57 [info     ] pkg.price_err                  box=L044 dims=250x201x20 err=price fail: {'success': False, 'error': 'Size exceed product
+13:16:58 [info     ] pkg.box                        box=L044 n=128 prog=54/67
+13:17:02 [info     ] pkg.price_err                  box=L069 dims=50x250x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:17:11 [info     ] pkg.price_err                  box=L069 dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:17:15 [info     ] pkg.price_err                  box=L069A dims=50x250x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:17:17 [info     ] pkg.price_err                  box=L069 dims=60x250x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:17:17 [info     ] pkg.box                        box=L069 n=120 prog=55/67
+13:17:24 [info     ] pkg.price_err                  box=L069A dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:17:30 [info     ] pkg.price_err                  box=L069A dims=60x250x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:17:30 [info     ] pkg.box                        box=L069A n=120 prog=56/67
+13:17:33 [info     ] pkg.box                        box=L082 n=144 prog=57/67
+13:17:43 [info     ] pkg.price_err                  box=M014 dims=200x140x4 err=price fail: {'success': False, 'error': 'Size exceed product
+13:17:46 [info     ] pkg.price_err                  box=M013 dims=250x20x4 err=price fail: {'success': False, 'error': 'Size exceed product
+13:17:52 [info     ] pkg.price_err                  box=M014 dims=250x20x4 err=price fail: {'success': False, 'error': 'Size exceed product
+13:17:53 [info     ] pkg.price_err                  box=M013 dims=250x220x1 err=price fail: {'success': False, 'error': 'Size exceed product
+13:17:54 [info     ] pkg.box                        box=M013 n=120 prog=58/67
+13:17:59 [info     ] pkg.price_err                  box=M014 dims=250x220x1 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:01 [info     ] pkg.box                        box=M014 n=112 prog=59/67
+13:18:03 [info     ] pkg.price_err                  box=M015 dims=160x110x4 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:08 [info     ] pkg.price_err                  box=M015 dims=200x140x4 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:10 [info     ] pkg.price_err                  box=M016 dims=160x110x4 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:16 [info     ] pkg.price_err                  box=M016 dims=200x140x4 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:19 [info     ] pkg.price_err                  box=M015 dims=250x20x4 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:23 [info     ] pkg.price_err                  box=M016 dims=125x80x4 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:26 [info     ] pkg.price_err                  box=M015 dims=250x220x1 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:27 [info     ] pkg.box                        box=M015 n=104 prog=60/67
+13:18:28 [info     ] pkg.price_err                  box=M016 dims=140x40x1 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:35 [info     ] pkg.price_err                  box=M016 dims=250x20x4 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:42 [info     ] pkg.box                        box=M061 n=136 prog=61/67
+13:18:43 [info     ] pkg.price_err                  box=M016 dims=250x220x1 err=price fail: {'success': False, 'error': 'Size exceed product
+13:18:44 [info     ] pkg.box                        box=M016 n=88 prog=62/67
+13:18:58 [info     ] pkg.box                        box=M062 n=136 prog=63/67
+13:18:59 [info     ] pkg.box                        box=M063 n=136 prog=64/67
+13:19:16 [info     ] pkg.box                        box=M064 n=136 prog=65/67
+13:19:17 [info     ] pkg.price_err                  box=T001 dims=50x250x70 err=price fail: {'success': False, 'error': 'Size exceed product
+13:19:26 [info     ] pkg.price_err                  box=T001 dims=250x250x50 err=price fail: {'success': False, 'error': 'Size exceed product
+13:19:29 [info     ] pkg.box                        box=Z039A n=136 prog=66/67
+13:19:31 [info     ] pkg.price_err                  box=T001 dims=60x250x60 err=price fail: {'success': False, 'error': 'Size exceed product
+13:19:32 [info     ] pkg.box                        box=T001 n=120 prog=67/67
+14:04:14 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+14:04:14 [info     ] browser.launched               channel=chrome headless=True
+14:04:14 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+14:04:32 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+14:04:47 [info     ] pkg.boot                       cookies=['__RequestVerificationToken'] token_len=108
+14:04:47 [info     ] pkg.box                        box=0930 n=skip prog=1/67
+14:05:03 [info     ] pkg.box                        box=A001 n=128 prog=2/67
+14:05:03 [info     ] pkg.box                        box=A001A n=120 prog=3/67
+14:05:21 [info     ] pkg.box                        box=A001X n=128 prog=4/67
+14:05:21 [info     ] pkg.box                        box=A002AX n=120 prog=5/67
+14:05:36 [info     ] pkg.box                        box=A002CX n=120 prog=6/67
+14:05:36 [info     ] pkg.box                        box=A002BX n=128 prog=7/67
+14:05:51 [info     ] pkg.box                        box=A002X n=128 prog=8/67
+14:05:55 [info     ] pkg.box                        box=A002FX n=128 prog=9/67
+14:06:05 [info     ] pkg.box                        box=B037 n=120 prog=10/67
+14:06:11 [info     ] pkg.box                        box=B038 n=128 prog=11/67
+14:06:24 [info     ] pkg.box                        box=B040A n=128 prog=12/67
+14:06:24 [info     ] pkg.box                        box=B044X n=skip prog=13/67
+14:06:24 [info     ] pkg.box                        box=B048A n=skip prog=14/67
+14:06:24 [info     ] pkg.box                        box=B052A n=skip prog=15/67
+14:06:24 [info     ] pkg.box                        box=C001A n=skip prog=16/67
+14:06:24 [info     ] pkg.box                        box=C001AA n=skip prog=17/67
+14:06:24 [info     ] pkg.box                        box=C001AB n=skip prog=18/67
+14:06:29 [info     ] pkg.box                        box=B042A n=128 prog=19/67
+14:06:29 [info     ] pkg.box                        box=C001AD n=skip prog=20/67
+14:06:37 [info     ] pkg.box                        box=C001AC n=120 prog=21/67
+14:06:37 [info     ] pkg.box                        box=C001AX n=skip prog=22/67
+14:06:37 [info     ] pkg.box                        box=C001AY n=skip prog=23/67
+14:06:44 [info     ] pkg.box                        box=C001AE n=120 prog=24/67
+14:06:44 [info     ] pkg.box                        box=C001BX n=skip prog=25/67
+14:06:44 [info     ] pkg.box                        box=C001EX n=skip prog=26/67
+14:06:44 [info     ] pkg.box                        box=C001IX n=skip prog=27/67
+14:06:50 [info     ] pkg.box                        box=C001B n=120 prog=28/67
+14:06:50 [info     ] pkg.box                        box=C001M n=skip prog=29/67
+14:06:50 [info     ] pkg.box                        box=C001N n=skip prog=30/67
+14:06:50 [info     ] pkg.box                        box=C001NX n=skip prog=31/67
+14:06:50 [info     ] pkg.box                        box=C001QX n=skip prog=32/67
+14:06:50 [info     ] pkg.box                        box=C001RX n=skip prog=33/67
+14:06:50 [info     ] pkg.box                        box=C017 n=skip prog=34/67
+14:06:50 [info     ] pkg.box                        box=D007A n=skip prog=35/67
+14:06:50 [info     ] pkg.box                        box=D030 n=skip prog=36/67
+14:06:57 [info     ] pkg.price_err                  box=D040A dims=100x90x60 err=price fail: {'success': False, 'error': 'Size exceed product
+14:07:02 [info     ] pkg.box                        box=C001JX n=120 prog=37/67
+14:07:02 [info     ] pkg.box                        box=D052A n=skip prog=38/67
+14:07:02 [info     ] pkg.box                        box=E005X n=skip prog=39/67
+14:07:02 [info     ] pkg.box                        box=E005Y n=skip prog=40/67
+14:07:02 [info     ] pkg.box                        box=E013X n=skip prog=41/67
+14:07:02 [info     ] pkg.box                        box=E028A n=skip prog=42/67
+14:07:02 [info     ] pkg.box                        box=E043A n=skip prog=43/67
+14:07:02 [info     ] pkg.box                        box=E049 n=skip prog=44/67
+14:07:02 [info     ] pkg.box                        box=G012 n=skip prog=45/67
+14:07:02 [info     ] pkg.box                        box=J023A n=skip prog=46/67
+14:07:02 [info     ] pkg.box                        box=K003 n=skip prog=47/67
+14:07:02 [info     ] pkg.box                        box=K006 n=skip prog=48/67
+14:07:02 [info     ] pkg.box                        box=K016 n=skip prog=49/67
+14:07:02 [info     ] pkg.box                        box=K016X n=skip prog=50/67
+14:07:02 [info     ] pkg.box                        box=K024 n=skip prog=51/67
+14:07:02 [info     ] pkg.box                        box=L021 n=skip prog=52/67
+14:07:02 [info     ] pkg.box                        box=L044 n=skip prog=53/67
+14:07:03 [info     ] pkg.price_err                  box=D040A dims=120x90x60 err=price fail: {'success': False, 'error': 'Size exceed product
+14:07:09 [info     ] pkg.price_err                  box=D040A dims=160x110x80 err=price fail: {'success': False, 'error': 'Size exceed product
+14:07:15 [info     ] pkg.price_err                  box=D040A dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+14:07:17 [info     ] pkg.box                        box=L069 n=128 prog=54/67
+14:07:22 [info     ] pkg.price_err                  box=D040A dims=150x80x70 err=price fail: {'success': False, 'error': 'Size exceed product
+14:07:31 [info     ] pkg.price_err                  box=D040A dims=100x80x80 err=price fail: {'success': False, 'error': 'Size exceed product
+14:07:32 [info     ] pkg.box                        box=L069A n=128 prog=55/67
+14:07:32 [info     ] pkg.box                        box=L082 n=skip prog=56/67
+14:07:36 [info     ] pkg.price_err                  box=D040A dims=90x160x60 err=price fail: {'success': False, 'error': 'Size exceed product
+14:07:36 [info     ] pkg.box                        box=D040A n=72 prog=57/67
+14:07:46 [info     ] pkg.box                        box=M013 n=128 prog=58/67
+14:07:48 [info     ] pkg.price_err                  box=M014 dims=200x140x4 err=price fail: {'success': False, 'error': 'Size exceed product
+14:07:56 [info     ] pkg.price_err                  box=M015 dims=160x110x4 err=price fail: {'success': False, 'error': 'Size exceed product
+14:07:56 [info     ] pkg.box                        box=M014 n=120 prog=59/67
+14:08:01 [info     ] pkg.price_err                  box=M015 dims=200x140x4 err=price fail: {'success': False, 'error': 'Size exceed product
+14:08:05 [info     ] pkg.price_err                  box=M016 dims=160x110x4 err=price fail: {'success': False, 'error': 'Size exceed product
+14:08:10 [info     ] pkg.price_err                  box=M016 dims=200x140x4 err=price fail: {'success': False, 'error': 'Size exceed product
+14:08:11 [info     ] pkg.price_err                  box=M015 dims=150x60x4 err=price fail: {'success': False, 'error': 'Size exceed product
+14:08:13 [info     ] pkg.box                        box=M015 n=104 prog=60/67
+14:08:13 [info     ] pkg.box                        box=M061 n=skip prog=61/67
+14:08:13 [info     ] pkg.box                        box=M062 n=skip prog=62/67
+14:08:13 [info     ] pkg.box                        box=M063 n=skip prog=63/67
+14:08:13 [info     ] pkg.box                        box=M064 n=skip prog=64/67
+14:08:17 [info     ] pkg.price_err                  box=M016 dims=125x80x4 err=price fail: {'success': False, 'error': 'Size exceed product
+14:08:23 [info     ] pkg.price_err                  box=M016 dims=140x40x1 err=price fail: {'success': False, 'error': 'Size exceed product
+14:08:28 [info     ] pkg.box                        box=T001 n=128 prog=65/67
+14:08:28 [info     ] pkg.box                        box=Z039A n=skip prog=66/67
+14:08:29 [info     ] pkg.price_err                  box=M016 dims=150x60x4 err=price fail: {'success': False, 'error': 'Size exceed product
+14:08:31 [info     ] pkg.box                        box=M016 n=88 prog=67/67
+14:20:43 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+14:20:43 [info     ] browser.launched               channel=chrome headless=True
+14:20:43 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+14:21:00 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+14:22:15 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+14:22:15 [info     ] browser.launched               channel=chrome headless=True
+14:22:16 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+14:22:33 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+23:26:46 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+23:26:47 [info     ] browser.launched               channel=chrome headless=True
+23:26:47 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+23:27:04 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+23:28:27 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+23:28:27 [info     ] browser.launched               channel=chrome headless=True
+23:28:27 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+23:28:44 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+10:00:36 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+10:00:36 [info     ] browser.launched               channel=chrome headless=True
+10:00:36 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+10:00:54 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+10:07:53 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+10:07:53 [info     ] browser.launched               channel=chrome headless=True
+10:07:53 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+10:08:11 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+10:08:25 [info     ] pkg.boot                       cookies=['__RequestVerificationToken'] token_len=108
+10:08:40 [info     ] pkg.box                        box=A001 n=128 prog=1/67
+10:08:40 [info     ] pkg.box                        box=0930 n=128 prog=2/67
+10:08:54 [info     ] pkg.box                        box=A001A n=120 prog=3/67
+10:08:55 [info     ] pkg.box                        box=A001X n=128 prog=4/67
+10:09:08 [info     ] pkg.box                        box=A002AX n=120 prog=5/67
+10:09:10 [info     ] pkg.box                        box=A002BX n=128 prog=6/67
+10:09:23 [info     ] pkg.box                        box=A002CX n=120 prog=7/67
+10:09:25 [info     ] pkg.box                        box=A002FX n=128 prog=8/67
+10:09:40 [info     ] pkg.box                        box=A002X n=128 prog=9/67
+10:09:41 [info     ] pkg.box                        box=B037 n=120 prog=10/67
+10:09:55 [info     ] pkg.box                        box=B038 n=128 prog=11/67
+10:09:56 [info     ] pkg.box                        box=B040A n=128 prog=12/67
+10:10:09 [info     ] pkg.box                        box=B042A n=128 prog=13/67
+10:10:11 [info     ] pkg.box                        box=B044X n=128 prog=14/67
+10:10:26 [info     ] pkg.box                        box=B048A n=128 prog=15/67
+10:10:28 [info     ] pkg.box                        box=B052A n=128 prog=16/67
+10:10:42 [info     ] pkg.box                        box=C001A n=128 prog=17/67
+10:10:43 [info     ] pkg.box                        box=C001AA n=128 prog=18/67
+10:10:56 [info     ] pkg.box                        box=C001AC n=120 prog=19/67
+10:10:57 [info     ] pkg.box                        box=C001AB n=128 prog=20/67
+10:11:10 [info     ] pkg.box                        box=C001AE n=120 prog=21/67
+10:11:11 [info     ] pkg.box                        box=C001AD n=128 prog=22/67
+10:11:26 [info     ] pkg.box                        box=C001AX n=128 prog=23/67
+10:11:27 [info     ] pkg.box                        box=C001AY n=128 prog=24/67
+10:11:40 [info     ] pkg.box                        box=C001B n=120 prog=25/67
+10:11:44 [info     ] pkg.box                        box=C001BX n=128 prog=26/67
+10:11:54 [info     ] pkg.box                        box=C001EX n=128 prog=27/67
+10:11:59 [info     ] pkg.box                        box=C001IX n=128 prog=28/67
+10:12:07 [info     ] pkg.box                        box=C001JX n=120 prog=29/67
+10:12:15 [info     ] pkg.box                        box=C001M n=128 prog=30/67
+10:12:21 [info     ] pkg.box                        box=C001N n=120 prog=31/67
+10:12:31 [info     ] pkg.box                        box=C001NX n=128 prog=32/67
+10:12:39 [info     ] pkg.box                        box=C001QX n=128 prog=33/67
+10:12:46 [info     ] pkg.box                        box=C001RX n=120 prog=34/67
+10:12:53 [info     ] pkg.box                        box=C017 n=128 prog=35/67
+10:12:57 [info     ] pkg.price_err                  box=D007A dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+10:13:05 [info     ] pkg.box                        box=D007A n=120 prog=36/67
+10:13:06 [info     ] pkg.box                        box=D030 n=128 prog=37/67
+10:13:12 [info     ] pkg.price_err                  box=D040A dims=100x90x60 err=price fail: {'success': False, 'error': 'Size exceed product
+10:13:18 [info     ] pkg.price_err                  box=D040A dims=120x90x60 err=price fail: {'success': False, 'error': 'Size exceed product
+10:13:18 [info     ] pkg.box                        box=D052A n=128 prog=38/67
+10:13:24 [info     ] pkg.price_err                  box=D040A dims=160x110x80 err=price fail: {'success': False, 'error': 'Size exceed product
+10:13:28 [info     ] pkg.price_err                  box=E005X dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+10:13:29 [info     ] pkg.price_err                  box=D040A dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+10:13:37 [info     ] pkg.price_err                  box=D040A dims=150x80x70 err=price fail: {'success': False, 'error': 'Size exceed product
+10:13:38 [info     ] pkg.box                        box=E005X n=120 prog=39/67
+10:13:46 [info     ] pkg.price_err                  box=D040A dims=100x80x80 err=price fail: {'success': False, 'error': 'Size exceed product
+10:13:48 [info     ] pkg.price_err                  box=E005Y dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+10:13:51 [info     ] pkg.price_err                  box=D040A dims=90x160x60 err=price fail: {'success': False, 'error': 'Size exceed product
+10:13:51 [info     ] pkg.box                        box=D040A n=72 prog=40/67
+10:13:56 [info     ] pkg.box                        box=E005Y n=120 prog=41/67
+10:14:05 [info     ] pkg.box                        box=E013X n=128 prog=42/67
+10:14:06 [info     ] pkg.price_err                  box=E028A dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+10:14:16 [info     ] pkg.box                        box=E028A n=120 prog=43/67
+10:14:20 [info     ] pkg.box                        box=E043A n=128 prog=44/67
+10:14:29 [info     ] pkg.price_err                  box=E049 dims=200x140x80 err=price fail: {'success': False, 'error': 'Size exceed product
+10:14:36 [info     ] pkg.box                        box=G012 n=120 prog=45/67
+10:14:39 [info     ] pkg.box                        box=E049 n=120 prog=46/67
+10:14:51 [info     ] pkg.box                        box=J023A n=128 prog=47/67
+10:14:55 [info     ] pkg.box                        box=K003 n=128 prog=48/67
+10:15:06 [info     ] pkg.box                        box=K006 n=128 prog=49/67
+10:15:10 [info     ] pkg.box                        box=K016 n=128 prog=50/67
+10:15:23 [info     ] pkg.box                        box=K016X n=128 prog=51/67
+10:15:27 [info     ] pkg.box                        box=K024 n=128 prog=52/67
+10:15:39 [info     ] pkg.box                        box=L021 n=128 prog=53/67
+10:15:42 [info     ] pkg.box                        box=L044 n=128 prog=54/67
+10:15:53 [info     ] pkg.box                        box=L069 n=128 prog=55/67
+10:15:56 [info     ] pkg.box                        box=L069A n=128 prog=56/67
+10:16:08 [info     ] pkg.box                        box=L082 n=128 prog=57/67
+10:16:10 [info     ] pkg.box                        box=M013 n=128 prog=58/67
+10:16:19 [info     ] pkg.price_err                  box=M014 dims=200x140x4 err=price fail: {'success': False, 'error': 'Size exceed product
+10:16:20 [info     ] pkg.price_err                  box=M015 dims=160x110x4 err=price fail: {'success': False, 'error': 'Size exceed product
+10:16:26 [info     ] pkg.price_err                  box=M015 dims=200x140x4 err=price fail: {'success': False, 'error': 'Size exceed product
+10:16:27 [info     ] pkg.box                        box=M014 n=120 prog=59/67
+10:16:36 [info     ] pkg.price_err                  box=M015 dims=150x60x4 err=price fail: {'success': False, 'error': 'Size exceed product
+10:16:37 [info     ] pkg.price_err                  box=M016 dims=160x110x4 err=price fail: {'success': False, 'error': 'Size exceed product
+10:16:39 [info     ] pkg.box                        box=M015 n=104 prog=60/67
+10:16:43 [info     ] pkg.price_err                  box=M016 dims=200x140x4 err=price fail: {'success': False, 'error': 'Size exceed product
+10:16:50 [info     ] pkg.price_err                  box=M016 dims=125x80x4 err=price fail: {'success': False, 'error': 'Size exceed product
+10:16:51 [info     ] pkg.box                        box=M061 n=128 prog=61/67
+10:16:55 [info     ] pkg.price_err                  box=M016 dims=140x40x1 err=price fail: {'success': False, 'error': 'Size exceed product
+10:17:01 [info     ] pkg.price_err                  box=M016 dims=150x60x4 err=price fail: {'success': False, 'error': 'Size exceed product
+10:17:04 [info     ] pkg.box                        box=M016 n=88 prog=62/67
+10:17:04 [info     ] pkg.box                        box=M062 n=128 prog=63/67
+10:17:18 [info     ] pkg.box                        box=M063 n=128 prog=64/67
+10:17:18 [info     ] pkg.box                        box=M064 n=128 prog=65/67
+10:17:35 [info     ] pkg.box                        box=Z039A n=120 prog=66/67
+10:17:35 [info     ] pkg.box                        box=T001 n=128 prog=67/67
+12:40:57 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+12:40:57 [info     ] browser.launched               channel=chrome headless=True
+12:40:57 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+12:41:16 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+15:40:09 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+15:40:10 [info     ] browser.launched               channel=chrome headless=True
+15:40:10 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+15:40:28 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member
+15:45:43 [warning  ] browser.channel_unavailable    channel=msedge error=TargetClosedError
+15:45:43 [info     ] browser.launched               channel=chrome headless=True
+15:45:44 [info     ] login.start                    url=https://www.excard.com.my/login user=yus***
+15:46:02 [info     ] login.result                   ok=True url=https://www.excard.com.my/home-member

@@ -14,10 +14,22 @@
       "port": 8020
     },
     {
+      "name": "printoka-calc-static",
+      "runtimeExecutable": "C:/Users/User/OneDrive/Desktop/Printoka.com/crawler/.venv/Scripts/python.exe",
+      "runtimeArgs": ["-m", "http.server", "8030", "--directory", "C:/Users/User/OneDrive/Desktop/Printoka.com/crawler/ui"],
+      "port": 8030
+    },
+    {
       "name": "printoka-web",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev", "--prefix", "C:/Users/User/OneDrive/Desktop/Printoka.com/web"],
       "port": 3000
+    },
+    {
+      "name": "optcg-sim",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "uvicorn", "web.app:app", "--app-dir", "C:/Users/User/OneDrive/Desktop/optcg-sim", "--port", "8099"],
+      "port": 8099
     }
   ]
 }
