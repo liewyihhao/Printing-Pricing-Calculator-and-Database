@@ -10,7 +10,7 @@ Saves output/packaging_samples.json {box: [{L,W,D,qty,total,unit,unit_weight,net
   python -m app.packaging_sampler [account]
 """
 from __future__ import annotations
-import json, sys, threading
+import json, sys, threading, time
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from .packaging_api import bootstrap_session
@@ -28,6 +28,10 @@ def _dims(lim):
     D0 = Darr[0] or 50
     Dmax = Darr[2] if len(Darr) > 2 and Darr[2] else D0 * 4
     def cD(d): return int(max(D0, min(d, Dmax)))
+    # a moderately-wide value for an axis min: ~2.2x the min, capped, so we cover the realistic
+    # aspect range (W/L up to ~2.5) WITHOUT the extreme shapes (5x, very deep) that packmage prices
+    # in a different regime the smooth model can't fit.
+    def wide(m): return int(min(max(m * 2.2, m + 100), 230))
     cand = [(L0, W0, D0),
             (L0 + 20, W0 + 15, cD(D0 + 20)),
             (L0 + 40, W0 + 30, cD(D0 + 40)),
@@ -38,7 +42,14 @@ def _dims(lim):
             (int(L0 * 1.5), int(W0 * 1.5), cD(int(D0 * 1.5))),
             (L0 * 2, W0 * 2, cD(min(D0 * 2, Dmax))),
             (int(L0 * 2.5), max(W0, 80), cD(max(D0, 70))),
-            (max(L0, 140), int(W0 * 2), cD(min(int(D0 * 1.8), Dmax)))]
+            (max(L0, 140), int(W0 * 2), cD(min(int(D0 * 1.8), Dmax))),
+            # moderate aspect corners so the fit interpolates (not extrapolates) to realistic
+            # non-cubic shapes — this is what tamed the E043A-type outliers.
+            (max(L0, 60), wide(W0), cD(D0 + 20)),          # wide   (W ~2.2x L)
+            (wide(L0), max(W0, 60), cD(D0 + 20)),          # long   (L ~2.2x W)
+            (max(L0, 120), max(W0, 90), D0),               # flat   (min depth)
+            (max(L0, 100), max(W0, 80), cD(int(max(D0, 80) * 1.8))),  # deeper
+            (max(L0, 90), wide(W0), cD(max(D0, 60)))]      # wide + mid depth
     seen, out = set(), []
     for t in cand:
         t = (int(t[0]), int(t[1]), int(t[2]))
@@ -68,16 +79,25 @@ def run(account_id=1):
             return box, "skip"
         rows = []
         chain = (defaults.get(box) or {}).get("ProcessJson")  # box's real default chain
+        seen = set()
         for (L, W, D) in _dims(lim.get(box, {})):
-            try:
-                for r in pk.price(box, L, W, D, QTYS, process=chain):
-                    dic = r.get("dic", {})
-                    rows.append({"L": L, "W": W, "D": D, "qty": r["qty"], "total": r["total"],
-                                 "unit": r["unit"], "unit_weight": r["unit_weight"],
-                                 "netarea": dic.get("netarea"), "area": dic.get("area"),
-                                 "no": dic.get("no"), "color": dic.get("color")})
-            except Exception as e:  # noqa: BLE001
-                log.info("pkg.price_err", box=box, dims=f"{L}x{W}x{D}", err=str(e)[:60])
+            if (L, W, D) in seen:
+                continue
+            seen.add((L, W, D))
+            for attempt in range(3):                       # retry transient connection drops
+                try:
+                    for r in pk.price(box, L, W, D, QTYS, process=chain):
+                        dic = r.get("dic", {})
+                        rows.append({"L": L, "W": W, "D": D, "qty": r["qty"], "total": r["total"],
+                                     "unit": r["unit"], "unit_weight": r["unit_weight"],
+                                     "netarea": dic.get("netarea"), "area": dic.get("area"),
+                                     "no": dic.get("no"), "color": dic.get("color")})
+                    break
+                except Exception as e:  # noqa: BLE001
+                    if "material" in str(e).lower() or attempt == 2:
+                        log.info("pkg.price_err", box=box, dims=f"{L}x{W}x{D}", err=str(e)[:60])
+                        break
+                    time.sleep(1.5)
         # one dieline at the mid size
         if box not in dielines:
             try:
@@ -91,7 +111,7 @@ def run(account_id=1):
             samples[box] = rows; samples_f.write_text(json.dumps(samples))
         return box, len(rows)
 
-    with ThreadPoolExecutor(max_workers=6) as ex:
+    with ThreadPoolExecutor(max_workers=2) as ex:      # low concurrency = clean prices (no drops)
         futs = {ex.submit(do_box, b): b for b in boxes}
         done = 0
         for f in as_completed(futs):

@@ -52,12 +52,19 @@ def build_params():
         D = np.array([r["D"] for r in rows], float); na = np.array([r["netarea"] for r in rows], float)
         qty = np.array([r["qty"] for r in rows], float); tot = np.array([r["total"] for r in rows], float)
         uw = np.array([r.get("unit_weight") or 0 for r in rows], float)
-        # 1) netarea from dims (unique dims rows)
-        Amat = np.column_stack([np.ones_like(L), L * W, (L + W) * D])
+        # 1) netarea from dims — FULL quadratic basis. netarea is a deterministic quadratic of the
+        # box's flat unfold, so with aspect-diverse samples this fits it (near-)exactly, killing the
+        # extrapolation blow-ups at unusual shapes (e.g. very wide boxes).
+        Amat = np.column_stack([np.ones_like(L), L, W, D, L * W, W * D, L * D, L * L, W * W, D * D])
         n_coef, *_ = np.linalg.lstsq(Amat, na, rcond=None)
-        # 2) total = a0 + a1*na + b0*qty + b1*(na*qty)
-        Tmat = np.column_stack([np.ones_like(na), na, qty, na * qty])
-        t_coef, *_ = np.linalg.lstsq(Tmat, tot, rcond=None)
+        # 2) total = setup(na) + perpiece(na)*qty, where each is CONCAVE in na (a + b*na + c*sqrt(na))
+        # — real box cost grows sub-linearly with area, so a purely-linear na fit (dominated by the
+        # big-box samples) overshoots small boxes ~15%. Fit RELATIVE error (weight 1/total) so small
+        # and large boxes are balanced. t = [s0,s1,s2, p0,p1,p2].
+        sq = np.sqrt(na)
+        Tmat = np.column_stack([np.ones_like(na), na, sq, qty, na * qty, sq * qty])
+        w = 1.0 / np.maximum(tot, 1.0)
+        t_coef, *_ = np.linalg.lstsq(Tmat * w[:, None], tot * w, rcond=None)
         # 3) unit weight ~ w0 + w1*na
         w_coef, *_ = np.linalg.lstsq(np.column_stack([np.ones_like(na), na]), uw, rcond=None)
         params[box] = {"n": n_coef.tolist(), "t": t_coef.tolist(), "w": w_coef.tolist(),
@@ -104,7 +111,12 @@ def _calibrate_options():
 
 def _netarea(box, L, W, D, p):
     n = p["n"]
-    return max(1.0, n[0] + n[1] * (L * W) + n[2] * ((L + W) * D))
+    na = (n[0] + n[1] * L + n[2] * W + n[3] * D + n[4] * (L * W)
+          + n[5] * (W * D) + n[6] * (L * D) + n[7] * (L * L) + n[8] * (W * W) + n[9] * (D * D))
+    # the quadratic can extrapolate to absurd (even negative) netarea for dim combos outside the
+    # sampled grid — clamp to the box's sampled netarea band so price stays sane (bounded, not wild).
+    lo, hi = p.get("na_min", 1.0), p.get("na_max", 1e9)
+    return min(max(na, lo * 0.85), hi * 1.15)
 
 
 def cash_price(box, L, W, D, qty, material="M0024", colour=4,
@@ -119,8 +131,9 @@ def cash_price(box, L, W, D, qty, material="M0024", colour=4,
         return 0.0
     na = _netarea(box, L, W, D, p)
     t = p["t"]
-    setup = t[0] + t[1] * na
-    perpiece = (t[2] + t[3] * na)
+    sq = na ** 0.5
+    setup = t[0] + t[1] * na + t[2] * sq
+    perpiece = (t[3] + t[4] * na + t[5] * sq)
     opt = fit.get("options", {}) if "boxes" in fit else {}
     perpiece *= opt.get("material", {}).get(material, 1.0)   # board cost; colour has no effect
     cash = setup + perpiece * qty
@@ -162,13 +175,14 @@ def weight_kg(box, L, W, D, qty):
 if __name__ == "__main__":
     import statistics
     params = build_params()
-    print(f"calibrated {len(params)} boxes -> {PARAMS.name}")
-    # in-sample + leave-one-dims-out audit
+    box_params = params.get("boxes", params)
+    print(f"calibrated {len(box_params)} boxes -> {PARAMS.name}")
+    # in-sample audit
     data = json.loads(SAMPLES.read_text())
     ins, loo = [], []
     for box, rows in data.items():
         rows = [r for r in rows if r.get("total") and r.get("netarea")]
-        if box not in params or len(rows) < 6:
+        if box not in box_params or len(rows) < 6:
             continue
         for r in rows:
             pred = cash_price(box, r["L"], r["W"], r["D"], r["qty"])

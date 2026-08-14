@@ -93,8 +93,14 @@ const BAKED = window.PKG_DATA || null;   // present in the offline standalone bu
 // JS port of packaging_engine.cash_price (used in offline mode)
 function pkgPrice(box, L, W, D, qty, material, coating, addons){
   const P = BAKED && BAKED.params; const p = P && P.boxes[box]; if(!p) return null;
-  const na = Math.max(1, p.n[0]+p.n[1]*(L*W)+p.n[2]*((L+W)*D));
-  const setup = p.t[0]+p.t[1]*na; let perpiece = p.t[2]+p.t[3]*na;
+  const n=p.n, naRaw = n.length>3
+    ? n[0]+n[1]*L+n[2]*W+n[3]*D+n[4]*(L*W)+n[5]*(W*D)+n[6]*(L*D)+n[7]*(L*L)+n[8]*(W*W)+n[9]*(D*D)
+    : n[0]+n[1]*(L*W)+n[2]*((L+W)*D);  // full-quadratic basis (fallback to old 3-term)
+  // clamp to the box's sampled netarea band so out-of-grid dims can't produce a wild/negative area
+  const na = Math.min(Math.max(naRaw, (p.na_min||1)*0.85), (p.na_max||1e9)*1.15);
+  const t=p.t, sq=Math.sqrt(na);
+  const setup = t.length>4 ? t[0]+t[1]*na+t[2]*sq : t[0]+t[1]*na;
+  let perpiece = t.length>4 ? t[3]+t[4]*na+t[5]*sq : t[2]+t[3]*na;   // concave-in-na (fallback to linear)
   perpiece *= (P.options.material[material] || 1);
   let cash = setup + perpiece*qty;
   const fd = P.options.finishing||{}, scale = na/(P.options.ref_na||1200);
