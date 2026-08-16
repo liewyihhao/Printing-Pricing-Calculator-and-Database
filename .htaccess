@@ -1,0 +1,10 @@
+ErrorDocument 401 "Denied"
+ErrorDocument 403 "Denied"
+
+# Allow access to wp-admin/admin-ajax.php
+<Files admin-ajax.php>
+    Order allow,deny
+    Allow from all
+    Satisfy any
+</Files>
+
