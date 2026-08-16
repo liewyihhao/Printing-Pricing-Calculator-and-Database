@@ -137,7 +137,7 @@ _JS_OPTS = r"""
 (labRx) => {
   const rx = new RegExp(labRx, 'i');
   const vis = el => el && el.offsetParent !== null && el.getBoundingClientRect().height > 1;
-  const junk = t => !t || /^-+$/.test(t) || /please select|^-- ?select|^select /i.test(t);
+  const junk = t => !t || /^[-—\s]+$/.test(t) || /please select|^[-—]*\s*select|select\b.*\bfirst/i.test(t);
   for (const sel of document.querySelectorAll('select')) {
     if (!vis(sel)) continue;
     const g = sel.closest('.form-group,.row,.mb-3,.field') || sel.parentElement;
@@ -353,6 +353,12 @@ async def check_product(prod, ex: Excard, our: OurSide):
         if getattr(ex, "is_webforms", False) and infl_of[fk]:
             soft_skipped.add(fk)      # conditional field on a postback form — can't drive the driver
             return                    # via native events, so the read is stale; curve-validity stands
+        # A cascade/validity field can only be compared if EVERY driver it depends on matched an
+        # Excard control (so we actually set the driver on the live form). If a driver is unmatched,
+        # the Excard control sits at its "select … first" placeholder and the read is meaningless.
+        if any(infl not in exlabel_cache for infl in infl_of[fk]):
+            soft_skipped.add(fk)
+            return
         sig = sig_of(fk, V)
         if (fk, sig) in compared:
             return
