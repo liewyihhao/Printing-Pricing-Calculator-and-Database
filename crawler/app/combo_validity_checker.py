@@ -96,7 +96,7 @@ def vkey(s, extra=()):
     s = re.sub(r"(\d+)\s*c\b", r"\1c", s)
     s = re.sub(r"(\d+)\s*colours?", r"\1c", s)
     # keep letter+digit codes (a4, a5) so "A4" and "4 × A4" don't collide to the same key
-    return frozenset(t for t in re.findall(r"\d+c|[a-z]+\d+|[a-z]{2,}|\d+", s) if t not in _VSTOP)
+    return frozenset(t for t in re.findall(r"\d+c|\b[a-z]\d+\b|[a-z]{2,}|\d+", s) if t not in _VSTOP)
 
 
 def labnorm(s: str) -> str:

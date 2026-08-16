@@ -1532,17 +1532,21 @@ def _loose_sheet_exact(data):
 
 
 def _loose_size_validity(data):
-    """Loose Sheet (litho 21 + aliases 101/102/103): Excard's LIVE form restricts Paper and Print
-    Colour BY SIZE — a dimension the permissive price curves don't encode, so we were over-offering
-    invalid combos (flagged by combo_validity_checker). Captured live to output/loose_form_map.json:
-      • Colour: ganged sizes (3×A4 / 4×A4 / 4×A5 / Custom) offer '4C (Both)' ONLY; A1 / A6 drop the 1C
-        variants; A2–A5 offer the full 4C+1C set (1C realised only on Simili via the paper rule).
-      • Paper: the thick Gloss Art Cards (230 / 310 / 360gsm) are offered ONLY for A2–A5 / 3×A4 / 4×A5;
-        A1 / A6 / 4×A4 / Custom exclude them.
-    Added as a SIZE-primary validity rule-set; the array-validity engine intersects it with the
-    existing paper-primary colour rule, reproducing Excard's exact per-(size,paper) option space.
-    (Lamination's per-size + Spot-UV / UV-Varnish variation is priced and remains a deferred CheckPrice
-    re-sample — NOT touched here to avoid under-quoting.) Re-run app._loose_capture to refresh the map."""
+    """Loose Sheet (litho 21 + aliases 101/102/103): rebuild the family's Paper / Print-Colour /
+    Lamination validity DIRECTLY from Excard's live form (output/loose_form_map.json, captured by
+    app._loose_capture) — the permissive price curves don't encode these, so we were over-offering
+    combos Excard forbids (flagged by combo_validity_checker). Emits TWO validity rule-sets that the
+    array-validity engine INTERSECTS, giving Excard's exact per-(size,paper) option space:
+      • SIZE-primary  (paper, colour, lamination) — e.g. ganged sizes 3×A4/4×A4/4×A5/Custom → Colour
+        '4C (Both)' only; thick Gloss Art Cards 230/310/360 only on A2–A5/3×A4/4×A5; ganged/4×A4 drop
+        UV-Varnish.
+      • PAPER-primary (colour, lamination) — e.g. Simili 80/100 → +1C, Simili 140 → 4C only; only the
+        4 cards + Gloss Art Paper 150 laminate; 'Gloss Waterbase Varnish' (not an Excard option) and
+        'Not Required' on cards are dropped.
+    This REPLACES the coarse paper→colour rule from _loose_sheet_exact. Options are kept only where an
+    Excard option value matches ours (vkey), so we never invent a priced option — the Spot-UV
+    lamination combos Excard adds stay a deferred CheckPrice UNDER, never silently priced.
+    Re-run app._loose_capture to refresh the map after any Excard change."""
     import json as _json, re as _re
     mp = OUT / "loose_form_map.json"
     if not mp.is_file():
@@ -1551,57 +1555,91 @@ def _loose_size_validity(data):
     fm = _json.loads(mp.read_text(encoding="utf-8"))
     _NOISE = _re.compile(r"coated|design|mm|cm|open size|micron|\d+\s*side|up|sheet|available|"
                          r"different|shape|strong glue|1up|free|best|seller|new", _re.I)
+    _NEG = _re.compile(r"not required|no lamination|^\s*none\s*$|^\s*no\s*$", _re.I)
     _STOP = {"card", "cards", "paper", "gsm", "side", "sides", "coated", "best", "seller", "new",
              "open", "size", "other", "a", "the", "of"}
 
     def vk(s):
         s = str(s).lower().replace("×", "x")
+        if _NEG.search(s):
+            return frozenset({"__none__"})
         s = _re.sub(r"\(([^)]*)\)", lambda m: " " if _NOISE.search(m.group(1)) else " " + m.group(1) + " ", s)
+        s = _re.sub(r"matte", "matt", s)
+        s = _re.sub(r"laminat(e|ion)", "laminat", s)
+        s = _re.sub(r"water\s*base", "waterbas", s)
         s = _re.sub(r"(\d)\s*x\s*(?=[a-z])", r"\1 ", s)
         s = _re.sub(r"\d+\s*mm\b", " ", s)
         s = _re.sub(r"(\d+)\s*c\b", r"\1c", s)
-        # keep letter+digit codes (a4, a5) as tokens — else "A4" ≡ "4 × A4" and sizes collide
-        return frozenset(t for t in _re.findall(r"\d+c|[a-z]+\d+|[a-z]{2,}|\d+", s) if t not in _STOP)
+        return frozenset(t for t in _re.findall(r"\d+c|\b[a-z]\d+\b|[a-z]{2,}|\d+", s) if t not in _STOP)
 
-    # Excard size string -> {paper vkeys, colour vkeys}
-    ex_by_size = {}
+    # Aggregate Excard's live form: per-size and per-paper ceilings for paper/colour/lamination.
+    size_paper, size_col, size_lam = {}, {}, {}
+    paper_col, paper_lam = {}, {}
     for exsize, d in fm.items():
-        cols = set()
-        for v in d.get("by_paper", {}).values():
-            cols |= {vk(c) for c in (v.get("colour") or [])}
-        ex_by_size[vk(exsize)] = {"papers": {vk(p) for p in d.get("papers", [])}, "colours": cols}
+        sk = vk(exsize)
+        size_paper.setdefault(sk, set()).update(vk(p) for p in d.get("papers", []))
+        size_col.setdefault(sk, set()); size_lam.setdefault(sk, set())
+        for pp, v in d.get("by_paper", {}).items():
+            pk = vk(pp)
+            for c in (v.get("colour") or []):
+                size_col[sk].add(vk(c)); paper_col.setdefault(pk, set()).add(vk(c))
+            for l in (v.get("lamination") or []):
+                size_lam[sk].add(vk(l)); paper_lam.setdefault(pk, set()).add(vk(l))
+
+    def allowed(our_opts, want):
+        return [o for o in our_opts if vk(o) in want]
 
     n = 0
     for p in data["products"]:
         if p.get("optsrc") != "loose21":
             continue
         F = {f["key"]: f for f in p["fields"]}
-        sf, pf, cf = F.get("size"), F.get("paper"), F.get("colour")
+        sf, pf, cf, lf = F.get("size"), F.get("paper"), F.get("colour"), F.get("lamination")
         if not (sf and pf and cf):
             continue
-        rules = {}
+        our_p, our_c = pf["options"], cf["options"]
+        our_l = (lf or {}).get("options") or []
+
+        srules = {}
         for osz in (sf.get("options") or []):
-            ex = ex_by_size.get(vk(osz))
-            if not ex:
+            sk = vk(osz)
+            if sk not in size_paper:
                 continue
-            allowed_paper = [op for op in pf["options"] if vk(op) in ex["papers"]]
-            allowed_colour = [oc for oc in cf["options"] if vk(oc) in ex["colours"]]
             slot = {}
-            if allowed_paper and len(allowed_paper) < len(pf["options"]):
-                slot["paper"] = allowed_paper
-            if allowed_colour and len(allowed_colour) < len(cf["options"]):
-                slot["colour"] = allowed_colour
+            ap, ac, al = allowed(our_p, size_paper[sk]), allowed(our_c, size_col[sk]), allowed(our_l, size_lam[sk])
+            if ap and len(ap) < len(our_p):
+                slot["paper"] = ap
+            if ac and len(ac) < len(our_c):
+                slot["colour"] = ac
+            if lf and al and len(al) < len(our_l):
+                slot["lamination"] = al
             if slot:
-                rules[osz] = slot
-        if not rules:
-            continue
-        size_rs = {"primary": "size",
-                   "fields": sorted({k for r in rules.values() for k in r}),
-                   "rules": rules}
-        V = p.get("validity")
-        p["validity"] = ([size_rs] + V) if isinstance(V, list) else ([size_rs, V] if V else size_rs)
-        n += 1
-    print(f"loose-size validity: {n} loose products gated Paper + Colour by size (ganged→4C Both, thick cards→A2-A5/3×A4/4×A5)")
+                srules[osz] = slot
+
+        prules = {}
+        for opp in our_p:
+            pk = vk(opp)
+            slot = {}
+            if pk in paper_col:
+                ac = allowed(our_c, paper_col[pk])
+                if ac and len(ac) < len(our_c):
+                    slot["colour"] = ac
+            if lf and pk in paper_lam:
+                al = allowed(our_l, paper_lam[pk])
+                if al and len(al) < len(our_l):
+                    slot["lamination"] = al
+            if slot:
+                prules[opp] = slot
+
+        rulesets = []
+        if srules:
+            rulesets.append({"primary": "size", "fields": sorted({k for r in srules.values() for k in r}), "rules": srules})
+        if prules:
+            rulesets.append({"primary": "paper", "fields": sorted({k for r in prules.values() for k in r}), "rules": prules})
+        if rulesets:
+            p["validity"] = rulesets if len(rulesets) > 1 else rulesets[0]   # replaces the coarse rule
+            n += 1
+    print(f"loose-size validity: {n} loose products — Paper/Colour/Lamination validity rebuilt from live form map")
 
 
 def _finishing_subcontrols(data):
