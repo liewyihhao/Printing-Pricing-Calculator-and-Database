@@ -95,7 +95,8 @@ def vkey(s, extra=()):
     s = re.sub(r"\d+\s*mm\b", " ", s)                     # drop dimension tokens (name stays)
     s = re.sub(r"(\d+)\s*c\b", r"\1c", s)
     s = re.sub(r"(\d+)\s*colours?", r"\1c", s)
-    return frozenset(t for t in re.findall(r"\d+c|[a-z]{2,}|\d+", s) if t not in _VSTOP)
+    # keep letter+digit codes (a4, a5) so "A4" and "4 × A4" don't collide to the same key
+    return frozenset(t for t in re.findall(r"\d+c|[a-z]+\d+|[a-z]{2,}|\d+", s) if t not in _VSTOP)
 
 
 def labnorm(s: str) -> str:

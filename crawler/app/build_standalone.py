@@ -1531,6 +1531,79 @@ def _loose_sheet_exact(data):
     print("loose-sheet: applied exact Excard validity (lamination/colour/folding-creasing/hole-punch) to 21,101,102,103")
 
 
+def _loose_size_validity(data):
+    """Loose Sheet (litho 21 + aliases 101/102/103): Excard's LIVE form restricts Paper and Print
+    Colour BY SIZE — a dimension the permissive price curves don't encode, so we were over-offering
+    invalid combos (flagged by combo_validity_checker). Captured live to output/loose_form_map.json:
+      • Colour: ganged sizes (3×A4 / 4×A4 / 4×A5 / Custom) offer '4C (Both)' ONLY; A1 / A6 drop the 1C
+        variants; A2–A5 offer the full 4C+1C set (1C realised only on Simili via the paper rule).
+      • Paper: the thick Gloss Art Cards (230 / 310 / 360gsm) are offered ONLY for A2–A5 / 3×A4 / 4×A5;
+        A1 / A6 / 4×A4 / Custom exclude them.
+    Added as a SIZE-primary validity rule-set; the array-validity engine intersects it with the
+    existing paper-primary colour rule, reproducing Excard's exact per-(size,paper) option space.
+    (Lamination's per-size + Spot-UV / UV-Varnish variation is priced and remains a deferred CheckPrice
+    re-sample — NOT touched here to avoid under-quoting.) Re-run app._loose_capture to refresh the map."""
+    import json as _json, re as _re
+    mp = OUT / "loose_form_map.json"
+    if not mp.is_file():
+        print("loose-size validity: SKIP (no output/loose_form_map.json — run app._loose_capture)")
+        return
+    fm = _json.loads(mp.read_text(encoding="utf-8"))
+    _NOISE = _re.compile(r"coated|design|mm|cm|open size|micron|\d+\s*side|up|sheet|available|"
+                         r"different|shape|strong glue|1up|free|best|seller|new", _re.I)
+    _STOP = {"card", "cards", "paper", "gsm", "side", "sides", "coated", "best", "seller", "new",
+             "open", "size", "other", "a", "the", "of"}
+
+    def vk(s):
+        s = str(s).lower().replace("×", "x")
+        s = _re.sub(r"\(([^)]*)\)", lambda m: " " if _NOISE.search(m.group(1)) else " " + m.group(1) + " ", s)
+        s = _re.sub(r"(\d)\s*x\s*(?=[a-z])", r"\1 ", s)
+        s = _re.sub(r"\d+\s*mm\b", " ", s)
+        s = _re.sub(r"(\d+)\s*c\b", r"\1c", s)
+        # keep letter+digit codes (a4, a5) as tokens — else "A4" ≡ "4 × A4" and sizes collide
+        return frozenset(t for t in _re.findall(r"\d+c|[a-z]+\d+|[a-z]{2,}|\d+", s) if t not in _STOP)
+
+    # Excard size string -> {paper vkeys, colour vkeys}
+    ex_by_size = {}
+    for exsize, d in fm.items():
+        cols = set()
+        for v in d.get("by_paper", {}).values():
+            cols |= {vk(c) for c in (v.get("colour") or [])}
+        ex_by_size[vk(exsize)] = {"papers": {vk(p) for p in d.get("papers", [])}, "colours": cols}
+
+    n = 0
+    for p in data["products"]:
+        if p.get("optsrc") != "loose21":
+            continue
+        F = {f["key"]: f for f in p["fields"]}
+        sf, pf, cf = F.get("size"), F.get("paper"), F.get("colour")
+        if not (sf and pf and cf):
+            continue
+        rules = {}
+        for osz in (sf.get("options") or []):
+            ex = ex_by_size.get(vk(osz))
+            if not ex:
+                continue
+            allowed_paper = [op for op in pf["options"] if vk(op) in ex["papers"]]
+            allowed_colour = [oc for oc in cf["options"] if vk(oc) in ex["colours"]]
+            slot = {}
+            if allowed_paper and len(allowed_paper) < len(pf["options"]):
+                slot["paper"] = allowed_paper
+            if allowed_colour and len(allowed_colour) < len(cf["options"]):
+                slot["colour"] = allowed_colour
+            if slot:
+                rules[osz] = slot
+        if not rules:
+            continue
+        size_rs = {"primary": "size",
+                   "fields": sorted({k for r in rules.values() for k in r}),
+                   "rules": rules}
+        V = p.get("validity")
+        p["validity"] = ([size_rs] + V) if isinstance(V, list) else ([size_rs, V] if V else size_rs)
+        n += 1
+    print(f"loose-size validity: {n} loose products gated Paper + Colour by size (ganged→4C Both, thick cards→A2-A5/3×A4/4×A5)")
+
+
 def _finishing_subcontrols(data):
     """Cover-finishing sub-controls (Exclusive Leather Wire-O Notebook etc.): Deboss reveals its
     size H/W; UV-DTF Stickering reveals sticker size + position. Add the showWhen + strip the '-'
@@ -2340,6 +2413,7 @@ def main():
     _fn, _fc = _reorder_fields(data)
     print(f"field order: {_fc}/{_fn} products resequenced to the supplier's option order")
     _loose_sheet_exact(data)      # exact Excard conditional validity for the loose-sheet family
+    _loose_size_validity(data)    # Loose Sheet: Excard restricts Paper + Colour by SIZE (live-captured)
     from app.validity_apply import apply as _apply_validity
     _apply_validity(data)         # capture-driven exact showWhen/validity for all flagged products
     _sticker_validity(data)       # sticker shape -> size-input conditionals

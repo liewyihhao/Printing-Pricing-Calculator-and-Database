@@ -1,0 +1,1212 @@
+{
+ "A1 (594mm × 840mm)": {
+  "papers": [
+   "Simili Paper 80gsm - Best Seller",
+   "Simili Paper 100gsm - Best Seller",
+   "Simili Paper 140gsm - Best Seller",
+   "Gloss Art Paper 80gsm - Best Seller (NEW)",
+   "Gloss Art Paper 100gsm - Best Seller",
+   "Gloss Art Paper 128gsm - Best Seller",
+   "Gloss Art Paper 150gsm - Best Seller",
+   "Matte Art Paper 130gsm - Best Seller",
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller"
+  ],
+  "by_paper": {
+   "Simili Paper 80gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 140gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 80gsm - Best Seller (NEW)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 128gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 150gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Not Required",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)"
+    ]
+   },
+   "Matte Art Paper 130gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)"
+    ]
+   }
+  }
+ },
+ "A2 (420mm × 594mm)": {
+  "papers": [
+   "Simili Paper 80gsm - Best Seller",
+   "Simili Paper 100gsm - Best Seller",
+   "Simili Paper 140gsm - Best Seller",
+   "Gloss Art Paper 80gsm - Best Seller (NEW)",
+   "Gloss Art Paper 100gsm - Best Seller",
+   "Gloss Art Paper 128gsm - Best Seller",
+   "Gloss Art Paper 150gsm - Best Seller",
+   "Matte Art Paper 130gsm - Best Seller",
+   "Gloss Art Card 230gsm (2 sides coated)",
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller",
+   "Gloss Art Card 310gsm (2 sides coated)",
+   "Gloss Art Card 360gsm (2 sides coated)"
+  ],
+  "by_paper": {
+   "Simili Paper 80gsm - Best Seller": {
+    "colour": [
+     "1C (Front)",
+     "1C (Both)",
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 100gsm - Best Seller": {
+    "colour": [
+     "1C (Front)",
+     "1C (Both)",
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 140gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 80gsm - Best Seller (NEW)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 128gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 150gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Not Required",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)",
+     "UV Varnish (Front)"
+    ]
+   },
+   "Matte Art Paper 130gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Card 230gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "Matt Lamination (Both) + Spot UV (Both)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 310gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 360gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   }
+  }
+ },
+ "A3 (297mm × 420mm)": {
+  "papers": [
+   "Simili Paper 80gsm - Best Seller",
+   "Simili Paper 100gsm - Best Seller",
+   "Simili Paper 140gsm - Best Seller",
+   "Gloss Art Paper 80gsm - Best Seller (NEW)",
+   "Gloss Art Paper 100gsm - Best Seller",
+   "Gloss Art Paper 128gsm - Best Seller",
+   "Gloss Art Paper 150gsm - Best Seller",
+   "Matte Art Paper 130gsm - Best Seller",
+   "Gloss Art Card 230gsm (2 sides coated)",
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller",
+   "Gloss Art Card 310gsm (2 sides coated)",
+   "Gloss Art Card 360gsm (2 sides coated)"
+  ],
+  "by_paper": {
+   "Simili Paper 80gsm - Best Seller": {
+    "colour": [
+     "1C (Front)",
+     "1C (Both)",
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 100gsm - Best Seller": {
+    "colour": [
+     "1C (Front)",
+     "1C (Both)",
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 140gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 80gsm - Best Seller (NEW)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 128gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 150gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Not Required",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)",
+     "UV Varnish (Front)"
+    ]
+   },
+   "Matte Art Paper 130gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Card 230gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "Matt Lamination (Both) + Spot UV (Both)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 310gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 360gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   }
+  }
+ },
+ "A4 (210mm × 297mm)": {
+  "papers": [
+   "Simili Paper 80gsm - Best Seller",
+   "Simili Paper 100gsm - Best Seller",
+   "Simili Paper 140gsm - Best Seller",
+   "Gloss Art Paper 80gsm - Best Seller (NEW)",
+   "Gloss Art Paper 100gsm - Best Seller",
+   "Gloss Art Paper 128gsm - Best Seller",
+   "Gloss Art Paper 150gsm - Best Seller",
+   "Matte Art Paper 130gsm - Best Seller",
+   "Gloss Art Card 230gsm (2 sides coated)",
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller",
+   "Gloss Art Card 310gsm (2 sides coated)",
+   "Gloss Art Card 360gsm (2 sides coated)"
+  ],
+  "by_paper": {
+   "Simili Paper 80gsm - Best Seller": {
+    "colour": [
+     "1C (Front)",
+     "1C (Both)",
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 100gsm - Best Seller": {
+    "colour": [
+     "1C (Front)",
+     "1C (Both)",
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 140gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 80gsm - Best Seller (NEW)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 128gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 150gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Not Required",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)",
+     "UV Varnish (Front)"
+    ]
+   },
+   "Matte Art Paper 130gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Card 230gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "Matt Lamination (Both) + Spot UV (Both)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 310gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 360gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   }
+  }
+ },
+ "A5 (148mm × 210mm)": {
+  "papers": [
+   "Simili Paper 80gsm - Best Seller",
+   "Simili Paper 100gsm - Best Seller",
+   "Simili Paper 140gsm - Best Seller",
+   "Gloss Art Paper 80gsm - Best Seller (NEW)",
+   "Gloss Art Paper 100gsm - Best Seller",
+   "Gloss Art Paper 128gsm - Best Seller",
+   "Gloss Art Paper 150gsm - Best Seller",
+   "Matte Art Paper 130gsm - Best Seller",
+   "Gloss Art Card 230gsm (2 sides coated)",
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller",
+   "Gloss Art Card 310gsm (2 sides coated)",
+   "Gloss Art Card 360gsm (2 sides coated)"
+  ],
+  "by_paper": {
+   "Simili Paper 80gsm - Best Seller": {
+    "colour": [
+     "1C (Front)",
+     "1C (Both)",
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 100gsm - Best Seller": {
+    "colour": [
+     "1C (Front)",
+     "1C (Both)",
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 140gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 80gsm - Best Seller (NEW)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 128gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 150gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Not Required",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)",
+     "UV Varnish (Front)"
+    ]
+   },
+   "Matte Art Paper 130gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Card 230gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "Matt Lamination (Both) + Spot UV (Both)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 310gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 360gsm (2 sides coated)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   }
+  }
+ },
+ "A6 (105mm × 148mm)": {
+  "papers": [
+   "Simili Paper 80gsm - Best Seller",
+   "Simili Paper 100gsm - Best Seller",
+   "Simili Paper 140gsm - Best Seller",
+   "Gloss Art Paper 80gsm - Best Seller (NEW)",
+   "Gloss Art Paper 100gsm - Best Seller",
+   "Gloss Art Paper 128gsm - Best Seller",
+   "Gloss Art Paper 150gsm - Best Seller",
+   "Matte Art Paper 130gsm - Best Seller",
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller"
+  ],
+  "by_paper": {
+   "Simili Paper 80gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 140gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 80gsm - Best Seller (NEW)": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 128gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 150gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Not Required",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)",
+     "UV Varnish (Front)"
+    ]
+   },
+   "Matte Art Paper 130gsm - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller": {
+    "colour": [
+     "4C (Front)",
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "Matt Lamination (Both) + Spot UV (Both)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   }
+  }
+ },
+ "3 × A4 (297mm × 630mm)": {
+  "papers": [
+   "Simili Paper 80gsm - Best Seller",
+   "Simili Paper 100gsm - Best Seller",
+   "Simili Paper 140gsm - Best Seller",
+   "Gloss Art Paper 80gsm - Best Seller (NEW)",
+   "Gloss Art Paper 100gsm - Best Seller",
+   "Gloss Art Paper 128gsm - Best Seller",
+   "Gloss Art Paper 150gsm - Best Seller",
+   "Matte Art Paper 130gsm - Best Seller",
+   "Gloss Art Card 230gsm (2 sides coated)",
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller",
+   "Gloss Art Card 310gsm (2 sides coated)",
+   "Gloss Art Card 360gsm (2 sides coated)"
+  ],
+  "by_paper": {
+   "Simili Paper 80gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 140gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 80gsm - Best Seller (NEW)": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 128gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 150gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Not Required",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)",
+     "UV Varnish (Front)"
+    ]
+   },
+   "Matte Art Paper 130gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Card 230gsm (2 sides coated)": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "Matt Lamination (Both) + Spot UV (Both)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 310gsm (2 sides coated)": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 360gsm (2 sides coated)": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   }
+  }
+ },
+ "4 × A4 (297mm × 840mm)": {
+  "papers": [
+   "Simili Paper 80gsm - Best Seller",
+   "Simili Paper 100gsm - Best Seller",
+   "Simili Paper 140gsm - Best Seller",
+   "Gloss Art Paper 80gsm - Best Seller (NEW)",
+   "Gloss Art Paper 100gsm - Best Seller",
+   "Gloss Art Paper 128gsm - Best Seller",
+   "Gloss Art Paper 150gsm - Best Seller",
+   "Matte Art Paper 130gsm - Best Seller",
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller"
+  ],
+  "by_paper": {
+   "Simili Paper 80gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 140gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 80gsm - Best Seller (NEW)": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 128gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 150gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Not Required",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)"
+    ]
+   },
+   "Matte Art Paper 130gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)"
+    ]
+   }
+  }
+ },
+ "4 × A5 (210mm × 594mm)": {
+  "papers": [
+   "Simili Paper 80gsm - Best Seller",
+   "Simili Paper 100gsm - Best Seller",
+   "Simili Paper 140gsm - Best Seller",
+   "Gloss Art Paper 80gsm - Best Seller (NEW)",
+   "Gloss Art Paper 100gsm - Best Seller",
+   "Gloss Art Paper 128gsm - Best Seller",
+   "Gloss Art Paper 150gsm - Best Seller",
+   "Matte Art Paper 130gsm - Best Seller",
+   "Gloss Art Card 230gsm (2 sides coated)",
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller",
+   "Gloss Art Card 310gsm (2 sides coated)",
+   "Gloss Art Card 360gsm (2 sides coated)"
+  ],
+  "by_paper": {
+   "Simili Paper 80gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 140gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 80gsm - Best Seller (NEW)": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 128gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 150gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Not Required",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)",
+     "UV Varnish (Front)"
+    ]
+   },
+   "Matte Art Paper 130gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Card 230gsm (2 sides coated)": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "Matt Lamination (Both) + Spot UV (Both)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 310gsm (2 sides coated)": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   },
+   "Gloss Art Card 360gsm (2 sides coated)": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Front) + Spot UV (Front)",
+     "Matt Lamination (Both)",
+     "Matt Lamination (Both) + Spot UV (Front)",
+     "UV Varnish (Front)",
+     "UV Varnish (Both)"
+    ]
+   }
+  }
+ },
+ "Custom Size": {
+  "papers": [
+   "Simili Paper 80gsm - Best Seller",
+   "Simili Paper 100gsm - Best Seller",
+   "Simili Paper 140gsm - Best Seller",
+   "Gloss Art Paper 80gsm - Best Seller (NEW)",
+   "Gloss Art Paper 100gsm - Best Seller",
+   "Gloss Art Paper 128gsm - Best Seller",
+   "Gloss Art Paper 150gsm - Best Seller",
+   "Matte Art Paper 130gsm - Best Seller",
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller"
+  ],
+  "by_paper": {
+   "Simili Paper 80gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Simili Paper 140gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 80gsm - Best Seller (NEW)": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 100gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 128gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Paper 150gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Not Required",
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)"
+    ]
+   },
+   "Matte Art Paper 130gsm - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": null
+   },
+   "Gloss Art Card 250gsm (2 sides coated) - Best Seller": {
+    "colour": [
+     "4C (Both)"
+    ],
+    "lamination": [
+     "Gloss Lamination (Front)",
+     "Gloss Lamination (Both)",
+     "Matt Lamination (Front)",
+     "Matt Lamination (Both)"
+    ]
+   }
+  }
+ }
+}
