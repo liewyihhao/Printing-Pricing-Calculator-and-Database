@@ -1898,6 +1898,103 @@ def _booklet_cover_lamination_validity(data):
         print(f"booklet cover-lamination validity: {n} products (cover paper -> lamination)")
 
 
+import re as _re
+
+
+def _laminatable_paper(name):
+    """Excard's consistent physical rule (verified live on booklet + loose-sheet litho & digital):
+    only COATED ART CARD (any gsm) or GLOSS/MATTE ART PAPER >=150gsm can be laminated. Simili
+    (uncoated), thinner art papers, and specialty stocks (Metal Ice / Super White / Linen / Suwen /
+    Synthetic — even at >=240gsm) cannot."""
+    n = name.lower()
+    m = _re.search(r"(\d+)\s*gsm", n)
+    gsm = int(m.group(1)) if m else 0
+    if "art card" in n:
+        return True
+    if ("gloss art paper" in n or "matte art paper" in n) and gsm >= 150:
+        return True
+    return False
+
+
+def _loose_digital_lamination(data):
+    """Loose Sheet DIGITAL (50): gate lamination by paper the same way the litho family does (via
+    _loose_sheet_exact) and the live do-loose-sheet form confirms — show lamination only for
+    laminatable papers. Hot-stamping stays available (matches Excard)."""
+    n = 0
+    for p in data["products"]:
+        if p["id"] != 50:
+            continue
+        fields = {f["key"]: f for f in p["fields"]}
+        lam = fields.get("lamination")
+        if not lam or lam.get("showWhen"):
+            continue
+        opts = data["options"].get(f"digital{p['id']}") or {}
+        papers = set(_re.findall(r"[A-Z][A-Za-z ]*?(?:\d+gsm|\d+micron)[^\"|]*", json.dumps(opts, ensure_ascii=False)))
+        lam_papers = sorted({pp.strip() for pp in papers if _laminatable_paper(pp)})
+        if lam_papers:
+            lam["showWhen"] = {"field": "paper", "values": lam_papers}
+            n += 1
+    if n:
+        print(f"loose-digital lamination: {n} product (paper -> lamination showWhen)")
+
+
+def _material_finishing_validity(data):
+    """Catalogue-wide guarantee: a paper/material axis gates the lamination / finishing / coating /
+    varnish axis EXACTLY as Excard's price curves show (a paper that never pairs with a real finish
+    in the curves cannot be finished). Derives the rule per pricelist product from its own curves and
+    applies it — filling any gap the product-specific helpers left (e.g. Greeting Card). Skips a
+    finishing field that's already gated via showWhen (loose-sheet) or already constrained by the
+    same paper primary, so it never double-handles or conflicts."""
+    PAPER = ("paper", "material", "papermaterial")
+    FIN = ("lamination", "finishing", "coating", "varnish")
+
+    def is_paper(a):
+        al = a.lower().replace(" ", "")
+        return any(k in al for k in PAPER) and "materialbase" not in al and "materialstand" not in al
+
+    def is_fin(a):
+        return any(k in a.lower().replace(" ", "") for k in FIN)
+
+    n = 0
+    for p in data["products"]:
+        if p.get("engine") != "pricelist":
+            continue
+        params = data["params"].get(p.get("paramKey"))
+        if not params:
+            continue
+        ac = params.get("axis_cols") or []
+        fields = {f["key"]: f for f in p["fields"]}
+        if not any(is_paper(a) for a in ac) or not any(is_fin(a) for a in ac):
+            continue
+        for pa in [a for a in ac if is_paper(a)]:
+            full = _curve_driven_ruleset(p, params, pa)
+            if not full:
+                continue
+            fin_keys = [_norm(a) for a in ac if is_fin(a)]
+            existing = p.get("validity")
+            ex_list = existing if isinstance(existing, list) else ([existing] if existing else [])
+            constrained_fields = {f for rs in ex_list if rs for f in rs.get("fields", [])}
+            keep = []
+            for fk in fin_keys:
+                fld = fields.get(fk)
+                # only touch finishing fields that are UNconstrained today (no showWhen, no validity
+                # rule from any product-specific helper) — pure gap-fill, never a duplicate.
+                if not fld or fk not in full["fields"] or fld.get("showWhen") or fk in constrained_fields:
+                    continue
+                keep.append(fk)
+            if not keep:
+                continue
+            rs = {"primary": full["primary"], "fields": keep,
+                  "rules": {dv: {fk: full["rules"][dv][fk] for fk in keep if fk in full["rules"][dv]}
+                            for dv in full["rules"]}}
+            existing = p.get("validity")
+            base = [r for r in (existing if isinstance(existing, list) else [existing]) if r and r.get("rules")]
+            p["validity"] = (base + [rs]) if base else rs
+            n += 1
+    if n:
+        print(f"material->finishing validity: {n} paper->finishing rule-sets (curve-derived)")
+
+
 def _greeting_card_validity(data):
     """Greeting Card: Fold Type drives which Models are available (each model belongs to exactly one
     fold) and which Envelopes (only Half Fold offers a White envelope). Excard's deps-derived
@@ -2207,6 +2304,9 @@ def main():
     _booklet_cover_lamination_validity(data)  # booklet cover paper -> cover lamination (live-captured)
     _curve_validity_config(data)      # apparel model->fabric, static-cling/car-sticker VDP, etc.
     _money_packet_validity(data)  # Mix-Design <-> Package valid-combo coupling (2nd rule-set)
+    _loose_digital_lamination(data)   # Loose Sheet Digital (50): paper -> lamination showWhen
+    _material_finishing_validity(data)  # catalogue-wide paper -> lamination/finishing gap-fill (runs
+    #                                     LAST so it only fills fields no specific helper constrained)
     _dedupe_validity(data)        # strip primary-in-own-fields / duplicate fields (build artifacts)
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
