@@ -65,16 +65,21 @@ _CHROME = re.compile(r"track order|^product$|quantity|country|courier|favourite|
 # directional/colour qualifiers, so equal keys ⇒ same option.
 _NEG = re.compile(r"not required|no required|^\s*none\s*$|no lamination|no hot ?stamping|"
                   r"no fold(ing)?|no cutting|not ?applicable|no hole ?punching|^\s*no\s*$", re.I)
-_NOISE_PAREN = re.compile(r"coated|design|mm|cm|open size|micron|\d+\s*side", re.I)
+_NOISE_PAREN = re.compile(r"coated|design|mm|cm|open size|micron|\d+\s*side|up|sheet|available|"
+                          r"different|shape|strong glue|1up|free", re.I)
 _VSTOP = {"card", "cards", "paper", "design", "designs", "best", "seller", "new", "diameter", "free",
-          "coated", "side", "sides", "gsm", "mm", "cm", "micron", "open", "size", "a", "the", "of"}
+          "coated", "side", "sides", "gsm", "mm", "cm", "micron", "open", "size", "other", "type",
+          "a", "the", "of", "for", "and", "with", "available"}
 
 
 def vkey(s, extra=()):
     """Canonical identity of an option value, tolerant of v4-vs-ours notation. `extra` = the field's
     label tokens (e.g. round/corner) which v4 often repeats inside the option text
     ("No Round Corner", "Hole Punching - Diameter 3mm") — strip them FIRST so the negative/positive
-    signal ("No"/"Required") and the real qualifier ("3mm") are what remain."""
+    signal ("No"/"Required") and the real qualifier ("3mm") are what remain. Also folds the spelling
+    variants the v4 SPA uses vs ours: Matte/Matt, Laminate/Lamination, Water Base/Waterbase, the
+    "NxA4"/"N × A4" size multiplier, and drops dimension tokens (envelopes/sizes name the same paper
+    with dims in different order/format)."""
     s = str(s).lower().replace("×", "x")
     for w in extra:
         if len(w) >= 2:
@@ -82,6 +87,12 @@ def vkey(s, extra=()):
     if _NEG.search(s):
         return frozenset({"__none__"})
     s = re.sub(r"\(([^)]*)\)", lambda m: " " if _NOISE_PAREN.search(m.group(1)) else " " + m.group(1) + " ", s)
+    s = re.sub(r"matte", "matt", s)                       # Matte == Matt
+    s = re.sub(r"laminat(e|ion)", "laminat", s)           # Laminate == Lamination
+    s = re.sub(r"water\s*base", "waterbas", s)            # Water Base == Waterbase
+    s = re.sub(r"varnish", "varnish", s)
+    s = re.sub(r"(\d)\s*x\s*(?=[a-z])", r"\1 ", s)        # 3xA4 / 3 × A4 -> "3 a4"
+    s = re.sub(r"\d+\s*mm\b", " ", s)                     # drop dimension tokens (name stays)
     s = re.sub(r"(\d+)\s*c\b", r"\1c", s)
     s = re.sub(r"(\d+)\s*colours?", r"\1c", s)
     return frozenset(t for t in re.findall(r"\d+c|[a-z]{2,}|\d+", s) if t not in _VSTOP)
