@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { HeroSection } from "@/components/home/HeroSection";
+import { HeroCarousel } from "@/components/home/HeroCarousel";
 import { PopularProducts } from "@/components/home/PopularProducts";
 import { HowItWorks } from "@/components/home/HowItWorks";
 import { WhyPrintoka } from "@/components/home/WhyPrintoka";
@@ -72,7 +72,7 @@ export default function HomePage() {
   return (
     <>
       <JsonLd data={faqSchema} />
-      <HeroSection />
+      <HeroCarousel />
       <PopularProducts />
       <HowItWorks />
       <WhyPrintoka />

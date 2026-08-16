@@ -7,6 +7,7 @@ import { PricePanel } from "@/components/products/PricePanel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CATEGORY_ICONS, formatMYR } from "@/lib/utils";
 import { ProductPhoto } from "@/components/products/ProductPhoto";
+import { ProductBanner } from "@/components/products/ProductBanner";
 import { cn } from "@/lib/utils";
 import {
   resolveDefaults,
@@ -113,6 +114,9 @@ export default function ProductPage({
           <ChevronRight className="w-3.5 h-3.5" />
           <span className="text-ink font-medium">{product.name}</span>
         </nav>
+
+        {/* Wide product hero banner (printoka media) */}
+        <ProductBanner id={product.id} alt={product.name} />
 
         <div className="grid lg:grid-cols-2 gap-10 items-start">
           {/* LEFT: Product preview */}
