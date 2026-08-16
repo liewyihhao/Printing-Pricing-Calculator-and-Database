@@ -1839,6 +1839,65 @@ def _bunting_material_validity(data):
         print(f"bunting material validity: {n} products (Material -> printing/lamination)")
 
 
+def _booklet_cover_lamination_validity(data):
+    """Booklet (Litho 19 / Digital 37): the COVER paper gates cover lamination — captured exactly
+    from the live v4 forms (booklet-offset-softcover / booklet-digital-softcover):
+      - Gloss Art Card * -> lamination MANDATORY (no 'Not Required' — the card must be laminated).
+      - Gloss/Matte Art Paper >=150gsm -> lamination OPTIONAL ('Not Required' + lam options).
+      - everything else (Simili any, art paper <150gsm, and specialty stocks Metal Ice / Super White
+        / Linen even at >=240gsm) -> 'Not Required' ONLY — no lamination.
+    NB embossing + hot-stamping are NOT gated (Excard offers them on every cover paper). Cover papers
+    are cascade-populated, so the rule keys on the `cover` field value via a validity rule-set."""
+    import re
+    n = 0
+    for p in data["products"]:
+        if "booklet" not in p["name"].lower():
+            continue
+        fields = {f["key"]: f for f in p["fields"]}
+        cov, lam = fields.get("cover"), fields.get("cover_lamination")
+        if not cov or not lam:
+            continue
+        base = lam.get("options") or []
+        # exact Excard cover-lamination sets (captured from the live v4 forms). >=150gsm art papers
+        # get the 6 base laminations; art cards additionally get the 2 varnishes and are MANDATORY.
+        LAM6 = {"Gloss Lamination (Front)", "Gloss Lamination (Both)", "Matte Lamination (Front)",
+                "Matte Lamination (Both)", "Matte Lamination (Front) + Spot UV (Front)",
+                "Matte Lamination (Both) + Spot UV (Front)"}
+        CARD_EXTRA = {"UV Varnish (Front)", "Gloss Waterbase Varnish (Front)"}
+        paper_lam = [o for o in base if o in LAM6]
+        card_lam = [o for o in base if o in (LAM6 | CARD_EXTRA)]
+        # collect every cover-paper value from the product's cascade options
+        covers = set()
+        opts = data["options"].get(p.get("optionsKey") or f"booklet{p['id']}") or {}
+        for cfg in opts.values():
+            cc = cfg.get("covers") if isinstance(cfg, dict) else None
+            if isinstance(cc, dict):
+                covers |= set(cc)
+            elif isinstance(cc, list):
+                covers |= set(cc)
+        rules = {}
+        for cv in covers:
+            name = cv.lower()
+            m = re.search(r"(\d+)\s*gsm", name)
+            gsm = int(m.group(1)) if m else 0
+            if "art card" in name:
+                allowed = card_lam                                  # mandatory lamination
+            elif ("gloss art paper" in name or "matte art paper" in name) and gsm >= 150:
+                allowed = ["Not Required"] + paper_lam              # optional
+            else:
+                allowed = ["Not Required"]                          # no lamination (Simili, thin, specialty)
+            rules[cv] = {"cover_lamination": allowed}
+        if not rules:
+            continue
+        rs = {"primary": "cover", "fields": ["cover_lamination"], "rules": rules}
+        existing = p.get("validity")
+        base_rs = [r for r in (existing if isinstance(existing, list) else [existing]) if r and r.get("rules")]
+        p["validity"] = (base_rs + [rs]) if base_rs else rs
+        n += 1
+    if n:
+        print(f"booklet cover-lamination validity: {n} products (cover paper -> lamination)")
+
+
 def _greeting_card_validity(data):
     """Greeting Card: Fold Type drives which Models are available (each model belongs to exactly one
     fold) and which Envelopes (only Half Fold offers a White envelope). Excard's deps-derived
@@ -2145,6 +2204,7 @@ def main():
     _validity_visibility(data)    # hide validity-constrained fields for non-applicable primary vals
     _bunting_material_validity(data)  # Material -> printing/lamination valid combos (all bunting)
     _greeting_card_validity(data)     # Fold Type -> model/envelope valid combos (exact from curves)
+    _booklet_cover_lamination_validity(data)  # booklet cover paper -> cover lamination (live-captured)
     _curve_validity_config(data)      # apparel model->fabric, static-cling/car-sticker VDP, etc.
     _money_packet_validity(data)  # Mix-Design <-> Package valid-combo coupling (2nd rule-set)
     _dedupe_validity(data)        # strip primary-in-own-fields / duplicate fields (build artifacts)
