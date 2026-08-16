@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { cn } from "@/lib/utils";
 import type { ProductDetail, ProductField } from "@/lib/pricing-api";
+import { fieldShown, allowedOptions as engineAllowed } from "@/lib/engine";
 
 interface ConfiguratorProps {
   product: ProductDetail;
@@ -37,30 +38,14 @@ function FieldRenderer({
   values: Record<string, string | number>;
   onChange: (key: string, value: string | number) => void;
 }) {
-  // Compute allowed options via validity cascade
-  const allowedOptions = useMemo(() => {
-    if (!product.validity) return field.options;
-    const { primary, rules } = product.validity;
+  // Allowed options via the shared engine (array-validity intersection), and showWhen visibility.
+  const allowedOptions = useMemo(
+    () => engineAllowed(field, product, values),
+    [field, product, values]
+  );
 
-    // Primary field: always show all its own options
-    if (field.key === primary) return field.options;
-
-    const primaryValue = values[primary] as string | undefined;
-
-    // Downstream field: get options from validity rules keyed by primary value
-    const ruleForPrimary = primaryValue ? rules[primaryValue] : null;
-    const allowedFromRules = ruleForPrimary?.[field.key] ?? null;
-
-    if (field.options) {
-      // Static options exist — filter them by validity rules if applicable
-      if (!primaryValue || !allowedFromRules) return field.options;
-      return field.options.filter((opt) => allowedFromRules.includes(opt));
-    }
-
-    // No static options: use validity rules as the option source
-    // (field is null-options, driven entirely by the cascade)
-    return allowedFromRules ?? [];
-  }, [field, product.validity, values]);
+  // Conditional field not currently applicable (e.g. lamination only for coated paper) → hide it.
+  if (!fieldShown(field, values)) return null;
 
   const currentValue = values[field.key] ?? "";
 

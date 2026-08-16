@@ -102,6 +102,10 @@ def _detail(p):
             "required": not f.get("optional", False) and f.get("type") != "number",
             "options": opts, "images": f.get("images") or None,
             "min": f.get("min"), "max": f.get("max"),
+            # conditional visibility + presentation the configurator needs to mirror the calculator
+            "showWhen": f.get("showWhen"), "swatch": f.get("swatch", False),
+            "optional": f.get("optional", False), "section": f.get("section"),
+            "default": f.get("default"), "note": f.get("note"),
         })
 
     validity = p.get("validity")

@@ -1,12 +1,19 @@
 "use client";
 
-import { useState, useCallback, useMemo, use } from "react";
+import { useState, useCallback, useMemo, use, useEffect } from "react";
 import { useProduct, useQuote } from "@/lib/pricing-api";
 import { Configurator } from "@/components/products/Configurator";
 import { PricePanel } from "@/components/products/PricePanel";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QUICK_QTY, CATEGORY_ICONS, formatMYR } from "@/lib/utils";
+import { CATEGORY_ICONS, formatMYR } from "@/lib/utils";
 import { cn } from "@/lib/utils";
+import {
+  resolveDefaults,
+  isComplete as engineIsComplete,
+  validQuantities,
+  defaultQuantity,
+  moq,
+} from "@/lib/engine";
 import { ChevronRight, Minus, Plus } from "lucide-react";
 import Link from "next/link";
 
@@ -22,26 +29,28 @@ export default function ProductPage({
   const [values, setValues] = useState<Record<string, string | number>>({});
   const [quantity, setQuantity] = useState(100);
 
+  // On product load, auto-fill defaults + a valid default quantity (mirrors the standalone
+  // calculator, which shows a price immediately) so the configurator resolves the full cascade.
+  useEffect(() => {
+    if (!product) return;
+    setValues((prev) => (Object.keys(prev).length ? prev : resolveDefaults(product, {})));
+    setQuantity((q) => (validQuantities(product).includes(q) ? q : defaultQuantity(product)));
+  }, [product]);
+
   const handleChange = useCallback((key: string, value: string | number) => {
     setValues((prev) => {
-      const next = { ...prev, [key]: value };
-      // When primary validity field changes, clear downstream fields
-      if (product?.validity?.primary === key) {
-        for (const f of product.validity.fields) {
-          delete next[f];
-        }
-      }
-      return next;
+      if (!product) return { ...prev, [key]: value };
+      // Set the value, then re-resolve the whole cascade: hidden fields drop out, downstream fields
+      // whose allowed set changed snap to a valid default (identical to the standalone calculator).
+      return resolveDefaults(product, { ...prev, [key]: value });
     });
   }, [product]);
 
-  // Determine if all required fields are filled
-  const isComplete = useMemo(() => {
-    if (!product) return false;
-    return product.fields
-      .filter((f) => f.required)
-      .every((f) => values[f.key] != null && values[f.key] !== "");
-  }, [product, values]);
+  // Quotable when every applicable (visible, non-optional, non-number) field has a valid value.
+  const isComplete = useMemo(
+    () => (product ? engineIsComplete(product, values) : false),
+    [product, values]
+  );
 
   const {
     data: quote,
@@ -157,55 +166,74 @@ export default function ProductPage({
             <div className="bg-white rounded-xl border border-border p-6">
               <h2 className="text-sm font-semibold text-ink mb-4">Quantity</h2>
 
-              {/* Quick chips */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {QUICK_QTY.filter(
-                  (q) => q >= (product.quantity.min ?? 1)
-                ).map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => setQuantity(q)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-lg border text-sm font-medium transition-all",
-                      quantity === q
-                        ? "border-brand-500 bg-brand-50 text-brand-700"
-                        : "border-border text-ink-secondary hover:border-brand-300"
-                    )}
-                  >
-                    {q.toLocaleString()}
-                  </button>
-                ))}
-              </div>
+              {(() => {
+                const qtyOptions = validQuantities(product);
+                const stepTo = (target: number) => {
+                  if (qtyOptions.length) {
+                    // snap to the nearest valid quantity in the product's ladder
+                    const nearest = qtyOptions.reduce((a, b) =>
+                      Math.abs(b - target) < Math.abs(a - target) ? b : a
+                    );
+                    setQuantity(nearest);
+                  } else {
+                    setQuantity(Math.max(moq(product), target));
+                  }
+                };
+                const idx = qtyOptions.indexOf(quantity);
+                return (
+                  <>
+                    {/* Quick chips — the product's actual order quantities */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {(qtyOptions.length ? qtyOptions.slice(0, 12) : [moq(product)]).map((q) => (
+                        <button
+                          key={q}
+                          onClick={() => setQuantity(q)}
+                          className={cn(
+                            "px-3 py-1.5 rounded-lg border text-sm font-medium transition-all",
+                            quantity === q
+                              ? "border-brand-500 bg-brand-50 text-brand-700"
+                              : "border-border text-ink-secondary hover:border-brand-300"
+                          )}
+                        >
+                          {q.toLocaleString()}
+                        </button>
+                      ))}
+                    </div>
 
-              {/* Stepper */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() =>
-                    setQuantity((q) =>
-                      Math.max(product.quantity.min ?? 1, q - 1)
-                    )
-                  }
-                  className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-surface-subtle transition-colors"
-                >
-                  <Minus className="w-4 h-4 text-ink-secondary" />
-                </button>
-                <input
-                  type="number"
-                  value={quantity}
-                  min={product.quantity.min ?? 1}
-                  onChange={(e) =>
-                    setQuantity(Math.max(product.quantity.min ?? 1, Number(e.target.value)))
-                  }
-                  className="w-24 h-9 rounded-lg border border-border text-center text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500"
-                />
-                <button
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-surface-subtle transition-colors"
-                >
-                  <Plus className="w-4 h-4 text-ink-secondary" />
-                </button>
-                <span className="text-sm text-ink-muted">pcs</span>
-              </div>
+                    {/* Stepper — moves along the valid ladder */}
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() =>
+                          qtyOptions.length
+                            ? setQuantity(qtyOptions[Math.max(0, idx - 1)] ?? quantity)
+                            : stepTo(quantity - 1)
+                        }
+                        className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-surface-subtle transition-colors"
+                      >
+                        <Minus className="w-4 h-4 text-ink-secondary" />
+                      </button>
+                      <input
+                        type="number"
+                        value={quantity}
+                        min={moq(product)}
+                        onChange={(e) => stepTo(Number(e.target.value))}
+                        className="w-24 h-9 rounded-lg border border-border text-center text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500"
+                      />
+                      <button
+                        onClick={() =>
+                          qtyOptions.length
+                            ? setQuantity(qtyOptions[Math.min(qtyOptions.length - 1, idx + 1)] ?? quantity)
+                            : stepTo(quantity + 1)
+                        }
+                        className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-surface-subtle transition-colors"
+                      >
+                        <Plus className="w-4 h-4 text-ink-secondary" />
+                      </button>
+                      <span className="text-sm text-ink-muted">pcs</span>
+                    </div>
+                  </>
+                );
+              })()}
 
               {product.quantity.note && (
                 <p className="text-xs text-ink-subtle mt-2">
