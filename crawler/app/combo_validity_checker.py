@@ -29,6 +29,24 @@ from app import browser as B
 from app.readymade_enum import login_v4
 from app.v4_form_capture import _V4_SLUG_BY_ID, _V4_SLUG
 from app.product_quantity import _base_slug, _ALIAS
+from app.parity_common import norm as _pnorm, ALIASES as _PALIASES
+
+
+def ctrl_key(name: str) -> str:
+    """Normalise an ASP.NET control name (ctl00$…$ddlPaper / rblCategory) to a parity control key,
+    so WebForms products (no human labels) still match our field keys — same rules as parity_common."""
+    tail = str(name).split("$")[-1].split("_")[-1]
+    tail = re.sub(r"^(rbl|ddl|combo|rdb|rb|chk)", "", tail, flags=re.I)
+    k = _pnorm(tail)
+    return _pnorm(_PALIASES.get(k, k))
+
+
+def name_key_match(cname: str, field_key: str, field_label: str) -> bool:
+    ck = ctrl_key(cname)
+    if not ck:
+        return False
+    fk, fl = _pnorm(field_key), _pnorm(field_label)
+    return bool((ck in fk or fk in ck or ck in fl or fl in ck) and len(ck) >= 3)
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "output"
@@ -175,19 +193,21 @@ _JS_SET = r"""
 _JS_ALL = r"""
 () => {
   const vis = el => el && el.offsetParent !== null && el.getBoundingClientRect().height > 1;
+  const humanLabel = le => { if (!le) return ''; const t = le.textContent.trim();
+    return /^ctl00\$|^mainContent/i.test(t) ? '' : t; };   // ASP.NET control-name is NOT a human label
   const out = [];
   for (const sel of document.querySelectorAll('select')) {
     if (!vis(sel)) continue;
     const g = sel.closest('.form-group,.row,.mb-3,.field') || sel.parentElement;
     const le = g && g.querySelector('label,.control-label,b,h5,h6');
-    out.push({ type: 'select', label: (le ? le.textContent.trim() : (sel.name || '')) });
+    out.push({ type: 'select', label: humanLabel(le), name: (sel.name || sel.id || '') });
   }
   const seen = new Set();
   for (const r of document.querySelectorAll("input[type=radio]")) {
     if (!vis(r)) continue; const grp = r.name || r.id; if (seen.has(grp)) continue; seen.add(grp);
     const box = r.closest('.form-group,.row,.mb-3,.field') || r.parentElement;
     const le = box && box.querySelector('label,.control-label,b,h5,h6');
-    out.push({ type: 'radio', label: (le ? le.textContent.trim() : grp) });
+    out.push({ type: 'radio', label: humanLabel(le), name: grp });
   }
   return out;
 }
@@ -210,6 +230,15 @@ class Excard:
         await self.page.goto(V4 + slug, wait_until="domcontentloaded", timeout=60000)
         await self.page.wait_for_timeout(6000)
         self._all = None
+        # WebForms (ASP.NET order_spec) forms cascade via full __doPostBack — native change events
+        # don't reliably fire it, so conditional reads are stale. Detect so the checker only trusts
+        # context-free fields on them (their curve-derived validity stands; see memory).
+        try:
+            self.is_webforms = await self.page.evaluate(
+                "() => document.querySelectorAll('.bigtitle_Ord').length === 0 && "
+                "!!document.querySelector(\"[name*='order_spec_controller'],[name*='order_spec_standard']\")")
+        except Exception:
+            self.is_webforms = False
 
     async def all_controls(self, force=False):
         if self._all is None or force:
@@ -285,6 +314,8 @@ async def check_product(prod, ex: Excard, our: OurSide):
     exlabel_cache = {}      # our_key -> excard label (lazily discovered, in-context)
     read_cache = {}         # (fkey, sig) -> excard opts result
     compared = set()        # (fkey, sig) already compared
+    soft_skipped = set()    # conditional fields not probed on a WebForms/postback form
+    match_kind = {}         # fkey -> "label" (SPA, driveable) | "name" (ASP.NET WebForms)
     memo = set()            # DFS states already fully explored
     budget = {"reads": 0, "max": 600}
 
@@ -293,8 +324,17 @@ async def check_product(prod, ex: Excard, our: OurSide):
             return exlabel_cache[fk]         # not yet revealed) must not poison later branches
         ctrls = await ex.all_controls(force=True)
         our_lab = fdef[fk]["label"]
+        # 1) human label (SPA products, driveable) — anchor on the label text
         hit = next((c["label"] for c in ctrls
-                    if not _CHROME.search(c["label"]) and label_match(our_lab, c["label"])), None)
+                    if c.get("label") and not _CHROME.search(c["label"]) and label_match(our_lab, c["label"])), None)
+        if hit:
+            match_kind[fk] = "label"
+        else:  # 2) ASP.NET control name (WebForms full-postback form) — anchor on the raw name
+            hit = next((c["name"] for c in ctrls
+                        if c.get("name") and not _CHROME.search(c["name"])
+                        and name_key_match(c["name"], fk, our_lab)), None)
+            if hit:
+                match_kind[fk] = "name"
         if hit:
             exlabel_cache[fk] = hit
         return hit
@@ -310,6 +350,9 @@ async def check_product(prod, ex: Excard, our: OurSide):
             return
         if ofld["kind"] in ("number", "image", "swatch"):
             return          # dimension inputs / colour-swatch & image-card pickers: not a select/radio combo axis
+        if getattr(ex, "is_webforms", False) and infl_of[fk]:
+            soft_skipped.add(fk)      # conditional field on a postback form — can't drive the driver
+            return                    # via native events, so the read is stale; curve-validity stands
         sig = sig_of(fk, V)
         if (fk, sig) in compared:
             return
@@ -406,7 +449,32 @@ async def check_product(prod, ex: Excard, our: OurSide):
             await dfs(i + 1, V2)
 
     await dfs(0, {})
+    matched = len(exlabel_cache)   # fields that resolved to an Excard control
+    # Form type from HOW fields matched: SPA controls carry human labels (driveable, authoritative);
+    # ASP.NET WebForms controls only match by name and cascade via full __doPostBack (not driveable
+    # by native events, and NOT authoritative — validity there is curve-governed, see memory). A form
+    # with any name-match and no label-match is a WebForms form.
+    webforms = bool(match_kind) and "label" not in match_kind.values()
+    # A form with NO matchable config control is a legacy / postback form the live probe can't touch
+    # (money-packet, foamboard, envelope, folder-picker …). Emit ONE product note, not per-field spam.
+    if matched == 0 and findings:
+        findings = [{"issue": "form_unprobeable_or_legacy", "context": {},
+                     "note": "no config control matched by human label or ASP.NET name — live cascade "
+                             "not probeable; validity governed by captured price curves",
+                     "our_fields": [f["key"] for f in fields if f.get("options")][:40]}]
+    elif webforms:
+        # WebForms/postback form: keep the findings for reference but demote them — the live form is
+        # not authoritative and its cascade can't be driven, so these are not actionable mismatches.
+        for f in findings:
+            if f["issue"] in ("options", "visibility"):
+                f["issue_downgraded_from"] = f["issue"]
+                f["issue"] = "webforms_unverified"
+    # REAL validity mismatches = options / visibility on a driveable SPA form only
+    real = [f for f in findings if f["issue"] in ("options", "visibility")]
     return {"id": pid, "name": prod["name"], "findings": findings,
+            "real_mismatches": len(real), "matched_fields": matched,
+            "form_type": "webforms" if webforms else ("legacy" if matched == 0 else "spa"),
+            "soft_skipped_conditional": sorted(soft_skipped),
             "reads": budget["reads"], "fields_checked": len(compared),
             "branchers": sorted(branchers)}
 
@@ -480,12 +548,26 @@ async def run(ids, our_only_mode=False):
                 r = {"id": p["id"], "name": p["name"], "error": str(e)[:200], "findings": []}
             r["slug"] = slug
             report[str(p["id"])] = r
-            n = len(r.get("findings", []))
-            status = "PASS" if n == 0 and "error" not in r else (f"{n} MISMATCH" if n else "ERROR")
+            findings = r.get("findings", [])
+            real = r.get("real_mismatches", len([f for f in findings if f.get("issue") in ("options", "visibility")]))
+            soft = len(findings) - real
+            ftype = r.get("form_type")
+            if "error" in r:
+                status = "ERROR"
+            elif ftype == "legacy":
+                status = "SKIP (legacy form — curve-governed)"
+            elif ftype == "webforms":
+                status = "SKIP (webforms — curve-governed)" + (f", {len(findings)} unverified" if findings else "")
+            elif real:
+                status = f"{real} MISMATCH" + (f" (+{soft} soft)" if soft else "")
+            else:
+                status = "PASS" + (f" ({soft} soft)" if soft else "")
             print(f"id{p['id']:>3} {p['name'][:34]:34} slug={slug:28} reads={r.get('reads','?'):>4} "
-                  f"checked={r.get('fields_checked','?'):>3}  {status}", file=sys.stderr)
-            for f in r.get("findings", []):
-                print(f"     · {f['field']:20} {f['issue']:24} "
+                  f"checked={r.get('fields_checked','?'):>3} matched={r.get('matched_fields','?'):>2}  {status}", file=sys.stderr)
+            for f in findings:
+                if f.get("issue") in ("form_unprobeable_or_legacy", "webforms_unverified", "our_control_not_on_excard"):
+                    continue        # probe-limitation noise; only print actionable SPA mismatches
+                print(f"     · {f.get('field','-'):20} {f['issue']:24} "
                       f"OVER={f.get('OVER_we_offer_excard_doesnt', f.get('our_options') if f['issue']!='options' else [])} "
                       f"UNDER={f.get('UNDER_excard_offers_we_dont','')}", file=sys.stderr)
         await b.close()
@@ -499,8 +581,11 @@ async def run(ids, our_only_mode=False):
             existing = {}
     existing.update(report)
     REPORT.write_text(json.dumps(existing, indent=1, ensure_ascii=False), encoding="utf-8")
-    total = sum(len(r.get("findings", [])) for r in report.values())
-    print(f"\n{len(report)} product(s) checked, {total} mismatch(es). -> {REPORT}", file=sys.stderr)
+    total_real = sum(r.get("real_mismatches", 0) for r in report.values())
+    skipped = sum(1 for r in report.values() if r.get("form_type") in ("webforms", "legacy"))
+    spa = sum(1 for r in report.values() if r.get("form_type") == "spa")
+    print(f"\n{len(report)} product(s) checked — {spa} SPA (authoritative), {skipped} webforms/legacy "
+          f"(curve-governed, skipped); {total_real} REAL mismatch(es). -> {REPORT}", file=sys.stderr)
 
 
 # playwright context helper (kept local so --our-only needs no browser import side effects)
