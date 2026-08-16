@@ -1709,6 +1709,52 @@ def _stand_material_validity(data):
         print(f"stand-material validity: {n} material-of-stand fields gated on stand=Required")
 
 
+def _bizcard_silkscreen_validity(data):
+    """Business Card: Excard offers 'Silkscreen Spot UV' its Required variants (Front / Both) under a
+    precise TWO-driver condition, captured live 2026-08-16:
+        paper ∈ {Gloss Art Card 250gsm, Gloss Art Card 310gsm}  AND  lamination = Matte Lamination.
+    (Gloss 360gsm and Matte Art Card do NOT enable it, even with matte lamination; every other
+    lamination — Gloss / Varnish / Soft Touch — keeps it at 'No Required'.) Model this exactly with
+    the array-validity engine, which intersects a field's allowed set across rule-sets: a paper-
+    primary rule-set (enabling papers → 3 opts, else No Required) AND a lamination-primary rule-set
+    (Matte Lamination → 3 opts, else No Required). Their intersection is Front/Both only when both
+    drivers agree. Silkscreen is a neutral, quoted-separately field (not in axisFields / addonDeltas),
+    so exposing the two variants carries no pricing risk. Runs after the capture-driven paper rule-set
+    (which already gates hot_stamping) so we extend it in place."""
+    NONE = "No Required"
+    OPTS = [NONE, "Silkscreen Spot UV (Front)", "Silkscreen Spot UV (Both)"]
+    def _paper_enables(o):
+        o = o.lower()
+        return ("gloss art card 250" in o) or ("gloss art card 310" in o)
+    def _lam_enables(o):
+        return "matte lamination" in o.lower()
+    for p in data["products"]:
+        ssf = next((f for f in p["fields"] if f["key"] == "silkscreen_spot_uv"), None)
+        paperf = next((f for f in p["fields"] if f["key"] == "paper"), None)
+        lamf = next((f for f in p["fields"] if f["key"] == "lamination"), None)
+        if not ssf or not paperf or not lamf:
+            continue
+        ssf["options"] = list(OPTS)
+        V = p.get("validity")
+        rulesets = V if isinstance(V, list) else ([V] if V else [])
+        # paper-primary rule-set (reuse the existing one that gates hot_stamping)
+        prs = next((r for r in rulesets if r.get("primary") == "paper"), None)
+        if prs is None:
+            prs = {"primary": "paper", "fields": [], "rules": {}}
+            rulesets.append(prs)
+        if "silkscreen_spot_uv" not in prs["fields"]:
+            prs["fields"].append("silkscreen_spot_uv")
+        for pv in (paperf.get("options") or []):
+            prs["rules"].setdefault(pv, {})["silkscreen_spot_uv"] = list(OPTS) if _paper_enables(pv) else [NONE]
+        # lamination-primary rule-set (new, dedicated to silkscreen)
+        lrs = {"primary": "lamination", "fields": ["silkscreen_spot_uv"], "rules": {}}
+        for lv in (lamf.get("options") or []):
+            lrs["rules"][lv] = {"silkscreen_spot_uv": list(OPTS) if _lam_enables(lv) else [NONE]}
+        rulesets.append(lrs)
+        p["validity"] = rulesets[0] if len(rulesets) == 1 else rulesets
+        print(f"bizcard silkscreen validity: id{p['id']} — paper∧lamination gate (Gloss250/310 ∧ Matte Lam)")
+
+
 def _validity_visibility(data):
     """Derive conditional VISIBILITY from a product's validity block. A constrained field whose
     valid-option set is non-empty for only a SUBSET of the primary values (e.g. Folder's CD Seal is
@@ -2307,6 +2353,7 @@ def main():
     _loose_digital_lamination(data)   # Loose Sheet Digital (50): paper -> lamination showWhen
     _material_finishing_validity(data)  # catalogue-wide paper -> lamination/finishing gap-fill (runs
     #                                     LAST so it only fills fields no specific helper constrained)
+    _bizcard_silkscreen_validity(data)  # Business Card: Spot UV Front/Both gated on coated paper
     _dedupe_validity(data)        # strip primary-in-own-fields / duplicate fields (build artifacts)
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
