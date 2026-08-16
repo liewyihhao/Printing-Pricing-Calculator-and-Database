@@ -225,6 +225,38 @@ _JS_ALL = r"""
 """
 
 
+_JS_CUR = r"""
+(labRx) => {
+  const rx = new RegExp(labRx, 'i');
+  const vis = el => el && el.offsetParent !== null;
+  for (const sel of document.querySelectorAll('select')) {
+    if (!vis(sel)) continue;
+    const g = sel.closest('.form-group,.row,.mb-3,.field') || sel.parentElement;
+    const le = g && g.querySelector('label,.control-label,b,h5,h6');
+    const lab = le ? le.textContent.trim() : (sel.name || '');
+    if (rx.test(lab) || rx.test(sel.name || '')) {
+      const o = sel.options[sel.selectedIndex];
+      return { visible: true, value: o ? o.text.trim() : '' };
+    }
+  }
+  const groups = {};
+  for (const r of document.querySelectorAll("input[type=radio]")) { (groups[r.name || r.id] = groups[r.name || r.id] || []).push(r); }
+  for (const grp in groups) {
+    const rs = groups[grp]; if (!rs.some(vis)) continue;
+    const box = rs[0].closest('.form-group,.row,.mb-3,.field') || rs[0].parentElement;
+    const le = box && box.querySelector('label,.control-label,b,h5,h6');
+    const lab = le ? le.textContent.trim() : grp;
+    if (rx.test(lab) || rx.test(grp)) {
+      const c = rs.find(r => r.checked);
+      const l = c ? (c.closest('label')?.textContent || document.querySelector(`label[for='${c.id}']`)?.textContent || c.parentElement?.textContent || '').trim() : '';
+      return { visible: true, value: l };
+    }
+  }
+  return { visible: false, value: null };
+}
+"""
+
+
 class Excard:
     def __init__(self, page):
         self.page = page
@@ -263,19 +295,42 @@ class Excard:
         return self._all
 
     async def opts(self, label_rx):
+        """Read a control's visible options, STABLY: the v4 SPA repopulates dependents async, so a
+        single read can catch a mid-cascade state. Read until two consecutive reads agree."""
+        prev = None
+        for _ in range(4):
+            try:
+                cur = await self.page.evaluate(_JS_OPTS, label_rx)
+            except Exception as e:
+                return {"visible": False, "error": str(e)[:80]}
+            if prev is not None and cur.get("visible") == prev.get("visible") and cur.get("options") == prev.get("options"):
+                return cur
+            prev = cur
+            await self.page.wait_for_timeout(450)
+        return prev or {"visible": False}
+
+    async def current(self, label_rx):
         try:
-            return await self.page.evaluate(_JS_OPTS, label_rx)
-        except Exception as e:
-            return {"visible": False, "error": str(e)[:80]}
+            return await self.page.evaluate(_JS_CUR, label_rx)
+        except Exception:
+            return {"visible": False, "value": None}
 
     async def set(self, label_rx, value):
-        try:
-            ok = await self.page.evaluate(_JS_SET, [label_rx, value])
-        except Exception:
-            ok = False
-        if ok:
-            await self.page.wait_for_timeout(1400)
-        return ok
+        """Set a control and VERIFY the change took (the SPA can drop a native event under load).
+        Retry a few times; return True only when the control actually shows `value`."""
+        for _ in range(3):
+            try:
+                ok = await self.page.evaluate(_JS_SET, [label_rx, value])
+            except Exception:
+                ok = False
+            await self.page.wait_for_timeout(1200)
+            cur = await self.current(label_rx)
+            if cur.get("value") is not None and str(cur["value"]).strip() == str(value).strip():
+                await self.page.wait_for_timeout(500)   # let dependents finish repopulating
+                return True
+            if not ok:
+                await self.page.wait_for_timeout(400)
+        return False
 
 
 # ───────────────────────── influence graph ─────────────────────────
@@ -356,6 +411,52 @@ async def check_product(prod, ex: Excard, our: OurSide):
     def sig_of(fk, V):
         return tuple(sorted((k, V[k]) for k in infl_of[fk] if k in V))
 
+    def labeltoks(fk):
+        toks = set(labnorm(fdef[fk]["label"]).split())
+        if exlabel_cache.get(fk):
+            toks |= set(labnorm(exlabel_cache[fk]).split())
+        return tuple(toks)
+
+    def deep_infl(fk):
+        """Transitive driver set of fk (cascade depends + validity primaries + showWhen fields, closed
+        over the chain) — the fields whose Excard value must be set to read fk correctly."""
+        seen, stack = set(), list(infl_of.get(fk, ()))
+        while stack:
+            d = stack.pop()
+            if d in seen:
+                continue
+            seen.add(d)
+            stack.extend(infl_of.get(d, ()))
+        return seen
+
+    async def ensure_prefix(fk, V):
+        """Re-assert every driver of fk on the LIVE form to its V value, verifying each — so the read
+        of fk reflects EXACTLY context V regardless of cascade drift. Returns True only when the
+        Excard state is confirmed; False means the state is unreliable (→ caller soft-skips rather
+        than emitting a false mismatch). This is what makes deep cascades trustworthy."""
+        if getattr(ex, "is_webforms", False):
+            return False
+        need = deep_infl(fk)
+        for f in order:
+            if f == fk:
+                break
+            if f not in need or f not in V:
+                continue
+            if not exlabel_cache.get(f) or match_kind.get(f) != "label":
+                return False                       # a required driver isn't a driveable SPA control
+            rx = "^" + re.escape(exlabel_cache[f]) + "$"
+            lbl = labeltoks(f)
+            cur = await ex.current(rx)
+            if cur.get("value") is not None and vkey(cur["value"], lbl) == vkey(V[f], lbl):
+                continue                           # already correct
+            exres = await ex.opts(rx)
+            if not exres.get("visible"):
+                return False
+            exval = next((o for o in exres["options"] if vkey(o, lbl) == vkey(V[f], lbl)), None)
+            if exval is None or not await ex.set(rx, exval):
+                return False
+        return True
+
     async def compare(fk, V):
         ofld = None
         res = our.resolve(pid, V)
@@ -391,6 +492,10 @@ async def check_product(prod, ex: Excard, our: OurSide):
         if key in read_cache:
             exres = read_cache[key]
         else:
+            if not await ensure_prefix(fk, V):      # confidence gate: only compare a state we could
+                soft_skipped.add(fk)                 # re-assert & verify on the live form
+                compared.discard((fk, sig))
+                return
             budget["reads"] += 1
             exres = await ex.opts(rx)
             read_cache[key] = exres
@@ -431,6 +536,8 @@ async def check_product(prod, ex: Excard, our: OurSide):
         key = (fk, sig_of(fk, V))
         exres = read_cache.get(key)
         if exres is None:
+            if not await ensure_prefix(fk, V):
+                return [(our_opts[0], None)] if our_opts else []   # unreliable — walk our side only
             budget["reads"] += 1
             exres = await ex.opts(rx); read_cache[key] = exres
         ex_opts = exres.get("options", []) if exres.get("visible") else []
@@ -462,10 +569,8 @@ async def check_product(prod, ex: Excard, our: OurSide):
         vals = pairs if fk in branchers else pairs[:1]
         for our_v, ex_v in vals:
             V2 = dict(V); V2[fk] = our_v
-            if ex_v is not None:
-                exlab = exlabel_cache.get(fk)
-                if exlab:
-                    await ex.set("^" + re.escape(exlab) + "$", ex_v)
+            # No incremental ex.set here: every read re-asserts the full driver prefix from V via
+            # ensure_prefix, so the live state is rebuilt & verified per read (drift-proof).
             await dfs(i + 1, V2)
 
     await dfs(0, {})
