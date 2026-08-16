@@ -1,29 +1,44 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300..800;1,400..700&display=swap");
 @import "tailwindcss";
+/* Tailwind v4 is CSS-first and does NOT auto-load the JS config — load our design tokens
+   (brand/ink/surface/border colours, fonts, shadows, animations) explicitly. */
+@config "../../tailwind.config.ts";
 
 :root {
   --background: #ffffff;
-  --foreground: #111827;
+  --foreground: #212121;
   --radius: 0.5rem;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Inter", system-ui, sans-serif;
+  --font-sans: "Montserrat", system-ui, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Montserrat", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+/* Printoka rainbow gradient — the logo's signature move, for accent flourishes. */
+.printoka-gradient {
+  background-image: linear-gradient(135deg, #ff5a00 0%, #ffc400 32%, #00c2bb 66%, #2962ff 100%);
+}
+.printoka-gradient-text {
+  background-image: linear-gradient(135deg, #ff5a00 0%, #ffc400 32%, #00c2bb 66%, #2962ff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .shimmer {
