@@ -231,12 +231,12 @@ class Excard:
         await self.page.wait_for_timeout(6000)
         self._all = None
         # WebForms (ASP.NET order_spec) forms cascade via full __doPostBack — native change events
-        # don't reliably fire it, so conditional reads are stale. Detect so the checker only trusts
-        # context-free fields on them (their curve-derived validity stands; see memory).
+        # don't reliably fire it, so conditional reads are stale. The presence of order_spec controls
+        # marks the postback engine EVEN when the form also has human labels (e.g. Foamboard, Money
+        # Packet — WebForms full-postback per memory). Their valid-combo space is curve-governed.
         try:
             self.is_webforms = await self.page.evaluate(
-                "() => document.querySelectorAll('.bigtitle_Ord').length === 0 && "
-                "!!document.querySelector(\"[name*='order_spec_controller'],[name*='order_spec_standard']\")")
+                "() => !!document.querySelector(\"[name*='order_spec_controller'],[name*='order_spec_standard']\")")
         except Exception:
             self.is_webforms = False
 
@@ -460,7 +460,7 @@ async def check_product(prod, ex: Excard, our: OurSide):
     # ASP.NET WebForms controls only match by name and cascade via full __doPostBack (not driveable
     # by native events, and NOT authoritative — validity there is curve-governed, see memory). A form
     # with any name-match and no label-match is a WebForms form.
-    webforms = bool(match_kind) and "label" not in match_kind.values()
+    webforms = bool(getattr(ex, "is_webforms", False)) or (bool(match_kind) and "label" not in match_kind.values())
     # A form with NO matchable config control is a legacy / postback form the live probe can't touch
     # (money-packet, foamboard, envelope, folder-picker …). Emit ONE product note, not per-field spam.
     if matched == 0 and findings:
