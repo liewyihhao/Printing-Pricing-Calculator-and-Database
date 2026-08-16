@@ -143,7 +143,7 @@ _JS_OPTS = r"""
     const g = sel.closest('.form-group,.row,.mb-3,.field') || sel.parentElement;
     const le = g && g.querySelector('label,.control-label,b,h5,h6');
     const lab = le ? le.textContent.trim() : (sel.name || '');
-    if (rx.test(lab)) {
+    if (rx.test(lab) || rx.test(sel.name || '')) {   // anchor may be a human label OR an ASP.NET name
       const opts = [...sel.options].map(o => o.text.trim()).filter(t => !junk(t));
       return { visible: true, type: 'select', label: lab, options: opts };
     }
@@ -155,7 +155,7 @@ _JS_OPTS = r"""
     const box = rs[0].closest('.form-group,.row,.mb-3,.field') || rs[0].parentElement;
     const le = box && box.querySelector('label,.control-label,b,h5,h6');
     const lab = le ? le.textContent.trim() : grp;
-    if (rx.test(lab)) {
+    if (rx.test(lab) || rx.test(grp)) {
       const opts = rs.filter(vis).map(r => (r.closest('label')?.textContent
         || document.querySelector(`label[for='${r.id}']`)?.textContent
         || r.parentElement?.textContent || '').trim()).filter(Boolean);
@@ -175,7 +175,7 @@ _JS_SET = r"""
     const g = sel.closest('.form-group,.row,.mb-3,.field') || sel.parentElement;
     const le = g && g.querySelector('label,.control-label,b,h5,h6');
     const lab = le ? le.textContent.trim() : (sel.name || '');
-    if (rx.test(lab)) {
+    if (rx.test(lab) || rx.test(sel.name || '')) {   // anchor may be a human label OR an ASP.NET name
       const i = [...sel.options].findIndex(o => o.text.trim() === val);
       if (i >= 0) { sel.selectedIndex = i; sel.dispatchEvent(new Event('input', {bubbles:true})); sel.dispatchEvent(new Event('change', {bubbles:true})); return true; }
       return false;
@@ -230,15 +230,18 @@ class Excard:
         await self.page.goto(V4 + slug, wait_until="domcontentloaded", timeout=60000)
         await self.page.wait_for_timeout(6000)
         self._all = None
-        # WebForms (ASP.NET order_spec) forms cascade via full __doPostBack — native change events
-        # don't reliably fire it, so conditional reads are stale. The presence of order_spec controls
-        # marks the postback engine EVEN when the form also has human labels (e.g. Foamboard, Money
-        # Packet — WebForms full-postback per memory). Their valid-combo space is curve-governed.
+        # Forms the live probe can't drive with plain select/radio events, so their reads are stale
+        # and their valid-combo space is curve-governed (see memory), not the live form:
+        #   • WebForms (ASP.NET order_spec) — cascade via full __doPostBack (Foamboard, Money Packet…)
+        #   • Readymade shirt modal — model/sleeve/fabric chosen in a +ADD MODEL popup (shirts, cap…)
         try:
-            self.is_webforms = await self.page.evaluate(
-                "() => !!document.querySelector(\"[name*='order_spec_controller'],[name*='order_spec_standard']\")")
+            info = await self.page.evaluate(
+                "() => ({ webforms: !!document.querySelector(\"[name*='order_spec_controller'],[name*='order_spec_standard']\"),"
+                " modal: !!document.querySelector('#shirt_add_model,.shirt-model-card,[id*=\"add_model\"]') })")
         except Exception:
-            self.is_webforms = False
+            info = {}
+        self.form_reason = "webforms" if info.get("webforms") else ("modal" if info.get("modal") else "")
+        self.is_webforms = bool(self.form_reason)
 
     async def all_controls(self, force=False):
         if self._all is None or force:
@@ -477,9 +480,10 @@ async def check_product(prod, ex: Excard, our: OurSide):
                 f["issue"] = "webforms_unverified"
     # REAL validity mismatches = options / visibility on a driveable SPA form only
     real = [f for f in findings if f["issue"] in ("options", "visibility")]
+    form_type = (getattr(ex, "form_reason", "") or "webforms") if webforms else ("legacy" if matched == 0 else "spa")
     return {"id": pid, "name": prod["name"], "findings": findings,
             "real_mismatches": len(real), "matched_fields": matched,
-            "form_type": "webforms" if webforms else ("legacy" if matched == 0 else "spa"),
+            "form_type": form_type,
             "soft_skipped_conditional": sorted(soft_skipped),
             "reads": budget["reads"], "fields_checked": len(compared),
             "branchers": sorted(branchers)}
@@ -560,10 +564,9 @@ async def run(ids, our_only_mode=False):
             ftype = r.get("form_type")
             if "error" in r:
                 status = "ERROR"
-            elif ftype == "legacy":
-                status = "SKIP (legacy form — curve-governed)"
-            elif ftype == "webforms":
-                status = "SKIP (webforms — curve-governed)" + (f", {len(findings)} unverified" if findings else "")
+            elif ftype in ("legacy", "webforms", "modal"):
+                nf = sum(1 for f in findings if f.get("issue") not in ("form_unprobeable_or_legacy",))
+                status = f"SKIP ({ftype} — curve-governed)" + (f", {nf} unverified" if nf else "")
             elif real:
                 status = f"{real} MISMATCH" + (f" (+{soft} soft)" if soft else "")
             else:
@@ -588,7 +591,7 @@ async def run(ids, our_only_mode=False):
     existing.update(report)
     REPORT.write_text(json.dumps(existing, indent=1, ensure_ascii=False), encoding="utf-8")
     total_real = sum(r.get("real_mismatches", 0) for r in report.values())
-    skipped = sum(1 for r in report.values() if r.get("form_type") in ("webforms", "legacy"))
+    skipped = sum(1 for r in report.values() if r.get("form_type") in ("webforms", "legacy", "modal"))
     spa = sum(1 for r in report.values() if r.get("form_type") == "spa")
     print(f"\n{len(report)} product(s) checked — {spa} SPA (authoritative), {skipped} webforms/legacy "
           f"(curve-governed, skipped); {total_real} REAL mismatch(es). -> {REPORT}", file=sys.stderr)
