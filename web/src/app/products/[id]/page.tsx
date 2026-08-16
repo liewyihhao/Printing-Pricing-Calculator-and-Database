@@ -6,6 +6,7 @@ import { Configurator } from "@/components/products/Configurator";
 import { PricePanel } from "@/components/products/PricePanel";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CATEGORY_ICONS, formatMYR } from "@/lib/utils";
+import { ProductPhoto } from "@/components/products/ProductPhoto";
 import { cn } from "@/lib/utils";
 import {
   resolveDefaults,
@@ -116,18 +117,19 @@ export default function ProductPage({
         <div className="grid lg:grid-cols-2 gap-10 items-start">
           {/* LEFT: Product preview */}
           <div className="lg:sticky lg:top-24">
-            <div className="aspect-square rounded-2xl border border-border bg-surface-muted overflow-hidden flex items-center justify-center">
-              {previewImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={previewImage}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-8xl">{icon}</span>
-              )}
-            </div>
+            {previewImage ? (
+              <div className="aspect-square rounded-xl border border-border bg-surface-muted overflow-hidden flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={previewImage} alt={product.name} className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <ProductPhoto
+                id={product.id}
+                icon={icon}
+                alt={product.name}
+                className="aspect-[4/3] rounded-xl border border-border"
+              />
+            )}
             <div className="mt-4 p-4 rounded-xl bg-surface-muted border border-border">
               <p className="text-xs text-ink-muted text-center">
                 Preview updates as you select options · Actual print may vary slightly
