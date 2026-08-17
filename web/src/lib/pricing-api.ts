@@ -116,6 +116,66 @@ export class QuoteError extends Error {
   }
 }
 
+// ─── Orders ─────────────────────────────────────────────────────────────────
+// Printoka's OWN order flow — POSTs a configured order *request* (no payment) to
+// the calculator API, which records it and returns ORD-YYMMDD-XXXXXX. Never links
+// out to the supplier. Mirrors app/public_api.py OrderRequest / OrderLine.
+
+export interface OrderLine {
+  product_id: number;
+  product_name: string;
+  options: Record<string, string | number>;
+  quantity: number;
+  unit_price?: number | null;
+  cash?: number | null;
+  weight_kg?: number | null;
+}
+
+export interface OrderRequestBody {
+  items: OrderLine[];
+  contact: Record<string, string>; // name, email, phone, company
+  delivery: Record<string, string>; // address lines, method, destination
+  artwork?: Record<string, string>; // filename, note, design_service
+  totals: Record<string, number>; // subtotal, delivery_fee, grand_total
+  remarks?: string;
+}
+
+export interface OrderCreateResponse {
+  ok: boolean;
+  order_ref: string;
+  status: string;
+  received_at: string;
+}
+
+// The stored record echoed back by GET /api/v1/orders/{ref}.
+export interface OrderRecord extends OrderRequestBody {
+  order_ref: string;
+  status: string;
+  received_at: string;
+}
+
+export async function createOrder(
+  body: OrderRequestBody
+): Promise<OrderCreateResponse> {
+  const { data } = await pricingApi.post<OrderCreateResponse>(
+    "/api/v1/orders",
+    body
+  );
+  return data;
+}
+
+export async function fetchOrder(ref: string): Promise<OrderRecord> {
+  try {
+    const { data } = await pricingApi.get<OrderRecord>(
+      `/api/v1/orders/${encodeURIComponent(ref)}`
+    );
+    return data;
+  } catch (err) {
+    const e = err as AxiosError;
+    throw new QuoteError(e.response?.status ?? 0, e.message);
+  }
+}
+
 // ─── API functions ────────────────────────────────────────────────────────────
 
 export async function fetchProducts(params?: {
@@ -199,5 +259,21 @@ export function useQuote(
     enabled: enabled && productId != null && quantity > 0,
     retry: false,
     staleTime: 0,
+  });
+}
+
+export function useCreateOrder() {
+  return useMutation({
+    mutationFn: (body: OrderRequestBody) => createOrder(body),
+  });
+}
+
+export function useOrder(ref: string | null) {
+  return useQuery({
+    queryKey: ["order", ref],
+    queryFn: () => fetchOrder(ref!),
+    enabled: !!ref,
+    retry: false,
+    staleTime: 1000 * 30,
   });
 }

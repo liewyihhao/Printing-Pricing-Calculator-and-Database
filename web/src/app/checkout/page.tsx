@@ -2,21 +2,25 @@
 
 import { useState } from "react";
 import { useCartStore } from "@/stores/cart";
+import { useCreateOrder } from "@/lib/pricing-api";
 import { formatMYR, computeDelivery } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ArrowRight, Check, CreditCard, Lock } from "lucide-react";
+import { ArrowRight, Check, CreditCard, Lock, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const STEPS = ["Cart", "Address", "Shipping", "Payment", "Confirm"];
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, subtotal, clearCart } = useCartStore();
+  const createOrder = useCreateOrder();
   const [step, setStep] = useState(1);
   const [address, setAddress] = useState({
     name: "",
+    email: "",
     phone: "",
     line1: "",
     line2: "",
@@ -30,11 +34,79 @@ export default function CheckoutPage() {
   const delivery = computeDelivery(totalWeight);
   const grand = sub + delivery;
 
-  const handlePlaceOrder = () => {
-    toast.success("Order placed! You'll receive a confirmation email shortly.");
-    clearCart();
-    router.push("/order-success?order=ORD-" + Date.now());
+  const addressComplete =
+    address.name.trim() &&
+    address.email.trim() &&
+    address.phone.trim() &&
+    address.line1.trim() &&
+    address.city.trim() &&
+    address.state.trim() &&
+    address.postcode.trim();
+
+  const handleContinueToShipping = () => {
+    if (!addressComplete) {
+      toast.error("Please fill in all required delivery details.");
+      return;
+    }
+    setStep(2);
   };
+
+  const handlePlaceOrder = async () => {
+    if (items.length === 0) {
+      router.push("/cart");
+      return;
+    }
+    try {
+      const res = await createOrder.mutateAsync({
+        items: items.map((i) => ({
+          product_id: i.productId,
+          product_name: i.productName,
+          options: i.options,
+          quantity: i.quantity,
+          unit_price: i.quote?.per_unit ?? null,
+          cash: i.quote?.cash ?? null,
+          weight_kg: i.quote?.weight_kg ?? null,
+        })),
+        contact: {
+          name: address.name,
+          email: address.email,
+          phone: address.phone,
+        },
+        delivery: {
+          line1: address.line1,
+          line2: address.line2,
+          city: address.city,
+          state: address.state,
+          postcode: address.postcode,
+          method: "Standard courier (J&T / Pos Laju)",
+        },
+        totals: {
+          subtotal: sub,
+          delivery_fee: delivery,
+          grand_total: grand,
+        },
+      });
+      clearCart();
+      toast.success("Order placed! Reference " + res.order_ref);
+      router.push("/order-success?order=" + encodeURIComponent(res.order_ref));
+    } catch {
+      toast.error("Could not place your order. Please try again.");
+    }
+  };
+
+  if (items.length === 0) {
+    return (
+      <div className="pt-24 pb-20 min-h-screen flex flex-col items-center justify-center gap-6 text-center">
+        <div>
+          <h1 className="text-2xl font-bold text-ink mb-2">Your cart is empty</h1>
+          <p className="text-ink-muted">Add a product before checking out.</p>
+        </div>
+        <Link href="/products">
+          <Button size="lg">Browse products</Button>
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-24 pb-20 min-h-screen">
@@ -82,6 +154,7 @@ export default function CheckoutPage() {
                 <h2 className="font-semibold text-ink mb-4">Delivery address</h2>
                 <div className="flex flex-col gap-4">
                   <Input label="Full name" required value={address.name} onChange={e => setAddress(p => ({ ...p, name: e.target.value }))} />
+                  <Input label="Email address" type="email" required value={address.email} onChange={e => setAddress(p => ({ ...p, email: e.target.value }))} />
                   <Input label="Phone number" required value={address.phone} onChange={e => setAddress(p => ({ ...p, phone: e.target.value }))} />
                   <Input label="Address line 1" required value={address.line1} onChange={e => setAddress(p => ({ ...p, line1: e.target.value }))} />
                   <Input label="Address line 2" value={address.line2} onChange={e => setAddress(p => ({ ...p, line2: e.target.value }))} />
@@ -91,7 +164,7 @@ export default function CheckoutPage() {
                   </div>
                   <Input label="State" required value={address.state} onChange={e => setAddress(p => ({ ...p, state: e.target.value }))} />
                 </div>
-                <Button className="mt-6 w-full gap-2" onClick={() => setStep(2)}>
+                <Button className="mt-6 w-full gap-2" onClick={handleContinueToShipping}>
                   Continue to shipping <ArrowRight className="w-4 h-4" />
                 </Button>
               </div>
@@ -130,9 +203,22 @@ export default function CheckoutPage() {
                     <Lock className="w-3.5 h-3.5" /> Payments are processed securely. We never store card details.
                   </p>
                 </div>
-                <Button className="mt-6 w-full gap-2" onClick={handlePlaceOrder}>
-                  Place order · {formatMYR(grand)}
-                  <ArrowRight className="w-4 h-4" />
+                <Button
+                  className="mt-6 w-full gap-2"
+                  onClick={handlePlaceOrder}
+                  disabled={createOrder.isPending}
+                >
+                  {createOrder.isPending ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Placing order…
+                    </>
+                  ) : (
+                    <>
+                      Place order · {formatMYR(grand)}
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </Button>
               </div>
             )}
