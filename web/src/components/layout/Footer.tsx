@@ -38,6 +38,21 @@ const COLUMNS: { heading: string; items: { label: string; href: string }[] }[] =
 
 const REGIONS = ["Malaysia", "Singapore", "Brunei"];
 
+const CITIES = [
+  { slug: "kuala-lumpur", name: "Kuala Lumpur" },
+  { slug: "petaling-jaya", name: "Petaling Jaya" },
+  { slug: "penang", name: "Penang" },
+  { slug: "johor-bahru", name: "Johor Bahru" },
+  { slug: "ipoh", name: "Ipoh" },
+  { slug: "melaka", name: "Melaka" },
+  { slug: "seremban", name: "Seremban" },
+  { slug: "kuching", name: "Kuching" },
+  { slug: "kota-kinabalu", name: "Kota Kinabalu" },
+  { slug: "alor-setar", name: "Alor Setar" },
+  { slug: "kuala-terengganu", name: "Kuala Terengganu" },
+  { slug: "miri", name: "Miri" },
+];
+
 export function Footer() {
   return (
     <footer className="border-t border-border bg-surface-muted mt-24">
@@ -109,7 +124,25 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-subtle">
+        {/* Local-SEO city links */}
+        <div className="mt-12 pt-8 border-t border-border">
+          <h4 className="text-xs font-semibold uppercase tracking-wide text-ink-subtle mb-3">
+            Online printing across Malaysia
+          </h4>
+          <div className="flex flex-wrap gap-x-4 gap-y-1.5">
+            {CITIES.map((c) => (
+              <Link
+                key={c.slug}
+                href={`/online-printing/${c.slug}`}
+                className="text-xs text-ink-muted hover:text-brand-500 transition-colors"
+              >
+                Printing {c.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-ink-subtle">
           <p>© {new Date().getFullYear()} Printoka. All rights reserved.</p>
           <p>Print. Create. Elevate. — Made in Malaysia 🇲🇾</p>
         </div>

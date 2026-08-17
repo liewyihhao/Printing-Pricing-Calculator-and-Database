@@ -11,18 +11,49 @@ interface ConfiguratorProps {
   onChange: (key: string, value: string | number) => void;
 }
 
+// Group the fields under Excard's questionnaire sections (General / Optional Finishing / Add On …)
+// in Excard's order, so the configurator mirrors the supplier's order form exactly.
+function groupSections(product: ProductDetail) {
+  const order = product.sectionOrder?.length ? [...product.sectionOrder] : [];
+  const bySection = new Map<string, ProductField[]>();
+  for (const f of product.fields) {
+    const s = f.section || "General";
+    if (!bySection.has(s)) bySection.set(s, []);
+    bySection.get(s)!.push(f);
+    if (!order.includes(s)) order.push(s); // append any extra sections in first-appearance order
+  }
+  return order.filter((s) => bySection.has(s)).map((s) => ({ name: s, fields: bySection.get(s)! }));
+}
+
 export function Configurator({ product, values, onChange }: ConfiguratorProps) {
+  const sections = useMemo(() => groupSections(product), [product]);
+
   return (
-    <div className="flex flex-col gap-6">
-      {product.fields.map((field) => (
-        <FieldRenderer
-          key={field.key}
-          field={field}
-          product={product}
-          values={values}
-          onChange={onChange}
-        />
-      ))}
+    <div className="flex flex-col gap-5">
+      {sections.map(({ name, fields }) => {
+        // Hide a section entirely when none of its fields currently apply (showWhen).
+        const anyVisible = fields.some((f) => fieldShown(f, values));
+        if (!anyVisible) return null;
+        return (
+          <div key={name} className="rounded-lg border border-border overflow-hidden bg-white">
+            {/* Excard-style teal section header */}
+            <div className="bg-accent-teal text-white text-sm font-semibold px-4 py-2.5">
+              {name}
+            </div>
+            <div className="flex flex-col gap-5 p-4">
+              {fields.map((field) => (
+                <FieldRenderer
+                  key={field.key}
+                  field={field}
+                  product={product}
+                  values={values}
+                  onChange={onChange}
+                />
+              ))}
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

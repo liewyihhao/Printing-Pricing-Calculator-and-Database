@@ -32,6 +32,13 @@ export interface ProductSummary {
 
 export type FieldType = "select" | "number";
 
+export interface ShowWhenCond {
+  field: string;
+  values?: string[];
+  notValues?: string[];
+}
+export type ShowWhen = ShowWhenCond | { all: ShowWhenCond[] };
+
 export interface ProductField {
   key: string;
   label: string;
@@ -41,16 +48,28 @@ export interface ProductField {
   images?: Record<string, string>; // option → data-URI
   min?: number;
   max?: number;
+  section?: string; // Excard questionnaire section (General / Optional Finishing / …)
+  swatch?: boolean;
+  optional?: boolean;
+  showWhen?: ShowWhen;
+  note?: string;
+  default?: string | number;
 }
 
-export interface ValidityRules {
+export interface ValidityRuleSet {
   primary: string; // field key that triggers cascading
   fields: string[]; // downstream field keys
   rules: Record<string, Record<string, string[]>>; // primary-value → {field → allowed[]}
 }
+// A product may carry one rule-set OR an array of them (array-validity, intersected).
+export type ValidityRules = ValidityRuleSet | ValidityRuleSet[];
 
 export interface QuantityConfig {
-  min: number;
+  moq?: number;
+  maxq?: number;
+  min?: number; // legacy alias
+  options?: number[];
+  mode?: string;
   note?: string;
 }
 
@@ -60,6 +79,7 @@ export interface ProductDetail extends ProductSummary {
   fields: ProductField[];
   validity?: ValidityRules;
   quantity: QuantityConfig;
+  sectionOrder?: string[]; // Excard's section order
 }
 
 export interface QuoteRequest {

@@ -131,6 +131,9 @@ def _detail(p):
             "pricing_type": _pricing_type(p), "markup": p.get("markup", 1.0),
             "fields": fields, "validity": validity,
             "quantity": _quantity_of(p),
+            # Excard's questionnaire sections, in Excard's order (General / Optional Finishing / …),
+            # so the configurator can group controls exactly like the supplier's order form.
+            "sectionOrder": p.get("sectionOrder") or [],
             "tiers": ["Cash", "Silver", "Gold", "Platinum"]}
 
 
