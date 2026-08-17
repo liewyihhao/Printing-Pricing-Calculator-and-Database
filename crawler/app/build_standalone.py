@@ -2354,6 +2354,41 @@ def _assign_quantity_section(data):
     print(f"quantity-section: {n} products place Quantity inside a spec section; the rest render it separately")
 
 
+def _add_round_corner_position(data):
+    """Excard reveals a 'Round Corner Position' image-grid (RC0601–RC0615, showing which corners are
+    rounded) once Round Corner = Required — a JS-only sub-control the audits don't see (captured live
+    via app._rc_probe → output/round_corner_position.json). Add it as a conditional image-grid field
+    right after round_corner on every product that has round corner. Price-neutral / display-only."""
+    import json as _json
+    cap_f = OUT / "round_corner_position.json"
+    if not cap_f.is_file():
+        print("round-corner-position: SKIP (no output/round_corner_position.json — run app._rc_probe)")
+        return
+    cap = _json.loads(cap_f.read_text(encoding="utf-8"))
+    codes = cap.get("codes") or []
+    images = cap.get("images") or {}
+    if not codes:
+        return
+    n = 0
+    for p in data["products"]:
+        rc = next((x for x in p["fields"] if x["key"] == "round_corner"), None)
+        if not rc or any(x["key"] == "round_corner_position" for x in p["fields"]):
+            continue
+        req = next((o for o in (rc.get("options") or []) if "no" not in o.lower()), "Required")
+        field = {
+            "key": "round_corner_position", "label": "Round Corner Position",
+            "options": list(codes), "images": {c: images.get(c, "") for c in codes},
+            "showWhen": {"field": "round_corner", "values": [req]},
+            "section": rc.get("section", "Optional Finishing"),
+            "addon": True, "neutral": True, "depends": [],
+            "note": "This is the actual round corner position (Front), for either portrait or "
+                    "landscape. No rotation required.",
+        }
+        p["fields"].insert(p["fields"].index(rc) + 1, field)
+        n += 1
+    print(f"round-corner-position: added the 15-option position picker to {n} product(s) with Round Corner")
+
+
 def _assign_sections(data):
     """Tag every field with the Excard order-form section it belongs to, so the calculator can
     render General / Optional Finishing / Add On headers like the supplier's form. Prefer the EXACT
@@ -2399,7 +2434,12 @@ def _embed_images(data):
         for f in p.get("fields", []):
             if "images" not in f:
                 continue
-            newimgs = {k: cache[u] for k, u in f["images"].items() if u in cache}
+            newimgs = {}
+            for k, u in f["images"].items():
+                if isinstance(u, str) and u.startswith("data:"):
+                    newimgs[k] = u              # already an embedded data URI (e.g. round-corner cards)
+                elif u in cache:
+                    newimgs[k] = cache[u]
             if newimgs:
                 f["images"] = newimgs
             else:
@@ -2484,6 +2524,7 @@ def main():
     _attach_images(data)     # after auto_parity, so images can attach to inc_* single-option fields
     _mark_colour_swatches(data)   # render foil/ink/rope colour pickers as colour swatches
     _assign_sections(data)        # tag fields with Excard sections (General/Finishing/Add On)
+    _add_round_corner_position(data)  # conditional Round Corner Position image-grid (RC0601–RC0615)
     _assign_quantity_section(data)  # tag which section (if any) holds Quantity — it's not always General
     _apply_ref_markup(data)
     _embed_images(data)
