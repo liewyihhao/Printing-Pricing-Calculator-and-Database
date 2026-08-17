@@ -644,6 +644,86 @@ def our_only(prod, our: OurSide):
     return {"id": pid, "name": prod["name"], "nodes": lines}
 
 
+# ───────────────────────── section capture (Excard questionnaire structure) ─────────────────────────
+# Walk the live form and record, per Excard section header (.bigtitle_Ord teal bar), the ordered
+# list of config controls under it — so we can confirm Printoka groups the questionnaire exactly
+# like Excard (General / Optional Finishing / Delivery / …).
+_JS_SECTIONS = r"""
+() => {
+  const vis = el => el && el.offsetParent !== null && el.getBoundingClientRect().height > 1;
+  const walk = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
+  const out = []; let cur = null; const seenGrp = new Set(); const seenLab = new Set();
+  let node;
+  while ((node = walk.nextNode())) {
+    if (node.classList && node.classList.contains('bigtitle_Ord')) {
+      const t = (node.textContent || '').trim();
+      if (t && t.length < 40) { cur = { section: t, fields: [] }; out.push(cur); }
+      continue;
+    }
+    const tag = node.tagName;
+    const isCtrl = tag === 'SELECT' || (tag === 'INPUT' && /radio|checkbox|text|number|file/.test(node.type));
+    if (!isCtrl || !vis(node) || !cur) continue;
+    const nm = node.name || node.id || '';
+    if (/favourite|^ddlProduct$|job ?name|remark|otherorder/i.test(nm)) continue;
+    if (node.type === 'radio') { if (seenGrp.has(nm)) continue; seenGrp.add(nm); }
+    const g = node.closest('.form-group,.row,.mb-3,.field') || node.parentElement;
+    const le = g && g.querySelector('label,.control-label,b,h5,h6');
+    const lab = (le ? le.textContent : nm).trim().replace(/\*/g, '').trim().slice(0, 40);
+    if (!lab) continue;
+    const key = cur.section + '|' + lab;
+    if (seenLab.has(key)) continue; seenLab.add(key);
+    cur.fields.push(lab);
+  }
+  return out;
+}
+"""
+
+
+async def capture_sections(ids):
+    """Drive each product's live Excard form and record its section→fields structure; write
+    output/section_capture.json and diff against our data's field.section assignments."""
+    data = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))["products"]
+    by_id = {p["id"]: p for p in data}
+    report = {}
+    async with async_playwright_ctx() as pw:
+        b = await B.launch(pw)
+        page = await b.new_page(viewport={"width": 1500, "height": 2600})
+        await login_v4(page)
+        ex = Excard(page)
+        for pid in ids:
+            prod = by_id.get(pid)
+            if not prod or prod.get("engine") == "contact":
+                continue
+            slug = await ex.slug_for(prod)
+            secs = []
+            try:
+                await ex.load(slug)
+                try:
+                    await page.evaluate(_REVEAL)   # expose conditional controls/sections
+                    await page.wait_for_timeout(2500)
+                except Exception:
+                    pass
+                secs = await page.evaluate(_JS_SECTIONS)
+            except Exception as e:
+                secs = [{"error": str(e)[:120]}]
+            # our current section->fields (labels), in field order
+            ours = {}
+            for f in prod.get("fields", []):
+                ours.setdefault(f.get("section") or "General", []).append(f.get("label", f["key"]))
+            report[str(pid)] = {"name": prod["name"], "slug": slug,
+                                "excard_sections": secs, "our_sections": ours}
+            ex_order = [s.get("section") for s in secs if s.get("section")]
+            print(f"id{pid:>3} {prod['name'][:30]:30} excard: {ex_order}", file=sys.stderr)
+        await b.close()
+    out = OUT / "section_capture.json"
+    out.write_text(json.dumps(report, indent=1, ensure_ascii=False), encoding="utf-8")
+    print(f"\nwrote {out}  ({len(report)} products)", file=sys.stderr)
+
+
+# provided by v4_form_capture (set every visible select to its first real option + turn on Required)
+from app.v4_form_capture import _REVEAL  # noqa: E402
+
+
 # ───────────────────────── runner ─────────────────────────
 async def run(ids, our_only_mode=False):
     data = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))["products"]
@@ -728,6 +808,10 @@ if __name__ == "__main__":
         data = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))["products"]
         ids = [int(a) for a in args[1:]] or [p["id"] for p in data]
         asyncio.run(run(ids, our_only_mode=True))
+    elif args[0] == "--sections":
+        data = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))["products"]
+        ids = [int(a) for a in args[1:]] or [p["id"] for p in data]
+        asyncio.run(capture_sections(ids))
     elif args[0] == "--all":
         data = json.loads((OUT / "calculator_data.json").read_text(encoding="utf-8"))["products"]
         asyncio.run(run([p["id"] for p in data]))
