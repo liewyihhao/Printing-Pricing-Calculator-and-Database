@@ -186,6 +186,31 @@ def get_product(product_id: int):
     return _detail(p)
 
 
+# Rich editorial content (Product Spec / Artwork Spec / Templates), generated from our OWN
+# catalogue by app.build_spec_content — copyright-safe, never the supplier's prose. One file
+# per product slug under output/spec_content/. Served so the storefront can render the same
+# educational tabs the offline product pages use.
+from app.build_specs_page import clean_name as _clean_name, slugify as _slugify  # noqa: E402
+
+SPEC_CONTENT = ROOT / "output" / "spec_content"
+
+
+@app.get("/api/v1/products/{product_id}/content")
+def get_product_content(product_id: int):
+    p = PRODUCTS.get(product_id)
+    if not p:
+        raise HTTPException(404, "unknown product_id")
+    slug = _slugify(_clean_name(p["name"]))
+    f = SPEC_CONTENT / f"{slug}.json"
+    if not f.exists():
+        return {"sections": [], "artwork": [], "templates": []}
+    data = json.loads(f.read_text(encoding="utf-8"))
+    # Normalise to the three expected areas so the client can rely on their presence.
+    return {"sections": data.get("sections", []),
+            "artwork": data.get("artwork", []),
+            "templates": data.get("templates", [])}
+
+
 class QuoteRequest(BaseModel):
     product_id: int
     options: dict = {}

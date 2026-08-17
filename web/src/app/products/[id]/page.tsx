@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useCallback, useMemo, use, useEffect } from "react";
-import { useProduct, useQuote } from "@/lib/pricing-api";
+import { useProduct, useQuote, useProductContent } from "@/lib/pricing-api";
 import { Configurator } from "@/components/products/Configurator";
 import { PricePanel } from "@/components/products/PricePanel";
+import { ProductContent } from "@/components/products/ProductContent";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CATEGORY_ICONS, formatMYR } from "@/lib/utils";
 import { ProductPhoto } from "@/components/products/ProductPhoto";
@@ -26,6 +27,7 @@ export default function ProductPage({
   const productId = Number(id);
 
   const { data: product, isLoading: productLoading } = useProduct(productId);
+  const { data: content } = useProductContent(productId);
   const [values, setValues] = useState<Record<string, string | number>>({});
   const [quantity, setQuantity] = useState(100);
 
@@ -175,6 +177,9 @@ export default function ProductPage({
             />
           </div>
         </div>
+
+        {/* Rich education tabs — Product Spec · Artwork Spec · Templates (from our own catalogue) */}
+        {content && <ProductContent content={content} />}
       </div>
     </div>
   );

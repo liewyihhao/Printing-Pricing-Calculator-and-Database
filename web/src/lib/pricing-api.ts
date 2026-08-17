@@ -164,6 +164,37 @@ export async function createOrder(
   return data;
 }
 
+// ─── Product editorial content (Product Spec / Artwork Spec / Templates) ───────
+// Generated from our own catalogue (app.build_spec_content) — copyright-safe education,
+// rendered as tabs on the product page. Two block shapes: keyvalue rows or a bullet list.
+
+export interface ContentKeyValueBlock {
+  title?: string;
+  type: "keyvalue";
+  rows: { k: string; v: string }[];
+  note?: string;
+}
+export interface ContentListBlock {
+  title?: string;
+  type: "list";
+  items: string[];
+  note?: string;
+}
+export type ContentBlock = ContentKeyValueBlock | ContentListBlock;
+
+export interface ProductContent {
+  sections: ContentBlock[]; // Product Spec
+  artwork: ContentBlock[]; // Artwork Spec
+  templates: ContentBlock[]; // Template sizes
+}
+
+export async function fetchProductContent(id: number): Promise<ProductContent> {
+  const { data } = await pricingApi.get<ProductContent>(
+    `/api/v1/products/${id}/content`
+  );
+  return data;
+}
+
 export async function fetchOrder(ref: string): Promise<OrderRecord> {
   try {
     const { data } = await pricingApi.get<OrderRecord>(
@@ -265,6 +296,16 @@ export function useQuote(
 export function useCreateOrder() {
   return useMutation({
     mutationFn: (body: OrderRequestBody) => createOrder(body),
+  });
+}
+
+export function useProductContent(id: number | null) {
+  return useQuery({
+    queryKey: ["product-content", id],
+    queryFn: () => fetchProductContent(id!),
+    enabled: id != null,
+    staleTime: 1000 * 60 * 10,
+    gcTime: 1000 * 60 * 60,
   });
 }
 
