@@ -2315,6 +2315,45 @@ def _money_packet_validity(data):
         print(f"money-packet validity: {n} products (Mix-Design<->Package + Paper->laminate)")
 
 
+def _assign_quantity_section(data):
+    """Tag each product with the Excard section that actually contains its Quantity control (captured
+    live via `combo_validity_checker --sections` → output/section_capture.json). Quantity is NOT
+    universally in General — Excard puts it in General for a few products (Business Card), in
+    'Size & Quantity' for apparel, in its own 'Quantity' section for some, and for most (the craft-
+    spec forms) it lives in the Summary/Delivery area, not a spec section. The web configurator uses
+    this to render Quantity inline ONLY where Excard groups it, and as a standalone block otherwise."""
+    import json as _json, re as _re
+    cap = OUT / "section_capture.json"
+    if not cap.is_file():
+        print("quantity-section: SKIP (no output/section_capture.json — run app.combo_validity_checker --sections)")
+        return
+    r = _json.loads(cap.read_text(encoding="utf-8"))
+
+    def nrm(s):
+        return _re.sub(r"[^a-z0-9]", "", str(s).lower())
+    NONCFG = {"delivery", "netpricefordeal", "addname", "summary", "artwork"}
+    qmap = {}
+    for pid, d in r.items():
+        sec = None
+        for s in d.get("excard_sections", []):
+            nm = s.get("section")
+            if not nm or nrm(nm) in NONCFG:
+                continue
+            if any("quantity" in nrm(lab) or nrm(lab) == "qty" for lab in s.get("fields", [])):
+                sec = nm
+                break
+        qmap[int(pid)] = sec
+    n = 0
+    for p in data["products"]:
+        qs = qmap.get(p["id"])
+        if qs:
+            p["quantitySection"] = qs
+            n += 1
+        else:
+            p.pop("quantitySection", None)
+    print(f"quantity-section: {n} products place Quantity inside a spec section; the rest render it separately")
+
+
 def _assign_sections(data):
     """Tag every field with the Excard order-form section it belongs to, so the calculator can
     render General / Optional Finishing / Add On headers like the supplier's form. Prefer the EXACT
@@ -2445,6 +2484,7 @@ def main():
     _attach_images(data)     # after auto_parity, so images can attach to inc_* single-option fields
     _mark_colour_swatches(data)   # render foil/ink/rope colour pickers as colour swatches
     _assign_sections(data)        # tag fields with Excard sections (General/Finishing/Add On)
+    _assign_quantity_section(data)  # tag which section (if any) holds Quantity — it's not always General
     _apply_ref_markup(data)
     _embed_images(data)
     from app.field_order import reorder as _reorder_fields

@@ -31,16 +31,15 @@ function groupSections(product: ProductDetail) {
 export function Configurator({ product, values, onChange, quantity, onQuantityChange }: ConfiguratorProps) {
   const sections = useMemo(() => groupSections(product), [product]);
 
-  // Excard groups Quantity inside "General" (or a "Size & Quantity" section). Render it there so the
-  // questionnaire matches the supplier's form exactly, rather than as a separate panel.
+  // Quantity is NOT universally in General — Excard puts it in a spec section only for some products
+  // (product.quantitySection); most keep it in the summary. Inline it into the matching section when
+  // Excard groups it there; otherwise render it as a standalone block after the sections.
   const qtySection = useMemo(() => {
-    const norm = (s: string) => s.toLowerCase();
-    return (
-      sections.find((s) => norm(s.name).includes("quantity"))?.name ??
-      sections.find((s) => norm(s.name).includes("general"))?.name ??
-      sections[0]?.name
-    );
-  }, [sections]);
+    if (!product.quantitySection) return null;
+    const nrm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const target = nrm(product.quantitySection);
+    return sections.find((s) => nrm(s.name) === target)?.name ?? null;
+  }, [sections, product.quantitySection]);
 
   return (
     <div className="flex flex-col gap-5">
@@ -82,6 +81,17 @@ export function Configurator({ product, values, onChange, quantity, onQuantityCh
           </div>
         );
       })}
+
+      {/* When Excard doesn't group Quantity into a spec section, render it on its own (like the
+          supplier's summary), NOT inside General. */}
+      {!qtySection && (
+        <div className="rounded-lg border border-border overflow-hidden bg-white">
+          <div className="bg-accent-teal text-white text-sm font-semibold px-4 py-2.5">Quantity</div>
+          <div className="p-4">
+            <QuantityControl product={product} quantity={quantity} onChange={onQuantityChange} hideLabel />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

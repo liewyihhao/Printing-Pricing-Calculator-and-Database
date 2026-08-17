@@ -80,6 +80,7 @@ export interface ProductDetail extends ProductSummary {
   validity?: ValidityRules;
   quantity: QuantityConfig;
   sectionOrder?: string[]; // Excard's section order
+  quantitySection?: string | null; // Excard section holding Quantity (null ⇒ render it separately)
 }
 
 export interface QuoteRequest {

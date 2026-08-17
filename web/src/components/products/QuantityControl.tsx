@@ -11,10 +11,12 @@ export function QuantityControl({
   product,
   quantity,
   onChange,
+  hideLabel = false,
 }: {
   product: ProductDetail;
   quantity: number;
   onChange: (q: number) => void;
+  hideLabel?: boolean;
 }) {
   const qtyOptions = validQuantities(product);
   const idx = qtyOptions.indexOf(quantity);
@@ -28,9 +30,11 @@ export function QuantityControl({
 
   return (
     <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-ink-secondary">
-        Quantity<span className="text-brand-500 ml-0.5">*</span>
-      </label>
+      {!hideLabel && (
+        <label className="text-sm font-medium text-ink-secondary">
+          Quantity<span className="text-brand-500 ml-0.5">*</span>
+        </label>
+      )}
       <div className="flex flex-wrap gap-2">
         {(qtyOptions.length ? qtyOptions.slice(0, 12) : [moq(product)]).map((q) => (
           <button

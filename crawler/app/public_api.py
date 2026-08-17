@@ -134,6 +134,9 @@ def _detail(p):
             # Excard's questionnaire sections, in Excard's order (General / Optional Finishing / …),
             # so the configurator can group controls exactly like the supplier's order form.
             "sectionOrder": p.get("sectionOrder") or [],
+            # The section that holds Quantity on Excard (or null — most products keep Quantity in the
+            # summary, NOT General). Configurator inlines Quantity only where Excard groups it.
+            "quantitySection": p.get("quantitySection"),
             "tiers": ["Cash", "Silver", "Gold", "Platinum"]}
 
 
