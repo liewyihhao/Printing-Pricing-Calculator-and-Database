@@ -138,6 +138,7 @@ function FieldRenderer({
             {field.min} – {field.max} mm
           </p>
         )}
+        {field.note && <p className="text-xs text-ink-muted italic leading-relaxed">{field.note}</p>}
       </div>
     );
   }
@@ -183,6 +184,7 @@ function FieldRenderer({
             );
           })}
         </div>
+        {field.note && <p className="text-xs text-ink-muted italic leading-relaxed">{field.note}</p>}
       </div>
     );
   }
@@ -214,6 +216,7 @@ function FieldRenderer({
           );
         })}
       </div>
+      {field.note && <p className="text-xs text-ink-muted italic leading-relaxed">{field.note}</p>}
     </div>
   );
 }
