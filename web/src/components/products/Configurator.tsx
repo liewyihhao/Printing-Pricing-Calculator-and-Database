@@ -1,14 +1,17 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import type { ProductDetail, ProductField } from "@/lib/pricing-api";
 import { fieldShown, allowedOptions as engineAllowed } from "@/lib/engine";
+import { QuantityControl } from "@/components/products/QuantityControl";
 
 interface ConfiguratorProps {
   product: ProductDetail;
   values: Record<string, string | number>;
   onChange: (key: string, value: string | number) => void;
+  quantity: number;
+  onQuantityChange: (q: number) => void;
 }
 
 // Group the fields under Excard's questionnaire sections (General / Optional Finishing / Add On …)
@@ -25,15 +28,27 @@ function groupSections(product: ProductDetail) {
   return order.filter((s) => bySection.has(s)).map((s) => ({ name: s, fields: bySection.get(s)! }));
 }
 
-export function Configurator({ product, values, onChange }: ConfiguratorProps) {
+export function Configurator({ product, values, onChange, quantity, onQuantityChange }: ConfiguratorProps) {
   const sections = useMemo(() => groupSections(product), [product]);
+
+  // Excard groups Quantity inside "General" (or a "Size & Quantity" section). Render it there so the
+  // questionnaire matches the supplier's form exactly, rather than as a separate panel.
+  const qtySection = useMemo(() => {
+    const norm = (s: string) => s.toLowerCase();
+    return (
+      sections.find((s) => norm(s.name).includes("quantity"))?.name ??
+      sections.find((s) => norm(s.name).includes("general"))?.name ??
+      sections[0]?.name
+    );
+  }, [sections]);
 
   return (
     <div className="flex flex-col gap-5">
       {sections.map(({ name, fields }) => {
         // Hide a section entirely when none of its fields currently apply (showWhen).
         const anyVisible = fields.some((f) => fieldShown(f, values));
-        if (!anyVisible) return null;
+        const showsQty = name === qtySection;
+        if (!anyVisible && !showsQty) return null;
         return (
           <div key={name} className="rounded-lg border border-border overflow-hidden bg-white">
             {/* Excard-style teal section header */}
@@ -41,15 +56,28 @@ export function Configurator({ product, values, onChange }: ConfiguratorProps) {
               {name}
             </div>
             <div className="flex flex-col gap-5 p-4">
-              {fields.map((field) => (
-                <FieldRenderer
-                  key={field.key}
-                  field={field}
-                  product={product}
-                  values={values}
-                  onChange={onChange}
-                />
-              ))}
+              {(() => {
+                const qtyEl = (
+                  <QuantityControl key="__qty" product={product} quantity={quantity} onChange={onQuantityChange} />
+                );
+                // Excard orders "… Quantity, Package" — insert Quantity right before the Package field.
+                const hasPackage = fields.some((f) => /package/i.test(f.key));
+                const out: ReactNode[] = [];
+                for (const field of fields) {
+                  if (showsQty && /package/i.test(field.key)) out.push(qtyEl);
+                  out.push(
+                    <FieldRenderer
+                      key={field.key}
+                      field={field}
+                      product={product}
+                      values={values}
+                      onChange={onChange}
+                    />
+                  );
+                }
+                if (showsQty && !hasPackage) out.push(qtyEl);
+                return out;
+              })()}
             </div>
           </div>
         );
