@@ -2389,6 +2389,68 @@ def _add_round_corner_position(data):
     print(f"round-corner-position: added the 15-option position picker to {n} product(s) with Round Corner")
 
 
+def _booklet_layout(data):
+    """Booklet (Litho Offset 19 / Digital 37): match Excard's live order-form sequence exactly and
+    expose the cover Hot Stamping sub-spec (foil colour + stamping area) the audits can't see.
+
+    Excard's captured sections (app.combo_validity_checker --sections): GENERAL (Cover Type,
+    Orientation, Size, Pages), COVER (Cover Paper, Cover Print Colour, Lamination/Finishing, Hot
+    Stamping Colour), CONTENT (Content Paper, Content Print Colour). The field-section capture only
+    covered the main selects, so binding/pages/embossing/hot-stamping/add-ons fell to the keyword
+    heuristic and landed out of sequence (Cover Type 3rd in General; embossing in its own 'Optional
+    Finishing'; hot stamping with no foil colour or size). This pins the order + sections and adds
+    the sub-controls (all price-neutral — the stamping block is quoted separately)."""
+    # Excard's cover-section sequence; keys we don't have are skipped, extras keep their tail slot.
+    ORDER = ["ordertype", "orientation", "size", "binding", "page",
+             "cover", "outer_inner", "cover_lamination", "cover_embossing",
+             "hot_stamping", "hot_stamping_colour", "hot_stamping_w", "hot_stamping_h",
+             "content", "colour",
+             "jawi", "extra_books"]
+    SECTION = {"ordertype": "General", "orientation": "General", "size": "General",
+               "binding": "General", "page": "General",
+               "cover": "Cover", "outer_inner": "Cover", "cover_lamination": "Cover",
+               "cover_embossing": "Cover", "hot_stamping": "Cover",
+               "hot_stamping_colour": "Cover", "hot_stamping_w": "Cover", "hot_stamping_h": "Cover",
+               "content": "Content", "colour": "Content",
+               "jawi": "Add On", "extra_books": "Add On"}
+    for p in data["products"]:
+        if "booklet" not in p["name"].lower():
+            continue
+        fields = {f["key"]: f for f in p["fields"]}
+        hs = fields.get("hot_stamping")
+        if hs and "hot_stamping_colour" not in fields:
+            no = next((o for o in (hs.get("options") or []) if o.lower().startswith(("not", "no "))),
+                      "Not Required")
+            when = {"field": "hot_stamping", "notValues": [no]}
+            fields["hot_stamping_colour"] = {
+                "key": "hot_stamping_colour", "label": "Cover hot stamping — foil colour",
+                "addon": True, "neutral": True, "depends": [], "options": ["Gold", "Silver"],
+                "showWhen": when, "note": "Foil colour for the cover hot-stamping block."}
+            fields["hot_stamping_w"] = {
+                "key": "hot_stamping_w", "label": "Cover hot stamping — area width (mm)",
+                "type": "number", "addon": True, "neutral": True, "depends": [],
+                "min": 5, "max": 300, "showWhen": when}
+            fields["hot_stamping_h"] = {
+                "key": "hot_stamping_h", "label": "Cover hot stamping — area height (mm)",
+                "type": "number", "addon": True, "neutral": True, "depends": [],
+                "min": 5, "max": 300, "showWhen": when,
+                "note": "Stamping area; the block/foil is quoted separately."}
+        # Pin section + rebuild the field order to Excard's sequence.
+        for k, f in fields.items():
+            if k in SECTION:
+                f["section"] = SECTION[k]
+        ordered = [fields.pop(k) for k in ORDER if k in fields]
+        ordered += list(fields.values())  # any unforeseen extras keep a stable tail slot
+        p["fields"] = ordered
+        secrank = {"General": 0, "Cover": 1, "Content": 2, "Add On": 3}
+        secs = []
+        for f in ordered:
+            s = f.get("section") or "General"
+            if s not in secs:
+                secs.append(s)
+        p["sectionOrder"] = sorted(secs, key=lambda s: secrank.get(s, 9))
+
+
 def _assign_sections(data):
     """Tag every field with the Excard order-form section it belongs to, so the calculator can
     render General / Optional Finishing / Add On headers like the supplier's form. Prefer the EXACT
@@ -2531,6 +2593,7 @@ def main():
     from app.field_order import reorder as _reorder_fields
     _fn, _fc = _reorder_fields(data)
     print(f"field order: {_fc}/{_fn} products resequenced to the supplier's option order")
+    _booklet_layout(data)         # Booklet: pin Excard's exact section sequence + cover hot-stamp sub-spec
     _loose_sheet_exact(data)      # exact Excard conditional validity for the loose-sheet family
     _loose_size_validity(data)    # Loose Sheet: Excard restricts Paper + Colour by SIZE (live-captured)
     from app.validity_apply import apply as _apply_validity

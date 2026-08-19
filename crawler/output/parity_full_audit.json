@@ -1,1 +1,16 @@
-{}
+{
+ "19": {
+  "name": "Booklet — Litho (Offset)",
+  "presence_gaps": [],
+  "value_gaps": [],
+  "order_ok": false,
+  "cascade": true
+ },
+ "37": {
+  "name": "Booklet — Digital",
+  "presence_gaps": [],
+  "value_gaps": [],
+  "order_ok": false,
+  "cascade": true
+ }
+}
