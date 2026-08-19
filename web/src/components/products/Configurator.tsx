@@ -118,39 +118,22 @@ function FieldRenderer({
 
   const currentValue = values[field.key] ?? "";
 
-  if (field.type === "number") {
-    return (
-      <div className="flex flex-col gap-1.5">
-        <label className="text-sm font-medium text-ink-secondary">
-          {field.label}
-          {field.required && <span className="text-red-500 ml-0.5">*</span>}
-        </label>
-        <input
-          type="number"
-          value={currentValue as number}
-          min={field.min}
-          max={field.max}
-          onChange={(e) => onChange(field.key, Number(e.target.value))}
-          className="h-10 rounded-lg border border-border bg-white px-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand-500 w-full max-w-xs"
-        />
-        {field.min != null && field.max != null && (
-          <p className="text-xs text-ink-muted">
-            {field.min} – {field.max} mm
-          </p>
-        )}
-        {field.note && <p className="text-xs text-ink-muted italic leading-relaxed">{field.note}</p>}
-      </div>
-    );
-  }
+  const labelEl = (
+    <label
+      htmlFor={`f-${field.key}`}
+      className="text-sm font-medium text-ink-secondary sm:pt-2"
+    >
+      {field.label}
+      {field.required && <span className="text-red-500 ml-0.5">*</span>}
+    </label>
+  );
 
-  // Image picker
+  // Image / swatch pickers keep the visual grid Excard uses (round-corner position, fold dielines).
+  // These sit full-width below their label rather than in the label-left row.
   if (field.images && Object.keys(field.images).length > 0) {
     return (
       <div className="flex flex-col gap-2">
-        <label className="text-sm font-medium text-ink-secondary">
-          {field.label}
-          {field.required && <span className="text-red-500 ml-0.5">*</span>}
-        </label>
+        {labelEl}
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
           {(allowedOptions ?? []).map((opt) => {
             const imgSrc = field.images![opt];
@@ -189,34 +172,47 @@ function FieldRenderer({
     );
   }
 
-  // Plain select
+  // Label-left row + control, matching Excard's classic order-form layout.
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="text-sm font-medium text-ink-secondary">
-        {field.label}
-        {field.required && <span className="text-red-500 ml-0.5">*</span>}
-      </label>
-      <div className="flex flex-wrap gap-2">
-        {(allowedOptions ?? []).map((opt) => {
-          const selected = currentValue === opt;
-          return (
-            <button
-              key={opt}
-              type="button"
-              onClick={() => onChange(field.key, opt)}
-              className={cn(
-                "px-3 py-1.5 rounded-lg border text-sm font-medium transition-all duration-150",
-                selected
-                  ? "border-brand-500 bg-brand-50 text-brand-700"
-                  : "border-border text-ink-secondary hover:border-brand-300 hover:text-ink"
-              )}
-            >
-              {opt}
-            </button>
-          );
-        })}
+    <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,190px)_1fr] sm:items-start gap-1.5 sm:gap-4">
+      {labelEl}
+      <div className="flex flex-col gap-1.5">
+        {field.type === "number" ? (
+          <input
+            id={`f-${field.key}`}
+            type="number"
+            value={currentValue as number}
+            min={field.min}
+            max={field.max}
+            onChange={(e) => onChange(field.key, Number(e.target.value))}
+            className="h-10 rounded-md border border-border bg-white px-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand-500 w-full"
+          />
+        ) : (
+          <select
+            id={`f-${field.key}`}
+            value={currentValue as string}
+            onChange={(e) => onChange(field.key, e.target.value)}
+            className="h-10 rounded-md border border-border bg-white px-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand-500 w-full cursor-pointer"
+          >
+            {!(allowedOptions ?? []).includes(currentValue as string) && (
+              <option value="" disabled>
+                Select…
+              </option>
+            )}
+            {(allowedOptions ?? []).map((opt) => (
+              <option key={opt} value={opt}>
+                {opt}
+              </option>
+            ))}
+          </select>
+        )}
+        {field.type === "number" && field.min != null && field.max != null && (
+          <p className="text-xs text-ink-muted">
+            {field.min} – {field.max} mm
+          </p>
+        )}
+        {field.note && <p className="text-xs text-ink-muted italic leading-relaxed">{field.note}</p>}
       </div>
-      {field.note && <p className="text-xs text-ink-muted italic leading-relaxed">{field.note}</p>}
     </div>
   );
 }

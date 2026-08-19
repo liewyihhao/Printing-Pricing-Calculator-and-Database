@@ -70,6 +70,7 @@ export interface QuantityConfig {
   min?: number; // legacy alias
   options?: number[];
   mode?: string;
+  custom?: boolean; // whether an arbitrary quantity (not just `options`) is accepted
   note?: string;
 }
 
