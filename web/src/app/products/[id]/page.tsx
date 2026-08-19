@@ -1,13 +1,21 @@
 "use client";
 
-import { useState, useCallback, useMemo, use } from "react";
-import { useProduct, useQuote } from "@/lib/pricing-api";
+import { useState, useCallback, useMemo, use, useEffect } from "react";
+import { useProduct, useQuote, useProductContent } from "@/lib/pricing-api";
 import { Configurator } from "@/components/products/Configurator";
 import { PricePanel } from "@/components/products/PricePanel";
+import { ProductContent } from "@/components/products/ProductContent";
 import { Skeleton } from "@/components/ui/skeleton";
-import { QUICK_QTY, CATEGORY_ICONS, formatMYR } from "@/lib/utils";
-import { cn } from "@/lib/utils";
-import { ChevronRight, Minus, Plus } from "lucide-react";
+import { CATEGORY_ICONS, formatMYR } from "@/lib/utils";
+import { ProductPhoto } from "@/components/products/ProductPhoto";
+import { ProductBanner } from "@/components/products/ProductBanner";
+import {
+  resolveDefaults,
+  isComplete as engineIsComplete,
+  validQuantities,
+  defaultQuantity,
+} from "@/lib/engine";
+import { ChevronRight } from "lucide-react";
 import Link from "next/link";
 
 export default function ProductPage({
@@ -19,29 +27,32 @@ export default function ProductPage({
   const productId = Number(id);
 
   const { data: product, isLoading: productLoading } = useProduct(productId);
+  const { data: content } = useProductContent(productId);
   const [values, setValues] = useState<Record<string, string | number>>({});
   const [quantity, setQuantity] = useState(100);
 
+  // On product load, auto-fill defaults + a valid default quantity (mirrors the standalone
+  // calculator, which shows a price immediately) so the configurator resolves the full cascade.
+  useEffect(() => {
+    if (!product) return;
+    setValues((prev) => (Object.keys(prev).length ? prev : resolveDefaults(product, {})));
+    setQuantity((q) => (validQuantities(product).includes(q) ? q : defaultQuantity(product)));
+  }, [product]);
+
   const handleChange = useCallback((key: string, value: string | number) => {
     setValues((prev) => {
-      const next = { ...prev, [key]: value };
-      // When primary validity field changes, clear downstream fields
-      if (product?.validity?.primary === key) {
-        for (const f of product.validity.fields) {
-          delete next[f];
-        }
-      }
-      return next;
+      if (!product) return { ...prev, [key]: value };
+      // Set the value, then re-resolve the whole cascade: hidden fields drop out, downstream fields
+      // whose allowed set changed snap to a valid default (identical to the standalone calculator).
+      return resolveDefaults(product, { ...prev, [key]: value });
     });
   }, [product]);
 
-  // Determine if all required fields are filled
-  const isComplete = useMemo(() => {
-    if (!product) return false;
-    return product.fields
-      .filter((f) => f.required)
-      .every((f) => values[f.key] != null && values[f.key] !== "");
-  }, [product, values]);
+  // Quotable when every applicable (visible, non-optional, non-number) field has a valid value.
+  const isComplete = useMemo(
+    () => (product ? engineIsComplete(product, values) : false),
+    [product, values]
+  );
 
   const {
     data: quote,
@@ -104,21 +115,25 @@ export default function ProductPage({
           <span className="text-ink font-medium">{product.name}</span>
         </nav>
 
+        {/* Wide product hero banner (printoka media) */}
+        <ProductBanner id={product.id} alt={product.name} />
+
         <div className="grid lg:grid-cols-2 gap-10 items-start">
           {/* LEFT: Product preview */}
           <div className="lg:sticky lg:top-24">
-            <div className="aspect-square rounded-2xl border border-border bg-surface-muted overflow-hidden flex items-center justify-center">
-              {previewImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={previewImage}
-                  alt={product.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <span className="text-8xl">{icon}</span>
-              )}
-            </div>
+            {previewImage ? (
+              <div className="aspect-square rounded-xl border border-border bg-surface-muted overflow-hidden flex items-center justify-center">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={previewImage} alt={product.name} className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <ProductPhoto
+                id={product.id}
+                icon={icon}
+                alt={product.name}
+                className="aspect-[4/3] rounded-xl border border-border"
+              />
+            )}
             <div className="mt-4 p-4 rounded-xl bg-surface-muted border border-border">
               <p className="text-xs text-ink-muted text-center">
                 Preview updates as you select options · Actual print may vary slightly
@@ -141,78 +156,15 @@ export default function ProductPage({
               )}
             </div>
 
-            {/* Configurator fields */}
-            <div className="bg-white rounded-xl border border-border p-6">
-              <h2 className="text-sm font-semibold text-ink mb-6">
-                Specifications
-              </h2>
-              <Configurator
-                product={product}
-                values={values}
-                onChange={handleChange}
-              />
-            </div>
-
-            {/* Quantity */}
-            <div className="bg-white rounded-xl border border-border p-6">
-              <h2 className="text-sm font-semibold text-ink mb-4">Quantity</h2>
-
-              {/* Quick chips */}
-              <div className="flex flex-wrap gap-2 mb-4">
-                {QUICK_QTY.filter(
-                  (q) => q >= (product.quantity.min ?? 1)
-                ).map((q) => (
-                  <button
-                    key={q}
-                    onClick={() => setQuantity(q)}
-                    className={cn(
-                      "px-3 py-1.5 rounded-lg border text-sm font-medium transition-all",
-                      quantity === q
-                        ? "border-brand-500 bg-brand-50 text-brand-700"
-                        : "border-border text-ink-secondary hover:border-brand-300"
-                    )}
-                  >
-                    {q.toLocaleString()}
-                  </button>
-                ))}
-              </div>
-
-              {/* Stepper */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() =>
-                    setQuantity((q) =>
-                      Math.max(product.quantity.min ?? 1, q - 1)
-                    )
-                  }
-                  className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-surface-subtle transition-colors"
-                >
-                  <Minus className="w-4 h-4 text-ink-secondary" />
-                </button>
-                <input
-                  type="number"
-                  value={quantity}
-                  min={product.quantity.min ?? 1}
-                  onChange={(e) =>
-                    setQuantity(Math.max(product.quantity.min ?? 1, Number(e.target.value)))
-                  }
-                  className="w-24 h-9 rounded-lg border border-border text-center text-sm font-medium focus:outline-none focus:ring-2 focus:ring-brand-500"
-                />
-                <button
-                  onClick={() => setQuantity((q) => q + 1)}
-                  className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-surface-subtle transition-colors"
-                >
-                  <Plus className="w-4 h-4 text-ink-secondary" />
-                </button>
-                <span className="text-sm text-ink-muted">pcs</span>
-              </div>
-
-              {product.quantity.note && (
-                <p className="text-xs text-ink-subtle mt-2">
-                  {product.quantity.note}
-                </p>
-              )}
-            </div>
+            {/* Configurator — fields grouped under Excard's questionnaire sections, Quantity inlined
+                into General exactly like the supplier's order form. */}
+            <Configurator
+              product={product}
+              values={values}
+              onChange={handleChange}
+              quantity={quantity}
+              onQuantityChange={setQuantity}
+            />
 
             {/* Price panel */}
             <PricePanel
@@ -225,6 +177,9 @@ export default function ProductPage({
             />
           </div>
         </div>
+
+        {/* Rich education tabs — Product Spec · Artwork Spec · Templates (from our own catalogue) */}
+        {content && <ProductContent content={content} />}
       </div>
     </div>
   );

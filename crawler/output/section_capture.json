@@ -1,0 +1,3253 @@
+{
+ "1": {
+  "name": "Business Card",
+  "slug": "business-card",
+  "excard_sections": [
+   {
+    "section": "General",
+    "fields": [
+     "Category",
+     "Size",
+     "Orientation",
+     "Paper",
+     "Print Colour",
+     "Paper Lamination",
+     "Silkscreen Spot UV",
+     "Quantity",
+     "Package"
+    ]
+   },
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "Hot Stamping",
+     "Round Corner",
+     "Hole Punching",
+     "Embossing"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Category",
+    "Size",
+    "Orientation",
+    "Paper",
+    "Print Colour",
+    "Lamination",
+    "Silkscreen Spot UV",
+    "Package"
+   ],
+   "Optional Finishing": [
+    "Hot Stamping",
+    "Hot Stamping — Foil Colour",
+    "Hot Stamping — Area width (mm)",
+    "Hot Stamping — Area height (mm)",
+    "Round Corner",
+    "Hole Punching",
+    "Embossing",
+    "Embossing — Area width (mm)",
+    "Embossing — Area height (mm)"
+   ]
+  }
+ },
+ "104": {
+  "name": "Notepad — Litho",
+  "slug": "notepad",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Paper",
+    "Binding",
+    "Print Colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Finishing"
+   ]
+  }
+ },
+ "106": {
+  "name": "Envelope — Litho",
+  "slug": "envelope",
+  "excard_sections": [
+   {
+    "section": "Add On",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "Add On": [
+    "Envelope model (size / window)",
+    "Envelope Type"
+   ],
+   "General": [
+    "Print colour / side",
+    "Size",
+    "Included"
+   ]
+  }
+ },
+ "107": {
+  "name": "Folder — Litho",
+  "slug": "folder",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Folder model",
+    "Size",
+    "Paper",
+    "Print colour",
+    "Included",
+    "Model Category"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Colour protective layer (back)"
+   ],
+   "Add On": [
+    "CD Seal",
+    "Fastener"
+   ]
+  }
+ },
+ "108": {
+  "name": "L-Shape Plastic Folder — Digital",
+  "slug": "l-shape-plastic-folder",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Print Method",
+    "Paper",
+    "PrintColour"
+   ]
+  }
+ },
+ "118": {
+  "name": "Wall Calendar — Litho",
+  "slug": "wall-calendar",
+  "excard_sections": [
+   {
+    "section": "Header",
+    "fields": []
+   },
+   {
+    "section": "Content",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Category",
+    "Model",
+    "Package",
+    "Content Artwork",
+    "Header Print Colour",
+    "Header Compulsory",
+    "Content Paper",
+    "Content Size",
+    "Content Compulsory"
+   ],
+   "Add On": [
+    "Header Paper",
+    "Header Size"
+   ]
+  }
+ },
+ "119": {
+  "name": "Arch File — Digital",
+  "slug": "arch-file",
+  "excard_sections": [
+   {
+    "section": "Outer Cover",
+    "fields": []
+   },
+   {
+    "section": "Inner Cover",
+    "fields": []
+   },
+   {
+    "section": "Quantity",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Binding",
+    "Print Colour",
+    "Cover paper",
+    "Cover print"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "120": {
+  "name": "Desk Calendar — Hard Stand (Litho)",
+  "slug": "hard-stand-desk-calendar",
+  "excard_sections": [
+   {
+    "section": "Front & Back Cover",
+    "fields": []
+   },
+   {
+    "section": "Content",
+    "fields": []
+   },
+   {
+    "section": "Stand",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Product Type",
+    "Model",
+    "Cover Paper",
+    "Cover Size",
+    "Content Artwork",
+    "Content Paper",
+    "Content Size",
+    "Stand Paper",
+    "Stand Size"
+   ]
+  }
+ },
+ "121": {
+  "name": "Desk Calendar — Soft Stand (Litho)",
+  "slug": "soft-stand-desk-calendar",
+  "excard_sections": [
+   {
+    "section": "Front & Back Cover",
+    "fields": []
+   },
+   {
+    "section": "Content",
+    "fields": []
+   },
+   {
+    "section": "Stand",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {}
+ },
+ "122": {
+  "name": "Wire-O Wall Calendar — Litho",
+  "slug": "wire-o-wall-calendar",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Print Method",
+    "Mould"
+   ],
+   "Optional Finishing": [
+    "Punch Hole"
+   ]
+  }
+ },
+ "123": {
+  "name": "Banner — Litho",
+  "slug": "banner",
+  "excard_sections": [
+   {
+    "section": "General",
+    "fields": [
+     "Size Type",
+     "Orientation",
+     "Size",
+     "Material",
+     "Quantity (Pcs)",
+     "Finishing",
+     "Top Eyelets",
+     "Bottom Eyelets",
+     "Compulsory",
+     "Packing Method"
+    ]
+   },
+   {
+    "section": "Finishing",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size Type",
+    "Orientation",
+    "Size",
+    "Material",
+    "Print Colour",
+    "Included"
+   ],
+   "Add On": [
+    "Top Eyelet",
+    "Bottom Eyelet"
+   ]
+  }
+ },
+ "124": {
+  "name": "Bunting — Litho",
+  "slug": "bunting",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Material",
+    "Printing"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Finishing"
+   ]
+  }
+ },
+ "125": {
+  "name": "Roll-Up Stand — Litho",
+  "slug": "roll-up-stand",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Paper / Binding",
+    "Print Colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "126": {
+  "name": "Wobbler — Digital",
+  "slug": "wobbler",
+  "excard_sections": [
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "No"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Category",
+    "Model Category",
+    "Model",
+    "Size",
+    "Paper",
+    "Print Colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Round Corner"
+   ]
+  }
+ },
+ "127": {
+  "name": "Paper Bag — Litho",
+  "slug": "paper-bag",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "Rush Order Terms & Conditions apply",
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Paper",
+    "Print Colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Size / Length",
+    "Hot Stamping Size"
+   ],
+   "Add On": [
+    "Rope Colour"
+   ]
+  }
+ },
+ "128": {
+  "name": "Canvas Tote Bag — Litho",
+  "slug": "canvas-tote-bag",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Paper",
+    "Bag Colour",
+    "Handle Colour",
+    "HandleLength",
+    "PrintColour",
+    "Included"
+   ]
+  }
+ },
+ "129": {
+  "name": "Mug — Litho",
+  "slug": "mug",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Mug Colour",
+    "Print Colour",
+    "Packing (included)"
+   ]
+  }
+ },
+ "130": {
+  "name": "Papan Kopi / Sachet Board — Litho",
+  "slug": "papan-kopi-sachet-board",
+  "excard_sections": [],
+  "our_sections": {
+   "General": [
+    "Model (SB 01=537x334mm 20win · SB 02=622x346mm 20win · SB 03=547x346mm 20win · SB 04=547x346mm 15win)",
+    "Print Method",
+    "Size",
+    "Window",
+    "Window Size",
+    "Window Shape"
+   ],
+   "Optional Finishing": [
+    "Hole Punch"
+   ]
+  }
+ },
+ "131": {
+  "name": "Pillow — Litho",
+  "slug": "pillow",
+  "excard_sections": [],
+  "our_sections": {
+   "General": [
+    "Print Method"
+   ]
+  }
+ },
+ "132": {
+  "name": "Button Badge — Digital",
+  "slug": "button-badge",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Package",
+    "Paper / Binding",
+    "Print Colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Finishing"
+   ]
+  }
+ },
+ "133": {
+  "name": "Hand Fan — Digital",
+  "slug": "hand-fan",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Paper",
+    "Print Colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "134": {
+  "name": "Hanger — Digital",
+  "slug": "hanger",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Paper",
+    "PrintColour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "135": {
+  "name": "Magnet — Digital",
+  "slug": "magnet",
+  "excard_sections": [],
+  "our_sections": {
+   "General": [
+    "Print Method",
+    "Rd Type",
+    "Shape",
+    "Size"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "136": {
+  "name": "Hard Cover Menu — Digital",
+  "slug": "hard-cover-menu",
+  "excard_sections": [
+   {
+    "section": "Front & Back Cover",
+    "fields": []
+   },
+   {
+    "section": "Content",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "OrderDesc",
+    "Print Colour",
+    "Included",
+    "CoverPaper",
+    "CoverSize",
+    "ContentPaper",
+    "ContentSize",
+    "Pages"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "137": {
+  "name": "Standing Pouch — Litho",
+  "slug": "standing-pouch",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Paper",
+    "Print Colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "138": {
+  "name": "Money Packet — Litho",
+  "slug": "money-packet",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Design",
+    "Model (MP 101=154x79.5mm · MP 103=79.5x154mm · MP 104=85x167mm)",
+    "Size",
+    "Mix Design",
+    "Package (number of designs)",
+    "Paper",
+    "Print Colour",
+    "Included",
+    "Print Method"
+   ],
+   "Add On": [
+    "Packing method (price-neutral; for info)"
+   ],
+   "Optional Finishing": [
+    "Finishing"
+   ]
+  }
+ },
+ "139": {
+  "name": "Non-Woven Bag — Litho",
+  "slug": "non-woven-bag",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model (determines size · WN-B5=200x230x80mm · WS-A4=280x330x80mm · WS-A3P=350x350x100mm · WS-A3L=420x320x100mm · WH-A4=280x330x80mm)",
+    "Size",
+    "Paper / Binding",
+    "Bag Colour (price-neutral; for info)",
+    "Handle Colour (price-neutral; for info)",
+    "Handle Length (price-neutral; for info)",
+    "Print Colour (WN/WS=1C only · WH=4C only)",
+    "Included"
+   ]
+  }
+ },
+ "140": {
+  "name": "Tent Card — Litho",
+  "slug": "tent-card",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model (TC 003=294x86mm · TC 004=294x140mm)",
+    "Size",
+    "Paper / Binding",
+    "Print Colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "141": {
+  "name": "Stamp Chop",
+  "slug": "stamp-chop",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Print Method",
+    "Ink Colour (no price change)",
+    "Stamp Type",
+    "Category",
+    "Model"
+   ]
+  }
+ },
+ "143": {
+  "name": "Sublimation Shirt",
+  "slug": "sublimation-shirt",
+  "excard_sections": [],
+  "our_sections": {
+   "General": [
+    "category",
+    "model",
+    "sleeve"
+   ]
+  }
+ },
+ "144": {
+  "name": "Cooler Bag — Litho",
+  "slug": "cooler-bag",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Print Colour"
+   ]
+  }
+ },
+ "145": {
+  "name": "DTF Tote Bag With Zip — Litho",
+  "slug": "dtf-totebag-with-zip",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Print Colour"
+   ]
+  }
+ },
+ "146": {
+  "name": "Heat Transfer Tote Bag — Litho",
+  "slug": "heat-transfer-tote-bag",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Print Colour",
+    "Orientation"
+   ]
+  }
+ },
+ "147": {
+  "name": "Laminated Non-Woven Bag — Litho",
+  "slug": "laminated-non-woven-bag",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Bag Colour",
+    "Handle Length",
+    "Print Colour"
+   ]
+  }
+ },
+ "148": {
+  "name": "RPET Non-Woven Bag — Litho",
+  "slug": "rpet-non-woven-bag",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Handle Length"
+   ]
+  }
+ },
+ "149": {
+  "name": "Toast Bag — Litho",
+  "slug": "toast-bag",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {}
+ },
+ "150": {
+  "name": "3-Side Seal Packaging — Litho",
+  "slug": "3-side-seal-packaging",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Material"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "151": {
+  "name": "Kraft Standing Pouch — Litho",
+  "slug": "kraft-standing-pouch",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Material",
+    "Material Base Color"
+   ]
+  }
+ },
+ "152": {
+  "name": "Standing Pouch with Spout — Litho",
+  "slug": "standing-pouch-spout",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "153": {
+  "name": "Vacuum Bag Packaging — Litho",
+  "slug": "vacuum-bag-packaging",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "154": {
+  "name": "Foamboard — Digital",
+  "slug": "foamboard",
+  "excard_sections": [
+   {
+    "section": "Add On",
+    "fields": [
+     "Not Required"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Cutting Method",
+    "Butterfly Stand",
+    "Material (Stand)",
+    "Package",
+    "Packing Material"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "155": {
+  "name": "Foamboard with Magnet — Digital",
+  "slug": "foamboard-with-magnet",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Shape"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "156": {
+  "name": "Foldable POP Display — Digital",
+  "slug": "foldable-pop-display",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size"
+   ]
+  }
+ },
+ "157": {
+  "name": "POP Display — Digital",
+  "slug": "pop-display",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "158": {
+  "name": "Wind Flag — Digital",
+  "slug": "wind-flag",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model"
+   ]
+  }
+ },
+ "159": {
+  "name": "Economy Roll-Up Stand — Digital",
+  "slug": "economy-roll-up-stand",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {}
+ },
+ "160": {
+  "name": "Bunting — Gear X Stand",
+  "slug": "bunting",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Material",
+    "Printing"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "161": {
+  "name": "Bunting — Round Base Stand",
+  "slug": "bunting",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Material",
+    "Printing"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "162": {
+  "name": "Bunting — Tripod Stand",
+  "slug": "bunting",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Material",
+    "Printing"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "163": {
+  "name": "Exclusive Leather Cover Wire-O Notebook — Litho",
+  "slug": "exclusive-leather-cover-wire-o-notebook",
+  "excard_sections": [
+   {
+    "section": "Front & Back Cover",
+    "fields": []
+   },
+   {
+    "section": "Cover Finishing",
+    "fields": []
+   },
+   {
+    "section": "Content",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "Additional Custom Design",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Print Colour (Cover)",
+    "Print Method",
+    "Orientation",
+    "UV DTF STICKERING",
+    "Sticker Size",
+    "Sticker Position",
+    "Ready Content",
+    "Inner Front Content",
+    "Additional Content",
+    "Paper 1 to 4",
+    "Paper 5 to 8",
+    "Paper 9 to 12",
+    "Print Colour"
+   ],
+   "Optional Finishing": [
+    "Finishing (Cover)",
+    "Deboss",
+    "Deboss Size H",
+    "Deboss Size W"
+   ]
+  }
+ },
+ "164": {
+  "name": "Hard Cover Perfect Bind Notebook — Litho",
+  "slug": "hard-cover-perfect-bind-notebook",
+  "excard_sections": [
+   {
+    "section": "Hard Cover",
+    "fields": []
+   },
+   {
+    "section": "Cover Finishing",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "Inner Paper",
+    "fields": [
+     "4C + 4C"
+    ]
+   },
+   {
+    "section": "Content",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "Optional Finishing": [
+    "Lamination",
+    "Hot Stamping Colour"
+   ],
+   "General": [
+    "Inner Print Colour",
+    "Print Method",
+    "Orientation",
+    "Additional content"
+   ]
+  }
+ },
+ "165": {
+  "name": "Creative Cut Card — Digital",
+  "slug": "creative-cut-card",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Paper"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "166": {
+  "name": "Greeting Card — Litho",
+  "slug": "greeting-card",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Fold Type",
+    "Model",
+    "Paper Material",
+    "Print Colour"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ],
+   "Add On": [
+    "Envelope"
+   ]
+  }
+ },
+ "167": {
+  "name": "Premium Money Packet — Litho",
+  "slug": "premium-money-packet",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Design",
+    "Model",
+    "Size",
+    "Mix Design",
+    "Package",
+    "Paper",
+    "Print Colour",
+    "Included",
+    "Print Method"
+   ],
+   "Add On": [
+    "Packing Method"
+   ],
+   "Optional Finishing": [
+    "Finishing"
+   ]
+  }
+ },
+ "168": {
+  "name": "Hot Stamping Money Packet — Litho",
+  "slug": "hot-stamping-money-packet",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Design",
+    "Model",
+    "Size",
+    "Mix Design",
+    "Package",
+    "Paper",
+    "Print Colour",
+    "Included",
+    "Print Method"
+   ],
+   "Add On": [
+    "Packing Method"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Finishing"
+   ]
+  }
+ },
+ "169": {
+  "name": "Envelope Money Packet — Litho",
+  "slug": "envelope-money-packet",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Design",
+    "Size",
+    "Print Colour",
+    "Included",
+    "Print Method",
+    "Package"
+   ],
+   "Optional Finishing": [
+    "Finishing"
+   ]
+  }
+ },
+ "172": {
+  "name": "DTF Shirt — Digital",
+  "slug": "dtf-shirt",
+  "excard_sections": [
+   {
+    "section": "SIZE & QUANTITY",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "category",
+    "model",
+    "fabric"
+   ]
+  }
+ },
+ "173": {
+  "name": "Silkscreen Shirt — Digital",
+  "slug": "silkscreen-shirt",
+  "excard_sections": [
+   {
+    "section": "SIZE & QUANTITY",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "category",
+    "model",
+    "fabric"
+   ]
+  }
+ },
+ "174": {
+  "name": "Lanyard — Litho",
+  "slug": "lanyard",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size"
+   ]
+  }
+ },
+ "175": {
+  "name": "Premium Desk Calendar — Litho",
+  "slug": "premium-desk-calendar",
+  "excard_sections": [
+   {
+    "section": "Front & Back Cover",
+    "fields": []
+   },
+   {
+    "section": "Content",
+    "fields": []
+   },
+   {
+    "section": "Stand",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "Optional Finishing": [
+    "Stand Lamination"
+   ]
+  }
+ },
+ "176": {
+  "name": "UV DTF Sticker — Digital",
+  "slug": "uv-dtf-sticker",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Package",
+    "Sheet(s)"
+   ]
+  }
+ },
+ "177": {
+  "name": "Food Tray — Litho",
+  "slug": "food-tray",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Ml",
+    "Size",
+    "Qty"
+   ]
+  }
+ },
+ "178": {
+  "name": "Kraft Paper Bag — Litho",
+  "slug": "kraft-paper-bag",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Handle Length",
+    "Material",
+    "Material Base Color",
+    "Print Colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Size / Length"
+   ],
+   "Add On": [
+    "Rope Colour"
+   ]
+  }
+ },
+ "179": {
+  "name": "Kotak Cenderahati — Litho",
+  "slug": "kotak-cenderahati",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Paper",
+    "Print Colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Lamination"
+   ]
+  }
+ },
+ "180": {
+  "name": "Corporate Shirt — Digital",
+  "slug": "corporate-shirt",
+  "excard_sections": [
+   {
+    "section": "GENERAL",
+    "fields": [
+     "Model",
+     "Sleeve Type",
+     "Fabric"
+    ]
+   },
+   {
+    "section": "SHIRT VDP",
+    "fields": [
+     "Position"
+    ]
+   },
+   {
+    "section": "PANT VDP",
+    "fields": []
+   },
+   {
+    "section": "LOGO PATCH ?",
+    "fields": [
+     "Patch Type"
+    ]
+   },
+   {
+    "section": "SIZE & QUANTITY",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "model",
+    "sleeve",
+    "Fabric"
+   ],
+   "Shirt Vdp": [
+    "Personalisation (VDP) Position"
+   ]
+  }
+ },
+ "181": {
+  "name": "Jacket — Digital",
+  "slug": "jacket",
+  "excard_sections": [
+   {
+    "section": "GENERAL",
+    "fields": [
+     "Model",
+     "Sleeve Type",
+     "Fabric"
+    ]
+   },
+   {
+    "section": "SHIRT VDP",
+    "fields": [
+     "Position"
+    ]
+   },
+   {
+    "section": "PANT VDP",
+    "fields": []
+   },
+   {
+    "section": "LOGO PATCH ?",
+    "fields": [
+     "Patch Type"
+    ]
+   },
+   {
+    "section": "SIZE & QUANTITY",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "model",
+    "sleeve",
+    "Fabric"
+   ],
+   "Shirt Vdp": [
+    "Personalisation (VDP) Position"
+   ]
+  }
+ },
+ "182": {
+  "name": "Muslimah Sublimation — Digital",
+  "slug": "muslimah",
+  "excard_sections": [
+   {
+    "section": "GENERAL",
+    "fields": [
+     "Category",
+     "Model",
+     "Sleeve Type",
+     "Fabric"
+    ]
+   },
+   {
+    "section": "SHIRT VDP",
+    "fields": [
+     "Position"
+    ]
+   },
+   {
+    "section": "PANT VDP",
+    "fields": []
+   },
+   {
+    "section": "LOGO PATCH ?",
+    "fields": [
+     "Patch Type"
+    ]
+   },
+   {
+    "section": "SIZE & QUANTITY",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "category",
+    "model",
+    "sleeve",
+    "fabric"
+   ],
+   "Shirt Vdp": [
+    "Personalisation (VDP) Position"
+   ]
+  }
+ },
+ "183": {
+  "name": "Sweatshirt & Hoodies — Digital",
+  "slug": "sweatshirt-hoodies",
+  "excard_sections": [
+   {
+    "section": "GENERAL",
+    "fields": [
+     "Model",
+     "Sleeve Type",
+     "Fabric"
+    ]
+   },
+   {
+    "section": "SHIRT VDP",
+    "fields": [
+     "Position"
+    ]
+   },
+   {
+    "section": "PANT VDP",
+    "fields": []
+   },
+   {
+    "section": "LOGO PATCH ?",
+    "fields": [
+     "Patch Type"
+    ]
+   },
+   {
+    "section": "SIZE & QUANTITY",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "model",
+    "sleeve",
+    "Fabric"
+   ],
+   "Shirt Vdp": [
+    "Personalisation (VDP) Position"
+   ]
+  }
+ },
+ "185": {
+  "name": "Cap — DTF",
+  "slug": "cap",
+  "excard_sections": [
+   {
+    "section": "SIZE & QUANTITY",
+    "fields": []
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model"
+   ]
+  }
+ },
+ "116": {
+  "name": "Static Cling Window Sticker — Digital",
+  "slug": "static-cling-window-sticker",
+  "excard_sections": [],
+  "our_sections": {
+   "General": [
+    "Print Method",
+    "Size",
+    "Print Direction",
+    "Print Colour"
+   ],
+   "Add On": [
+    "VDPType",
+    "VDP"
+   ]
+  }
+ },
+ "117": {
+  "name": "Car Sticker — Digital (= Static Cling form)",
+  "slug": "car-sticker",
+  "excard_sections": [
+   {
+    "section": "Other Finishing",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Paper / Binding",
+    "Print Colour",
+    "Print Direction"
+   ],
+   "Add On": [
+    "VDPType",
+    "VDP"
+   ]
+  }
+ },
+ "115": {
+  "name": "Kad Terima Kasih — Digital",
+  "slug": "kad-terima-kasih",
+  "excard_sections": [
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "Not Required"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Paper",
+    "Print Colour"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Hole Punch"
+   ]
+  }
+ },
+ "114": {
+  "name": "Kad Kahwin — Digital",
+  "slug": "kad-kahwin",
+  "excard_sections": [
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "Add On",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "Quantity",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Paper",
+    "Print Colour",
+    "Category"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Hot Stamping",
+    "Hot Stamping — Foil Colour",
+    "Hot Stamping — Panel width (mm)",
+    "Hot Stamping — Panel height (mm)"
+   ],
+   "Add On": [
+    "Envelope"
+   ]
+  }
+ },
+ "113": {
+  "name": "PVC Card — Digital",
+  "slug": "pvc-card",
+  "excard_sections": [
+   {
+    "section": "Other Finishing",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$"
+    ]
+   },
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "Not Required"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Orientation (no online price change)",
+    "Size",
+    "Paper / Binding",
+    "Print colour",
+    "Included"
+   ],
+   "Optional Finishing": [
+    "Hole punching"
+   ],
+   "Add On": [
+    "Variable Data Printing"
+   ]
+  }
+ },
+ "112": {
+  "name": "Wire-O Notebook — Litho",
+  "slug": "wire-o-notebook",
+  "excard_sections": [],
+  "our_sections": {
+   "General": [
+    "Print Method",
+    "Orientation",
+    "Ready Content",
+    "Print Colour (Content)",
+    "Additional Content",
+    "Paper 1 to 4",
+    "Paper 5 to 8",
+    "Paper 9 to 12",
+    "Print Colour"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Hot Stamping"
+   ]
+  }
+ },
+ "111": {
+  "name": "Computer Form — Litho (NCR)",
+  "slug": "computer-form",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Package",
+    "Layers / plies (Multi Layer only)",
+    "Ups (forms per set)",
+    "Print colour",
+    "Copy change (no online price change)"
+   ],
+   "Add On": [
+    "Numbering (quoted separately)"
+   ]
+  }
+ },
+ "110": {
+  "name": "Voucher — Litho",
+  "slug": "voucher-pad",
+  "excard_sections": [
+   {
+    "section": "Content",
+    "fields": [
+     "ctl00$mainContent$order_spec_controller$",
+     "perf_panel_1"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "Rush Order Terms & Conditions apply",
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Form",
+    "Print Method",
+    "Size",
+    "Content paper",
+    "Sets per book/pad",
+    "Content colour",
+    "Print Colour"
+   ],
+   "Add On": [
+    "Numbering"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Perforation Line",
+    "Perforation lines (no online price change)"
+   ]
+  }
+ },
+ "109": {
+  "name": "Bookmark — Digital",
+  "slug": "bookmark",
+  "excard_sections": [
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "No Required"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Model",
+    "Size",
+    "Paper",
+    "Print Colour",
+    "IsAlQuran"
+   ],
+   "Optional Finishing": [
+    "Lamination",
+    "Round Corner",
+    "Hole Punch"
+   ]
+  }
+ },
+ "105": {
+  "name": "Letterhead — Litho",
+  "slug": "letterhead",
+  "excard_sections": [
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Paper",
+    "Print colour / side",
+    "Packing"
+   ]
+  }
+ },
+ "24": {
+  "name": "Bill-Book — Litho (NCR Carbonless)",
+  "slug": "bill-book",
+  "excard_sections": [
+   {
+    "section": "General",
+    "fields": [
+     "Size",
+     "Binding Type",
+     "Orientation",
+     "Binding Location"
+    ]
+   },
+   {
+    "section": "Layers Configuration",
+    "fields": [
+     "Paper Materials",
+     "Paper Material + Layers",
+     "Last Layer Perforation",
+     "Different Artwork per Layer",
+     "Copy Change",
+     "paperLayer1",
+     "paperLayer2"
+    ]
+   },
+   {
+    "section": "Print Color",
+    "fields": [
+     "Print Colour"
+    ]
+   },
+   {
+    "section": "Quantity",
+    "fields": [
+     "Quantity (Books / Pads)",
+     "Sets per Book/Pad"
+    ]
+   },
+   {
+    "section": "Finishing",
+    "fields": [
+     "Numbering",
+     "Number From",
+     "Number To",
+     "Hole Punching"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Binding",
+    "Size",
+    "Orientation",
+    "Binding Location",
+    "Back printing",
+    "Sets"
+   ],
+   "Layers Configuration": [
+    "Paper Materials",
+    "Layers",
+    "Last Layer Perforation",
+    "Paper (per layer)",
+    "Different Artwork per Layer",
+    "Copy Change"
+   ],
+   "Finishing": [
+    "Numbering",
+    "Hole Punching"
+   ],
+   "Print Color": [
+    "Print Colour"
+   ]
+  }
+ },
+ "60": {
+  "name": "Label Sticker — Digital",
+  "slug": "label-sticker",
+  "excard_sections": [
+   {
+    "section": "Product Type",
+    "fields": [
+     "Sample Proof (1 sheet)",
+     "Order Type",
+     "Category"
+    ]
+   },
+   {
+    "section": "Product Spec",
+    "fields": [
+     "Size",
+     "Paper",
+     "Print Colour",
+     "Quantity (pcs)",
+     "Package",
+     "Lamination",
+     "Cutting Method"
+    ]
+   },
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "Easy Peel"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "Product Type": [
+    "Product type",
+    "Cut type (Sticker only)",
+    "Sample Proof (1 sheet)"
+   ],
+   "Product Spec": [
+    "Material",
+    "Print colour",
+    "Lamination",
+    "Package (N-in-1, ×N)"
+   ],
+   "General": [
+    "Print Method",
+    "Sheet size — Multiple Dieline only",
+    "Die lines per sheet — Multiple Dieline (no price effect)",
+    "Height (mm) — Rectangle/Standard/Custom",
+    "Width (mm) — Rectangle/Standard/Custom",
+    "Diameter (mm) — Round only"
+   ],
+   "Optional Finishing": [
+    "Easy Peel",
+    "Hot stamping (block quoted separately)"
+   ]
+  }
+ },
+ "61": {
+  "name": "Label Sticker — Letterpress (Hot Stamping)",
+  "slug": "label-sticker",
+  "excard_sections": [
+   {
+    "section": "Product Type",
+    "fields": [
+     "Sample Proof (1 sheet)",
+     "Order Type",
+     "Category"
+    ]
+   },
+   {
+    "section": "Product Spec",
+    "fields": [
+     "Size",
+     "Paper",
+     "Print Colour",
+     "Quantity (pcs)",
+     "Package",
+     "Lamination",
+     "Cutting Method"
+    ]
+   },
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "Easy Peel"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Print Method",
+    "Height (mm) — Standard Shape",
+    "Width (mm) — Standard Shape",
+    "Diameter (mm) — Round only"
+   ],
+   "Optional Finishing": [
+    "Easy Peel",
+    "Hot stamping colour"
+   ],
+   "Product Type": [
+    "Sample Proof (1 sheet)",
+    "Shape"
+   ]
+  }
+ },
+ "21": {
+  "name": "Loose Sheet — Litho (Offset)",
+  "slug": "lo-loose-sheet",
+  "excard_sections": [
+   {
+    "section": "General",
+    "fields": [
+     "Size",
+     "Paper",
+     "Print Colour",
+     "Quantity",
+     "Package"
+    ]
+   },
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "Folding Type"
+    ]
+   },
+   {
+    "section": "Add On",
+    "fields": [
+     "Envelope"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "size",
+    "paper",
+    "colour",
+    "Package (ganging)",
+    "lamination"
+   ],
+   "Optional Finishing": [
+    "Folding",
+    "Creasing",
+    "Hole Punching",
+    "Hole Punch Position",
+    "Hot Stamping",
+    "Hot Stamping — Size",
+    "Hot Stamping — Foil Colour",
+    "Perforation",
+    "Perforation Side",
+    "Panel 1 width (mm)",
+    "Panel 2 width (mm)",
+    "Panel 3 width (mm)",
+    "Panel 4 width (mm)",
+    "Panel 5 width (mm)",
+    "Panel 6 width (mm)",
+    "Panel 7 width (mm)"
+   ],
+   "Add On": [
+    "Envelope"
+   ]
+  }
+ },
+ "50": {
+  "name": "Loose Sheet — Digital",
+  "slug": "do-loose-sheet",
+  "excard_sections": [
+   {
+    "section": "General",
+    "fields": [
+     "Size",
+     "Paper",
+     "Print Colour",
+     "Quantity",
+     "Package"
+    ]
+   },
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "Folding Type",
+     "Hot Stamping"
+    ]
+   },
+   {
+    "section": "Add On",
+    "fields": [
+     "Envelope"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Size",
+    "Paper",
+    "Print colour",
+    "Package (ganging)",
+    "Custom width (mm) — optional",
+    "Custom height (mm) — optional"
+   ],
+   "Add On": [
+    "Envelope (add-on)"
+   ],
+   "Optional Finishing": [
+    "Hot stamping",
+    "Folding",
+    "Hole punching",
+    "Lamination / Finishing",
+    "Round corner",
+    "Perforation line(s)"
+   ]
+  }
+ },
+ "19": {
+  "name": "Booklet — Litho (Offset)",
+  "slug": "booklet-offset-softcover",
+  "excard_sections": [
+   {
+    "section": "GENERAL",
+    "fields": [
+     "Cover Type",
+     "Book Orientation",
+     "Book Size (Closed Size)",
+     "Pages (Including cover)"
+    ]
+   },
+   {
+    "section": "COVER",
+    "fields": [
+     "Cover Paper",
+     "Cover Print Colour",
+     "Lamination / Finishing",
+     "Hot Stamping Colour"
+    ]
+   },
+   {
+    "section": "CONTENT",
+    "fields": [
+     "Content Paper",
+     "Content Print Colour",
+     "Lamination"
+    ]
+   },
+   {
+    "section": "QUANTITY",
+    "fields": [
+     "Quantity",
+     "Need Extra Books for Sampling?"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "Rush Order Terms & Conditions apply",
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Orientation",
+    "Size",
+    "Cover type",
+    "Binding",
+    "Pages (incl. cover)"
+   ],
+   "Cover": [
+    "Cover paper",
+    "Cover lamination / finishing",
+    "Cover colour sides",
+    "Cover hot stamping (block quoted separately)"
+   ],
+   "Optional Finishing": [
+    "Cover embossing — emboss size (block quoted separately)"
+   ],
+   "Content": [
+    "Content paper",
+    "Content print colour"
+   ],
+   "Add On": [
+    "Jawi content",
+    "Add 3 extra books (+RM30)"
+   ]
+  }
+ },
+ "37": {
+  "name": "Booklet — Digital",
+  "slug": "booklet-digital-softcover",
+  "excard_sections": [
+   {
+    "section": "GENERAL",
+    "fields": [
+     "Cover Type",
+     "Book Orientation",
+     "Book Size",
+     "Pages"
+    ]
+   },
+   {
+    "section": "COVER",
+    "fields": [
+     "Cover Paper",
+     "Cover Print Colour",
+     "Lamination / Finishing",
+     "Cover Hot Stamping"
+    ]
+   },
+   {
+    "section": "CONTENT",
+    "fields": [
+     "Content Paper",
+     "Content Print Colour",
+     "Lamination"
+    ]
+   },
+   {
+    "section": "QUANTITY",
+    "fields": [
+     "Quantity"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Fee applies)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "Orientation",
+    "Size",
+    "Cover type",
+    "Binding",
+    "Pages (incl. cover)"
+   ],
+   "Cover": [
+    "Cover paper",
+    "Cover lamination / finishing",
+    "Cover colour sides",
+    "Cover hot stamping (block quoted separately)"
+   ],
+   "Optional Finishing": [
+    "Cover embossing — emboss size (block quoted separately)"
+   ],
+   "Content": [
+    "Content paper",
+    "Content print colour"
+   ],
+   "Add On": [
+    "Jawi content",
+    "Add 3 extra books (+RM30)"
+   ]
+  }
+ },
+ "101": {
+  "name": "Brochure (= Loose Sheet Litho)",
+  "slug": "lo-loose-sheet",
+  "excard_sections": [
+   {
+    "section": "General",
+    "fields": [
+     "Size",
+     "Paper",
+     "Print Colour",
+     "Quantity",
+     "Package"
+    ]
+   },
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "Folding Type"
+    ]
+   },
+   {
+    "section": "Add On",
+    "fields": [
+     "Envelope"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "size",
+    "paper",
+    "colour",
+    "Package (ganging)",
+    "lamination"
+   ],
+   "Optional Finishing": [
+    "Folding",
+    "Creasing",
+    "Hole Punching",
+    "Hole Punch Position",
+    "Hot Stamping",
+    "Hot Stamping — Size",
+    "Hot Stamping — Foil Colour",
+    "Perforation",
+    "Perforation Side",
+    "Panel 1 width (mm)",
+    "Panel 2 width (mm)",
+    "Panel 3 width (mm)",
+    "Panel 4 width (mm)",
+    "Panel 5 width (mm)",
+    "Panel 6 width (mm)",
+    "Panel 7 width (mm)"
+   ],
+   "Add On": [
+    "Envelope"
+   ]
+  }
+ },
+ "102": {
+  "name": "Flyer (= Loose Sheet Litho)",
+  "slug": "lo-loose-sheet",
+  "excard_sections": [
+   {
+    "section": "General",
+    "fields": [
+     "Size",
+     "Paper",
+     "Print Colour",
+     "Quantity",
+     "Package"
+    ]
+   },
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "Folding Type"
+    ]
+   },
+   {
+    "section": "Add On",
+    "fields": [
+     "Envelope"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "size",
+    "paper",
+    "colour",
+    "Package (ganging)",
+    "lamination"
+   ],
+   "Optional Finishing": [
+    "Folding",
+    "Creasing",
+    "Hole Punching",
+    "Hole Punch Position",
+    "Hot Stamping",
+    "Hot Stamping — Size",
+    "Hot Stamping — Foil Colour",
+    "Perforation",
+    "Perforation Side",
+    "Panel 1 width (mm)",
+    "Panel 2 width (mm)",
+    "Panel 3 width (mm)",
+    "Panel 4 width (mm)",
+    "Panel 5 width (mm)",
+    "Panel 6 width (mm)",
+    "Panel 7 width (mm)"
+   ],
+   "Add On": [
+    "Envelope"
+   ]
+  }
+ },
+ "103": {
+  "name": "Customprint (= Loose Sheet Litho)",
+  "slug": "lo-loose-sheet",
+  "excard_sections": [
+   {
+    "section": "General",
+    "fields": [
+     "Size",
+     "Paper",
+     "Print Colour",
+     "Quantity",
+     "Package"
+    ]
+   },
+   {
+    "section": "Optional Finishing",
+    "fields": [
+     "Folding Type"
+    ]
+   },
+   {
+    "section": "Add On",
+    "fields": [
+     "Envelope"
+    ]
+   },
+   {
+    "section": "DELIVERY",
+    "fields": [
+     "West Malaysia",
+     "ctl00$mainContent$order_price$ddlOtherCo",
+     "Appointed Courier (Free Shipping)"
+    ]
+   },
+   {
+    "section": "NET PRICE FOR DEAL",
+    "fields": []
+   }
+  ],
+  "our_sections": {
+   "General": [
+    "size",
+    "paper",
+    "colour",
+    "Package (ganging)",
+    "lamination"
+   ],
+   "Optional Finishing": [
+    "Folding",
+    "Creasing",
+    "Hole Punching",
+    "Hole Punch Position",
+    "Hot Stamping",
+    "Hot Stamping — Size",
+    "Hot Stamping — Foil Colour",
+    "Perforation",
+    "Perforation Side",
+    "Panel 1 width (mm)",
+    "Panel 2 width (mm)",
+    "Panel 3 width (mm)",
+    "Panel 4 width (mm)",
+    "Panel 5 width (mm)",
+    "Panel 6 width (mm)",
+    "Panel 7 width (mm)"
+   ],
+   "Add On": [
+    "Envelope"
+   ]
+  }
+ }
+}

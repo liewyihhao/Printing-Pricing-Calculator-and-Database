@@ -8,6 +8,7 @@ import { fetchProduct, fetchQuote } from "@/lib/pricing-api";
 import { formatMYR, CATEGORY_ICONS, LEAD_TIMES } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProductPhoto } from "@/components/products/ProductPhoto";
 
 function useStartingPrice(product: ProductSummary) {
   // Fetch detail to get first valid config, then quote it
@@ -57,13 +58,15 @@ export function ProductCard({ product }: { product: ProductSummary }) {
 
   return (
     <Link href={`/products/${product.id}`} className="group block">
-      <div className="bg-white rounded-xl border border-border p-4 hover:shadow-card-hover hover:border-brand-200 transition-all duration-200 h-full flex flex-col">
-        {/* Image / icon area */}
-        <div className="aspect-[4/3] rounded-lg bg-surface-muted flex items-center justify-center text-5xl mb-4 group-hover:bg-brand-50 transition-colors">
-          {icon}
-        </div>
-
-        <div className="flex-1 flex flex-col gap-1.5">
+      <div className="bg-white rounded-lg border border-border overflow-hidden hover:shadow-card-hover hover:border-brand-200 transition-all duration-200 h-full flex flex-col">
+        {/* Product photo (real printoka media, falls back to category icon) */}
+        <ProductPhoto
+          id={product.id}
+          icon={icon}
+          alt={product.name}
+          className="aspect-[4/3] w-full group-hover:brightness-[1.03] transition-all"
+        />
+        <div className="p-4 flex-1 flex flex-col gap-1.5">
           <div className="flex items-start justify-between gap-2">
             <h3 className="text-sm font-semibold text-ink leading-snug">
               {product.name}

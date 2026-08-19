@@ -10,45 +10,53 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Printoka brand — primary accent is the live site's signature red (#E52220).
         brand: {
-          50: "#f0f4ff",
-          100: "#e0e9ff",
-          200: "#c7d5fe",
-          300: "#a5b8fd",
-          400: "#8191fa",
-          500: "#6366f1",
-          600: "#4f46e5",
-          700: "#4338ca",
-          800: "#3730a3",
-          900: "#312e81",
-          950: "#1e1b4b",
+          50: "#fef3f2",
+          100: "#fde3e1",
+          200: "#fbccc9",
+          300: "#f7a8a3",
+          400: "#f0766e",
+          500: "#e52220", // Printoka red — CTAs, links, highlights
+          600: "#cc1d1b",
+          700: "#a91816",
+          800: "#8a1614",
+          900: "#731817",
+          950: "#3e0908",
+        },
+        // The rainbow-logo palette (Brand Guideline) — used sparingly for accents / illustration.
+        accent: {
+          orange: "#ff5a00",
+          gold: "#ffc400",
+          teal: "#00c2bb",
+          blue: "#2962ff",
         },
         surface: {
           DEFAULT: "#ffffff",
-          muted: "#f9fafb",
-          subtle: "#f3f4f6",
+          muted: "#fafafa",
+          subtle: "#f5f5f5",
         },
         ink: {
-          DEFAULT: "#111827",
-          secondary: "#374151",
-          muted: "#6b7280",
-          subtle: "#9ca3af",
+          DEFAULT: "#212121", // live site body text
+          secondary: "#424242",
+          muted: "#616161", // live site secondary text
+          subtle: "#9e9e9e",
         },
         border: {
-          DEFAULT: "#e5e7eb",
-          strong: "#d1d5db",
+          DEFAULT: "#e0e0e0",
+          strong: "#bdbdbd",
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "sans-serif"],
-        display: ["Inter", "system-ui", "sans-serif"],
+        sans: ["Montserrat", "system-ui", "sans-serif"],
+        display: ["Montserrat", "system-ui", "sans-serif"],
       },
       boxShadow: {
         "card": "0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05)",
         "card-hover": "0 4px 12px 0 rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.06)",
         "panel": "0 0 0 1px rgb(0 0 0 / 0.05), 0 2px 8px 0 rgb(0 0 0 / 0.06)",
         "dialog": "0 20px 60px -10px rgb(0 0 0 / 0.15)",
-        "price": "0 0 0 1px rgb(99 102 241 / 0.2), 0 4px 16px 0 rgb(99 102 241 / 0.08)",
+        "price": "0 0 0 1px rgb(229 34 32 / 0.18), 0 4px 16px 0 rgb(229 34 32 / 0.08)",
       },
       borderRadius: {
         "4xl": "2rem",

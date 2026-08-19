@@ -1531,6 +1531,117 @@ def _loose_sheet_exact(data):
     print("loose-sheet: applied exact Excard validity (lamination/colour/folding-creasing/hole-punch) to 21,101,102,103")
 
 
+def _loose_size_validity(data):
+    """Loose Sheet (litho 21 + aliases 101/102/103): rebuild the family's Paper / Print-Colour /
+    Lamination validity DIRECTLY from Excard's live form (output/loose_form_map.json, captured by
+    app._loose_capture) — the permissive price curves don't encode these, so we were over-offering
+    combos Excard forbids (flagged by combo_validity_checker). Emits TWO validity rule-sets that the
+    array-validity engine INTERSECTS, giving Excard's exact per-(size,paper) option space:
+      • SIZE-primary  (paper, colour, lamination) — e.g. ganged sizes 3×A4/4×A4/4×A5/Custom → Colour
+        '4C (Both)' only; thick Gloss Art Cards 230/310/360 only on A2–A5/3×A4/4×A5; ganged/4×A4 drop
+        UV-Varnish.
+      • PAPER-primary (colour, lamination) — e.g. Simili 80/100 → +1C, Simili 140 → 4C only; only the
+        4 cards + Gloss Art Paper 150 laminate; 'Gloss Waterbase Varnish' (not an Excard option) and
+        'Not Required' on cards are dropped.
+    This REPLACES the coarse paper→colour rule from _loose_sheet_exact. Options are kept only where an
+    Excard option value matches ours (vkey), so we never invent a priced option — the Spot-UV
+    lamination combos Excard adds stay a deferred CheckPrice UNDER, never silently priced.
+    Re-run app._loose_capture to refresh the map after any Excard change."""
+    import json as _json, re as _re
+    mp = OUT / "loose_form_map.json"
+    if not mp.is_file():
+        print("loose-size validity: SKIP (no output/loose_form_map.json — run app._loose_capture)")
+        return
+    fm = _json.loads(mp.read_text(encoding="utf-8"))
+    _NOISE = _re.compile(r"coated|design|mm|cm|open size|micron|\d+\s*side|up|sheet|available|"
+                         r"different|shape|strong glue|1up|free|best|seller|new", _re.I)
+    _NEG = _re.compile(r"not required|no lamination|^\s*none\s*$|^\s*no\s*$", _re.I)
+    _STOP = {"card", "cards", "paper", "gsm", "side", "sides", "coated", "best", "seller", "new",
+             "open", "size", "other", "a", "the", "of"}
+
+    def vk(s):
+        s = str(s).lower().replace("×", "x")
+        if _NEG.search(s):
+            return frozenset({"__none__"})
+        s = _re.sub(r"\(([^)]*)\)", lambda m: " " if _NOISE.search(m.group(1)) else " " + m.group(1) + " ", s)
+        s = _re.sub(r"matte", "matt", s)
+        s = _re.sub(r"laminat(e|ion)", "laminat", s)
+        s = _re.sub(r"water\s*base", "waterbas", s)
+        s = _re.sub(r"(\d)\s*x\s*(?=[a-z])", r"\1 ", s)
+        s = _re.sub(r"\d+\s*mm\b", " ", s)
+        s = _re.sub(r"(\d+)\s*c\b", r"\1c", s)
+        return frozenset(t for t in _re.findall(r"\d+c|\b[a-z]\d+\b|[a-z]{2,}|\d+", s) if t not in _STOP)
+
+    # Aggregate Excard's live form: per-size and per-paper ceilings for paper/colour/lamination.
+    size_paper, size_col, size_lam = {}, {}, {}
+    paper_col, paper_lam = {}, {}
+    for exsize, d in fm.items():
+        sk = vk(exsize)
+        size_paper.setdefault(sk, set()).update(vk(p) for p in d.get("papers", []))
+        size_col.setdefault(sk, set()); size_lam.setdefault(sk, set())
+        for pp, v in d.get("by_paper", {}).items():
+            pk = vk(pp)
+            for c in (v.get("colour") or []):
+                size_col[sk].add(vk(c)); paper_col.setdefault(pk, set()).add(vk(c))
+            for l in (v.get("lamination") or []):
+                size_lam[sk].add(vk(l)); paper_lam.setdefault(pk, set()).add(vk(l))
+
+    def allowed(our_opts, want):
+        return [o for o in our_opts if vk(o) in want]
+
+    n = 0
+    for p in data["products"]:
+        if p.get("optsrc") != "loose21":
+            continue
+        F = {f["key"]: f for f in p["fields"]}
+        sf, pf, cf, lf = F.get("size"), F.get("paper"), F.get("colour"), F.get("lamination")
+        if not (sf and pf and cf):
+            continue
+        our_p, our_c = pf["options"], cf["options"]
+        our_l = (lf or {}).get("options") or []
+
+        srules = {}
+        for osz in (sf.get("options") or []):
+            sk = vk(osz)
+            if sk not in size_paper:
+                continue
+            slot = {}
+            ap, ac, al = allowed(our_p, size_paper[sk]), allowed(our_c, size_col[sk]), allowed(our_l, size_lam[sk])
+            if ap and len(ap) < len(our_p):
+                slot["paper"] = ap
+            if ac and len(ac) < len(our_c):
+                slot["colour"] = ac
+            if lf and al and len(al) < len(our_l):
+                slot["lamination"] = al
+            if slot:
+                srules[osz] = slot
+
+        prules = {}
+        for opp in our_p:
+            pk = vk(opp)
+            slot = {}
+            if pk in paper_col:
+                ac = allowed(our_c, paper_col[pk])
+                if ac and len(ac) < len(our_c):
+                    slot["colour"] = ac
+            if lf and pk in paper_lam:
+                al = allowed(our_l, paper_lam[pk])
+                if al and len(al) < len(our_l):
+                    slot["lamination"] = al
+            if slot:
+                prules[opp] = slot
+
+        rulesets = []
+        if srules:
+            rulesets.append({"primary": "size", "fields": sorted({k for r in srules.values() for k in r}), "rules": srules})
+        if prules:
+            rulesets.append({"primary": "paper", "fields": sorted({k for r in prules.values() for k in r}), "rules": prules})
+        if rulesets:
+            p["validity"] = rulesets if len(rulesets) > 1 else rulesets[0]   # replaces the coarse rule
+            n += 1
+    print(f"loose-size validity: {n} loose products — Paper/Colour/Lamination validity rebuilt from live form map")
+
+
 def _finishing_subcontrols(data):
     """Cover-finishing sub-controls (Exclusive Leather Wire-O Notebook etc.): Deboss reveals its
     size H/W; UV-DTF Stickering reveals sticker size + position. Add the showWhen + strip the '-'
@@ -1707,6 +1818,52 @@ def _stand_material_validity(data):
         n += 1
     if n:
         print(f"stand-material validity: {n} material-of-stand fields gated on stand=Required")
+
+
+def _bizcard_silkscreen_validity(data):
+    """Business Card: Excard offers 'Silkscreen Spot UV' its Required variants (Front / Both) under a
+    precise TWO-driver condition, captured live 2026-08-16:
+        paper ∈ {Gloss Art Card 250gsm, Gloss Art Card 310gsm}  AND  lamination = Matte Lamination.
+    (Gloss 360gsm and Matte Art Card do NOT enable it, even with matte lamination; every other
+    lamination — Gloss / Varnish / Soft Touch — keeps it at 'No Required'.) Model this exactly with
+    the array-validity engine, which intersects a field's allowed set across rule-sets: a paper-
+    primary rule-set (enabling papers → 3 opts, else No Required) AND a lamination-primary rule-set
+    (Matte Lamination → 3 opts, else No Required). Their intersection is Front/Both only when both
+    drivers agree. Silkscreen is a neutral, quoted-separately field (not in axisFields / addonDeltas),
+    so exposing the two variants carries no pricing risk. Runs after the capture-driven paper rule-set
+    (which already gates hot_stamping) so we extend it in place."""
+    NONE = "No Required"
+    OPTS = [NONE, "Silkscreen Spot UV (Front)", "Silkscreen Spot UV (Both)"]
+    def _paper_enables(o):
+        o = o.lower()
+        return ("gloss art card 250" in o) or ("gloss art card 310" in o)
+    def _lam_enables(o):
+        return "matte lamination" in o.lower()
+    for p in data["products"]:
+        ssf = next((f for f in p["fields"] if f["key"] == "silkscreen_spot_uv"), None)
+        paperf = next((f for f in p["fields"] if f["key"] == "paper"), None)
+        lamf = next((f for f in p["fields"] if f["key"] == "lamination"), None)
+        if not ssf or not paperf or not lamf:
+            continue
+        ssf["options"] = list(OPTS)
+        V = p.get("validity")
+        rulesets = V if isinstance(V, list) else ([V] if V else [])
+        # paper-primary rule-set (reuse the existing one that gates hot_stamping)
+        prs = next((r for r in rulesets if r.get("primary") == "paper"), None)
+        if prs is None:
+            prs = {"primary": "paper", "fields": [], "rules": {}}
+            rulesets.append(prs)
+        if "silkscreen_spot_uv" not in prs["fields"]:
+            prs["fields"].append("silkscreen_spot_uv")
+        for pv in (paperf.get("options") or []):
+            prs["rules"].setdefault(pv, {})["silkscreen_spot_uv"] = list(OPTS) if _paper_enables(pv) else [NONE]
+        # lamination-primary rule-set (new, dedicated to silkscreen)
+        lrs = {"primary": "lamination", "fields": ["silkscreen_spot_uv"], "rules": {}}
+        for lv in (lamf.get("options") or []):
+            lrs["rules"][lv] = {"silkscreen_spot_uv": list(OPTS) if _lam_enables(lv) else [NONE]}
+        rulesets.append(lrs)
+        p["validity"] = rulesets[0] if len(rulesets) == 1 else rulesets
+        print(f"bizcard silkscreen validity: id{p['id']} — paper∧lamination gate (Gloss250/310 ∧ Matte Lam)")
 
 
 def _validity_visibility(data):
@@ -2158,6 +2315,142 @@ def _money_packet_validity(data):
         print(f"money-packet validity: {n} products (Mix-Design<->Package + Paper->laminate)")
 
 
+def _assign_quantity_section(data):
+    """Tag each product with the Excard section that actually contains its Quantity control (captured
+    live via `combo_validity_checker --sections` → output/section_capture.json). Quantity is NOT
+    universally in General — Excard puts it in General for a few products (Business Card), in
+    'Size & Quantity' for apparel, in its own 'Quantity' section for some, and for most (the craft-
+    spec forms) it lives in the Summary/Delivery area, not a spec section. The web configurator uses
+    this to render Quantity inline ONLY where Excard groups it, and as a standalone block otherwise."""
+    import json as _json, re as _re
+    cap = OUT / "section_capture.json"
+    if not cap.is_file():
+        print("quantity-section: SKIP (no output/section_capture.json — run app.combo_validity_checker --sections)")
+        return
+    r = _json.loads(cap.read_text(encoding="utf-8"))
+
+    def nrm(s):
+        return _re.sub(r"[^a-z0-9]", "", str(s).lower())
+    NONCFG = {"delivery", "netpricefordeal", "addname", "summary", "artwork"}
+    qmap = {}
+    for pid, d in r.items():
+        sec = None
+        for s in d.get("excard_sections", []):
+            nm = s.get("section")
+            if not nm or nrm(nm) in NONCFG:
+                continue
+            if any("quantity" in nrm(lab) or nrm(lab) == "qty" for lab in s.get("fields", [])):
+                sec = nm
+                break
+        qmap[int(pid)] = sec
+    n = 0
+    for p in data["products"]:
+        qs = qmap.get(p["id"])
+        if qs:
+            p["quantitySection"] = qs
+            n += 1
+        else:
+            p.pop("quantitySection", None)
+    print(f"quantity-section: {n} products place Quantity inside a spec section; the rest render it separately")
+
+
+def _add_round_corner_position(data):
+    """Excard reveals a 'Round Corner Position' image-grid (RC0601–RC0615, showing which corners are
+    rounded) once Round Corner = Required — a JS-only sub-control the audits don't see (captured live
+    via app._rc_probe → output/round_corner_position.json). Add it as a conditional image-grid field
+    right after round_corner on every product that has round corner. Price-neutral / display-only."""
+    import json as _json
+    cap_f = OUT / "round_corner_position.json"
+    if not cap_f.is_file():
+        print("round-corner-position: SKIP (no output/round_corner_position.json — run app._rc_probe)")
+        return
+    cap = _json.loads(cap_f.read_text(encoding="utf-8"))
+    codes = cap.get("codes") or []
+    images = cap.get("images") or {}
+    if not codes:
+        return
+    n = 0
+    for p in data["products"]:
+        rc = next((x for x in p["fields"] if x["key"] == "round_corner"), None)
+        if not rc or any(x["key"] == "round_corner_position" for x in p["fields"]):
+            continue
+        req = next((o for o in (rc.get("options") or []) if "no" not in o.lower()), "Required")
+        field = {
+            "key": "round_corner_position", "label": "Round Corner Position",
+            "options": list(codes), "images": {c: images.get(c, "") for c in codes},
+            "showWhen": {"field": "round_corner", "values": [req]},
+            "section": rc.get("section", "Optional Finishing"),
+            "addon": True, "neutral": True, "depends": [],
+            "note": "This is the actual round corner position (Front), for either portrait or "
+                    "landscape. No rotation required.",
+        }
+        p["fields"].insert(p["fields"].index(rc) + 1, field)
+        n += 1
+    print(f"round-corner-position: added the 15-option position picker to {n} product(s) with Round Corner")
+
+
+def _booklet_layout(data):
+    """Booklet (Litho Offset 19 / Digital 37): match Excard's live order-form sequence exactly and
+    expose the cover Hot Stamping sub-spec (foil colour + stamping area) the audits can't see.
+
+    Excard's captured sections (app.combo_validity_checker --sections): GENERAL (Cover Type,
+    Orientation, Size, Pages), COVER (Cover Paper, Cover Print Colour, Lamination/Finishing, Hot
+    Stamping Colour), CONTENT (Content Paper, Content Print Colour). The field-section capture only
+    covered the main selects, so binding/pages/embossing/hot-stamping/add-ons fell to the keyword
+    heuristic and landed out of sequence (Cover Type 3rd in General; embossing in its own 'Optional
+    Finishing'; hot stamping with no foil colour or size). This pins the order + sections and adds
+    the sub-controls (all price-neutral — the stamping block is quoted separately)."""
+    # Excard's cover-section sequence; keys we don't have are skipped, extras keep their tail slot.
+    ORDER = ["ordertype", "orientation", "size", "binding", "page",
+             "cover", "outer_inner", "cover_lamination", "cover_embossing",
+             "hot_stamping", "hot_stamping_colour", "hot_stamping_w", "hot_stamping_h",
+             "content", "colour",
+             "jawi", "extra_books"]
+    SECTION = {"ordertype": "General", "orientation": "General", "size": "General",
+               "binding": "General", "page": "General",
+               "cover": "Cover", "outer_inner": "Cover", "cover_lamination": "Cover",
+               "cover_embossing": "Cover", "hot_stamping": "Cover",
+               "hot_stamping_colour": "Cover", "hot_stamping_w": "Cover", "hot_stamping_h": "Cover",
+               "content": "Content", "colour": "Content",
+               "jawi": "Add On", "extra_books": "Add On"}
+    for p in data["products"]:
+        if "booklet" not in p["name"].lower():
+            continue
+        fields = {f["key"]: f for f in p["fields"]}
+        hs = fields.get("hot_stamping")
+        if hs and "hot_stamping_colour" not in fields:
+            no = next((o for o in (hs.get("options") or []) if o.lower().startswith(("not", "no "))),
+                      "Not Required")
+            when = {"field": "hot_stamping", "notValues": [no]}
+            fields["hot_stamping_colour"] = {
+                "key": "hot_stamping_colour", "label": "Cover hot stamping — foil colour",
+                "addon": True, "neutral": True, "depends": [], "options": ["Gold", "Silver"],
+                "showWhen": when, "note": "Foil colour for the cover hot-stamping block."}
+            fields["hot_stamping_w"] = {
+                "key": "hot_stamping_w", "label": "Cover hot stamping — area width (mm)",
+                "type": "number", "addon": True, "neutral": True, "depends": [],
+                "min": 5, "max": 300, "showWhen": when}
+            fields["hot_stamping_h"] = {
+                "key": "hot_stamping_h", "label": "Cover hot stamping — area height (mm)",
+                "type": "number", "addon": True, "neutral": True, "depends": [],
+                "min": 5, "max": 300, "showWhen": when,
+                "note": "Stamping area; the block/foil is quoted separately."}
+        # Pin section + rebuild the field order to Excard's sequence.
+        for k, f in fields.items():
+            if k in SECTION:
+                f["section"] = SECTION[k]
+        ordered = [fields.pop(k) for k in ORDER if k in fields]
+        ordered += list(fields.values())  # any unforeseen extras keep a stable tail slot
+        p["fields"] = ordered
+        secrank = {"General": 0, "Cover": 1, "Content": 2, "Add On": 3}
+        secs = []
+        for f in ordered:
+            s = f.get("section") or "General"
+            if s not in secs:
+                secs.append(s)
+        p["sectionOrder"] = sorted(secs, key=lambda s: secrank.get(s, 9))
+
+
 def _assign_sections(data):
     """Tag every field with the Excard order-form section it belongs to, so the calculator can
     render General / Optional Finishing / Add On headers like the supplier's form. Prefer the EXACT
@@ -2203,7 +2496,12 @@ def _embed_images(data):
         for f in p.get("fields", []):
             if "images" not in f:
                 continue
-            newimgs = {k: cache[u] for k, u in f["images"].items() if u in cache}
+            newimgs = {}
+            for k, u in f["images"].items():
+                if isinstance(u, str) and u.startswith("data:"):
+                    newimgs[k] = u              # already an embedded data URI (e.g. round-corner cards)
+                elif u in cache:
+                    newimgs[k] = cache[u]
             if newimgs:
                 f["images"] = newimgs
             else:
@@ -2288,12 +2586,16 @@ def main():
     _attach_images(data)     # after auto_parity, so images can attach to inc_* single-option fields
     _mark_colour_swatches(data)   # render foil/ink/rope colour pickers as colour swatches
     _assign_sections(data)        # tag fields with Excard sections (General/Finishing/Add On)
+    _add_round_corner_position(data)  # conditional Round Corner Position image-grid (RC0601–RC0615)
+    _assign_quantity_section(data)  # tag which section (if any) holds Quantity — it's not always General
     _apply_ref_markup(data)
     _embed_images(data)
     from app.field_order import reorder as _reorder_fields
     _fn, _fc = _reorder_fields(data)
     print(f"field order: {_fc}/{_fn} products resequenced to the supplier's option order")
+    _booklet_layout(data)         # Booklet: pin Excard's exact section sequence + cover hot-stamp sub-spec
     _loose_sheet_exact(data)      # exact Excard conditional validity for the loose-sheet family
+    _loose_size_validity(data)    # Loose Sheet: Excard restricts Paper + Colour by SIZE (live-captured)
     from app.validity_apply import apply as _apply_validity
     _apply_validity(data)         # capture-driven exact showWhen/validity for all flagged products
     _sticker_validity(data)       # sticker shape -> size-input conditionals
@@ -2307,6 +2609,7 @@ def main():
     _loose_digital_lamination(data)   # Loose Sheet Digital (50): paper -> lamination showWhen
     _material_finishing_validity(data)  # catalogue-wide paper -> lamination/finishing gap-fill (runs
     #                                     LAST so it only fills fields no specific helper constrained)
+    _bizcard_silkscreen_validity(data)  # Business Card: Spot UV Front/Both gated on coated paper
     _dedupe_validity(data)        # strip primary-in-own-fields / duplicate fields (build artifacts)
     _finishing_subcontrols(data)  # cover-finishing (deboss / UV-DTF) sub-control reveals
     _cover_content_validity(data)  # Order Type (Cover/Content) -> spec-field visibility
