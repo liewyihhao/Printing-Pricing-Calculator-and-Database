@@ -54,7 +54,9 @@ def accuracy():
     # MEASURED median % vs Excard (output/audit_report.json). Curve products are
     # exact at Excard's order quantities; this is the custom-quantity interp error.
     return {1: 0.0,    # bizcard Standard: EXACT v4 CheckPrice pricelist (2160 curves)
-            21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 6.3, 61: 10.5, 24: 2.5,
+            # 60/61 stickers now EXACT on the sampled space (4C rectangle / Standard-Shape foil) via
+            # the CheckPrice-sample lookup; 1C / Round / custom sizes still formula-estimated.
+            21: 1.7, 50: 1.3, 19: 0.5, 37: 1.6, 60: 0.0, 61: 0.0, 24: 2.5,
             110: 0.0,
             111: 4.0,   # computer form: factor model, LOO ~4%
             114: 0.0,   # kad kahwin: EXACT v4 CheckPrice pricelist (154 curves)
@@ -2389,6 +2391,50 @@ def _add_round_corner_position(data):
     print(f"round-corner-position: added the 15-option position picker to {n} product(s) with Round Corner")
 
 
+def _bake_sticker_lookup(data):
+    """Convert the two Label Sticker products from a fitted sheet-imposition FORMULA (~4–9% off
+    Excard) to an EXACT lookup over the captured CheckPrice samples, with the formula kept as the
+    fallback for un-sampled configs.
+
+    Sampled space (Excard ground truth):
+      - Digital (60):     4C Rectangle/Square — 12 materials x 16 standard sizes x 9 qtys.
+      - Letterpress (61): Standard Shape — Gold/Silver x 13 sizes x 7 qtys.
+    Lookup is keyed by material (digital) / foil colour (letterpress) -> "WxH" -> {qty: cash}. The
+    engine hits it for the base price and interpolates qty (exact at sampled sizes+qtys, area-
+    interpolated between); anything outside the sampled space falls back to cashSticker(). Baked onto
+    the params objects (P.lookup) so the engine reaches it as DATA.params.sticker_*.lookup."""
+    OUT = ROOT / "output"
+
+    def _tbl(samples, keyfn):
+        tbl: dict = {}
+        for s in samples:
+            cash = s.get("cash")
+            if not cash or cash <= 0:
+                continue
+            k = keyfn(s)
+            if k is None:
+                continue
+            size = f"{int(s['w'])}x{int(s['h'])}"
+            tbl.setdefault(k, {}).setdefault(size, {})[str(int(s["qty"]))] = round(float(cash), 2)
+        return tbl
+
+    params = data.get("params", {})
+    dig_f = OUT / "sticker_samples_digital.json"
+    if (sp := data.get("params", {}).get("sticker_digital")) is not None and dig_f.is_file():
+        samples = json.loads(dig_f.read_text(encoding="utf-8"))
+        # digital samples are all 4C Rectangle/Square; key by material (paper)
+        sp["lookup"] = _tbl(samples, lambda s: s.get("paper"))
+        print(f"sticker lookup: digital baked {sum(len(v) for v in sp['lookup'].values())} size-curves "
+              f"across {len(sp['lookup'])} materials")
+    lp_f = OUT / "sticker_samples_letterpress.json"
+    if (sp := params.get("sticker_letterpress")) is not None and lp_f.is_file():
+        samples = json.loads(lp_f.read_text(encoding="utf-8"))
+        # letterpress samples are Standard Shape; key by foil colour (Gold/Silver)
+        sp["lookup"] = _tbl(samples, lambda s: s.get("hs_colour"))
+        print(f"sticker lookup: letterpress baked {sum(len(v) for v in sp['lookup'].values())} size-curves "
+              f"across {len(sp['lookup'])} foil colours")
+
+
 def _booklet_layout(data):
     """Booklet (Litho Offset 19 / Digital 37): match Excard's live order-form sequence exactly and
     expose the cover Hot Stamping sub-spec (foil colour + stamping area) the audits can't see.
@@ -2594,6 +2640,7 @@ def main():
     _fn, _fc = _reorder_fields(data)
     print(f"field order: {_fc}/{_fn} products resequenced to the supplier's option order")
     _booklet_layout(data)         # Booklet: pin Excard's exact section sequence + cover hot-stamp sub-spec
+    _bake_sticker_lookup(data)    # Label Stickers: exact CheckPrice-sample lookup (formula = fallback)
     _loose_sheet_exact(data)      # exact Excard conditional validity for the loose-sheet family
     _loose_size_validity(data)    # Loose Sheet: Excard restricts Paper + Colour by SIZE (live-captured)
     from app.validity_apply import apply as _apply_validity
