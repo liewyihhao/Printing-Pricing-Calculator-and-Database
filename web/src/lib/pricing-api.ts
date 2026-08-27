@@ -181,7 +181,21 @@ export interface ContentListBlock {
   items: string[];
   note?: string;
 }
-export type ContentBlock = ContentKeyValueBlock | ContentListBlock;
+// Richer "cards" block (e.g. a materials guide): each item is a named card with ideal-use bullets.
+export interface ContentCardItem {
+  name: string;
+  ideal?: string[];
+}
+export interface ContentCardsBlock {
+  title?: string;
+  type: "cards";
+  items: ContentCardItem[];
+  note?: string;
+}
+export type ContentBlock =
+  | ContentKeyValueBlock
+  | ContentListBlock
+  | ContentCardsBlock;
 
 export interface ProductContent {
   sections: ContentBlock[]; // Product Spec

@@ -13,12 +13,33 @@ const TABS = [
   { key: "templates", label: "Templates", icon: LayoutTemplate },
 ] as const;
 
+// Content items may be plain strings OR richer card objects ({name, ideal:[...]}) — coerce both so
+// an unexpected object shape is never handed to React as a child (which throws).
+type LooseItem = string | { name?: string; ideal?: string[] } | null | undefined;
+
+function asCard(item: LooseItem): { name: string; ideal: string[] } | null {
+  if (typeof item === "string") return item ? { name: item, ideal: [] } : null;
+  if (item && typeof item === "object") {
+    const name = typeof item.name === "string" ? item.name : "";
+    const ideal = Array.isArray(item.ideal)
+      ? item.ideal.filter((x): x is string => typeof x === "string")
+      : [];
+    if (name || ideal.length) return { name, ideal };
+  }
+  return null;
+}
+
 function Block({ block }: { block: ContentBlock }) {
+  const items: LooseItem[] = "items" in block ? (block.items as LooseItem[]) : [];
+  const cards = items.map(asCard).filter((c): c is { name: string; ideal: string[] } => c !== null);
+  const isCards = block.type === "cards" || cards.some((c) => c.ideal.length > 0);
+
   return (
     <div className="flex flex-col gap-3">
       {block.title && (
         <h3 className="text-sm font-semibold text-ink">{block.title}</h3>
       )}
+
       {block.type === "keyvalue" ? (
         <dl className="rounded-lg border border-border divide-y divide-border overflow-hidden">
           {block.rows.map((row, i) => (
@@ -33,16 +54,37 @@ function Block({ block }: { block: ContentBlock }) {
             </div>
           ))}
         </dl>
+      ) : isCards ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {cards.map((c, i) => (
+            <div key={i} className="rounded-lg border border-border p-4">
+              {c.name && (
+                <p className="text-sm font-semibold text-ink mb-1.5">{c.name}</p>
+              )}
+              {c.ideal.length > 0 && (
+                <ul className="flex flex-col gap-1">
+                  {c.ideal.map((line, j) => (
+                    <li key={j} className="flex gap-2 text-xs text-ink-secondary leading-relaxed">
+                      <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-brand-400" />
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          ))}
+        </div>
       ) : (
         <ul className="flex flex-col gap-2">
-          {block.items.map((item, i) => (
+          {cards.map((c, i) => (
             <li key={i} className="flex gap-2.5 text-sm text-ink-secondary leading-relaxed">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-400" />
-              <span>{item}</span>
+              <span>{c.name}</span>
             </li>
           ))}
         </ul>
       )}
+
       {block.note && (
         <div className="flex gap-2 rounded-lg bg-brand-50 border border-brand-100 px-3 py-2.5">
           <Info className="w-4 h-4 text-brand-500 shrink-0 mt-0.5" />
