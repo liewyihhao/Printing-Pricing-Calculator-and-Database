@@ -62,8 +62,23 @@ export function Configurator({ product, values, onChange, quantity, onQuantityCh
                 // Excard orders "… Quantity, Package" — insert Quantity right before the Package field.
                 const hasPackage = fields.some((f) => /package/i.test(f.key));
                 const out: ReactNode[] = [];
+                const handled = new Set<string>();
+                const hasSizePair =
+                  fields.some((f) => f.key === "height") &&
+                  fields.some((f) => f.key === "width");
                 for (const field of fields) {
+                  if (handled.has(field.key)) continue;
                   if (showsQty && /package/i.test(field.key)) out.push(qtyEl);
+                  // Render Height/Width (and the Round-only Diameter) as ONE combined "Size" control,
+                  // like Excard's order form, instead of separate rows.
+                  if (field.key === "height" && hasSizePair) {
+                    out.push(
+                      <SizeField key="__size" product={product} values={values} onChange={onChange} />
+                    );
+                    handled.add("width");
+                    handled.add("diameter");
+                    continue;
+                  }
                   out.push(
                     <FieldRenderer
                       key={field.key}
@@ -90,6 +105,66 @@ export function Configurator({ product, values, onChange, quantity, onQuantityCh
           <div className="p-4">
             <QuantityControl product={product} quantity={quantity} onChange={onQuantityChange} hideLabel />
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Combined "Size" control (Height × Width, or the Round-only Diameter) — mirrors Excard's order form,
+// which shows the two dimensions side-by-side with their allowed ranges under one "Size" label.
+function SizeField({
+  product,
+  values,
+  onChange,
+}: {
+  product: ProductDetail;
+  values: Record<string, string | number>;
+  onChange: (key: string, value: string | number) => void;
+}) {
+  const byKey = (k: string) => product.fields.find((f) => f.key === k);
+  const h = byKey("height");
+  const w = byKey("width");
+  const d = byKey("diameter");
+  const showDiameter = !!d && fieldShown(d, values);
+  const showHW = (!!h && fieldShown(h, values)) || (!!w && fieldShown(w, values));
+  if (!showDiameter && !showHW) return null;
+
+  // "Height (mm) — Rectangle/…" → "Height"; pair with the field's min–max range.
+  const dimName = (f: ProductField) => (f.label.split(/[—(]/)[0] || f.key).trim();
+  const rangeLabel = (f: ProductField) =>
+    f.min != null && f.max != null
+      ? `${dimName(f)} (${f.min}–${f.max} mm)`
+      : dimName(f);
+
+  const numInput = (f: ProductField) => (
+    <div className="flex flex-1 flex-col gap-1">
+      <span className="text-xs text-ink-muted">{rangeLabel(f)}</span>
+      <input
+        id={`f-${f.key}`}
+        type="number"
+        value={(values[f.key] ?? "") as number}
+        min={f.min}
+        max={f.max}
+        onChange={(e) => onChange(f.key, Number(e.target.value))}
+        className="h-10 w-full rounded-md border border-border bg-white px-3 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-brand-500"
+      />
+      <span className="text-[11px] text-ink-muted">mm</span>
+    </div>
+  );
+
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-[minmax(0,190px)_1fr] sm:items-start gap-1.5 sm:gap-4">
+      <label className="text-sm font-medium text-ink-secondary sm:pt-2">
+        Size<span className="text-red-500 ml-0.5">*</span>
+      </label>
+      {showDiameter ? (
+        <div className="max-w-[220px]">{numInput(d!)}</div>
+      ) : (
+        <div className="flex items-start gap-3">
+          {h && numInput(h)}
+          <span className="pt-6 text-ink-muted font-medium select-none">×</span>
+          {w && numInput(w)}
         </div>
       )}
     </div>
