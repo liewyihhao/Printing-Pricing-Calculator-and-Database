@@ -2435,6 +2435,48 @@ def _bake_sticker_lookup(data):
               f"across {len(sp['lookup'])} foil colours")
 
 
+def _sticker_layout(data):
+    """Label Stickers (Digital 60 / Letterpress 61): match Excard's live section sequence. The Size
+    (Height x Width) control is a JS widget the --sections capture couldn't read, so height/width/
+    diameter fell to the 'General' heuristic at the BOTTOM of the form instead of FIRST in Product
+    Spec. Excard's Product Spec = Size, Paper, Print Colour, Quantity, Package, Lamination, Cutting
+    Method (captured in section_capture.json). Pin the fields to those sections + order so Size shows
+    right under Category, like the supplier's order form."""
+    ORDER = ["sample_proof", "type", "inc_printmethod", "category",   # Product Type
+             "height", "width", "diameter",                          # Product Spec — Size first
+             "paper", "colour", "package", "finishing",              # Paper, Print Colour, [Qty], Package, Lamination
+             "dielines", "sheet_size",                               # Cutting Method (conditional, last)
+             "easy_peel", "hot_stamping"]                            # Optional Finishing
+    SECTION = {"sample_proof": "Product Type", "type": "Product Type",
+               "inc_printmethod": "Product Type", "category": "Product Type",
+               "height": "Product Spec", "width": "Product Spec", "diameter": "Product Spec",
+               "dielines": "Product Spec", "sheet_size": "Product Spec",
+               "paper": "Product Spec", "colour": "Product Spec",
+               "package": "Product Spec", "finishing": "Product Spec",
+               "easy_peel": "Optional Finishing", "hot_stamping": "Optional Finishing"}
+    secrank = {"Product Type": 0, "Product Spec": 1, "Optional Finishing": 2}
+    n = 0
+    for p in data["products"]:
+        if p.get("engine") != "sticker":
+            continue
+        fields = {f["key"]: f for f in p["fields"]}
+        for k, f in fields.items():
+            if k in SECTION:
+                f["section"] = SECTION[k]
+        ordered = [fields.pop(k) for k in ORDER if k in fields]
+        ordered += list(fields.values())
+        p["fields"] = ordered
+        secs = []
+        for f in ordered:
+            s = f.get("section") or "Product Spec"
+            if s not in secs:
+                secs.append(s)
+        p["sectionOrder"] = sorted(secs, key=lambda s: secrank.get(s, 9))
+        p["quantitySection"] = "Product Spec"   # Excard groups Quantity inside Product Spec
+        n += 1
+    print(f"sticker layout: pinned Size into Product Spec for {n} sticker product(s)")
+
+
 def _booklet_layout(data):
     """Booklet (Litho Offset 19 / Digital 37): match Excard's live order-form sequence exactly and
     expose the cover Hot Stamping sub-spec (foil colour + stamping area) the audits can't see.
@@ -2641,6 +2683,7 @@ def main():
     print(f"field order: {_fc}/{_fn} products resequenced to the supplier's option order")
     _booklet_layout(data)         # Booklet: pin Excard's exact section sequence + cover hot-stamp sub-spec
     _bake_sticker_lookup(data)    # Label Stickers: exact CheckPrice-sample lookup (formula = fallback)
+    _sticker_layout(data)         # Label Stickers: pin Excard's section order (Size first in Product Spec)
     _loose_sheet_exact(data)      # exact Excard conditional validity for the loose-sheet family
     _loose_size_validity(data)    # Loose Sheet: Excard restricts Paper + Colour by SIZE (live-captured)
     from app.validity_apply import apply as _apply_validity
