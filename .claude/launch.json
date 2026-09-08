@@ -20,12 +20,6 @@
       "port": 8030
     },
     {
-      "name": "printoka-web",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev", "--prefix", "C:/Users/User/OneDrive/Desktop/Printoka.com/web"],
-      "port": 3000
-    },
-    {
       "name": "optcg-sim",
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "uvicorn", "web.app:app", "--app-dir", "C:/Users/User/OneDrive/Desktop/optcg-sim", "--port", "8099"],

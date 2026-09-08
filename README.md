@@ -36,7 +36,6 @@ Printoka.com/
 │   │   └── spec_content/, spec_facts/, fold_diagrams/ # authored + crawled product depth
 │   ├── HANDOFF.md               # full state/architecture handoff (START HERE)
 │   └── tests/, booklet_docs/
-├── web/                         # 57 files — Next.js storefront (cart/checkout/track)
 ├── dashboard/                   # ops dashboard
 ├── .claude/  .agents/           # Claude Code config + bundled skills
 └── README.md, PROJECT_SUMMARY.md, brand assets (logo, guideline, product images)
