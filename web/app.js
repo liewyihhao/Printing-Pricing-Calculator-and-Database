@@ -252,7 +252,11 @@ class Component extends DCLogic {
     const el = e.target.closest && e.target.closest('[data-go]');
     if (!el) return;
     const v = el.getAttribute('data-go');
-    // real <a href> cards: let modified/middle clicks open a new tab (crawlers + users),
+    // Product links point to the server-rendered SEO page (/<slug>-printing). Let a plain
+    // left-click do a FULL navigation so everyone lands on that static SEO page, not the SPA
+    // configurator — the SEO page's "Check Price Now" then loads the configurator (/configure/).
+    if (el.tagName === 'A' && v && v.indexOf('open:') === 0 && el.getAttribute('href') && (e.button == null || e.button === 0) && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) return;
+    // other real <a href> cards (categories, blog): let modified/middle clicks open a new tab,
     // but intercept a plain left-click so it routes in-app instead of a full page reload.
     if (el.tagName === 'A' && el.getAttribute('href') && (e.button == null || e.button === 0) && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) e.preventDefault();
     if (v === '_mega') return this.setState(s => ({ megaOpen: !s.megaOpen }));
@@ -712,7 +716,7 @@ class Component extends DCLogic {
     setMeta('robots', d.robots || 'index,follow');
     // canonical URL — strip query/hash so each route has one canonical address
     const origin = (typeof location !== 'undefined' ? location.origin : 'https://printoka.com');
-    const canonical = origin + (typeof location !== 'undefined' ? location.pathname : '/');
+    const canonical = origin + (d.canonical || (typeof location !== 'undefined' ? location.pathname : '/'));
     let can = document.head.querySelector('link[rel="canonical"]'); if (!can) { can = document.createElement('link'); can.setAttribute('rel', 'canonical'); document.head.appendChild(can); } can.setAttribute('href', canonical);
     // Open Graph + Twitter Card — social share previews
     const ogImg = d.image ? (/^https?:/.test(d.image) ? d.image : origin + d.image) : (origin + '/assets/products/business-card.jpg');
@@ -762,7 +766,8 @@ class Component extends DCLogic {
         { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: origin + '/' }, { '@type': 'ListItem', position: 2, name: cat }, { '@type': 'ListItem', position: 3, name: name }] },
         { '@type': 'FAQPage', mainEntity: faqs.map(f => ({ '@type': 'Question', name: f[0], acceptedAnswer: { '@type': 'Answer', text: f[1] } })) },
       ] };
-      return { title: name + ' Printing | ' + (from != null && from >= 0.001 ? 'From ' + money0(from) + '/pc | ' : '') + 'Printoka', description: 'Order ' + name + ' printing online in ' + C + ' — configure your options, get an instant price, and print with a free artwork check. Member discounts up to 15%.', robots: IDX, jsonld };
+      // configurator canonicalises to the static SEO page so the /configure/ route never competes
+      return { title: name + ' Printing | ' + (from != null && from >= 0.001 ? 'From ' + money0(from) + '/pc | ' : '') + 'Printoka', description: 'Order ' + name + ' printing online in ' + C + ' — configure your options, get an instant price, and print with a free artwork check. Member discounts up to 15%.', robots: IDX, canonical: (prod ? this.productPath(prod.id) : null), jsonld };
     }
     if (route === 'category') {
       const active = this.state.catFilter || 'all', isAll = active === 'all';
