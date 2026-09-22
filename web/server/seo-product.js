@@ -59,10 +59,21 @@ function facts(r) {
   const sizeF = findField(/size/i), matF = findField(/paper|material|stock/i);
   const sizes = sizeF ? optionsOf(prod, sizeF.key, cfg).filter(v => !/other|custom/i.test(v)) : [];
   const materials = matF ? optionsOf(prod, matF.key, cfg).filter(v => !NONE_RE.test(String(v))) : [];
-  const finFields = (prod.fields || []).filter(f => /laminat|spot|stamp|emboss|foil|corner|coat|varnish/i.test(f.key) && optionsOf(prod, f.key, cfg).length);
-  const finishing = []; finFields.forEach(f => optionsOf(prod, f.key, cfg).forEach(v => { if (!NONE_RE.test(String(v)) && finishing.indexOf(v) < 0) finishing.push(v); }));
-  const foilF = (prod.fields || []).find(f => /hot_stamping_colour|foil/i.test(f.key));
-  const foils = foilF ? optionsOf(prod, foilF.key, cfg).filter(v => !NONE_RE.test(String(v))) : [];
+  // Finishing = the finishing TYPES available, not every option value. Lamination variants
+  // keep their type but drop the (Front)/(Both) side; Spot UV, Hot Stamping, Round Corner and
+  // Embossing collapse to a single "is available" label (no colours, RC codes or sides).
+  const finishing = []; const addFin = l => { if (l && finishing.indexOf(l) < 0) finishing.push(l); };
+  (prod.fields || []).forEach(f => {
+    const k = f.key; const opts = optionsOf(prod, f.key, cfg).filter(v => !NONE_RE.test(String(v)));
+    if (!opts.length) return;
+    if (/hot_stamping_colour|foil/i.test(k)) return;                 // colours: never listed
+    if (/round_corner_position/i.test(k)) return;                    // RC die codes: never listed
+    if (/lamination|varnish|coat/i.test(k)) opts.forEach(v => String(v).split('+').forEach(part => addFin(part.replace(/\s*\((?:both|front|back)\)\s*/ig, '').trim())));
+    else if (/spot_uv|spotuv|silkscreen/i.test(k)) addFin('Spot UV');
+    else if (/hot_stamping|stamp/i.test(k)) addFin('Hot Stamping');
+    else if (/round_corner/i.test(k)) addFin('Round Corner');
+    else if (/emboss/i.test(k)) addFin('Embossing');
+  });
   // the "types to configure" = the product's top-level category/model field values
   const catField = (prod.fields || []).find(f => /^(category|model|type)$/i.test(f.key) && optionsOf(prod, f.key, cfg).length);
   const types = catField ? optionsOf(prod, catField.key, cfg) : [];
@@ -78,7 +89,7 @@ function facts(r) {
   let sample = qopts.slice(); if (sample.length > 6) { const pick = [0, (sample.length / 3) | 0, (2 * sample.length / 3) | 0, sample.length - 1]; sample = pick.map(i => sample[i]); }
   let from = null;
   sample.forEach(qn => { try { const q = E.localQuote(prod, cfg, qn); const cash = q && (q.printoka_cash != null ? q.printoka_cash : q.cash); if (cash != null && qn) { const pp = cash / qn; if (from == null || pp < from) from = pp; } } catch (e) {} });
-  return { name: r.name, catId: r.catId, catLabel: categoryLabel(r.catId), sizes, materials, finishing, foils, types, typeKey, options, moq, qopts, from };
+  return { name: r.name, catId: r.catId, catLabel: categoryLabel(r.catId), sizes, materials, finishing, types, typeKey, options, moq, qopts, from };
 }
 
 // ---- CMS-style copy, generated (mirrors the client's productSeo / catWhy) ----
@@ -155,7 +166,6 @@ function page(slug, origin, opts) {
     + '</div></section>');
   // TOC
   const toc = [['why', 'Why Printoka'], ['types', 'Configure'], ['sizes', 'Sizes'], ['materials', 'Materials'], ['finishing', 'Finishing']];
-  if (f.foils.length) toc.push(['foils', 'Foil Colours']);
   toc.push(['delivery', 'Delivery'], ['specs', 'Specifications'], ['faq', 'FAQ']);
   S.push('<nav class="pk-toc" aria-label="On this page"><ul>' + toc.map(t => '<li><a href="#' + t[0] + '">' + esc(t[1]) + '</a></li>').join('') + '</ul></nav>');
   // why
@@ -189,11 +199,6 @@ function page(slug, origin, opts) {
   if (f.finishing.length) {
     S.push(sec('finishing', '<h2>Finishing for your ' + esc(name) + '</h2><div class="pk-grid pk-fins">'
       + f.finishing.map(x => '<div class="pk-fin">' + esc(x) + '</div>').join('') + '</div>'));
-  }
-  // foils
-  if (f.foils.length) {
-    S.push(sec('foils', '<h2>Hot stamping foil colours</h2><div class="pk-grid pk-fins">'
-      + f.foils.map(x => '<div class="pk-fin">' + esc(x) + '</div>').join('') + '</div>'));
   }
   // delivery
   S.push(sec('delivery', '<h2>We deliver your ' + esc(name) + ' anywhere in Malaysia</h2><ul class="pk-states">'
