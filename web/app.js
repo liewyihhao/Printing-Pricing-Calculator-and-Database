@@ -2950,14 +2950,18 @@ class Component extends DCLogic {
                     this.chip(from != null ? 'Instant' : 'On request', from != null ? 'ok' : 'warn'))));
             })))),
       // SEO content section above the footer
-      h('section', { style: { borderTop: '1px solid ' + HAIR, marginTop: 46, paddingTop: 34 } },
-        h('h2', { style: { margin: '0 0 12px', fontSize: 23, fontWeight: 600, letterSpacing: '-.02em' } }, seo.heading),
-        h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: '10px 40px', maxWidth: 980 } },
+      h('section', { style: { borderTop: '1px solid ' + HAIR, marginTop: 46, paddingTop: 34, maxWidth: 900 } },
+        h('h2', { style: { margin: '0 0 18px', fontSize: 23, fontWeight: 600, letterSpacing: '-.02em' } }, seo.heading),
+        seo.whyHeading ? h('h3', { style: { margin: '0 0 10px', fontSize: 16.5, fontWeight: 600, color: INK } }, seo.whyHeading) : null,
+        (seo.bullets && seo.bullets.length) ? h('ul', { style: { margin: '0 0 20px', padding: '0 0 0 22px' } },
+          seo.bullets.map((b, i) => h('li', { key: i, style: { fontSize: 14, color: MUT, lineHeight: 1.95 } }, b))) : null,
+        h('div', { style: { display: 'flex', flexDirection: 'column', gap: 13 } },
           seo.paras.map((t, i) => h('p', { key: i, style: { margin: 0, fontSize: 14, color: MUT, lineHeight: 1.85 } }, t)))));
   }
 
-  // category SEO copy — real sentences derived from the live catalogue (product count,
-  // representative min-order and from-price), not keyword filler.
+  // category SEO copy — a keyword heading, a "Why print X" benefit list, and descriptive
+  // paragraphs. Benefit bullets are hand-written per category; the closing paragraph is
+  // derived live from the catalogue (product count, representative names, from-price).
   categorySeo(catId) {
     const all = catId === 'all';
     const label = all ? 'Online printing' : this.catCategoryLabel(catId);
@@ -2968,14 +2972,32 @@ class Component extends DCLogic {
     const froms = items.map(p => this.catFromPrice(p.id)).filter(x => x != null);
     const minFrom = froms.length ? Math.min.apply(null, froms) : null;
     const showFrom = minFrom != null && minFrom >= 0.01;
+    // per-category benefit bullets + an opening pitch (benefit-first, no filler)
+    const WHY = {
+      'business-essentials': { bullets: ['Make a sharp first impression at every meeting', 'Put your contact details in every prospect’s hand', 'Look established from the first hello'], pitch: 'Your business card and stationery are the first thing a client touches. Print them well and you look ready for the deal before you say a word. Choose premium stocks and finishes that feel as good as they look.' },
+      'flyers-leaflets': { bullets: ['Put your promotion straight into people’s hands', 'Drive walk-ins with an offer they can hold', 'Reach a whole neighbourhood on a small budget'], pitch: 'A flyer works because someone holds it. Hand out a launch, a menu or an offer and your message goes home with the customer. Pick your size and paper, and print as few or as many as you need.' },
+      'labels-stickers': { bullets: ['Brand every product you sell', 'Seal your packaging with your own mark', 'Turn plain boxes into shelf appeal'], pitch: 'Labels and stickers put your brand on the product itself. They are low cost, hard-wearing and they travel wherever your product goes. Choose round, rectangular, oval or a custom die-cut shape to fit your packaging exactly.' },
+      'books-stationery': { bullets: ['Keep your brand on a desk all year', 'Give clients something they use every day', 'Collect your story in one book'], pitch: 'Notebooks, booklets and company profiles carry more of your story than a single page. The right binding and paper make them feel premium and keep your brand in daily use.' },
+      'cards-invitations': { bullets: ['Set the tone for the big day', 'Give guests something worth keeping', 'Add foil and texture people want to touch'], pitch: 'A wedding invitation or greeting card gets kept, not thrown away. The right paper and finishing make the moment feel special before it begins. Add hot foil, embossing or a die-cut shape to make it yours.' },
+      'large-format': { bullets: ['Get seen from across the street', 'Own your storefront and events', 'Stand tall at every roadshow'], pitch: 'Banners, buntings and roll-ups put your message where a crowd can see it. Print on durable material that lasts the event and beyond, at the exact size you need.' },
+      'packaging-boxes': { bullets: ['Protect your product in transit', 'Turn unboxing into your best advert', 'Own the shelf with custom print'], pitch: 'Custom boxes and mailers protect your product and sell it at the same time. A branded unboxing is the advert your customer photographs and shares. Design on a free die-line built for your exact size.' },
+      'apparel-gifts': { bullets: ['Put your brand on your team', 'Turn events into walking billboards', 'Give gifts people actually use'], pitch: 'Printed shirts, totes and mugs earn daily use, which makes them some of the highest-exposure branding you can buy. Choose the print method that suits your run and your design.' },
+    };
+    const why = WHY[catId] || { bullets: ['Get an exact price before you order', 'Choose from 100+ products in one place', 'Print with a free artwork check'], pitch: 'Printoka is an online printing marketplace bringing 30+ vendors and our own facility into one place. Configure any product, see the exact price on screen, and order online.' };
     const lead = all
       ? 'Every product Printoka prints, priced online in seconds.'
       : 'Order ' + label.toLowerCase() + ' online across Malaysia, Singapore and Brunei. ' + items.length + ' product' + (items.length === 1 ? '' : 's') + ', each priced online in seconds.';
-    const paras = [];
-    paras.push('Printoka prints ' + items.length + ' ' + label.toLowerCase() + ' product' + (items.length === 1 ? '' : 's') + (names.length ? ', including ' + names.slice(0, 5).join(', ') + (items.length > 5 ? ' and more' : '') : '') + '. Configure your spec, see the exact price as you choose, and order online.');
-    if (minMoq != null || showFrom) paras.push('Start from ' + (minMoq != null ? 'as few as ' + minMoq.toLocaleString() + ' pcs' : 'small runs') + (showFrom ? ', from ' + this.money(minFrom) + ' per piece' : '') + '. Members save up to 15% at checkout.');
-    paras.push('Upload your artwork and our prepress team checks trim, bleed, resolution and colour before printing. Turnaround is 3 working days after approval, with nationwide delivery or free pickup in the Klang Valley.');
-    return { lead, heading: all ? 'Online printing in Malaysia, Singapore & Brunei' : label + ' printing: instant online pricing', paras };
+    // closing paragraph from live catalogue data
+    const catalogue = 'Printoka prints ' + items.length + ' ' + (all ? 'product' : label.toLowerCase() + ' product') + (items.length === 1 ? '' : 's') + (names.length ? ', including ' + names.slice(0, 5).join(', ') + (items.length > 5 ? ' and more' : '') : '') + '. Configure your spec, see the exact price as you choose'
+      + (minMoq != null ? ', from as few as ' + minMoq.toLocaleString() + ' pc' + (minMoq === 1 ? '' : 's') : '')
+      + (showFrom ? ' and ' + this.money(minFrom) + ' per piece' : '') + ', and order online. Members save up to 15% at checkout.';
+    return {
+      lead,
+      heading: all ? 'Online Printing in Malaysia, Singapore & Brunei' : 'Print ' + label + ' Online in Malaysia',
+      whyHeading: all ? 'Why Print with Printoka' : 'Why Print ' + label,
+      bullets: why.bullets,
+      paras: [why.pitch, catalogue],
+    };
   }
 
   // ===== PRODUCT + CONFIGURATOR =====
