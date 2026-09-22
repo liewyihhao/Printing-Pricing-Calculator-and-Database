@@ -295,8 +295,8 @@ function css() {
     ':where(a,button):focus-visible{outline:2px solid ' + T.brand + ';outline-offset:2px}',
     '.pk-main{max-width:1180px;margin:0 auto;padding:0 20px}',
     '.pk-sec{scroll-margin-top:76px;padding:34px 0;border-top:1px solid ' + T.line + '}',
-    '.pk-sec h2{font-size:19px;font-weight:600;margin:0 0 16px}.pk-sec h3{font-size:15.5px;font-weight:600;margin:22px 0 8px}',
-    '.pk-sec p{font-size:14px;color:' + T.muted + ';line-height:1.8;max-width:80ch}',
+    '.pk-sec h2{font-size:19px;font-weight:600;margin:0 0 16px;text-align:center}.pk-sec h3{font-size:15.5px;font-weight:600;margin:22px 0 8px}',
+    '.pk-sec p{font-size:14px;color:' + T.muted + ';line-height:1.8;max-width:80ch;margin-left:auto;margin-right:auto;text-align:center}',
     // header (matches runtime.js chrome)
     '.pk-headwrap{position:sticky;top:0;z-index:60}.pk-head{background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid ' + T.hairline + '}',
     '.pk-head-in{max-width:1180px;margin:0 auto;padding:10px 20px;min-height:64px;display:flex;align-items:center;flex-wrap:wrap;gap:10px 18px}',
@@ -324,11 +324,11 @@ function css() {
     // grids
     '.pk-grid{display:grid;gap:14px}.pk-types{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.pk-sizes{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.pk-mats{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}.pk-fins{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}',
     '.pk-type{display:flex;flex-direction:column;border:1px solid ' + T.hairline + ';border-radius:10px;overflow:hidden;background:#fff;color:' + T.ink + '}.pk-type:hover{color:' + T.ink + '}',
-    '.pk-type-ph{background:' + T.alt + ';color:#9e9e9e;font-size:11px;text-align:center;padding:34px 8px}.pk-type-l{font-weight:600;font-size:14px;padding:12px 14px 8px}.pk-type .pk-btn-sm{margin:0 14px 14px;text-align:center}',
+    '.pk-type-ph{background:' + T.alt + ';color:#9e9e9e;font-size:11px;text-align:center;padding:34px 8px}.pk-type-l{font-weight:600;font-size:14px;padding:12px 14px 8px}.pk-type .pk-btn-sm{margin:auto 14px 14px;text-align:center}',
     // carousel (used when >5 type cards): horizontal scroll with arrow buttons
     '.pk-carousel{display:flex;align-items:center;gap:10px}.pk-car-track{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;scroll-snap-type:x proximity;padding:2px 0}',
     '.pk-car-track::-webkit-scrollbar{height:7px}.pk-car-track::-webkit-scrollbar-thumb{background:' + T.hairline + ';border-radius:4px}',
-    '.pk-car-track>.pk-type{display:inline-flex;flex-direction:column;width:220px;vertical-align:top;white-space:normal;margin-right:14px;scroll-snap-align:start}',
+    '.pk-car-track>.pk-type{display:inline-flex;flex-direction:column;width:220px;min-height:222px;vertical-align:top;white-space:normal;margin-right:14px;scroll-snap-align:start}',
     '.pk-car-btn{flex:none;align-self:center;width:40px;height:40px;border-radius:50%;border:1px solid ' + T.hairline + ';background:#fff;color:' + T.brand + ';font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}.pk-car-btn:hover{background:' + T.brand + ';color:#fff;border-color:' + T.brand + '}',
     '@media(max-width:600px){.pk-car-btn{display:none}}',
     '.pk-scale-note{font-size:11.5px;color:#9e9e9e;margin:-8px 0 14px}',
@@ -342,11 +342,12 @@ function css() {
     '.pk-states{list-style:none;margin:0 auto 28px;padding:0;max-width:860px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;text-align:left}',
     '.pk-states li{font-size:14px;font-weight:500;color:#fff;padding-left:30px;position:relative;line-height:1.5}.pk-states li:before{content:"\\2713";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:#fff;color:' + T.brand + ';font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}',
     '.pk-deliver .pk-btn{background:#fff;color:' + T.brand + '}.pk-deliver .pk-btn:hover{background:#fff;color:' + T.brandDark + '}',
-    // FAQ accordion (native <details>, styled like the printoka.com FAQ)
-    '.pk-faq-sec h2{margin-bottom:6px}.pk-faq{max-width:900px;border-top:1px solid ' + T.line + '}',
+    // FAQ accordion (native <details>, styled like the printoka.com FAQ) — section centred,
+    // Q&A text kept left-aligned inside the centred block
+    '.pk-faq-sec{text-align:center}.pk-faq-sec h2{margin-bottom:6px}.pk-faq{max-width:900px;margin:0 auto;text-align:left;border-top:1px solid ' + T.line + '}',
     '.pk-faq-item{border-bottom:1px solid ' + T.line + '}.pk-faq-item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px 2px;font-size:14.5px;font-weight:600;color:' + T.ink + '}.pk-faq-item summary::-webkit-details-marker{display:none}',
     '.pk-faq-ch{flex:none;color:' + T.brand + ';font-size:13px;transition:transform .15s}.pk-faq-item[open] .pk-faq-ch{transform:rotate(180deg)}',
-    '.pk-faq-a{padding:0 2px 18px;font-size:13.5px;color:' + T.muted + ';line-height:1.75;max-width:80ch}.pk-faq-sec .pk-btn{margin-top:20px}',
+    '.pk-faq-a{padding:0 2px 18px;font-size:13.5px;color:' + T.muted + ';line-height:1.75}.pk-faq-sec .pk-btn{margin-top:20px}',
     // footer (matches app footer)
     '.pk-fpromo{margin-top:56px;background:' + T.brand + ';color:#fff}.pk-fpromo-in{max-width:1180px;margin:0 auto;padding:30px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:26px;align-items:start}',
     '.pk-fp{display:flex;flex-direction:column;gap:12px;text-align:center}.pk-fp-h{font-size:17px;font-weight:600}',
