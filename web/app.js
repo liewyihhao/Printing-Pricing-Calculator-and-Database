@@ -3069,13 +3069,19 @@ class Component extends DCLogic {
     // radio dot, the option label and a Select / Not available subtext; the chosen card is
     // highlighted, and options that are invalid for the current spec are greyed and disabled.
     const cardGroup = (key, fieldLabel, curText, isPh0, note, remark, items) => {
-      const cards = items.map((it, i) => {
+      // collapsible: the field shows only its current value until clicked; clicking reveals the
+      // option cards, and picking one collapses it again (the original site's dropdown behaviour).
+      const open = this.state.ddOpen === key;
+      const toggle = () => this.setState(st => ({ ddOpen: st.ddOpen === key ? null : key }));
+      const close = () => this.setState({ ddOpen: null });
+      const cards = open ? items.map((it, i) => {
         const on = it.on, avail = it.avail !== false || on;
         return h(avail ? 'button' : 'div', {
           key: it.val != null ? it.val : i, type: avail ? 'button' : undefined,
-          onClick: avail ? (e => { e.preventDefault(); it.onPick(); }) : undefined,
+          onClick: avail ? (e => { e.preventDefault(); e.stopPropagation(); it.onPick(); close(); }) : undefined,
           role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-disabled': avail ? undefined : 'true',
           tabIndex: avail ? 0 : -1, 'aria-label': fieldLabel + ': ' + it.label + (avail ? '' : ' (not available)'),
+          onKeyDown: avail ? (e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); e.stopPropagation(); it.onPick(); close(); } else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } }) : undefined,
           style: { display: 'flex', alignItems: 'center', gap: 11, textAlign: 'left', width: '100%', font: 'inherit',
             border: '1px solid ' + (on ? TEAL : HAIR), borderRadius: 12, background: on ? '#fdf2f2' : (avail ? '#fff' : ALT),
             padding: '13px 14px', cursor: avail ? 'pointer' : 'default', opacity: avail ? 1 : 0.75, outlineOffset: '2px' } },
@@ -3084,14 +3090,19 @@ class Component extends DCLogic {
           h('span', { style: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 } },
             h('span', { style: { fontSize: 13.5, fontWeight: 500, lineHeight: 1.3, color: avail ? INK : FAINT, textDecoration: avail ? 'none' : 'line-through' } }, it.label),
             avail ? null : h('span', { style: { fontSize: 11.5, fontWeight: 400, color: '#bdbdbd' } }, 'Not available')));
-      });
+      }) : [];
       return h('div', { key: key, style: { padding: '16px 0', borderTop: '1px solid ' + LINE } },
-        h('div', { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: (note || remark) ? 6 : 12 } },
-          h('div', { style: { fontSize: 13.5, fontWeight: 600 } }, fieldLabel),
-          h('div', { style: { fontSize: 13, fontWeight: 500, color: isPh0 ? FAINT : MUT, textAlign: 'right' } }, curText)),
-        note ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5, marginBottom: 12 } }, note) : null,
-        remark ? h('div', { style: { fontSize: 11.5, color: MUT, lineHeight: 1.55, background: ALT, borderRadius: 8, padding: '9px 12px', marginBottom: 12 } }, remark) : null,
-        h('div', { role: 'radiogroup', 'aria-label': fieldLabel, style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 } }, cards));
+        h('div', { style: { fontSize: 13.5, fontWeight: 600, marginBottom: 8 } }, fieldLabel),
+        note ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5, marginBottom: 8 } }, note) : null,
+        // the collapsed control: current value + chevron; click to open the option list
+        h('div', { onClick: e => { e.stopPropagation(); toggle(); }, tabIndex: 0, role: 'combobox', 'aria-haspopup': 'listbox', 'aria-expanded': open ? 'true' : 'false', 'aria-label': fieldLabel + (isPh0 ? ' (not selected)' : ': ' + curText),
+          onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); e.stopPropagation(); toggle(); } else if (e.key === 'ArrowDown' && !open) { e.preventDefault(); e.stopPropagation(); this.setState({ ddOpen: key }); } else if (e.key === 'Escape' && open) { e.preventDefault(); e.stopPropagation(); close(); } },
+          style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, cursor: 'pointer', padding: '11px 14px', border: '1px solid ' + (open ? TEAL : HAIR), borderRadius: 10, background: '#fff', boxShadow: open ? '0 0 0 3px rgba(229,34,32,.10)' : 'none' } },
+          h('span', { style: { fontSize: 14, fontWeight: 500, color: isPh0 ? FAINT : INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, curText),
+          h('span', { 'aria-hidden': 'true', style: { flex: 'none', color: FAINT, fontSize: 10, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .12s' } }, '▼')),
+        open ? h('div', { style: { marginTop: 10 } },
+          remark ? h('div', { style: { fontSize: 11.5, color: MUT, lineHeight: 1.55, background: ALT, borderRadius: 8, padding: '9px 12px', marginBottom: 12 } }, remark) : null,
+          h('div', { role: 'radiogroup', 'aria-label': fieldLabel, style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 } }, cards)) : null);
     };
     const optCards = (def, options, sel) => {
       const label = (ov.label && ov.label[def.key]) || def.label;
@@ -3178,19 +3189,15 @@ class Component extends DCLogic {
     const groups = secOrder.map(sec => {
       const secFields = fields.filter(f => (f.def.section || 'General') === sec);
       secFields.forEach(f => { usedKeys[f.def.key] = 1; });
-      let nodes;
-      if (sec === qtySec) {
-        const pkgIdx = secFields.findIndex(f => /^package$/i.test(f.def.key));
-        nodes = []; secFields.forEach((f, i) => { if (i === pkgIdx) nodes.push(qtyField); nodes.push(renderField(f)); });
-        if (pkgIdx < 0) nodes.push(qtyField);
-      } else nodes = secFields.map(renderField);
-      return { sec, nodes };
+      return { sec, nodes: secFields.map(renderField) };
     });
     const orphans = fields.filter(f => !usedKeys[f.def.key]);
     if (orphans.length) groups[0].nodes = groups[0].nodes.concat(orphans.map(renderField));
-    const sectionHeader = (sec) => h('div', { key: 'h_' + sec, style: { display: 'flex', alignItems: 'center', gap: 9, margin: '18px 0 2px' } },
-      h('span', { style: { width: 4, height: 15, background: TEAL, borderRadius: 2, flex: 'none' } }),
-      h('span', { style: { fontSize: 12, fontWeight: 700, letterSpacing: '.05em', textTransform: 'uppercase', color: INK } }, sec));
+    // Quantity is always the LAST configuration option, after every other field/section.
+    if (groups.length) groups[groups.length - 1].nodes = groups[groups.length - 1].nodes.concat([qtyField]);
+    const sectionHeader = (sec) => h('div', { key: 'h_' + sec, style: { display: 'flex', alignItems: 'center', gap: 10, margin: '22px 0 4px' } },
+      h('span', { style: { width: 4, height: 18, background: TEAL, borderRadius: 2, flex: 'none' } }),
+      h('span', { style: { fontSize: 15, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', color: INK } }, sec));
     return h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '10px 20px 0' } },
       h('div', { style: { fontSize: 12.5, color: FAINT, marginBottom: 14 } },
         h('span', { 'data-go': 'home', style: { color: TEAL } }, 'Home'), ' › ', h('span', { 'data-go': prod ? ('catopen:' + this.catCategoryOf(prod.id)) : 'category', style: { color: TEAL } }, prod ? this.catCategoryLabel(this.catCategoryOf(prod.id)) : 'Products'), ' › ', NAME),
