@@ -168,13 +168,6 @@ function page(slug, origin, opts) {
     + '<p class="pk-hero-tag">configure, upload and print</p></div>'
     + '<div class="pk-hero-benefits">' + heroBenefits.map(b => '<div class="pk-hb"><div class="pk-hb-h">' + esc(b[0]) + '</div><div class="pk-hb-c">' + esc(b[1]) + '</div></div>').join('') + '</div>'
     + '</div></section>');
-  // Table of content — centred numbered anchor list
-  const toc = [['types', 'Choose ' + name + ' configuration']];
-  if (f.sizes.length) toc.push(['sizes', name + ' Sizes']);
-  if (f.materials.length) toc.push(['materials', name + ' Materials']);
-  if (f.finishing.length) toc.push(['finishing', name + ' Finishing']);
-  S.push('<section class="pk-toc"><h2>Table of content</h2><div class="pk-toc-list">'
-    + toc.map((t, i) => '<a href="#' + t[0] + '"><span class="pk-toc-n">' + (i + 1) + '.</span> ' + esc(t[1]) + '</a>').join('') + '</div></section>');
   // Why Printoka? — light band with six icon benefits
   const ICON = {
     thumb: '<path d="M7 11v9M2 13a2 2 0 0 1 2-2h3v9H4a2 2 0 0 1-2-2v-5zM7 11l4-8a2 2 0 0 1 2 2v4h5a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 17 20H7"/>',
@@ -317,9 +310,6 @@ function css() {
     '.pk-hb-h{font-weight:700;font-size:15px}.pk-hb-c{font-size:13px;color:rgba(255,255,255,.92);padding-left:14px;position:relative;margin-top:2px;line-height:1.5}.pk-hb-c:before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:#fff}',
     // buttons
     '.pk-btn{display:inline-block;background:' + T.brand + ';color:#fff;font-weight:600;font-size:13.5px;padding:11px 20px;border-radius:2px}.pk-btn:hover{background:' + T.brandDark + ';color:#fff}.pk-btn-lg{padding:13px 26px;font-size:14px}.pk-btn-sm{padding:9px 14px;font-size:12.5px;margin-top:auto}',
-    // table of content (centred, numbered)
-    '.pk-toc{text-align:center;padding:30px 0}.pk-toc h2{font-size:22px;font-weight:500;margin:0 0 16px;color:' + T.ink + '}',
-    '.pk-toc-list{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 30px;max-width:900px;margin:0 auto}.pk-toc-list a{font-size:14px;font-weight:500;color:' + T.brand + '}.pk-toc-n{color:' + T.ink + ';font-weight:600}',
     // why printoka (light band, six icon benefits)
     '.pk-why{background:' + T.alt + '}.pk-why-in{max-width:1180px;margin:0 auto;padding:44px 20px;text-align:center}.pk-why h2{font-size:24px;font-weight:600;margin:0 0 8px}.pk-why-sub{font-size:14px;color:' + T.muted + ';margin:0 auto 30px;max-width:64ch}',
     '.pk-why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:22px}.pk-why-i{display:flex;flex-direction:column;align-items:center;gap:10px}',
