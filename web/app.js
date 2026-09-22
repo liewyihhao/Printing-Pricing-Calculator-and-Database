@@ -3075,7 +3075,7 @@ class Component extends DCLogic {
             on ? h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: TEAL } }) : null),
           h('span', { style: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 } },
             h('span', { style: { fontSize: 13.5, fontWeight: 500, lineHeight: 1.3, color: avail ? INK : FAINT, textDecoration: avail ? 'none' : 'line-through' } }, it.label),
-            h('span', { style: { fontSize: 11.5, fontWeight: on ? 600 : 400, color: on ? TEAL : (avail ? FAINT : '#bdbdbd') } }, avail ? 'Select' : 'Not available')));
+            avail ? null : h('span', { style: { fontSize: 11.5, fontWeight: 400, color: '#bdbdbd' } }, 'Not available')));
       });
       return h('div', { key: key, style: { padding: '16px 0', borderTop: '1px solid ' + LINE } },
         h('div', { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: (note || remark) ? 6 : 12 } },
