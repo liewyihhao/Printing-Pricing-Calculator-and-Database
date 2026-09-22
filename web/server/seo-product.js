@@ -155,22 +155,48 @@ function page(slug, origin, opts) {
   // sections
   const S = [];
   const sec = (id, inner) => '<section id="' + id + '" class="pk-sec">' + inner + '</section>';
-  // hero
+  // hero — orange banner replicating the printoka.com product header: product cutout (left),
+  // "Print Your {name} Online Now!" (centre), three benefit blocks (right).
+  const heroBenefits = [
+    ['Schedule your delivery', 'Large orders delivered affordably, door to door'],
+    ['Satisfaction guaranteed', 'Quality and speed you can rely on'],
+    ['Exclusive member pricing', 'A special price rate for Printoka members'],
+  ];
   S.push('<section id="top" class="pk-hero"><div class="pk-hero-in">'
-    + '<div class="pk-hero-l"><div class="pk-eyebrow">Print ' + esc(name) + ' Online Now!</div>'
-    + '<h1>' + esc(h1) + '</h1>'
-    + '<p class="pk-hero-sub">' + esc(c.intro) + '</p>'
-    + '<a class="pk-btn pk-btn-lg" href="' + esc(configUrl) + '">Check Price Now</a></div>'
-    + (asset ? '<div class="pk-hero-img"><img src="' + esc(asset) + '" alt="' + esc(name + ' printed by Printoka') + '" width="320" height="320" fetchpriority="high"></div>' : '')
-    + '<ul class="pk-hero-promises"><li>Exact price before you order</li><li>Free artwork check</li><li>3 working days after approval</li></ul>'
+    + (asset ? '<div class="pk-hero-img"><img src="' + esc(asset) + '" alt="' + esc(name + ' printed by Printoka') + '" width="300" height="220" fetchpriority="high"></div>' : '')
+    + '<div class="pk-hero-c"><h1><span class="pk-h-sm">Print Your</span><span class="pk-h-lg">' + esc(name) + '</span><span class="pk-h-md">Online Now!</span></h1>'
+    + '<p class="pk-hero-tag">configure, upload and print</p></div>'
+    + '<div class="pk-hero-benefits">' + heroBenefits.map(b => '<div class="pk-hb"><div class="pk-hb-h">' + esc(b[0]) + '</div><div class="pk-hb-c">' + esc(b[1]) + '</div></div>').join('') + '</div>'
     + '</div></section>');
-  // TOC
-  const toc = [['why', 'Why Printoka'], ['types', 'Configure'], ['sizes', 'Sizes'], ['materials', 'Materials'], ['finishing', 'Finishing']];
-  toc.push(['delivery', 'Delivery'], ['faq', 'FAQ']);
-  S.push('<nav class="pk-toc" aria-label="On this page"><ul>' + toc.map(t => '<li><a href="#' + t[0] + '">' + esc(t[1]) + '</a></li>').join('') + '</ul></nav>');
-  // why
-  S.push(sec('why', '<h2>Why print ' + esc(name) + ' with Printoka</h2><ul class="pk-why-bullets">' + c.why.map(b => '<li>' + esc(b) + '</li>').join('')
-    + '</ul><div class="pk-trust">' + TRUST.map(t => '<div class="pk-trust-i"><div class="pk-trust-h">' + esc(t[0]) + '</div><div class="pk-trust-c">' + esc(t[1]) + '</div></div>').join('') + '</div>'));
+  // Table of content — centred numbered anchor list
+  const toc = [['types', 'Choose ' + name + ' configuration']];
+  if (f.sizes.length) toc.push(['sizes', name + ' Sizes']);
+  if (f.materials.length) toc.push(['materials', name + ' Materials']);
+  if (f.finishing.length) toc.push(['finishing', name + ' Finishing']);
+  S.push('<section class="pk-toc"><h2>Table of content</h2><div class="pk-toc-list">'
+    + toc.map((t, i) => '<a href="#' + t[0] + '"><span class="pk-toc-n">' + (i + 1) + '.</span> ' + esc(t[1]) + '</a>').join('') + '</div></section>');
+  // Why Printoka? — light band with six icon benefits
+  const ICON = {
+    thumb: '<path d="M7 11v9M2 13a2 2 0 0 1 2-2h3v9H4a2 2 0 0 1-2-2v-5zM7 11l4-8a2 2 0 0 1 2 2v4h5a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 17 20H7"/>',
+    clock: '<path d="M6 2h12M6 22h12M8 2c0 4 8 6 8 10s-8 6-8 10M16 2c0 4-8 6-8 10"/>',
+    truck: '<path d="M1 6h13v11H1zM14 9h4l3 3v5h-7zM6 20a2 2 0 1 0 0-.1M18 20a2 2 0 1 0 0-.1"/>',
+    shield: '<path d="M12 2l8 3v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V5zM9 12l2 2 4-4"/>',
+    card: '<path d="M2 5h20v14H2zM2 10h20"/>',
+    shop: '<path d="M3 9l1-5h16l1 5M3 9h18v11H3zM3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/>',
+  };
+  const svg = p => '<svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="' + T.brand + '" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
+  const WHY6 = [
+    [svg(ICON.thumb), 'Superior Quality', ''],
+    [svg(ICON.clock), 'Instant Price Quotation', ''],
+    [svg(ICON.truck), 'Configurable Delivery Options', ''],
+    [svg(ICON.shield), 'Professional Print Experts at your service', ''],
+    [svg(ICON.card), 'Credit Terms for Corporate Members', 'Subject to application'],
+    [svg(ICON.shop), 'Membership Plans', ''],
+  ];
+  S.push('<section id="why" class="pk-why"><div class="pk-why-in"><h2>Why Printoka?</h2>'
+    + '<p class="pk-why-sub">The exclusive benefits you get as a member of Printoka.com.</p>'
+    + '<div class="pk-why-grid">' + WHY6.map(w => '<div class="pk-why-i"><span class="pk-why-icon">' + w[0] + '</span><div class="pk-why-l">' + esc(w[1]) + '</div>' + (w[2] ? '<div class="pk-why-note">' + esc(w[2]) + '</div>' : '') + '</div>').join('') + '</div>'
+    + '</div></section>');
   // types to configure
   if (f.types.length) {
     S.push(sec('types', '<h2>Choose the type of ' + esc(name) + ' to configure</h2><div class="pk-grid pk-types">'
@@ -280,21 +306,25 @@ function css() {
     '.pk-search{display:flex;align-items:center;flex:1 1 260px;min-width:120px;border:1px solid ' + T.hairline + ';border-radius:3px;overflow:hidden}.pk-search input{flex:1;border:0;padding:0 12px;font:400 13px Montserrat,sans-serif;color:' + T.ink + ';min-width:0;outline:none}.pk-search button{border:0;background:' + T.brand + ';padding:11px 15px;display:flex;cursor:pointer}.pk-search button img{height:13px;width:auto;filter:brightness(0) invert(1)}',
     '.pk-head-r{display:flex;align-items:center;gap:14px;font-size:13px;color:' + T.inkDark + ';white-space:nowrap}.pk-head-r a{color:' + T.inkDark + '}.pk-loc{cursor:default}.pk-div{width:1px;height:16px;background:' + T.hairline + '}',
     '.pk-login{display:flex;align-items:center;gap:7px;font-size:13.5px}.pk-login img{height:18px;width:auto}.pk-cart{display:flex}.pk-cart img{height:19px;width:auto}.pk-country{display:flex;align-items:center;gap:6px}.pk-country img{height:15px;width:22px;object-fit:cover;display:block}',
-    // hero
-    '.pk-hero{background:' + T.inkDark + ';color:#fff}.pk-hero-in{max-width:1180px;margin:0 auto;padding:40px 20px;display:flex;flex-wrap:wrap;gap:28px;align-items:center;min-height:208px}',
-    '.pk-hero-l{flex:1 1 320px}.pk-eyebrow{color:' + T.amber + ';font-weight:600;font-size:13px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}',
-    '.pk-hero h1{font-size:clamp(24px,3vw,32px);font-weight:600;letter-spacing:-.01em;margin:0 0 12px}',
-    '.pk-hero-sub{color:#e6e6e6;font-size:14px;line-height:1.8;max-width:60ch;margin:0 0 18px}',
-    '.pk-hero-img{flex:0 0 auto}.pk-hero-img img{filter:drop-shadow(0 14px 26px rgba(0,0,0,.4));border-radius:8px}',
-    '.pk-hero-promises{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;font-size:13.5px}.pk-hero-promises li{padding-left:22px;position:relative}.pk-hero-promises li:before{content:"\\2713";color:' + T.amber + ';position:absolute;left:0;font-weight:700}',
+    // hero (orange banner, printoka.com product-header layout)
+    '.pk-hero{background:linear-gradient(115deg,#F26722 0%,#EF5A28 45%,#E52220 100%);color:#fff;overflow:hidden}',
+    '.pk-hero-in{max-width:1180px;margin:0 auto;padding:34px 20px;display:flex;flex-wrap:wrap;gap:28px;align-items:center;min-height:216px}',
+    '.pk-hero-img{flex:0 0 auto}.pk-hero-img img{height:190px;width:auto;filter:drop-shadow(0 18px 30px rgba(0,0,0,.28))}',
+    '.pk-hero-c{flex:1 1 300px}.pk-hero h1{margin:0;display:flex;flex-direction:column;line-height:1.08;font-weight:400}',
+    '.pk-h-sm{font-size:26px}.pk-h-lg{font-size:40px;font-weight:700;letter-spacing:-.01em}.pk-h-md{font-size:30px;font-weight:500}',
+    '.pk-hero-tag{margin:12px 0 0;font-size:20px;font-weight:300;color:rgba(255,255,255,.95)}',
+    '.pk-hero-benefits{flex:0 1 320px;display:flex;flex-direction:column;gap:14px}',
+    '.pk-hb-h{font-weight:700;font-size:15px}.pk-hb-c{font-size:13px;color:rgba(255,255,255,.92);padding-left:14px;position:relative;margin-top:2px;line-height:1.5}.pk-hb-c:before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:#fff}',
     // buttons
     '.pk-btn{display:inline-block;background:' + T.brand + ';color:#fff;font-weight:600;font-size:13.5px;padding:11px 20px;border-radius:2px}.pk-btn:hover{background:' + T.brandDark + ';color:#fff}.pk-btn-lg{padding:13px 26px;font-size:14px}.pk-btn-sm{padding:9px 14px;font-size:12.5px;margin-top:auto}',
-    // toc
-    '.pk-toc{border-top:1px solid ' + T.line + ';background:' + T.alt + '}.pk-toc ul{list-style:none;margin:0;padding:12px 0;display:flex;gap:18px;overflow-x:auto}.pk-toc li{white-space:nowrap}.pk-toc a{font-size:13px;font-weight:500;color:' + T.muted + '}',
-    // why
-    '.pk-why-bullets{margin:0 0 22px;padding-left:20px}.pk-why-bullets li{font-size:14.5px;line-height:1.9}',
-    '.pk-trust{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;border:1px solid ' + T.hairline + ';border-radius:8px;padding:18px}',
-    '.pk-trust-h{font-weight:600;font-size:13.5px}.pk-trust-c{font-size:12.5px;color:' + T.muted + ';margin-top:3px}',
+    // table of content (centred, numbered)
+    '.pk-toc{text-align:center;padding:30px 0}.pk-toc h2{font-size:22px;font-weight:500;margin:0 0 16px;color:' + T.ink + '}',
+    '.pk-toc-list{display:flex;flex-wrap:wrap;justify-content:center;gap:14px 30px;max-width:900px;margin:0 auto}.pk-toc-list a{font-size:14px;font-weight:500;color:' + T.brand + '}.pk-toc-n{color:' + T.ink + ';font-weight:600}',
+    // why printoka (light band, six icon benefits)
+    '.pk-why{background:' + T.alt + '}.pk-why-in{max-width:1180px;margin:0 auto;padding:44px 20px;text-align:center}.pk-why h2{font-size:24px;font-weight:600;margin:0 0 8px}.pk-why-sub{font-size:14px;color:' + T.muted + ';margin:0 auto 30px;max-width:64ch}',
+    '.pk-why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:22px}.pk-why-i{display:flex;flex-direction:column;align-items:center;gap:10px}',
+    '.pk-why-icon{width:56px;height:56px;border-radius:50%;border:1.5px solid ' + T.brand + ';display:flex;align-items:center;justify-content:center;background:#fff}',
+    '.pk-why-l{font-size:14px;font-weight:500;color:' + T.ink + ';line-height:1.4;max-width:20ch}.pk-why-note{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:' + T.muted + '}',
     // grids
     '.pk-grid{display:grid;gap:14px}.pk-types{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.pk-sizes{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.pk-mats{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}.pk-fins{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}',
     '.pk-type{display:flex;flex-direction:column;border:1px solid ' + T.hairline + ';border-radius:10px;overflow:hidden;background:#fff;color:' + T.ink + '}.pk-type:hover{color:' + T.ink + '}',
