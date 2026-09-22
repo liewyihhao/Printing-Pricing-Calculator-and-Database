@@ -3402,95 +3402,150 @@ class Component extends DCLogic {
   }
 
   // ===== ARTWORK UPLOAD + BLEED CHECKER =====
+  // target print size (mm) from the current configuration, so checks are measured against
+  // the size the customer actually picked
+  artworkTarget() {
+    try {
+      const cfg = this.pkV();
+      if (cfg.custom_w && cfg.custom_h) return { w: +cfg.custom_w, h: +cfg.custom_h };
+      if (cfg.fold_w_thin && cfg.fold_h_thin) return { w: +cfg.fold_w_thin, h: +cfg.fold_h_thin };
+      if (cfg.fold_w_fat && cfg.fold_h_fat) return { w: +cfg.fold_w_fat, h: +cfg.fold_h_fat };
+      const m = String(cfg.size || '').match(/(\d+(?:\.\d+)?)\s*mm\s*[x×]\s*(\d+(?:\.\d+)?)\s*mm/i);
+      if (m) return { w: +m[1], h: +m[2] };
+    } catch (e) {}
+    return null;
+  }
+  awLoadPdfjs() {
+    if (typeof window !== 'undefined' && window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if (this._pdfjsP) return this._pdfjsP;
+    this._pdfjsP = new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      s.onload = () => { try { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(window.pdfjsLib); } catch (e) { rej(e); } };
+      s.onerror = () => rej(new Error('pdfjs load failed'));
+      document.head.appendChild(s);
+    });
+    return this._pdfjsP;
+  }
+  // read a JPEG's SOF marker to see if it is CMYK (4 components) vs RGB (3); null if not JPEG
+  awDetectCmyk(file) {
+    return file.arrayBuffer().then(buf => {
+      const b = new Uint8Array(buf);
+      if (!(b[0] === 0xFF && b[1] === 0xD8)) return null;
+      let i = 2;
+      while (i < b.length - 9) {
+        if (b[i] !== 0xFF) { i++; continue; }
+        const m = b[i + 1];
+        if (m >= 0xC0 && m <= 0xCF && m !== 0xC4 && m !== 0xC8 && m !== 0xCC) return b[i + 9] === 4;
+        const len = (b[i + 2] << 8) | b[i + 3]; if (len < 2) break; i += 2 + len;
+      }
+      return null;
+    }).catch(() => null);
+  }
+  awFinish(checks, preview) {
+    this.setState({ aw: Object.assign({}, this.state.aw, { status: 'done', checks: checks.slice(), preview: preview || null }) });
+  }
+  awCheckRaster(file, target, checks) {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+      const pw = img.naturalWidth, ph = img.naturalHeight;
+      if (target) {
+        const dpi = Math.max(Math.min(pw / (target.w / 25.4), ph / (target.h / 25.4)), Math.min(pw / (target.h / 25.4), ph / (target.w / 25.4)));
+        checks.push({ t: 'Resolution', s: dpi >= 300 ? 'pass' : dpi >= 150 ? 'warn' : 'fail', d: Math.round(dpi) + ' dpi at print size' + (dpi < 300 ? ' — 300 dpi recommended for a sharp print' : '') });
+        const arArt = Math.max(pw, ph) / Math.min(pw, ph), arTgt = Math.max(target.w, target.h) / Math.min(target.w, target.h), off = Math.abs(arArt - arTgt) / arTgt;
+        checks.push({ t: 'Proportions', s: off < 0.03 ? 'pass' : off < 0.12 ? 'warn' : 'fail', d: off < 0.03 ? 'Matches your ' + target.w + '×' + target.h + ' mm size' : 'Ratio differs from the selected size — may be cropped or stretched' });
+      } else checks.push({ t: 'Dimensions', s: 'info', d: pw + ' × ' + ph + ' px' });
+      this.awDetectCmyk(file).then(cmyk => {
+        checks.push(cmyk === true ? { t: 'Colour mode', s: 'pass', d: 'CMYK — print-ready' } : { t: 'Colour mode', s: 'warn', d: 'RGB — converted to CMYK, colour may shift slightly' });
+        this.awFinish(checks, url);
+      });
+    };
+    img.onerror = () => { checks.push({ t: 'Readable', s: 'fail', d: 'This image could not be opened' }); this.awFinish(checks, null); };
+    img.src = url;
+  }
+  awCheckPdf(file, target, checks) {
+    this.awLoadPdfjs().then(pdfjs => file.arrayBuffer().then(buf => pdfjs.getDocument({ data: buf }).promise).then(pdf => {
+      checks.push({ t: 'Pages', s: 'pass', d: pdf.numPages + ' page' + (pdf.numPages > 1 ? 's' : '') });
+      return pdf.getPage(1).then(page => {
+        const vp = page.getViewport({ scale: 1 }), wmm = vp.width / 72 * 25.4, hmm = vp.height / 72 * 25.4;
+        if (target) {
+          const big = Math.max(wmm, hmm), small = Math.min(wmm, hmm), tBig = Math.max(target.w, target.h), tSmall = Math.min(target.w, target.h);
+          const trimOff = Math.max(Math.abs(big - tBig), Math.abs(small - tSmall)), bleedOff = Math.max(Math.abs(big - (tBig + 6)), Math.abs(small - (tSmall + 6)));
+          if (bleedOff < 1.5) checks.push({ t: 'Size & bleed', s: 'pass', d: Math.round(wmm) + '×' + Math.round(hmm) + ' mm — trim + 3 mm bleed' });
+          else if (trimOff < 1) checks.push({ t: 'Size & bleed', s: 'warn', d: Math.round(wmm) + '×' + Math.round(hmm) + ' mm — no bleed; add 3 mm all round' });
+          else checks.push({ t: 'Size & bleed', s: 'fail', d: Math.round(wmm) + '×' + Math.round(hmm) + ' mm — expected about ' + (tBig + 6) + '×' + (tSmall + 6) + ' mm (trim + bleed)' });
+        } else checks.push({ t: 'Page size', s: 'info', d: Math.round(wmm) + '×' + Math.round(hmm) + ' mm' });
+        const scale = Math.min(2, 560 / vp.width), v2 = page.getViewport({ scale }), canvas = document.createElement('canvas');
+        canvas.width = v2.width; canvas.height = v2.height;
+        return page.render({ canvasContext: canvas.getContext('2d'), viewport: v2 }).promise.then(() => this.awFinish(checks, canvas.toDataURL('image/png')));
+      });
+    })).catch(() => { checks.push({ t: 'Readable', s: 'fail', d: 'This PDF could not be opened' }); this.awFinish(checks, null); });
+  }
+  analyzeArtwork(file) {
+    if (!file) return;
+    const ext = (file.name.split('.').pop() || '').toLowerCase();
+    const okExt = ['pdf', 'jpg', 'jpeg', 'png', 'ai', 'eps', 'tif', 'tiff', 'zip', 'gif', 'webp'];
+    const checks = [];
+    checks.push({ t: 'File format', s: okExt.indexOf(ext) >= 0 ? 'pass' : 'fail', d: (ext ? '.' + ext : 'unknown') + (okExt.indexOf(ext) >= 0 ? ' accepted' : ' — not a supported print format') });
+    const mb = file.size / 1048576;
+    checks.push({ t: 'File size', s: mb <= 1024 ? 'pass' : 'fail', d: (mb < 10 ? mb.toFixed(1) : Math.round(mb)) + ' MB' + (mb > 1024 ? ' — over the 1 GB limit' : '') });
+    this.setState({ aw: { name: file.name, sizeMB: mb, ext, status: 'analyzing', checks: checks.slice(), preview: null } });
+    if (okExt.indexOf(ext) < 0) return this.awFinish(checks, null);
+    const target = this.artworkTarget();
+    if (ext === 'pdf') this.awCheckPdf(file, target, checks);
+    else if (['jpg', 'jpeg', 'png', 'gif', 'webp'].indexOf(ext) >= 0) this.awCheckRaster(file, target, checks);
+    else { checks.push({ t: 'Preview', s: 'info', d: 'Vector and archive files are reviewed by our prepress team after upload' }); this.awFinish(checks, null); }
+  }
+  // Automated artwork checker — the customer uploads a file, the browser inspects it and lists
+  // the real risks/warnings, then they choose to continue or replace it. No instructions to read.
   s_artwork() {
-    const zoom = this.state.zoom || 100, page = this.state.apage || 1;
-    const CHECKS = [
-      ['C2.1', 'File format valid', 'pass', 'PDF/X-1a:2001 · 2 pages · 4.1 MB'],
-      ['C2.2', 'Page count matches job', 'pass', '2 of 2 required pages present'],
-      ['C2.3', 'Trim dimensions', 'pass', '54.0 × 89.0 mm · within 0.3 mm tolerance'],
-      ['C2.4', 'Bleed present', 'fail', 'Page 1: background stops 1.2 mm short of the bleed line on the right edge'],
-      ['C2.5', 'Safe area respected', 'warn', 'Page 2: phone number sits 1.8 mm inside the safe margin'],
-      ['C2.6', 'Resolution floor (300 dpi)', 'pass', 'Lowest placed image 412 dpi'],
-      ['C2.7', 'Colour mode', 'warn', 'Logo swatch is RGB — will be converted to CMYK, colour may shift'],
-      ['C2.8', 'Fonts embedded / outlined', 'pass', '4 fonts embedded, none subset-missing'],
-      ['C2.9', 'Overprint & transparency', 'pass', 'No live transparency on spot layers'],
-      ['C2.10', 'Special-finish layer naming', 'pass', 'No foil or spot-UV layer required for this job'],
-    ];
-    const dot = s => h('span', { style: { flex: 'none', height: 10, width: 10, borderRadius: '50%', background: s === 'pass' ? '#63AA02' : s === 'warn' ? '#E8A317' : TEAL, marginTop: 5 } });
-    const fails = CHECKS.filter(c => c[2] === 'fail').length, warns = CHECKS.filter(c => c[2] === 'warn').length;
-    const VERSIONS = [
-      ['v3', 'aiman-bizcard-v3.pdf', '12 Sep · 14:02', 'Current · 1 fail, 2 warnings'],
-      ['v2', 'aiman-bizcard-v2.pdf', '11 Sep · 17:40', 'Rejected by prepress — wrong trim size'],
-      ['v1', 'aiman-bizcard.pdf', '11 Sep · 09:15', 'Replaced by customer'],
-    ];
-    const scale = zoom / 100;
-    const sheet = h('div', { style: { display: 'grid', placeItems: 'center', background: '#f3f4f6', padding: 26, overflow: 'hidden' } },
-      h('div', { style: { position: 'relative', width: 300 * scale, height: 190 * scale, background: '#fff', boxShadow: '0 2px 14px rgba(33,33,33,.14)' } },
-        h('div', { style: { position: 'absolute', inset: 0, background: 'linear-gradient(115deg,#231f20 0 62%,#fff 62% 100%)' } }),
-        h('div', { style: { position: 'absolute', inset: 16 * scale + 'px', border: '1px dashed ' + TEAL } }),
-        h('div', { style: { position: 'absolute', inset: 30 * scale + 'px', border: '1px dashed #2fa4c5' } }),
-        h('div', { style: { position: 'absolute', top: 0, right: 0, bottom: 0, width: 14 * scale, background: 'rgba(229,34,32,.35)', borderLeft: '1px solid ' + TEAL } }),
-        h('div', { style: { position: 'absolute', right: 6 * scale, bottom: 6 * scale, fontSize: 10, fontWeight: 600, color: TEAL, background: '#fff', padding: '2px 5px' } }, 'bleed short 1.2 mm')));
+    const aw = this.state.aw;
+    const NAME = this.pkProduct() ? this.catName(this.pkProduct().id) : null;
+    const COL = { pass: '#2e9e5b', warn: '#E8A317', fail: '#E52220', info: '#9aa0a6' };
+    const dot = s => h('span', { style: { flex: 'none', height: 11, width: 11, borderRadius: '50%', background: COL[s] || COL.info, marginTop: 4 } });
+    const onFiles = fl => { if (fl && fl[0]) this.analyzeArtwork(fl[0]); };
+    if (!aw) {
+      // upload state — one line, a big dropzone, nothing to read
+      return h('div', { style: { maxWidth: 720, margin: '0 auto', padding: '10px 20px 0' } },
+        this.head('Upload artwork' + (NAME ? ' — ' + NAME : ''), 'Drop your file in and we’ll check it for you.'),
+        h('label', { htmlFor: 'aw-input',
+          onDragOver: e => { e.preventDefault(); }, onDrop: e => { e.preventDefault(); onFiles(e.dataTransfer.files); },
+          style: { display: 'block', border: '2px dashed ' + HAIR, borderRadius: 16, background: ALT, padding: '54px 24px', textAlign: 'center', cursor: 'pointer', marginTop: 18 } },
+          h('input', { id: 'aw-input', type: 'file', accept: '.pdf,.jpg,.jpeg,.png,.ai,.eps,.tif,.tiff,.zip', style: { display: 'none' }, onChange: e => onFiles(e.target.files) }),
+          h('img', { src: window.__asset('assets/icons/upload-artwork.svg'), alt: '', style: { height: 44, width: 'auto', display: 'block', margin: '0 auto 14px' } }),
+          h('div', { style: { fontSize: 16, fontWeight: 600, marginBottom: 6 } }, 'Drop your artwork here'),
+          h('div', { style: { fontSize: 13, color: MUT } }, 'or click to browse — PDF, JPG, PNG, AI, EPS')));
+    }
+    const checks = aw.checks || [], analyzing = aw.status === 'analyzing';
+    const fails = checks.filter(c => c.s === 'fail').length, warns = checks.filter(c => c.s === 'warn').length;
+    const overall = analyzing ? 'analyzing' : fails ? 'fail' : warns ? 'warn' : 'pass';
+    const banner = { analyzing: ['#eef1f4', INK, 'Checking your artwork…'], pass: ['#eafaf0', '#1c7a45', 'Looks good — ready to print'], warn: ['#fff7e9', '#8a5a00', warns + ' thing' + (warns > 1 ? 's' : '') + ' to review before you continue'], fail: ['#fdf0f0', '#b3241f', fails + ' issue' + (fails > 1 ? 's' : '') + ' found — please check'] }[overall];
     return h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '10px 20px 0' } },
-      this.head('Upload & check artwork' + (this.pkProduct() ? ' — ' + this.catName(this.pkProduct().id) : ''), 'Upload your print-ready file (JPG, PNG, EPS, AI, ID, PDF or ZIP — up to 1 GB). Every upload is scanned for malware, then checked against this product’s template. Each check reports pass, warning or fail on its own — never one opaque “invalid file” message. You can also upload later and we’ll email you a link.'),
-      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 22, marginTop: 20, alignItems: 'start' } },
-        h('div', { style: { display: 'flex', flexDirection: 'column', gap: 18 } },
-          h('div', { style: { border: '1px dashed ' + HAIR, background: ALT, padding: 26, textAlign: 'center' } },
-            h('img', { src: window.__asset('assets/icons/upload-artwork.svg'), alt: '', style: { height: 38, width: 'auto', display: 'block', margin: '0 auto 12px' } }),
-            h('div', { style: { fontSize: 14.5, fontWeight: 600, marginBottom: 5 } }, 'Drag artwork here, or browse'),
-            h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.7 } }, 'PDF preferred · AI, EPS, PNG and JPG accepted for this product · multi-file upload for multi-page jobs · every file is virus-scanned before it reaches prepress')),
-          // artwork specification — the setup requirements, kept with the upload flow
-          h('div', { style: { border: '1px solid ' + HAIR } },
-            h('div', { style: { padding: '13px 16px', borderBottom: '1px solid ' + HAIR, fontSize: 13.5, fontWeight: 600 } }, 'Artwork specification'),
-            h('table', { style: { width: '100%', borderCollapse: 'collapse', fontSize: 13 } }, h('tbody', null,
-              [['File format', 'Print-ready PDF preferred. AI, EPS, or high-resolution PNG/TIFF also accepted.'], ['Resolution', '300 dpi at 100% size. Vector art stays sharp.'], ['Colour mode', 'CMYK for accurate colour (RGB is converted and can shift).'], ['Bleed', '3 mm on every side. Extend the background into the bleed.'], ['Safe margin', 'Keep text and logos 3–5 mm inside the trim.'], ['Fonts', 'Outline or embed all fonts before exporting.'], ['Spot UV / foil', 'Supply a separate 100% black mask layer, named for the finish.']]
-                .map((r, i, arr) => h('tr', { key: i, style: { borderBottom: i === arr.length - 1 ? 'none' : '1px solid ' + LINE } },
-                  h('th', { style: { textAlign: 'left', verticalAlign: 'top', width: 118, padding: '11px 16px', fontSize: 12.5, fontWeight: 600, color: TEAL } }, r[0]),
-                  h('td', { style: { padding: '11px 16px 11px 0', color: MUT, lineHeight: 1.6 } }, r[1])))))),
-          h('div', { style: { border: '1px solid ' + HAIR } },
-            h('div', { style: { padding: '13px 16px', borderBottom: '1px solid ' + HAIR, fontSize: 13.5, fontWeight: 600 } }, 'Version history'),
-            VERSIONS.map((v, i) => h('div', { key: i, style: { padding: '12px 16px', borderTop: i ? '1px solid ' + LINE : 'none', display: 'flex', gap: 12, alignItems: 'baseline' } },
-              h('span', { style: { fontSize: 12, fontWeight: 600, color: i === 0 ? TEAL : FAINT, flex: 'none' } }, v[0]),
-              h('span', { style: { flex: 1, minWidth: 0 } },
-                h('span', { style: { display: 'block', fontFamily: 'ui-monospace,Menlo,monospace', fontSize: 12, color: INK } }, v[1]),
-                h('span', { style: { display: 'block', fontSize: 12, color: MUT, marginTop: 3 } }, v[3])),
-              h('span', { style: { fontSize: 11.5, color: FAINT, flex: 'none' } }, v[2])))),
-          h('div', { style: { border: '1px solid ' + HAIR, padding: 18 } },
-            h('div', { style: { fontSize: 13.5, fontWeight: 600, marginBottom: 9 } }, 'Guides & templates for this product'),
-            [['Business card artwork guide', 'learn'], ['Download die-line — AI / PDF / PSD', 'learn'], ['Bleed and safe area explained', 'learn']].map((g, i) =>
-              h('div', { key: i, 'data-go': g[1], style: { display: 'flex', gap: 8, alignItems: 'center', padding: '7px 0', fontSize: 13, color: TEAL, fontWeight: 600, cursor: 'pointer' } }, g[0],
-                h('img', { src: window.__asset('assets/icons/arrow-right.svg'), alt: '', style: { height: 11, width: 'auto', display: 'block' } }))))),
-        h('div', { style: { display: 'flex', flexDirection: 'column', gap: 18 } },
-          h('div', { style: { border: '1px solid ' + HAIR } },
-            h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', padding: '11px 14px', borderBottom: '1px solid ' + HAIR } },
-              h('span', { style: { fontSize: 13, fontWeight: 600, marginRight: 'auto' } }, 'Overlay viewer'),
-              [['set:apage:1', 'Page 1', page === 1], ['set:apage:2', 'Page 2', page === 2]].map((p, i) =>
-                h('span', { key: i, 'data-go': p[0], style: { fontSize: 12, fontWeight: 600, padding: '5px 11px', borderRadius: 2, cursor: 'pointer', background: p[2] ? TEAL : '#fff', color: p[2] ? '#fff' : MUT, border: '1px solid ' + (p[2] ? TEAL : HAIR) } }, p[1])),
-              [['set:zoom:75', '75%', 75], ['set:zoom:100', '100%', 100], ['set:zoom:150', '150%', 150]].map((z, i) =>
-                h('span', { key: i, 'data-go': z[0], style: { fontSize: 12, fontWeight: 600, padding: '5px 10px', borderRadius: 2, cursor: 'pointer', color: zoom === z[2] ? TEAL : MUT, border: '1px solid ' + (zoom === z[2] ? TEAL : HAIR) } }, z[1]))),
-            sheet,
-            h('div', { style: { display: 'flex', gap: 18, flexWrap: 'wrap', padding: '11px 14px', borderTop: '1px solid ' + HAIR, fontSize: 12, color: MUT } },
-              [['Trim', '#231f20'], ['Bleed 3 mm', TEAL], ['Safe area', '#2fa4c5']].map((l, i) =>
-                h('span', { key: i, style: { display: 'flex', alignItems: 'center', gap: 7 } },
-                  h('span', { style: { width: 18, height: 0, borderTop: '2px dashed ' + l[1] } }), l[0])))),
-          h('div', { style: { border: '1px solid ' + HAIR } },
-            h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center', padding: '13px 16px', borderBottom: '1px solid ' + HAIR } },
-              h('span', { style: { fontSize: 13.5, fontWeight: 600, marginRight: 'auto' } }, 'Automated checks'),
-              this.chip(fails + ' fail', 'bad'), this.chip(warns + ' warnings', 'warn'), this.chip((CHECKS.length - fails - warns) + ' pass', 'ok')),
-            CHECKS.map((c, i) => h('div', { key: i, style: { display: 'flex', gap: 12, padding: '12px 16px', borderTop: i ? '1px solid ' + LINE : 'none', background: c[2] === 'fail' ? '#fdf6f6' : '#fff' } },
-              dot(c[2]),
+      h('h1', { style: { margin: '2px 0 16px', fontSize: 26, fontWeight: 600, letterSpacing: '-.02em' } }, 'Artwork check' + (NAME ? ' — ' + NAME : '')),
+      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 22, alignItems: 'start' } },
+        // preview
+        h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden' } },
+          h('div', { style: { display: 'grid', placeItems: 'center', background: '#f3f4f6', minHeight: 240, padding: 20 } },
+            aw.preview ? h('img', { src: aw.preview, alt: 'Your artwork', style: { maxWidth: '100%', maxHeight: 360, boxShadow: '0 2px 14px rgba(33,33,33,.16)' } })
+              : h('div', { style: { fontSize: 13, color: FAINT, textAlign: 'center', lineHeight: 1.7 } }, analyzing ? 'Rendering preview…' : 'No preview for this file type')),
+          h('div', { style: { display: 'flex', justifyContent: 'space-between', gap: 10, padding: '11px 14px', borderTop: '1px solid ' + HAIR, fontSize: 12.5, color: MUT } },
+            h('span', { style: { fontFamily: 'ui-monospace,Menlo,monospace', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, aw.name),
+            h('span', { style: { flex: 'none' } }, (aw.sizeMB < 10 ? aw.sizeMB.toFixed(1) : Math.round(aw.sizeMB)) + ' MB'))),
+        // report
+        h('div', { style: { display: 'flex', flexDirection: 'column', gap: 16 } },
+          h('div', { style: { background: banner[0], color: banner[1], borderRadius: 10, padding: '13px 16px', fontSize: 14, fontWeight: 600 } }, banner[2]),
+          h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden' } },
+            checks.map((c, i) => h('div', { key: i, style: { display: 'flex', gap: 12, padding: '13px 16px', borderTop: i ? '1px solid ' + LINE : 'none', background: c.s === 'fail' ? '#fdf6f6' : '#fff' } },
+              dot(c.s),
               h('div', { style: { minWidth: 0, flex: 1 } },
-                h('div', { style: { display: 'flex', gap: 9, alignItems: 'baseline', flexWrap: 'wrap' } },
-                  h('span', { style: { fontSize: 13.5, fontWeight: 600 } }, c[1])),
-                h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.6, marginTop: 3 } }, c[3])),
-              c[2] !== 'pass' && h('span', { 'data-go': 'learn', style: { fontSize: 12, fontWeight: 600, color: TEAL, cursor: 'pointer', whiteSpace: 'nowrap' } }, 'How to fix')))),
-          h('div', { style: { border: '1px solid ' + HAIR, padding: 18, display: 'flex', flexDirection: 'column', gap: 12 } },
-            h('div', { style: { fontSize: 13.5, fontWeight: 600 } }, 'Your decision'),
-            h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.7 } }, 'One check failed. You can still continue — prepress will review it manually and may send it back — or fix the file now and re-upload as v4.'),
-            h('div', { style: { display: 'flex', gap: 10, flexWrap: 'wrap' } },
-              this.btn('Fix and re-upload', 'teal', 'artwork', { borderRadius: 2 }),
-              this.btn('Looks good, continue', 'ghost', 'cart', { borderRadius: 2 }),
-              this.btn('Download annotated PDF', 'ghost', 'artwork', { borderRadius: 2 }))))));
+                h('div', { style: { fontSize: 13.5, fontWeight: 600 } }, c.t),
+                h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.6, marginTop: 3 } }, c.d)))),
+            analyzing ? h('div', { style: { padding: '13px 16px', borderTop: '1px solid ' + LINE, fontSize: 12.5, color: FAINT } }, 'Running remaining checks…') : null),
+          !analyzing ? h('div', { style: { display: 'flex', gap: 10, flexWrap: 'wrap' } },
+            this.btn(fails ? 'Continue anyway →' : 'Continue to cart →', fails ? 'amber' : 'teal', 'cart', { justifyContent: 'center' }),
+            h('label', { htmlFor: 'aw-reinput', style: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, border: '1px solid ' + HAIR, borderRadius: 8, padding: '11px 20px', fontSize: 13.5, fontWeight: 600, color: INK, cursor: 'pointer' } },
+              h('input', { id: 'aw-reinput', type: 'file', accept: '.pdf,.jpg,.jpeg,.png,.ai,.eps,.tif,.tiff,.zip', style: { display: 'none' }, onChange: e => onFiles(e.target.files) }), 'Replace file')) : null)));
   }
 
   // ===== CART =====
