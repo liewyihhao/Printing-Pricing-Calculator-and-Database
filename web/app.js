@@ -1456,6 +1456,9 @@ class Component extends DCLogic {
     const segs = window.location.pathname.split('/').filter(Boolean);
     if (!segs.length) { if (this.state.route !== 'home') this.setState({ route: 'home' }); return; }
     if (segs[0] === 'blog' && segs[1]) return this.blogOpen(segs[1]);
+    // named top-level routes (so the SSR header/footer links resolve in the SPA)
+    const NAMED = { cart: 'cart', checkout: 'checkout', auth: 'auth', search: 'search', learn: 'learn', 'learning-hub': 'learn', membership: 'membership', contact: 'contact', about: 'about', 'about-us': 'about', support: 'support', downloads: 'downloads', partners: 'partners', terms: 'terms', track: 'track', packaging: 'packaging' };
+    if (segs.length === 1 && NAMED[segs[0]]) return this.setState({ route: NAMED[segs[0]] });
     // category listing: /products or /products/<catId>
     if (segs[0] === 'products') return this.setState({ route: 'category', catFilter: segs[1] || 'all' });
     // product page: /<name>-printing (matched before the SEO city landing pages, which carry an
