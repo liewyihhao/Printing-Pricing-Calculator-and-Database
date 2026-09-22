@@ -3097,9 +3097,17 @@ class Component extends DCLogic {
       const curText = isPh0 ? 'Please Select' : (optLabel[chosen] || chosen);
       const note = (ov.noteOverride && Object.prototype.hasOwnProperty.call(ov.noteOverride, def.key)) ? ov.noteOverride[def.key] : (def.neutral ? null : (def.note || null));
       // which of the displayed options are valid for the current spec (the engine's live set)
-      const availSet = {}; (options || []).forEach(o => { availSet[Array.isArray(o) ? o[0] : o] = 1; });
+      const availSet = {}; const validVals = (options || []).map(o => Array.isArray(o) ? o[0] : o);
+      validVals.forEach(v => { availSet[v] = 1; });
+      // Only grey "Not available" when the engine's live set is a subset of the displayed menu —
+      // i.e. the override is the full menu and the engine filters it (e.g. paper vs lamination).
+      // When the displayed options are a display-only override the engine doesn't enumerate
+      // (fold "Open Size" presets, plastic-card sets), the engine set is disjoint, so trust the
+      // override and show every option as available (don't falsely grey them).
+      const dispSet = {}; dispOptions.forEach(v => { dispSet[Array.isArray(v) ? v[0] : v] = 1; });
+      const reliable = validVals.length > 0 && validVals.every(v => dispSet[v]);
       const items = dispOptions.map(v => { const val = Array.isArray(v) ? v[0] : v;
-        return { val: val, label: optLabel[val] || val, on: chosen === val, avail: !!availSet[val],
+        return { val: val, label: optLabel[val] || val, on: chosen === val, avail: reliable ? !!availSet[val] : true,
           onPick: () => this.setState(st => ({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) })) }; });
       return cardGroup(def.key, label, curText, isPh0, note, remark, items);
     };
