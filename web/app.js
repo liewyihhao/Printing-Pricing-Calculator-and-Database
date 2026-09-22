@@ -3070,9 +3070,11 @@ class Component extends DCLogic {
     // (label + current value) over a responsive grid of selectable cards. Each card shows a
     // radio dot, the option label and a Select / Not available subtext; the chosen card is
     // highlighted, and options that are invalid for the current spec are greyed and disabled.
-    const cardGroup = (key, fieldLabel, curText, isPh0, note, remark, items) => {
+    const cardGroup = (key, fieldLabel, curText, isPh0, note, remark, items, selected) => {
       // collapsible: the field shows only its current value until clicked; clicking reveals the
       // option cards, and picking one collapses it again (the original site's dropdown behaviour).
+      // `selected` = the customer has actively chosen this field; when false the value reads in a
+      // lighter tone so unselected fields (placeholders and untouched defaults) stand out.
       const open = this.state.ddOpen === key;
       const toggle = () => this.setState(st => ({ ddOpen: st.ddOpen === key ? null : key }));
       const close = () => this.setState({ ddOpen: null });
@@ -3103,7 +3105,7 @@ class Component extends DCLogic {
             h('div', { style: { fontSize: 13.5, fontWeight: 600 } }, fieldLabel),
             note ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5, marginTop: 3 } }, note) : null),
           h('div', { style: { flex: '0 1 auto', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, minWidth: 0 } },
-            h('span', { style: { fontSize: 14, fontWeight: 500, color: isPh0 ? FAINT : INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, curText),
+            h('span', { style: { fontSize: 14, fontWeight: 500, color: selected ? INK : '#adadad', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, curText),
             h('span', { 'aria-hidden': 'true', style: { flex: 'none', color: FAINT, fontSize: 10, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .12s' } }, '▼'))),
         open ? h('div', { style: { marginTop: 12 } },
           remark ? h('div', { style: { fontSize: 11.5, color: MUT, lineHeight: 1.55, background: ALT, borderRadius: 8, padding: '9px 12px', marginBottom: 12 } }, remark) : null,
@@ -3143,7 +3145,11 @@ class Component extends DCLogic {
       const items = dispOptions.map(v => { const val = Array.isArray(v) ? v[0] : v;
         return { val: val, label: optLabel[val] || val, on: chosen === val, avail: reliable ? !!availSet[val] : true,
           onPick: () => this.setState(st => Object.assign({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) }, isSizeField ? { sizeConfirmed: false } : {})) }; });
-      return cardGroup(def.key, label, curText, isPh0, note, remark, items);
+      // "selected" = the customer set this field explicitly (placeholder chosen, or a value in
+      // state.cfg); an untouched default is NOT selected, so it reads lighter.
+      const uv = this.state.cfg[def.key];
+      const selected = isPh ? !isPh0 : (uv != null && uv !== '');
+      return cardGroup(def.key, label, curText, isPh0, note, remark, items, selected);
     };
     // quantity, straight from the engine's per-product model (moq / options)
     const qobj = this.pkQtyObj();
@@ -3156,7 +3162,7 @@ class Component extends DCLogic {
     const qtyPh0 = qtyPh && !qtyChosen;
     const qtyCur = qtyPh0 ? 'Please Select' : (s.qty.toLocaleString() + ' pcs' + (bestSeller.indexOf(s.qty) >= 0 ? ' — Best Seller' : ''));
     const qtyItems = qopts.map(qn => ({ val: qn, label: qn.toLocaleString() + ' pcs' + (bestSeller.indexOf(qn) >= 0 ? ' · Best Seller' : ''), on: qtyChosen && s.qty === qn, avail: true, onPick: () => this.setState({ qty: qn, qtyChosen: true }) }));
-    const qtyField = cardGroup('quantity', 'Quantity', qtyCur, qtyPh0, qobj ? 'min. order ' + qobj.moq.toLocaleString() + ' pcs' : null, qtyRemark, qtyItems);
+    const qtyField = cardGroup('quantity', 'Quantity', qtyCur, qtyPh0, qobj ? 'min. order ' + qobj.moq.toLocaleString() + ' pcs' : null, qtyRemark, qtyItems, qtyChosen);
     // image picker: a selectable grid of option thumbnails (e.g. Round Corner Position)
     const imgPicker = (def, options, sel, base) => {
       const label = (ov.label && ov.label[def.key]) || def.label;
