@@ -3056,7 +3056,36 @@ class Component extends DCLogic {
               },
               style: { padding: '10px 13px', fontSize: 13.5, cursor: 'pointer', color: it.on ? TEAL : INK, fontWeight: it.on ? 600 : 400, background: it.on ? '#fdf2f2' : '#fff', borderTop: i ? '1px solid ' + LINE : 'none', outlineOffset: '-2px' } }, it.label)))) : null);
     };
-    const optSelect = (def, options, sel) => {
+    // card-tile option selector (the "Craft your specification" layout): a field header row
+    // (label + current value) over a responsive grid of selectable cards. Each card shows a
+    // radio dot, the option label and a Select / Not available subtext; the chosen card is
+    // highlighted, and options that are invalid for the current spec are greyed and disabled.
+    const cardGroup = (key, fieldLabel, curText, isPh0, note, remark, items) => {
+      const cards = items.map((it, i) => {
+        const on = it.on, avail = it.avail !== false || on;
+        return h(avail ? 'button' : 'div', {
+          key: it.val != null ? it.val : i, type: avail ? 'button' : undefined,
+          onClick: avail ? (e => { e.preventDefault(); it.onPick(); }) : undefined,
+          role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-disabled': avail ? undefined : 'true',
+          tabIndex: avail ? 0 : -1, 'aria-label': fieldLabel + ': ' + it.label + (avail ? '' : ' (not available)'),
+          style: { display: 'flex', alignItems: 'center', gap: 11, textAlign: 'left', width: '100%', font: 'inherit',
+            border: '1px solid ' + (on ? TEAL : HAIR), borderRadius: 12, background: on ? '#fdf2f2' : (avail ? '#fff' : ALT),
+            padding: '13px 14px', cursor: avail ? 'pointer' : 'default', opacity: avail ? 1 : 0.75, outlineOffset: '2px' } },
+          h('span', { 'aria-hidden': 'true', style: { flex: 'none', width: 18, height: 18, borderRadius: '50%', border: '2px solid ' + (on ? TEAL : '#cfcfcf'), background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' } },
+            on ? h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: TEAL } }) : null),
+          h('span', { style: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 } },
+            h('span', { style: { fontSize: 13.5, fontWeight: 500, lineHeight: 1.3, color: avail ? INK : FAINT, textDecoration: avail ? 'none' : 'line-through' } }, it.label),
+            h('span', { style: { fontSize: 11.5, fontWeight: on ? 600 : 400, color: on ? TEAL : (avail ? FAINT : '#bdbdbd') } }, avail ? 'Select' : 'Not available')));
+      });
+      return h('div', { key: key, style: { padding: '16px 0', borderTop: '1px solid ' + LINE } },
+        h('div', { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, marginBottom: (note || remark) ? 6 : 12 } },
+          h('div', { style: { fontSize: 13.5, fontWeight: 600 } }, fieldLabel),
+          h('div', { style: { fontSize: 13, fontWeight: 500, color: isPh0 ? FAINT : MUT, textAlign: 'right' } }, curText)),
+        note ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5, marginBottom: 12 } }, note) : null,
+        remark ? h('div', { style: { fontSize: 11.5, color: MUT, lineHeight: 1.55, background: ALT, borderRadius: 8, padding: '9px 12px', marginBottom: 12 } }, remark) : null,
+        h('div', { role: 'radiogroup', 'aria-label': fieldLabel, style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 } }, cards));
+    };
+    const optCards = (def, options, sel) => {
       const label = (ov.label && ov.label[def.key]) || def.label;
       const remark = (ov.remark && ov.remark[def.key]) || null;
       const optLabel = (ov.optLabel && ov.optLabel[def.key]) || {};
@@ -3066,11 +3095,13 @@ class Component extends DCLogic {
       const chosen = isPh ? (this.state.cfg[def.key] != null ? this.state.cfg[def.key] : '') : (sel != null ? sel : (dispOptions[0] || ''));
       const isPh0 = isPh && (chosen === '' || chosen == null);
       const curText = isPh0 ? 'Please Select' : (optLabel[chosen] || chosen);
-      const items = dispOptions.map(v => { const val = Array.isArray(v) ? v[0] : v; return { label: optLabel[val] || val, on: chosen === val, onPick: () => this.setState(st => ({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) })) }; });
       const note = (ov.noteOverride && Object.prototype.hasOwnProperty.call(ov.noteOverride, def.key)) ? ov.noteOverride[def.key] : (def.neutral ? null : (def.note || null));
-      return h('div', { key: def.key, style: rowStyle },
-        labelCell(label, note),
-        ctrlWrap(pkDropdown(def.key, curText, isPh0, remark, items, label)));
+      // which of the displayed options are valid for the current spec (the engine's live set)
+      const availSet = {}; (options || []).forEach(o => { availSet[Array.isArray(o) ? o[0] : o] = 1; });
+      const items = dispOptions.map(v => { const val = Array.isArray(v) ? v[0] : v;
+        return { val: val, label: optLabel[val] || val, on: chosen === val, avail: !!availSet[val],
+          onPick: () => this.setState(st => ({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) })) }; });
+      return cardGroup(def.key, label, curText, isPh0, note, remark, items);
     };
     // quantity, straight from the engine's per-product model (moq / options)
     const qobj = this.pkQtyObj();
@@ -3082,10 +3113,8 @@ class Component extends DCLogic {
     const qtyRemark = ov.remark && ov.remark.quantity;
     const qtyPh0 = qtyPh && !qtyChosen;
     const qtyCur = qtyPh0 ? 'Please Select' : (s.qty.toLocaleString() + ' pcs' + (bestSeller.indexOf(s.qty) >= 0 ? ' — Best Seller' : ''));
-    const qtyItems = qopts.map(qn => ({ label: qn.toLocaleString() + ' pcs' + (bestSeller.indexOf(qn) >= 0 ? ' — Best Seller' : ''), on: qtyChosen && s.qty === qn, onPick: () => this.setState({ qty: qn, qtyChosen: true }) }));
-    const qtyField = h('div', { key: 'qty', style: rowStyle },
-      labelCell('Quantity', qobj ? 'min. order ' + qobj.moq.toLocaleString() + ' pcs' : null),
-      ctrlWrap(pkDropdown('quantity', qtyCur, qtyPh0, qtyRemark, qtyItems, 'Quantity')));
+    const qtyItems = qopts.map(qn => ({ val: qn, label: qn.toLocaleString() + ' pcs' + (bestSeller.indexOf(qn) >= 0 ? ' · Best Seller' : ''), on: qtyChosen && s.qty === qn, avail: true, onPick: () => this.setState({ qty: qn, qtyChosen: true }) }));
+    const qtyField = cardGroup('quantity', 'Quantity', qtyCur, qtyPh0, qobj ? 'min. order ' + qobj.moq.toLocaleString() + ' pcs' : null, qtyRemark, qtyItems);
     // image picker: a selectable grid of option thumbnails (e.g. Round Corner Position)
     const imgPicker = (def, options, sel, base) => {
       const label = (ov.label && ov.label[def.key]) || def.label;
@@ -3106,7 +3135,7 @@ class Component extends DCLogic {
       if (def.widget === 'foilColours') return this.foilColourPicker(def, cfg);
       const imgBase = ov.optImages && ov.optImages[def.key];
       if (imgBase && options && options.length) return imgPicker(def, options, cfg[def.key], imgBase);
-      if (options && options.length) return optSelect(def, options, cfg[def.key]);
+      if (options && options.length) return optCards(def, options, cfg[def.key]);
       const isNum = def.type === 'number';
       const unit = /\(mm\)/i.test(def.label || '') ? ' mm' : '';
       const hints = [];
@@ -3158,22 +3187,34 @@ class Component extends DCLogic {
               h('p', { style: { margin: '0 0 12px', fontSize: 14, color: MUT, lineHeight: 1.7 } }, (() => { try { const s = this.productSeo(prod, NAME); if (s && s.paras && s.paras[0]) return s.paras[0]; } catch (e) {} return 'Configure your job and see the exact price before you order.'; })()),
               h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap' } }, this.chip('Price to the cent', 'ok'), this.chip('Ready in 3 working days', 'teal')))),
           h('div', { style: { display: 'flex', flexDirection: 'column', gap: 4, border: '1px solid ' + HAIR, borderRadius: 14, padding: 20 } },
-            h('div', { style: { fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: TEAL, marginBottom: 4 } }, 'Configure your order'),
+            h('div', { style: { fontSize: 18, fontWeight: 600, letterSpacing: '-.01em', color: INK, borderBottom: '2px solid ' + TEAL, paddingBottom: 8, marginBottom: 4, display: 'inline-block' } }, 'Craft your specification'),
             groups.map(g => h('div', { key: g.sec, style: { display: 'flex', flexDirection: 'column' } }, sectionHeader(g.sec), g.nodes)))),
         h('div', { style: { position: 'sticky', top: 122, display: 'flex', flexDirection: 'column', gap: 14 } },
           this.card([
-            h('div', { key: 'a', style: { fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: FAINT } }, 'Live price'),
-            h('div', { key: 'b', style: { display: 'flex', alignItems: 'baseline', gap: 8, margin: '8px 0 4px' } },
-              quoteOnly
-                ? h('span', { style: { fontSize: 24, fontWeight: 600, letterSpacing: '-.02em', color: TEAL } }, 'Price on request')
-                : (ready
-                    ? h('span', { style: { fontSize: 34, fontWeight: 600, letterSpacing: '-.03em', color: TEAL } }, this.money(p.net))
-                    : h('span', { style: { fontSize: 20, fontWeight: 600, letterSpacing: '-.01em', color: MUT } }, 'Select your options')),
-              !quoteOnly && ready && h('span', { style: { fontSize: 12.5, color: FAINT, whiteSpace: 'nowrap' } }, 'incl. ' + this.taxLabel())),
-            h('div', { key: 'c', style: { fontSize: 12.5, color: MUT, marginBottom: 14 } }, quoteOnly ? 'This product is quoted on request.' : (ready ? (this.currency() + ' ' + (p.unit * this.fx()).toFixed(3) + ' per piece · ' + this.state.qty.toLocaleString() + ' pcs') : 'Choose the required options above to see your live price.')),
-            !quoteOnly && ready && h('div', { key: 'd', style: { display: 'flex', flexDirection: 'column', gap: 7, fontSize: 12.5, borderTop: '1px solid ' + LINE, paddingTop: 12 } },
-              [['Subtotal', this.money(p.gross)], [this.tier() + ' member −' + this.tierPct() + '%', '−' + this.money(p.disc), TEAL], ['Est. weight', ((this.pkWeight() != null ? this.pkWeight() : this.state.qty * 0.0012)).toFixed(2) + ' kg'], ['Est. shipping (Selangor)', this.money(12)], ['Delivery window', ((ov.processDays != null ? ov.processDays + (ov.processDays === 1 ? ' working day' : ' working days') : '3–4 working days'))]]
-                .map((r, i) => h('div', { key: i, style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, lineHeight: 1.5, color: r[2] || MUT } }, h('span', { style: { flex: '1 1 auto', minWidth: 0 } }, r[0]), h('span', { style: { flex: 'none', fontWeight: 500, whiteSpace: 'nowrap', color: r[2] || INK } }, r[1])))),
+            h('div', { key: 'h', style: { fontSize: 18, fontWeight: 600, letterSpacing: '-.01em', color: INK, borderBottom: '2px solid ' + TEAL, paddingBottom: 8, marginBottom: 12, display: 'inline-block' } }, 'Summary'),
+            // live spec summary, straight from the current configuration
+            (() => { let lines = []; try { lines = (this.pkOrderSpec().lines || []); } catch (e) {} return lines.length
+              ? h('div', { key: 'spec', style: { display: 'flex', flexDirection: 'column', gap: 8 } },
+                  lines.map((l, i) => h('div', { key: i, style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 14, fontSize: 12.5, lineHeight: 1.5 } },
+                    h('span', { style: { color: FAINT, flex: '0 0 auto' } }, l[0]), h('span', { style: { color: INK, fontWeight: 500, textAlign: 'right' } }, l[1]))))
+              : null; })(),
+            // order quantity + production time
+            h('div', { key: 'qp', style: { display: 'flex', flexDirection: 'column', gap: 8, borderTop: '1px solid ' + LINE, paddingTop: 12, marginTop: 12, fontSize: 12.5 } },
+              [['Order Quantity', qtyChosen ? s.qty.toLocaleString() + ' pcs' : 'Please select'], ['Production time', ov.processDays != null ? (ov.processDays + (ov.processDays === 1 ? ' working day' : ' working days')) : '3 working days']]
+                .map((r, i) => h('div', { key: i, style: { display: 'flex', justifyContent: 'space-between', gap: 12, lineHeight: 1.5 } }, h('span', { style: { color: FAINT } }, r[0]), h('span', { style: { color: INK, fontWeight: 500 } }, r[1])))),
+            // price
+            quoteOnly
+              ? h('div', { key: 'pr', style: { borderTop: '1px solid ' + LINE, paddingTop: 14, marginTop: 12 } }, h('span', { style: { fontSize: 22, fontWeight: 600, color: TEAL } }, 'Price on request'))
+              : (ready
+                  ? h('div', { key: 'pr', style: { borderTop: '1px solid ' + LINE, paddingTop: 12, marginTop: 12, display: 'flex', flexDirection: 'column', gap: 7 } },
+                      [['Subtotal', this.money(p.gross), MUT], [this.tier() + ' member −' + this.tierPct() + '%', '−' + this.money(p.disc), TEAL], ['Est. shipping (Selangor)', this.money(12), MUT]]
+                        .map((r, i) => h('div', { key: i, style: { display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 12.5, lineHeight: 1.5, color: r[2] } }, h('span', null, r[0]), h('span', { style: { fontWeight: 500, color: r[2] === TEAL ? TEAL : INK } }, r[1]))),
+                      h('div', { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, borderTop: '1px solid ' + LINE, paddingTop: 11, marginTop: 4 } },
+                        h('span', { style: { fontSize: 15, fontWeight: 600 } }, 'Total'),
+                        h('span', { style: { fontSize: 30, fontWeight: 600, letterSpacing: '-.02em', color: TEAL } }, this.money(p.net))),
+                      h('div', { style: { fontSize: 11.5, color: FAINT } }, this.currency() + ' ' + (p.unit * this.fx()).toFixed(3) + ' per piece · incl. ' + this.taxLabel()))
+                  : h('div', { key: 'pr', style: { borderTop: '1px solid ' + LINE, paddingTop: 14, marginTop: 12, fontSize: 20, fontWeight: 600, color: MUT } }, 'Select your options')),
+            // actions
             h('div', { key: 'e', style: { display: 'flex', flexDirection: 'column', gap: 9, marginTop: 16 } },
               (quoteOnly || ready)
                 ? h('div', { style: { display: 'flex', flexDirection: 'column', gap: 9 } },
