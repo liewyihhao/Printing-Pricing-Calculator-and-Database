@@ -166,7 +166,7 @@ function page(slug, origin, opts) {
     + '</div></section>');
   // TOC
   const toc = [['why', 'Why Printoka'], ['types', 'Configure'], ['sizes', 'Sizes'], ['materials', 'Materials'], ['finishing', 'Finishing']];
-  toc.push(['delivery', 'Delivery'], ['specs', 'Specifications'], ['faq', 'FAQ']);
+  toc.push(['delivery', 'Delivery'], ['faq', 'FAQ']);
   S.push('<nav class="pk-toc" aria-label="On this page"><ul>' + toc.map(t => '<li><a href="#' + t[0] + '">' + esc(t[1]) + '</a></li>').join('') + '</ul></nav>');
   // why
   S.push(sec('why', '<h2>Why print ' + esc(name) + ' with Printoka</h2><ul class="pk-why-bullets">' + c.why.map(b => '<li>' + esc(b) + '</li>').join('')
@@ -200,19 +200,17 @@ function page(slug, origin, opts) {
     S.push(sec('finishing', '<h2>Finishing for your ' + esc(name) + '</h2><div class="pk-grid pk-fins">'
       + f.finishing.map(x => '<div class="pk-fin">' + esc(x) + '</div>').join('') + '</div>'));
   }
-  // delivery
-  S.push(sec('delivery', '<h2>We deliver your ' + esc(name) + ' anywhere in Malaysia</h2><ul class="pk-states">'
-    + MY_STATES.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul>'));
-  // specs (all "tabs" stacked, all in DOM)
-  const optRows = f.options.map(o => '<tr><th>' + esc(o.label) + '</th><td>' + esc(o.values.join(' · ')) + '</td></tr>').join('');
-  S.push(sec('specs', '<h2>Specifications</h2>'
-    + '<h3>Product spec</h3><table class="pk-spec"><tbody>' + optRows + '</tbody></table>'
-    + '<h3>Artwork spec</h3><p>Supply a print-ready PDF at 300 dpi in CMYK, with 3 mm bleed on every side and key text kept 3 to 5 mm inside the trim. <a href="/artwork">Check your artwork</a> before you order.</p>'
-    + '<h3>Templates</h3><p>Download a print-ready die-line for your size (AI, PDF or PSD) on the configurator.</p>'
-    + '<h3>Description &amp; FAQ</h3><p>' + esc(c.intro) + '</p><p>' + esc(c.moqCopy) + '</p><p>' + esc(c.turnaround) + '</p>'));
-  // faq
-  S.push(sec('faq', '<h2>' + esc(name) + ' printing FAQ</h2><dl class="pk-faq">'
-    + c.faq.map(q => '<dt>' + esc(q[0]) + '</dt><dd>' + esc(q[1]) + '</dd>').join('') + '</dl>'));
+  // delivery — a full-width attention-catching banner (reassurance + states + CTA)
+  S.push('<section id="delivery" class="pk-deliver"><div class="pk-deliver-in">'
+    + '<h2>We Deliver Your ' + esc(name) + ' Anywhere in Malaysia</h2>'
+    + '<p class="pk-deliver-sub">Wherever you are, we’ve got you. Fast, tracked, door-to-door delivery to every state — or free pickup in the Klang Valley.</p>'
+    + '<ul class="pk-states">' + MY_STATES.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul>'
+    + '<a class="pk-btn pk-btn-lg" href="' + esc(configUrl) + '">Configure your ' + esc(name) + '</a>'
+    + '</div></section>');
+  // FAQ — native <details> accordion styled like the printoka.com FAQ (no JS needed)
+  S.push('<section id="faq" class="pk-faq-sec"><h2>' + esc(name) + ' printing FAQ</h2><div class="pk-faq">'
+    + c.faq.map((q, i) => '<details class="pk-faq-item"' + (i === 0 ? ' open' : '') + '><summary>' + esc(q[0]) + '<span class="pk-faq-ch" aria-hidden="true">▾</span></summary><div class="pk-faq-a">' + esc(q[1]) + '</div></details>').join('')
+    + '</div><a class="pk-btn" href="/contact">Ask a question</a></section>');
   // seo copy
   S.push(sec('about', '<h2>About ' + esc(name) + ' printing</h2><p>' + esc(c.intro) + '</p><p>' + esc(c.sizesCopy) + ' ' + esc(c.moqCopy) + '</p>'));
 
@@ -305,9 +303,18 @@ function css() {
     '.pk-size{border:1px solid ' + T.hairline + ';border-radius:10px;padding:12px;text-align:center}.pk-size-box{height:128px;display:flex;align-items:center;justify-content:center}.pk-size-box span{background:#fff;border:1.5px solid ' + T.brand + ';border-radius:2px;display:block}.pk-size-na{width:60px;height:40px;border-style:dashed!important;border-color:' + T.hairline + '!important}.pk-size-l{font-size:12.5px;font-weight:500;margin-top:8px}',
     '.pk-mat{border:1px solid ' + T.hairline + ';border-radius:10px;padding:14px}.pk-mat-l{font-size:13.5px;font-weight:500}.pk-bars{display:flex;gap:4px;margin:9px 0 5px}.pk-bars span{height:6px;flex:1;border-radius:3px;background:' + T.hairline + '}.pk-bars span.on{background:' + T.brand + '}.pk-mat-c{font-size:11.5px;color:' + T.muted + '}.pk-mat-c-neutral{color:#9e9e9e}',
     '.pk-fin{border:1px solid ' + T.hairline + ';border-left:3px solid ' + T.brand + ';border-radius:8px;padding:12px 14px;font-size:13.5px;font-weight:500}',
-    '.pk-states{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}.pk-states li{font-size:13px;color:' + T.muted + ';padding-left:16px;position:relative}.pk-states li:before{content:"\\2713";color:' + T.brand + ';position:absolute;left:0}',
-    '.pk-spec{width:100%;border-collapse:collapse;font-size:13px}.pk-spec th{text-align:left;color:' + T.brand + ';font-weight:600;padding:11px 16px 11px 0;vertical-align:top;width:200px}.pk-spec td{color:' + T.muted + ';padding:11px 0;border-bottom:1px solid ' + T.line + '}',
-    '.pk-faq dt{font-weight:600;font-size:14px;margin-top:14px}.pk-faq dd{margin:5px 0 0;font-size:13.5px;color:' + T.muted + ';line-height:1.7}',
+    // delivery banner (attention-catching: gradient band, white text, check-circle states, CTA)
+    '.pk-deliver{background:linear-gradient(90deg,#FF9A2E,#F02B29);color:#fff;border-radius:16px;margin:40px 0;box-shadow:0 18px 40px rgba(229,34,32,.18)}',
+    '.pk-deliver-in{padding:42px 28px;text-align:center}.pk-deliver h2{color:#fff;font-size:26px;font-weight:700;letter-spacing:-.01em;margin:0 0 10px}',
+    '.pk-deliver-sub{color:rgba(255,255,255,.94);font-size:14.5px;line-height:1.7;max-width:62ch;margin:0 auto 26px}',
+    '.pk-states{list-style:none;margin:0 auto 28px;padding:0;max-width:860px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;text-align:left}',
+    '.pk-states li{font-size:14px;font-weight:500;color:#fff;padding-left:30px;position:relative;line-height:1.5}.pk-states li:before{content:"\\2713";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:#fff;color:' + T.brand + ';font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}',
+    '.pk-deliver .pk-btn{background:#fff;color:' + T.brand + '}.pk-deliver .pk-btn:hover{background:#fff;color:' + T.brandDark + '}',
+    // FAQ accordion (native <details>, styled like the printoka.com FAQ)
+    '.pk-faq-sec h2{margin-bottom:6px}.pk-faq{max-width:900px;border-top:1px solid ' + T.line + '}',
+    '.pk-faq-item{border-bottom:1px solid ' + T.line + '}.pk-faq-item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px 2px;font-size:14.5px;font-weight:600;color:' + T.ink + '}.pk-faq-item summary::-webkit-details-marker{display:none}',
+    '.pk-faq-ch{flex:none;color:' + T.brand + ';font-size:13px;transition:transform .15s}.pk-faq-item[open] .pk-faq-ch{transform:rotate(180deg)}',
+    '.pk-faq-a{padding:0 2px 18px;font-size:13.5px;color:' + T.muted + ';line-height:1.75;max-width:80ch}.pk-faq-sec .pk-btn{margin-top:20px}',
     // footer (matches app footer)
     '.pk-fpromo{margin-top:56px;background:' + T.brand + ';color:#fff}.pk-fpromo-in{max-width:1180px;margin:0 auto;padding:30px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:26px;align-items:start}',
     '.pk-fp{display:flex;flex-direction:column;gap:12px;text-align:center}.pk-fp-h{font-size:17px;font-weight:600}',
