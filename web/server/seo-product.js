@@ -302,7 +302,7 @@ function css() {
     ':where(a,button):focus-visible{outline:2px solid ' + T.brand + ';outline-offset:2px}',
     '.pk-main{max-width:1180px;margin:0 auto;padding:0 20px}',
     '.pk-sec{scroll-margin-top:76px;padding:46px 0;border-top:1px solid ' + T.line + '}',
-    '.pk-sec h2{font-size:19px;font-weight:600;margin:0 0 16px;text-align:center}.pk-sec h3{font-size:15.5px;font-weight:600;margin:22px 0 8px}',
+    '.pk-sec h2{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:0 0 16px;text-align:center}.pk-sec h3{font-size:16px;font-weight:600;margin:22px 0 8px}',
     '.pk-sec p{font-size:14px;color:' + T.muted + ';line-height:1.8;max-width:80ch;margin-left:auto;margin-right:auto;text-align:center}',
     // header (matches runtime.js chrome)
     '.pk-headwrap{position:sticky;top:0;z-index:60}.pk-head{background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid ' + T.hairline + '}',
@@ -322,9 +322,9 @@ function css() {
     '.pk-hero-benefits{flex:0 1 320px;display:flex;flex-direction:column;gap:14px}',
     '.pk-hb-h{font-weight:700;font-size:15px}.pk-hb-c{font-size:13px;color:rgba(255,255,255,.92);padding-left:14px;position:relative;margin-top:2px;line-height:1.5}.pk-hb-c:before{content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;background:#fff}',
     // buttons
-    '.pk-btn{display:inline-block;background:' + T.brand + ';color:#fff;font-weight:600;font-size:13.5px;padding:11px 20px;border-radius:2px}.pk-btn:hover{background:' + T.brandDark + ';color:#fff}.pk-btn-lg{padding:13px 26px;font-size:14px}.pk-btn-sm{padding:9px 14px;font-size:12.5px;margin-top:auto}',
+    '.pk-btn{display:inline-block;background:' + T.brand + ';color:#fff;font-weight:600;font-size:14px;padding:11px 20px;border-radius:8px}.pk-btn:hover{background:' + T.brandDark + ';color:#fff}.pk-btn-lg{padding:13px 26px;font-size:14px}.pk-btn-sm{padding:9px 14px;font-size:12.5px;margin-top:auto}',
     // why printoka (light band, six icon benefits)
-    '.pk-why{background:' + T.alt + '}.pk-why-in{max-width:1180px;margin:0 auto;padding:44px 20px;text-align:center}.pk-why h2{font-size:24px;font-weight:600;margin:0 0 8px}.pk-why-sub{font-size:14px;color:' + T.muted + ';margin:0 auto 30px;max-width:64ch}',
+    '.pk-why{background:' + T.alt + '}.pk-why-in{max-width:1180px;margin:0 auto;padding:44px 20px;text-align:center}.pk-why h2{font-size:22px;font-weight:600;letter-spacing:-.01em;margin:0 0 8px}.pk-why-sub{font-size:14px;color:' + T.muted + ';margin:0 auto 30px;max-width:64ch}',
     '.pk-why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:22px}.pk-why-i{display:flex;flex-direction:column;align-items:center;gap:10px}',
     '.pk-why-icon{width:56px;height:56px;border-radius:50%;border:1.5px solid ' + T.brand + ';display:flex;align-items:center;justify-content:center;background:#fff}',
     '.pk-why-l{font-size:14px;font-weight:500;color:' + T.ink + ';line-height:1.4;max-width:20ch}.pk-why-note{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:' + T.muted + '}',
@@ -346,14 +346,14 @@ function css() {
     '.pk-fin{border:1px solid ' + T.hairline + ';border-left:3px solid ' + T.brand + ';border-radius:8px;padding:12px 14px;font-size:13.5px;font-weight:500}',
     // delivery banner (attention-catching: gradient band, white text, check-circle states, CTA)
     '.pk-deliver{background:linear-gradient(90deg,#FF9A2E,#F02B29);color:#fff;border-radius:16px;margin:40px 0;box-shadow:0 18px 40px rgba(229,34,32,.18)}',
-    '.pk-deliver-in{padding:42px 28px;text-align:center}.pk-deliver h2{color:#fff;font-size:26px;font-weight:700;letter-spacing:-.01em;margin:0 0 10px}',
+    '.pk-deliver-in{padding:42px 28px;text-align:center}.pk-deliver h2{color:#fff;font-size:22px;font-weight:700;letter-spacing:-.01em;margin:0 0 10px}',
     '.pk-deliver-sub{color:rgba(255,255,255,.94);font-size:14.5px;line-height:1.7;max-width:62ch;margin:0 auto 26px}',
     '.pk-states{list-style:none;margin:0 auto 28px;padding:0;max-width:860px;display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;text-align:left}',
     '.pk-states li{font-size:14px;font-weight:500;color:#fff;padding-left:30px;position:relative;line-height:1.5}.pk-states li:before{content:"\\2713";position:absolute;left:0;top:0;width:20px;height:20px;border-radius:50%;background:#fff;color:' + T.brand + ';font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}',
     '.pk-deliver .pk-btn{background:#fff;color:' + T.brand + '}.pk-deliver .pk-btn:hover{background:#fff;color:' + T.brandDark + '}',
     // FAQ accordion (native <details>, styled like the printoka.com FAQ) — section centred,
     // Q&A text kept left-aligned inside the centred block
-    '.pk-faq-sec{text-align:center}.pk-faq-sec h2{margin-bottom:6px}.pk-faq{max-width:900px;margin:0 auto;text-align:left;border-top:1px solid ' + T.line + '}',
+    '.pk-faq-sec{text-align:center}.pk-faq-sec h2{font-size:20px;font-weight:600;letter-spacing:-.01em;margin:0 0 6px}.pk-faq{max-width:900px;margin:0 auto;text-align:left;border-top:1px solid ' + T.line + '}',
     '.pk-faq-item{border-bottom:1px solid ' + T.line + '}.pk-faq-item summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:17px 2px;font-size:14.5px;font-weight:600;color:' + T.ink + '}.pk-faq-item summary::-webkit-details-marker{display:none}',
     '.pk-faq-ch{flex:none;color:' + T.brand + ';font-size:13px;transition:transform .15s}.pk-faq-item[open] .pk-faq-ch{transform:rotate(180deg)}',
     '.pk-faq-a{padding:0 2px 18px;font-size:13.5px;color:' + T.muted + ';line-height:1.75}.pk-faq-sec .pk-btn{margin-top:20px}',

@@ -1823,8 +1823,8 @@ class Component extends DCLogic {
   head(title, sub, actions) {
     return h('div', { style: { display: 'flex', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap' } },
       h('div', { style: { flex: '1 1 320px', minWidth: 0 } },
-        h('h1', { style: { margin: '0 0 5px', fontSize: 25, fontWeight: 600, letterSpacing: '-.02em' } }, title),
-        h('p', { style: { margin: 0, fontSize: 13.5, color: MUT, maxWidth: '76ch', lineHeight: 1.65 } }, sub)),
+        h('h1', { style: { margin: '0 0 6px', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em' } }, title),
+        h('p', { style: { margin: 0, fontSize: 14, color: MUT, maxWidth: '76ch', lineHeight: 1.7 } }, sub)),
       actions && h('div', { style: { display: 'flex', gap: 9, flexWrap: 'wrap' } }, actions));
   }
 
@@ -2971,8 +2971,8 @@ class Component extends DCLogic {
           })())),
       // SEO content section above the footer
       h('section', { style: { borderTop: '1px solid ' + HAIR, marginTop: 46, paddingTop: 34, maxWidth: 900 } },
-        h('h2', { style: { margin: '0 0 18px', fontSize: 23, fontWeight: 600, letterSpacing: '-.02em' } }, seo.heading),
-        seo.whyHeading ? h('h3', { style: { margin: '0 0 10px', fontSize: 16.5, fontWeight: 600, color: INK } }, seo.whyHeading) : null,
+        h('h2', { style: { margin: '0 0 18px', fontSize: 20, fontWeight: 600, letterSpacing: '-.01em' } }, seo.heading),
+        seo.whyHeading ? h('h3', { style: { margin: '0 0 10px', fontSize: 16, fontWeight: 600, color: INK } }, seo.whyHeading) : null,
         (seo.bullets && seo.bullets.length) ? h('ul', { style: { margin: '0 0 20px', padding: '0 0 0 22px' } },
           seo.bullets.map((b, i) => h('li', { key: i, style: { fontSize: 14, color: MUT, lineHeight: 1.95 } }, b))) : null,
         h('div', { style: { display: 'flex', flexDirection: 'column', gap: 13 } },
@@ -3246,7 +3246,7 @@ class Component extends DCLogic {
           h('div', { style: { display: 'flex', gap: 20, flexWrap: 'wrap', marginBottom: 26 } },
             h('div', { style: { flex: '0 0 300px', maxWidth: 340, filter: 'drop-shadow(0 12px 24px rgba(33,33,33,.12))' } }, this.art(prod ? prod.name : 'card')),
             h('div', { style: { flex: '1 1 300px', minWidth: 0 } },
-              h('h1', { style: { margin: '0 0 10px', fontSize: 30, fontWeight: 600, letterSpacing: '-.02em' } }, NAME + ' Printing'),
+              h('h1', { style: { margin: '0 0 10px', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em' } }, NAME + ' Printing'),
               h('p', { style: { margin: '0 0 12px', fontSize: 14, color: MUT, lineHeight: 1.7 } }, (() => { try { const s = this.productSeo(prod, NAME); if (s && s.paras && s.paras[0]) return s.paras[0]; } catch (e) {} return 'Configure your job and see the exact price before you order.'; })()),
               h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap' } }, this.chip('Price to the cent', 'ok'), this.chip('Ready in 3 working days', 'teal')))),
           h('div', { style: { display: 'flex', flexDirection: 'column', gap: 4, border: '1px solid ' + HAIR, borderRadius: 14, padding: 20 } },
@@ -3312,7 +3312,7 @@ class Component extends DCLogic {
     const sizes = sizeField ? sizeField.options.filter(s => !/other|custom/i.test(s)) : [];
     const slug = prod ? (this.catOverride(prod.id).slug || 'product') : 'product';
     return h('section', { style: { borderTop: '1px solid ' + HAIR, marginTop: 44, paddingTop: 34 } },
-      h('h2', { style: { margin: '0 0 6px', fontSize: 22, fontWeight: 600, letterSpacing: '-.02em' } }, NAME + ' Templates'),
+      h('h2', { style: { margin: '0 0 6px', fontSize: 20, fontWeight: 600, letterSpacing: '-.01em' } }, NAME + ' Templates'),
       h('p', { style: { fontSize: 13.5, color: MUT, margin: '0 0 18px', maxWidth: '82ch' } }, 'Download a print-ready template for your size, design on it, and remove the guides before you submit. Every template has trim, +3 mm bleed and the safe area marked.'),
       sizes.length ? h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', maxWidth: 620 } },
         h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 90px 90px 78px', gap: 8, padding: '10px 14px', background: ALT, fontSize: 11, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: FAINT } },
@@ -3522,7 +3522,7 @@ class Component extends DCLogic {
     const overall = analyzing ? 'analyzing' : fails ? 'fail' : warns ? 'warn' : 'pass';
     const banner = { analyzing: ['#eef1f4', INK, 'Checking your artwork…'], pass: ['#eafaf0', '#1c7a45', 'Looks good — ready to print'], warn: ['#fff7e9', '#8a5a00', warns + ' thing' + (warns > 1 ? 's' : '') + ' to review before you continue'], fail: ['#fdf0f0', '#b3241f', fails + ' issue' + (fails > 1 ? 's' : '') + ' found — please check'] }[overall];
     return h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '10px 20px 0' } },
-      h('h1', { style: { margin: '2px 0 16px', fontSize: 26, fontWeight: 600, letterSpacing: '-.02em' } }, 'Artwork check' + (NAME ? ' — ' + NAME : '')),
+      h('h1', { style: { margin: '2px 0 16px', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em' } }, 'Artwork check' + (NAME ? ' — ' + NAME : '')),
       h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 22, alignItems: 'start' } },
         // preview
         h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden' } },
