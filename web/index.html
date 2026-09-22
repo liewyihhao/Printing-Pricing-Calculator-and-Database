@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- resolve relative assets (scripts, icons) from root on nested content URLs (/blog/…, /…-printing-city/) -->
+<base href="/">
+<link rel="sitemap" type="application/xml" href="/sitemap.xml">
+<link rel="icon" type="image/svg+xml" href="/assets/icons/logomark.svg">
+<link rel="apple-touch-icon" href="/assets/icons/logomark.svg">
+<meta name="theme-color" content="#E52220">
+<title>Printoka — Online Printing in Malaysia, Singapore &amp; Brunei</title>
+<meta name="description" content="Order business cards, flyers, stickers, packaging and more online. Instant pricing, member discounts up to 15%, and nationwide delivery across Malaysia, Singapore and Brunei.">
+<!-- Static Open Graph / Twitter fallbacks; applySEO() refines these per route at runtime -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Printoka">
+<meta property="og:title" content="Printoka — Online Printing in Malaysia, Singapore & Brunei">
+<meta property="og:description" content="Order business cards, flyers, stickers, packaging and more online. Instant pricing and nationwide delivery.">
+<meta property="og:image" content="/assets/products/business-card.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="/assets/products/business-card.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#fff;color:#212121;font-family:Montserrat,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  *{box-sizing:border-box}
+  a{color:#14568a;text-decoration:none}
+  a:hover{color:#0e3f66}
+  ::selection{background:#E5222026}
+  [data-go]{cursor:pointer}
+  /* configurator dropdown control: subtle hover so the collapsed (borderless) row still reads as clickable */
+  .pk-ddctl{transition:background .12s}
+  .pk-ddctl:hover{background:#f6f7f8}
+  button:focus-visible,[data-go]:focus-visible,[role=button]:focus-visible,[role=option]:focus-visible,[role=combobox]:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #E52220;outline-offset:2px}
+  /* skip-to-content link: off-screen until keyboard-focused */
+  .pk-skip{position:absolute;left:-9999px;top:8px;z-index:200;background:#E52220;color:#fff;padding:9px 15px;border-radius:6px;font-weight:600;text-decoration:none}
+  .pk-skip:focus{left:8px}
+  @keyframes pkFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+  @keyframes pkShine{0%{transform:translateX(0) skewX(-18deg)}60%,100%{transform:translateX(240px) skewX(-18deg)}}
+  .pkfloat{animation:pkFloat 4.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+  .pkshine{animation:pkShine 5s ease-in-out infinite}
+  @media(prefers-reduced-motion:reduce){.pkfloat,.pkshine{animation:none!important}}
+  .pk-mobilebar{display:none}
+  @media(max-width:760px){
+    [data-shell]{grid-template-columns:1fr!important}
+    [data-shell]>aside{position:static!important;display:flex;flex-wrap:wrap;gap:4px}
+    [data-shell]>aside>div{flex:0 0 auto}
+    .pk-mobilebar{display:flex}
+    body{padding-bottom:64px}
+  }
+</style>
+<script>
+  // Asset resolver — falls back to the literal path, which is served from /assets.
+  window.__asset = function (p) { return p; };
+</script>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<!-- Storefront catalogue: display-name overrides + categories (display-only, over the engine) -->
+<script src="catalogue.js"></script>
+<script src="runtime.js"></script>
+<script src="app.js"></script>
+<script>
+  // Render the app immediately (React + app.js are small), THEN load the ~20MB pricing
+  // engine in the background so it never blocks first paint / LCP. The app is null-safe
+  // without window.PricingEngine (prices fill in once it loads and fires pk-engine-ready).
+  ReactDOM.createRoot(document.getElementById('root'))
+    .render(React.createElement(window.PKComponent, window.PKProps));
+  (function () {
+    var s = document.createElement('script');
+    s.src = 'pricing/engine.js';
+    s.async = true;
+    s.onload = function () { try { window.dispatchEvent(new Event('pk-engine-ready')); } catch (e) {} };
+    document.body.appendChild(s);
+  })();
+</script>
+</body>
+</html>

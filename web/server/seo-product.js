@@ -158,12 +158,21 @@ function page(slug, origin, opts) {
   // hero — orange banner replicating the printoka.com product header: product cutout (left),
   // "Print Your {name} Online Now!" (centre), three benefit blocks (right).
   const heroBenefits = [
-    ['Schedule your delivery', 'Large orders delivered affordably, door to door'],
-    ['Satisfaction guaranteed', 'Quality and speed you can rely on'],
-    ['Exclusive member pricing', 'A special price rate for Printoka members'],
+    ['Schedule your delivery', 'Door-to-door, nationwide'],
+    ['Satisfaction guaranteed', 'Quality you can rely on'],
+    ['Exclusive member pricing', 'Save 5–15% as a member'],
   ];
+  // a branded illustration so the hero is never lopsided when a product has no cutout photo yet
+  const heroFallback = '<div class="pk-hero-img pk-hero-fallback" aria-hidden="true"><svg viewBox="0 0 220 180" width="220" height="180" fill="none">'
+    + '<rect x="18" y="46" width="150" height="104" rx="9" fill="rgba(255,255,255,.16)"/>'
+    + '<rect x="34" y="30" width="150" height="104" rx="9" fill="rgba(255,255,255,.30)"/>'
+    + '<rect x="50" y="14" width="150" height="104" rx="9" fill="#fff"/>'
+    + '<circle cx="74" cy="42" r="9" fill="#E52220"/>'
+    + '<rect x="90" y="37" width="82" height="7" rx="3.5" fill="#e2e2e2"/><rect x="90" y="50" width="58" height="6" rx="3" fill="#ededed"/>'
+    + '<rect x="66" y="74" width="118" height="6" rx="3" fill="#f0f0f0"/><rect x="66" y="88" width="96" height="6" rx="3" fill="#f0f0f0"/><rect x="66" y="102" width="70" height="6" rx="3" fill="#f0f0f0"/>'
+    + '</svg></div>';
   S.push('<section id="top" class="pk-hero"><div class="pk-hero-in">'
-    + (asset ? '<div class="pk-hero-img"><img src="' + esc(asset) + '" alt="' + esc(name + ' printed by Printoka') + '" width="300" height="220" fetchpriority="high"></div>' : '')
+    + (asset ? '<div class="pk-hero-img"><img src="' + esc(asset) + '" alt="' + esc(name + ' printed by Printoka') + '" width="300" height="220" fetchpriority="high"></div>' : heroFallback)
     + '<div class="pk-hero-c"><h1><span class="pk-h-sm">Print Your</span><span class="pk-h-lg">' + esc(name) + '</span><span class="pk-h-md">Online Now!</span></h1>'
     + '<p class="pk-hero-tag">configure, upload and print</p></div>'
     + '<div class="pk-hero-benefits">' + heroBenefits.map(b => '<div class="pk-hb"><div class="pk-hb-h">' + esc(b[0]) + '</div><div class="pk-hb-c">' + esc(b[1]) + '</div></div>').join('') + '</div>'
@@ -171,7 +180,7 @@ function page(slug, origin, opts) {
   // Choose the type to configure (before "Why Printoka?"). More than 5 types => a horizontal
   // carousel (scroll left/right) instead of a wrapping grid.
   if (f.types.length) {
-    const cards = f.types.map(t => '<a class="pk-type" href="' + esc(configUrl + '?' + f.typeKey + '=' + encodeURIComponent(t)) + '"><div class="pk-type-ph" aria-hidden="true">Photography in progress</div><div class="pk-type-l">' + esc(t) + '</div><span class="pk-btn pk-btn-sm">Check Price Now</span></a>').join('');
+    const cards = f.types.map(t => '<a class="pk-type" href="' + esc(configUrl + '?' + f.typeKey + '=' + encodeURIComponent(t)) + '"><div class="pk-type-ph" aria-hidden="true"><img src="/assets/icons/logomark.svg" alt=""></div><div class="pk-type-l">' + esc(t) + '</div><span class="pk-btn pk-btn-sm">Check Price</span></a>').join('');
     const body = f.types.length > 5
       ? '<div class="pk-carousel"><button type="button" class="pk-car-btn pk-car-prev" aria-label="Scroll left">‹</button><div class="pk-car-track">' + cards + '</div><button type="button" class="pk-car-btn pk-car-next" aria-label="Scroll right">›</button></div>'
       : '<div class="pk-grid pk-types">' + cards + '</div>';
@@ -226,7 +235,7 @@ function page(slug, origin, opts) {
   // delivery — a full-width attention-catching banner (reassurance + states + CTA)
   S.push('<section id="delivery" class="pk-deliver"><div class="pk-deliver-in">'
     + '<h2>We Deliver Your ' + esc(name) + ' Anywhere in Malaysia</h2>'
-    + '<p class="pk-deliver-sub">Wherever you are, we’ve got you. Fast, tracked, door-to-door delivery to every state — or free pickup in the Klang Valley.</p>'
+    + '<p class="pk-deliver-sub">Fast, tracked, door-to-door delivery to every state, or free Klang Valley pickup.</p>'
     + '<ul class="pk-states">' + MY_STATES.map(s => '<li>' + esc(s) + '</li>').join('') + '</ul>'
     + '<a class="pk-btn pk-btn-lg" href="' + esc(configUrl) + '">Configure your ' + esc(name) + '</a>'
     + '</div></section>');
@@ -234,8 +243,6 @@ function page(slug, origin, opts) {
   S.push('<section id="faq" class="pk-faq-sec"><h2>' + esc(name) + ' printing FAQ</h2><div class="pk-faq">'
     + c.faq.map((q, i) => '<details class="pk-faq-item"' + (i === 0 ? ' open' : '') + '><summary>' + esc(q[0]) + '<span class="pk-faq-ch" aria-hidden="true">▾</span></summary><div class="pk-faq-a">' + esc(q[1]) + '</div></details>').join('')
     + '</div><a class="pk-btn" href="/contact">Ask a question</a></section>');
-  // seo copy
-  S.push(sec('about', '<h2>About ' + esc(name) + ' printing</h2><p>' + esc(c.intro) + '</p><p>' + esc(c.sizesCopy) + ' ' + esc(c.moqCopy) + '</p>'));
 
   // header — a faithful static replica of the app's runtime.js chrome (logo, red Products
   // button, search, locale, login, cart, country), so the SEO page matches the storefront.
@@ -294,7 +301,7 @@ function css() {
     'a{color:' + T.brand + ';text-decoration:none}a:hover{color:' + T.brandDark + '}img{max-width:100%;height:auto}',
     ':where(a,button):focus-visible{outline:2px solid ' + T.brand + ';outline-offset:2px}',
     '.pk-main{max-width:1180px;margin:0 auto;padding:0 20px}',
-    '.pk-sec{scroll-margin-top:76px;padding:34px 0;border-top:1px solid ' + T.line + '}',
+    '.pk-sec{scroll-margin-top:76px;padding:46px 0;border-top:1px solid ' + T.line + '}',
     '.pk-sec h2{font-size:19px;font-weight:600;margin:0 0 16px;text-align:center}.pk-sec h3{font-size:15.5px;font-weight:600;margin:22px 0 8px}',
     '.pk-sec p{font-size:14px;color:' + T.muted + ';line-height:1.8;max-width:80ch;margin-left:auto;margin-right:auto;text-align:center}',
     // header (matches runtime.js chrome)
@@ -308,7 +315,7 @@ function css() {
     // hero (orange banner, printoka.com product-header layout)
     '.pk-hero{background:linear-gradient(115deg,#F26722 0%,#EF5A28 45%,#E52220 100%);color:#fff;overflow:hidden}',
     '.pk-hero-in{max-width:1180px;margin:0 auto;padding:34px 20px;display:flex;flex-wrap:wrap;gap:28px;align-items:center;min-height:216px}',
-    '.pk-hero-img{flex:0 0 auto}.pk-hero-img img{height:190px;width:auto;filter:drop-shadow(0 18px 30px rgba(0,0,0,.28))}',
+    '.pk-hero-img{flex:0 0 auto}.pk-hero-img img{height:190px;width:auto;filter:drop-shadow(0 18px 30px rgba(0,0,0,.28))}.pk-hero-fallback{display:flex;align-items:center;justify-content:center}.pk-hero-fallback svg{filter:drop-shadow(0 16px 28px rgba(0,0,0,.22))}',
     '.pk-hero-c{flex:1 1 300px}.pk-hero h1{margin:0;display:flex;flex-direction:column;line-height:1.08;font-weight:400}',
     '.pk-h-sm{font-size:26px}.pk-h-lg{font-size:40px;font-weight:700;letter-spacing:-.01em}.pk-h-md{font-size:30px;font-weight:500}',
     '.pk-hero-tag{margin:12px 0 0;font-size:20px;font-weight:300;color:rgba(255,255,255,.95)}',
@@ -324,7 +331,9 @@ function css() {
     // grids
     '.pk-grid{display:grid;gap:14px}.pk-types{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.pk-sizes{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.pk-mats{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}.pk-fins{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}',
     '.pk-type{display:flex;flex-direction:column;border:1px solid ' + T.hairline + ';border-radius:10px;overflow:hidden;background:#fff;color:' + T.ink + '}.pk-type:hover{color:' + T.ink + '}',
-    '.pk-type-ph{background:' + T.alt + ';color:#9e9e9e;font-size:11px;text-align:center;padding:34px 8px}.pk-type-l{font-weight:600;font-size:14px;padding:12px 14px 8px}.pk-type .pk-btn-sm{margin:auto 14px 14px;text-align:center}',
+    '.pk-type-ph{background:' + T.alt + ';padding:30px 8px;display:flex;align-items:center;justify-content:center}.pk-type-ph img{height:36px;width:auto;opacity:.16}.pk-type-l{font-weight:600;font-size:14px;padding:12px 14px 8px}',
+    // secondary (outline) CTA on type cards — dials back the repeated solid red; fills on card hover
+    '.pk-type .pk-btn-sm{margin:auto 14px 14px;text-align:center;background:#fff;color:' + T.brand + ';border:1px solid ' + T.brand + '}.pk-type:hover .pk-btn-sm{background:' + T.brand + ';color:#fff}',
     // carousel (used when >5 type cards): horizontal scroll with arrow buttons
     '.pk-carousel{display:flex;align-items:center;gap:10px}.pk-car-track{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;scroll-snap-type:x proximity;padding:2px 0}',
     '.pk-car-track::-webkit-scrollbar{height:7px}.pk-car-track::-webkit-scrollbar-thumb{background:' + T.hairline + ';border-radius:4px}',
