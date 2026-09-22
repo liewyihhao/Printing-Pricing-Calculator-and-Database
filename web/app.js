@@ -840,6 +840,8 @@ class Component extends DCLogic {
       if (PAIRS[k]) { const [hk, tag] = PAIRS[k]; if (cfg[hk] && cfg[k]) lines.push([tag, cfg[hk] + 'mm × ' + cfg[k] + 'mm']); continue; }
       let val = cfg[k]; if (val == null || val === '') continue;
       if (NONE_RE.test(String(val))) continue;   // drop "No/Not Required" selections (geometry fields are never none-like)
+      // the size field's "Other (Custom Size)" is already covered by the combined Custom/Open Size line
+      if (k === 'size' && /other|custom/i.test(String(val)) && (cfg.custom_w || cfg.fold_w_thin || cfg.fold_w_fat)) continue;
       if (/^\d+(\.\d+)?$/.test(String(val)) && /\(mm\)/i.test(def.label || '')) val = val + 'mm';
       lines.push([dispLabel(def), String(dispVal(def, val))]);
     }
@@ -1468,7 +1470,7 @@ class Component extends DCLogic {
     if (!this.pkProducts().length) { this._urlPending = true; return; }
     this._urlPending = false;
     const pid = this.pkIdBySlug(segs[0]);
-    if (pid != null) { if (typeof window !== 'undefined') window.scrollTo(0, 0); return this.setState({ prodId: pid, cfg: {}, qty: 1000, qtyChosen: false, route: 'product' }); }
+    if (pid != null) { if (typeof window !== 'undefined') window.scrollTo(0, 0); return this.setState({ prodId: pid, cfg: {}, qty: 1000, qtyChosen: false, sizeConfirmed: false, route: 'product' }); }
     const LOC = { au: 1, nz: 1, sg: 1, bn: 1 };
     let locale = 'my', rest = segs;
     if (LOC[segs[0]]) { locale = segs[0]; rest = segs.slice(1); }
@@ -3097,15 +3099,23 @@ class Component extends DCLogic {
         // the collapsed control: current value + chevron; click to open the option list
         h('div', { onClick: e => { e.stopPropagation(); toggle(); }, tabIndex: 0, role: 'combobox', 'aria-haspopup': 'listbox', 'aria-expanded': open ? 'true' : 'false', 'aria-label': fieldLabel + (isPh0 ? ' (not selected)' : ': ' + curText),
           onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); e.stopPropagation(); toggle(); } else if (e.key === 'ArrowDown' && !open) { e.preventDefault(); e.stopPropagation(); this.setState({ ddOpen: key }); } else if (e.key === 'Escape' && open) { e.preventDefault(); e.stopPropagation(); close(); } },
-          style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, cursor: 'pointer', padding: '11px 14px', border: '1px solid ' + (open ? TEAL : HAIR), borderRadius: 10, background: '#fff', boxShadow: open ? '0 0 0 3px rgba(229,34,32,.10)' : 'none' } },
-          h('span', { style: { fontSize: 14, fontWeight: 500, color: isPh0 ? FAINT : INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, curText),
+          style: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, cursor: 'pointer', padding: '10px 2px', border: 'none', background: 'transparent' } },
+          h('span', { style: { flex: 1, textAlign: 'right', fontSize: 14, fontWeight: 500, color: isPh0 ? FAINT : INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, curText),
           h('span', { 'aria-hidden': 'true', style: { flex: 'none', color: FAINT, fontSize: 10, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .12s' } }, '▼')),
         open ? h('div', { style: { marginTop: 10 } },
           remark ? h('div', { style: { fontSize: 11.5, color: MUT, lineHeight: 1.55, background: ALT, borderRadius: 8, padding: '9px 12px', marginBottom: 12 } }, remark) : null,
           h('div', { role: 'radiogroup', 'aria-label': fieldLabel, style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 } }, cards)) : null);
     };
+    // custom-size dimension fields: the H/W pairs shown when Size = "Other (Custom Size)".
+    // After the user fills both and clicks Confirm, the Size field displays "Custom Size: HxW"
+    // and the inputs collapse (state.sizeConfirmed). Editing re-opens them (reset on size pick).
+    const DIM_PAIRS = [['custom_h', 'custom_w'], ['fold_h_thin', 'fold_w_thin'], ['fold_h_fat', 'fold_w_fat']];
+    const WIDTH_KEYS = { custom_w: 'custom_h', fold_w_thin: 'fold_h_thin', fold_w_fat: 'fold_h_fat' };
+    const DIM_KEYS = { custom_h: 1, custom_w: 1, fold_h_thin: 1, fold_w_thin: 1, fold_h_fat: 1, fold_w_fat: 1 };
+    const activeDims = () => { for (const p of DIM_PAIRS) { const hv = cfg[p[0]], wv = cfg[p[1]]; if (hv != null && hv !== '' && wv != null && wv !== '') return { hk: p[0], wk: p[1], h: hv, w: wv }; } return null; };
     const optCards = (def, options, sel) => {
       const label = (ov.label && ov.label[def.key]) || def.label;
+      const isSizeField = def.key === 'size';
       const remark = (ov.remark && ov.remark[def.key]) || null;
       const optLabel = (ov.optLabel && ov.optLabel[def.key]) || {};
       const isPh = !!(ov.placeholder && ov.placeholder.indexOf(def.key) >= 0);
@@ -3113,7 +3123,9 @@ class Component extends DCLogic {
       dispOptions = (typeof dispOptions === 'function' ? (dispOptions(this.pkV(), options) || options) : (dispOptions || options));
       const chosen = isPh ? (this.state.cfg[def.key] != null ? this.state.cfg[def.key] : '') : (sel != null ? sel : (dispOptions[0] || ''));
       const isPh0 = isPh && (chosen === '' || chosen == null);
-      const curText = isPh0 ? 'Please Select' : (optLabel[chosen] || chosen);
+      let curText = isPh0 ? 'Please Select' : (optLabel[chosen] || chosen);
+      // once a custom size is confirmed, the Size field reads "Custom Size: H mm × W mm"
+      if (isSizeField && /other|custom/i.test(String(chosen)) && this.state.sizeConfirmed) { const d = activeDims(); if (d) curText = 'Custom Size: ' + d.h + 'mm × ' + d.w + 'mm'; }
       const note = (ov.noteOverride && Object.prototype.hasOwnProperty.call(ov.noteOverride, def.key)) ? ov.noteOverride[def.key] : (def.neutral ? null : (def.note || null));
       // which of the displayed options are valid for the current spec (the engine's live set)
       const availSet = {}; const validVals = (options || []).map(o => Array.isArray(o) ? o[0] : o);
@@ -3127,7 +3139,7 @@ class Component extends DCLogic {
       const reliable = validVals.length > 0 && validVals.every(v => dispSet[v]);
       const items = dispOptions.map(v => { const val = Array.isArray(v) ? v[0] : v;
         return { val: val, label: optLabel[val] || val, on: chosen === val, avail: reliable ? !!availSet[val] : true,
-          onPick: () => this.setState(st => ({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) })) }; });
+          onPick: () => this.setState(st => Object.assign({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) }, isSizeField ? { sizeConfirmed: false } : {})) }; });
       return cardGroup(def.key, label, curText, isPh0, note, remark, items);
     };
     // quantity, straight from the engine's per-product model (moq / options)
@@ -3163,6 +3175,8 @@ class Component extends DCLogic {
       const imgBase = ov.optImages && ov.optImages[def.key];
       if (imgBase && options && options.length) return imgPicker(def, options, cfg[def.key], imgBase);
       if (options && options.length) return optCards(def, options, cfg[def.key]);
+      // custom-size dimension inputs collapse once the size is confirmed
+      if (DIM_KEYS[def.key] && this.state.sizeConfirmed) return null;
       const isNum = def.type === 'number';
       const unit = /\(mm\)/i.test(def.label || '') ? ' mm' : '';
       const hints = [];
@@ -3170,6 +3184,12 @@ class Component extends DCLogic {
       else if (def.min != null) hints.push('Minimum ' + def.min + unit);
       else if (def.max != null) hints.push('Maximum ' + def.max + unit);
       if (def.note) hints.push(def.note);
+      // Confirm button after the WIDTH input of a custom-size pair (both dimensions filled)
+      const widthHK = WIDTH_KEYS[def.key];
+      const bothFilled = widthHK && cfg[widthHK] != null && cfg[widthHK] !== '' && cfg[def.key] != null && cfg[def.key] !== '';
+      const confirmBtn = widthHK ? h('button', { type: 'button', disabled: !bothFilled,
+        onClick: e => { e.preventDefault(); e.stopPropagation(); if (bothFilled) this.setState({ sizeConfirmed: true, ddOpen: null }); },
+        style: { marginTop: 4, alignSelf: 'flex-start', background: bothFilled ? TEAL : '#e9ecef', color: bothFilled ? '#fff' : MUT, border: 'none', borderRadius: 8, padding: '10px 22px', fontSize: 13.5, fontWeight: 600, cursor: bothFilled ? 'pointer' : 'not-allowed', font: '600 13.5px Montserrat,sans-serif' } }, 'Confirm size') : null;
       return h('div', { key: def.key, style: rowStyle },
         labelCell(def.label, null),
         ctrlWrap(h('div', { style: { display: 'flex', flexDirection: 'column', gap: 5 } },
@@ -3177,7 +3197,8 @@ class Component extends DCLogic {
             value: cfg[def.key] || '', placeholder: def.placeholder || ('Enter ' + def.label.toLowerCase()), 'aria-label': def.label,
             onChange: e => { const val = e.target.value; this.setState(st => ({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) })); },
             style: Object.assign({}, selStyle, { font: '400 14px Montserrat,sans-serif' }) }),
-          hints.length ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5 } }, hints.join(' · ')) : null)));
+          hints.length ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5 } }, hints.join(' · ')) : null,
+          confirmBtn)));
     };
     // group fields by the engine's section order (General / Optional Finishing / …),
     // exactly as the source order form categorises them; quantity sits in its section
