@@ -3305,21 +3305,22 @@ class Component extends DCLogic {
 
   // full-width product-detail / SEO section (below the configurator): intro copy for
   // search engines + the Product Spec / Artwork Spec / Templates / FAQ tabs.
+  // Below the configurator: just the product's Templates (spec / description / FAQ live on the
+  // SEO page now; artwork spec belongs with the Upload & Check Artwork flow).
   productDetails(prod, NAME) {
-    const s = this.state;
-    const tabs = [['spec', 'Product Spec'], ['artwork', 'Artwork Spec'], ['templates', 'Templates'], ['about', 'Description & FAQ']];
-    const seo = this.productSeo(prod, NAME);
+    const sizeField = this.pkFields().find(f => /size/i.test(f.def.key) && f.options && f.options.length);
+    const sizes = sizeField ? sizeField.options.filter(s => !/other|custom/i.test(s)) : [];
+    const slug = prod ? (this.catOverride(prod.id).slug || 'product') : 'product';
     return h('section', { style: { borderTop: '1px solid ' + HAIR, marginTop: 44, paddingTop: 34 } },
-      h('div', { style: { maxWidth: 900 } },
-        h('h2', { style: { margin: '0 0 18px', fontSize: 24, fontWeight: 600, letterSpacing: '-.02em' } }, seo.heading),
-        seo.whyHeading ? h('h3', { style: { margin: '0 0 10px', fontSize: 16.5, fontWeight: 600, color: INK } }, seo.whyHeading) : null,
-        (seo.bullets && seo.bullets.length) ? h('ul', { style: { margin: '0 0 20px', padding: '0 0 0 22px' } },
-          seo.bullets.map((b, i) => h('li', { key: i, style: { fontSize: 14, color: MUT, lineHeight: 1.95 } }, b))) : null,
-        h('div', { style: { display: 'flex', flexDirection: 'column', gap: 13 } },
-          seo.paras.map((t, i) => h('p', { key: i, style: { margin: 0, fontSize: 14, color: MUT, lineHeight: 1.85 } }, t)))),
-      h('div', { style: { display: 'flex', gap: 24, borderBottom: '1px solid ' + HAIR, marginTop: 30, flexWrap: 'wrap' } },
-        tabs.map(t => h('span', { key: t[0], 'data-go': 'set:tab:' + t[0], style: { padding: '13px 2px', fontSize: 14, fontWeight: 600, color: s.tab === t[0] ? TEAL : FAINT, borderBottom: '3px solid ' + (s.tab === t[0] ? AMBER : 'transparent'), marginBottom: -1, cursor: 'pointer' } }, t[1]))),
-      h('div', { style: { paddingTop: 22 } }, this.productPanel()));
+      h('h2', { style: { margin: '0 0 6px', fontSize: 22, fontWeight: 600, letterSpacing: '-.02em' } }, NAME + ' Templates'),
+      h('p', { style: { fontSize: 13.5, color: MUT, margin: '0 0 18px', maxWidth: '82ch' } }, 'Download a print-ready template for your size, design on it, and remove the guides before you submit. Every template has trim, +3 mm bleed and the safe area marked.'),
+      sizes.length ? h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', maxWidth: 620 } },
+        h('div', { style: { display: 'grid', gridTemplateColumns: '1fr 90px 90px 78px', gap: 8, padding: '10px 14px', background: ALT, fontSize: 11, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: FAINT } },
+          h('span', null, 'Size'), h('span', { style: { textAlign: 'center' } }, 'Illustrator'), h('span', { style: { textAlign: 'center' } }, 'Photoshop'), h('span', { style: { textAlign: 'center' } }, 'PDF')),
+        sizes.map((sz, i) => h('div', { key: i, style: { display: 'grid', gridTemplateColumns: '1fr 90px 90px 78px', gap: 8, padding: '10px 14px', borderTop: '1px solid ' + LINE, alignItems: 'center' } },
+          h('span', { style: { fontSize: 13, fontWeight: 500 } }, sz, h('span', { style: { color: FAINT, fontWeight: 400 } }, ' · +3 mm bleed')),
+          ['.ai', '.psd', '.pdf'].map((ext, j) => h('a', { key: j, href: 'templates/' + slug + '/' + sz.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + ext, style: { textAlign: 'center', fontSize: 12, fontWeight: 600, color: TEAL, border: '1px solid ' + HAIR, borderRadius: 6, padding: '6px 0', textDecoration: 'none' } }, ['AI', 'PSD', 'PDF'][j]))))) : h('p', { style: { fontSize: 13, color: FAINT } }, 'Templates for this product are supplied on request.'),
+      h('div', { style: { fontSize: 11.5, color: FAINT, marginTop: 12, lineHeight: 1.6 } }, 'Need a size that is not listed? Ask us and we will send you the template.'));
   }
 
   // SEO copy generator — real, product-specific sentences built from the live catalogue
@@ -3438,6 +3439,14 @@ class Component extends DCLogic {
             h('img', { src: window.__asset('assets/icons/upload-artwork.svg'), alt: '', style: { height: 38, width: 'auto', display: 'block', margin: '0 auto 12px' } }),
             h('div', { style: { fontSize: 14.5, fontWeight: 600, marginBottom: 5 } }, 'Drag artwork here, or browse'),
             h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.7 } }, 'PDF preferred · AI, EPS, PNG and JPG accepted for this product · multi-file upload for multi-page jobs · every file is virus-scanned before it reaches prepress')),
+          // artwork specification — the setup requirements, kept with the upload flow
+          h('div', { style: { border: '1px solid ' + HAIR } },
+            h('div', { style: { padding: '13px 16px', borderBottom: '1px solid ' + HAIR, fontSize: 13.5, fontWeight: 600 } }, 'Artwork specification'),
+            h('table', { style: { width: '100%', borderCollapse: 'collapse', fontSize: 13 } }, h('tbody', null,
+              [['File format', 'Print-ready PDF preferred. AI, EPS, or high-resolution PNG/TIFF also accepted.'], ['Resolution', '300 dpi at 100% size. Vector art stays sharp.'], ['Colour mode', 'CMYK for accurate colour (RGB is converted and can shift).'], ['Bleed', '3 mm on every side. Extend the background into the bleed.'], ['Safe margin', 'Keep text and logos 3–5 mm inside the trim.'], ['Fonts', 'Outline or embed all fonts before exporting.'], ['Spot UV / foil', 'Supply a separate 100% black mask layer, named for the finish.']]
+                .map((r, i, arr) => h('tr', { key: i, style: { borderBottom: i === arr.length - 1 ? 'none' : '1px solid ' + LINE } },
+                  h('th', { style: { textAlign: 'left', verticalAlign: 'top', width: 118, padding: '11px 16px', fontSize: 12.5, fontWeight: 600, color: TEAL } }, r[0]),
+                  h('td', { style: { padding: '11px 16px 11px 0', color: MUT, lineHeight: 1.6 } }, r[1])))))),
           h('div', { style: { border: '1px solid ' + HAIR } },
             h('div', { style: { padding: '13px 16px', borderBottom: '1px solid ' + HAIR, fontSize: 13.5, fontWeight: 600 } }, 'Version history'),
             VERSIONS.map((v, i) => h('div', { key: i, style: { padding: '12px 16px', borderTop: i ? '1px solid ' + LINE : 'none', display: 'flex', gap: 12, alignItems: 'baseline' } },
