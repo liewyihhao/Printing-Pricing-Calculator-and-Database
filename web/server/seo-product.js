@@ -168,6 +168,17 @@ function page(slug, origin, opts) {
     + '<p class="pk-hero-tag">configure, upload and print</p></div>'
     + '<div class="pk-hero-benefits">' + heroBenefits.map(b => '<div class="pk-hb"><div class="pk-hb-h">' + esc(b[0]) + '</div><div class="pk-hb-c">' + esc(b[1]) + '</div></div>').join('') + '</div>'
     + '</div></section>');
+  // Choose the type to configure (before "Why Printoka?"). More than 5 types => a horizontal
+  // carousel (scroll left/right) instead of a wrapping grid.
+  if (f.types.length) {
+    const cards = f.types.map(t => '<a class="pk-type" href="' + esc(configUrl + '?' + f.typeKey + '=' + encodeURIComponent(t)) + '"><div class="pk-type-ph" aria-hidden="true">Photography in progress</div><div class="pk-type-l">' + esc(t) + '</div><span class="pk-btn pk-btn-sm">Check Price Now</span></a>').join('');
+    const body = f.types.length > 5
+      ? '<div class="pk-carousel"><button type="button" class="pk-car-btn pk-car-prev" aria-label="Scroll left">‹</button><div class="pk-car-track">' + cards + '</div><button type="button" class="pk-car-btn pk-car-next" aria-label="Scroll right">›</button></div>'
+      : '<div class="pk-grid pk-types">' + cards + '</div>';
+    S.push(sec('types', '<h2>Choose the type of ' + esc(name) + ' to configure</h2>' + body));
+  } else {
+    S.push(sec('types', '<h2>Configure your ' + esc(name) + '</h2><p>' + esc(c.sizesCopy) + '</p><a class="pk-btn pk-btn-lg" href="' + esc(configUrl) + '">Check Price Now</a>'));
+  }
   // Why Printoka? — light band with six icon benefits
   const ICON = {
     thumb: '<path d="M7 11v9M2 13a2 2 0 0 1 2-2h3v9H4a2 2 0 0 1-2-2v-5zM7 11l4-8a2 2 0 0 1 2 2v4h5a2 2 0 0 1 2 2.3l-1.2 6A2 2 0 0 1 17 20H7"/>',
@@ -190,13 +201,6 @@ function page(slug, origin, opts) {
     + '<p class="pk-why-sub">The exclusive benefits you get as a member of Printoka.com.</p>'
     + '<div class="pk-why-grid">' + WHY6.map(w => '<div class="pk-why-i"><span class="pk-why-icon">' + w[0] + '</span><div class="pk-why-l">' + esc(w[1]) + '</div>' + (w[2] ? '<div class="pk-why-note">' + esc(w[2]) + '</div>' : '') + '</div>').join('') + '</div>'
     + '</div></section>');
-  // types to configure
-  if (f.types.length) {
-    S.push(sec('types', '<h2>Choose the type of ' + esc(name) + ' to configure</h2><div class="pk-grid pk-types">'
-      + f.types.map(t => '<a class="pk-type" href="' + esc(configUrl + '?' + f.typeKey + '=' + encodeURIComponent(t)) + '"><div class="pk-type-ph" aria-hidden="true">Photography in progress</div><div class="pk-type-l">' + esc(t) + '</div><span class="pk-btn pk-btn-sm">Check Price Now</span></a>').join('') + '</div>'));
-  } else {
-    S.push(sec('types', '<h2>Configure your ' + esc(name) + '</h2><p>' + esc(c.sizesCopy) + '</p><a class="pk-btn pk-btn-lg" href="' + esc(configUrl) + '">Check Price Now</a>'));
-  }
   // sizes (to scale)
   if (f.sizes.length) {
     const parsed = f.sizes.map(s => ({ s, d: parseSize(s) }));
@@ -278,7 +282,9 @@ function page(slug, origin, opts) {
     + (asset ? '<link rel="preload" as="image" href="' + esc(asset) + '">' : '')
     + jsonld.map(j => '<script type="application/ld+json">' + JSON.stringify(j) + '</script>').join('')
     + '<style>' + css() + '</style></head><body>'
-    + header + '<main class="pk-main">' + S.join('') + '</main>' + footer + '</body></html>';
+    + header + '<main class="pk-main">' + S.join('') + '</main>' + footer
+    + '<script>document.querySelectorAll(".pk-carousel").forEach(function(c){var t=c.querySelector(".pk-car-track");var p=c.querySelector(".pk-car-prev"),n=c.querySelector(".pk-car-next");function s(d){t.scrollBy({left:d*Math.max(240,t.clientWidth*0.8),behavior:"auto"})}if(p)p.onclick=function(){s(-1)};if(n)n.onclick=function(){s(1)}});</script>'
+    + '</body></html>';
   return html;
 }
 
@@ -319,6 +325,12 @@ function css() {
     '.pk-grid{display:grid;gap:14px}.pk-types{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.pk-sizes{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.pk-mats{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}.pk-fins{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}',
     '.pk-type{display:flex;flex-direction:column;border:1px solid ' + T.hairline + ';border-radius:10px;overflow:hidden;background:#fff;color:' + T.ink + '}.pk-type:hover{color:' + T.ink + '}',
     '.pk-type-ph{background:' + T.alt + ';color:#9e9e9e;font-size:11px;text-align:center;padding:34px 8px}.pk-type-l{font-weight:600;font-size:14px;padding:12px 14px 8px}.pk-type .pk-btn-sm{margin:0 14px 14px;text-align:center}',
+    // carousel (used when >5 type cards): horizontal scroll with arrow buttons
+    '.pk-carousel{display:flex;align-items:center;gap:10px}.pk-car-track{flex:1;min-width:0;overflow-x:auto;white-space:nowrap;scroll-snap-type:x proximity;padding:2px 0}',
+    '.pk-car-track::-webkit-scrollbar{height:7px}.pk-car-track::-webkit-scrollbar-thumb{background:' + T.hairline + ';border-radius:4px}',
+    '.pk-car-track>.pk-type{display:inline-flex;flex-direction:column;width:220px;vertical-align:top;white-space:normal;margin-right:14px;scroll-snap-align:start}',
+    '.pk-car-btn{flex:none;align-self:center;width:40px;height:40px;border-radius:50%;border:1px solid ' + T.hairline + ';background:#fff;color:' + T.brand + ';font-size:22px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}.pk-car-btn:hover{background:' + T.brand + ';color:#fff;border-color:' + T.brand + '}',
+    '@media(max-width:600px){.pk-car-btn{display:none}}',
     '.pk-scale-note{font-size:11.5px;color:#9e9e9e;margin:-8px 0 14px}',
     '.pk-size{border:1px solid ' + T.hairline + ';border-radius:10px;padding:12px;text-align:center}.pk-size-box{height:128px;display:flex;align-items:center;justify-content:center}.pk-size-box span{background:#fff;border:1.5px solid ' + T.brand + ';border-radius:2px;display:block}.pk-size-na{width:60px;height:40px;border-style:dashed!important;border-color:' + T.hairline + '!important}.pk-size-l{font-size:12.5px;font-weight:500;margin-top:8px}',
     '.pk-mat{border:1px solid ' + T.hairline + ';border-radius:10px;padding:14px}.pk-mat-l{font-size:13.5px;font-weight:500}.pk-bars{display:flex;gap:4px;margin:9px 0 5px}.pk-bars span{height:6px;flex:1;border-radius:3px;background:' + T.hairline + '}.pk-bars span.on{background:' + T.brand + '}.pk-mat-c{font-size:11.5px;color:' + T.muted + '}.pk-mat-c-neutral{color:#9e9e9e}',

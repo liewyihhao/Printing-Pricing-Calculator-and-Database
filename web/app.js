@@ -2947,10 +2947,12 @@ class Component extends DCLogic {
         sidebar,
         h('div', null,
           h('div', { key: 'count', style: { fontSize: 13, color: MUT, marginBottom: 14 } }, items.length + ' products' + (active === 'all' ? '' : ' in ' + this.catCategoryLabel(active))),
-          h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 16 } },
-            items.map(p => {
+          (() => {
+            // more than 5 products => a horizontal carousel (scroll left/right); else a grid
+            const carousel = items.length > 5;
+            const card = p => {
               const from = this.catFromPrice(p.id), moq = this.catMoq(p.id);
-              return h('a', { key: p.id, href: this.productPath(p.id) || undefined, 'data-go': 'open:' + p.id, style: { border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'pointer', color: 'inherit', textDecoration: 'none' } },
+              return h('a', { key: p.id, href: this.productPath(p.id) || undefined, 'data-go': 'open:' + p.id, style: Object.assign({ border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'pointer', color: 'inherit', textDecoration: 'none' }, carousel ? { display: 'inline-flex', width: '216px', verticalAlign: 'top', whiteSpace: 'normal', marginRight: '16px', scrollSnapAlign: 'start' } : {}) },
                 this.art(p.engName),
                 h('div', { style: { padding: '13px 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 } },
                   h('span', { style: { fontSize: 13.5, fontWeight: 500, lineHeight: 1.3, minHeight: 34 } }, p.name),
@@ -2958,7 +2960,15 @@ class Component extends DCLogic {
                   h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 'auto', paddingTop: 4 } },
                     h('span', { style: { fontSize: 14.5, fontWeight: 600, color: TEAL } }, from != null ? ('from ' + this.money(from) + '/pc') : 'Quote'),
                     this.chip(from != null ? 'Instant' : 'On request', from != null ? 'ok' : 'warn'))));
-            })))),
+            };
+            if (!carousel) return h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 16 } }, items.map(card));
+            const carBtn = { flex: 'none', alignSelf: 'center', width: 40, height: 40, borderRadius: '50%', border: '1px solid ' + HAIR, background: '#fff', color: TEAL, fontSize: 22, lineHeight: 1, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' };
+            const scroll = (btn, dir) => { const t = dir < 0 ? btn.nextSibling : btn.previousSibling; if (t) t.scrollBy({ left: dir * Math.max(240, t.clientWidth * 0.8), behavior: 'auto' }); };
+            return h('div', { style: { display: 'flex', alignItems: 'center', gap: 10 } },
+              h('button', { type: 'button', 'aria-label': 'Scroll left', onClick: e => scroll(e.currentTarget, -1), style: carBtn }, '‹'),
+              h('div', { style: { flex: 1, minWidth: 0, overflowX: 'auto', whiteSpace: 'nowrap', scrollSnapType: 'x proximity', padding: '2px 0' } }, items.map(card)),
+              h('button', { type: 'button', 'aria-label': 'Scroll right', onClick: e => scroll(e.currentTarget, 1), style: carBtn }, '›'));
+          })())),
       // SEO content section above the footer
       h('section', { style: { borderTop: '1px solid ' + HAIR, marginTop: 46, paddingTop: 34, maxWidth: 900 } },
         h('h2', { style: { margin: '0 0 18px', fontSize: 23, fontWeight: 600, letterSpacing: '-.02em' } }, seo.heading),
