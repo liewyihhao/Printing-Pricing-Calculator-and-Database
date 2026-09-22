@@ -252,6 +252,9 @@ class Component extends DCLogic {
     const el = e.target.closest && e.target.closest('[data-go]');
     if (!el) return;
     const v = el.getAttribute('data-go');
+    // real <a href> cards: let modified/middle clicks open a new tab (crawlers + users),
+    // but intercept a plain left-click so it routes in-app instead of a full page reload.
+    if (el.tagName === 'A' && el.getAttribute('href') && (e.button == null || e.button === 0) && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) e.preventDefault();
     if (v === '_mega') return this.setState(s => ({ megaOpen: !s.megaOpen }));
     if (v === '_dismiss') return this.setState({ banner: false });
     if (v === '_locale') { const L = ['EN', 'ZH', 'MS']; return this.setState(s => ({ locale: L[(L.indexOf(s.locale || 'EN') + 1) % 3] })); }
@@ -349,6 +352,19 @@ class Component extends DCLogic {
     return null;
   }
   productPath(id) { const sl = this.pkSlug(id); return sl ? '/' + sl : null; }
+  // crawlable href for a nav token so product/category cards can be real <a> links (internal
+  // link equity + anchor text). Returns null for tokens that are pure in-app state changes.
+  navHref(go) {
+    if (!go || typeof go !== 'string') return null;
+    if (go.indexOf('open:') === 0) return this.productPath(Number(go.slice(5)));
+    if (go.indexOf('catopen:') === 0) { const cf = go.slice(8); return cf === 'all' ? '/products' : '/products/' + cf; }
+    if (go === 'packaging') return '/products/packaging-boxes';
+    if (go.indexOf('blog:') === 0) return '/blog/' + go.slice(5) + '/';
+    return null;
+  }
+  // props for a clickable card that navigates: a real <a href> when the token maps to a URL,
+  // else the plain data-go span/div. Spread onto an h('a',…)/h('div',…) accordingly.
+  cardGo(go) { const href = this.navHref(go); return href ? { tag: 'a', props: { href, 'data-go': go } } : { tag: 'div', props: { 'data-go': go } }; }
   // push a route's URL into the address bar so it is shareable/back-navigable (SPA history)
   pushUrl(path) { try { if (typeof history !== 'undefined' && path && location.pathname !== path) history.pushState({ pk: 1 }, '', path); } catch (e) {} }
   // per-product quantity model straight from the pricing engine (moq / options / chips)
@@ -749,15 +765,20 @@ class Component extends DCLogic {
       return { title: name + ' Printing | ' + (from != null && from >= 0.001 ? 'From ' + money0(from) + '/pc | ' : '') + 'Printoka', description: 'Order ' + name + ' printing online in ' + C + ' — configure your options, get an instant price, and print with a free artwork check. Member discounts up to 15%.', robots: IDX, jsonld };
     }
     if (route === 'category') {
-      const active = this.state.catFilter || 'all', label = active === 'all' ? 'Online Printing' : this.catCategoryLabel(active);
+      const active = this.state.catFilter || 'all', isAll = active === 'all';
+      const label = isAll ? 'Online Printing' : this.catCategoryLabel(active);
+      // "Online Printing" already contains "Printing", so don't append it again (avoids "… Printing Printing")
+      const collName = isAll ? 'Online Printing' : label + ' Printing';
+      const titleLead = isAll ? 'Online Printing' : label + ' Printing Online';
+      const descLead = isAll ? 'Online printing' : 'Custom ' + label.toLowerCase() + ' printing';
       const items = this.catProducts(active), froms = items.map(p => this.catFromPrice(p.id)).filter(x => x != null), minFrom = froms.length ? Math.min.apply(null, froms) : null;
       const jsonld = { '@context': ctx, '@graph': [
-        { '@type': 'CollectionPage', name: label + ' Printing' },
+        { '@type': 'CollectionPage', name: collName },
         { '@type': 'ItemList', itemListElement: items.slice(0, 20).map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p.name })) },
         { '@type': 'BreadcrumbList', itemListElement: [{ '@type': 'ListItem', position: 1, name: 'Home', item: origin + '/' }, { '@type': 'ListItem', position: 2, name: label }] },
       ] };
       const showFrom = minFrom != null && minFrom >= 0.01;
-      return { title: label + ' Printing Online | ' + (showFrom ? 'From ' + money0(minFrom) + '/pc | ' : '') + 'Printoka', description: 'Custom ' + label.toLowerCase() + ' printing in ' + C + '. Configure size, material and finish, see the price instantly, and order online' + (showFrom ? ' — from ' + money0(minFrom) + ' per piece.' : '.'), robots: IDX, jsonld };
+      return { title: titleLead + ' | ' + (showFrom ? 'From ' + money0(minFrom) + '/pc | ' : '') + 'Printoka', description: descLead + ' in ' + C + '. Configure size, material and finish, see the price instantly, and order online' + (showFrom ? ', from ' + money0(minFrom) + ' per piece.' : '.'), robots: IDX, jsonld };
     }
     if (route === 'home') return { title: 'Printoka — Online Printing in Malaysia, Singapore & Brunei | 100+ Products, Instant Pricing', description: 'Order business cards, flyers, stickers, packaging and more online. Instant pricing, member discounts up to 15%, and nationwide delivery across Malaysia, Singapore and Brunei.', robots: IDX, jsonld: { '@context': ctx, '@graph': [org, { '@type': 'WebSite', name: 'Printoka', url: origin, potentialAction: { '@type': 'SearchAction', target: origin + '/search?q={search_term_string}', 'query-input': 'required name=search_term_string' } }] } };
     if (route === 'packaging') return { title: 'Custom Packaging Boxes Printing | Design Your Own | Printoka', description: 'Design custom packaging boxes, sleeves and mailers online in ' + C + '. Choose your size, material and finishing, with a free die-line to design on.', robots: IDX, jsonld: org };
@@ -1481,7 +1502,7 @@ class Component extends DCLogic {
       h('h2', { style: { fontSize: 22, fontWeight: 600, margin: '0 0 16px' } }, 'Popular products' + (place ? ' in ' + place : '')),
       h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 16 } },
         prods.map(pr => { const from = this.catFromPrice(pr.id);
-          return h('div', { key: pr.id, 'data-go': 'open:' + pr.id, style: { border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', overflow: 'hidden', cursor: 'pointer' } },
+          return h('a', { key: pr.id, href: this.productPath(pr.id) || undefined, 'data-go': 'open:' + pr.id, style: { border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', overflow: 'hidden', cursor: 'pointer', display: 'block', color: 'inherit', textDecoration: 'none' } },
             this.art(pr.engName),
             h('div', { style: { padding: '13px 14px' } },
               h('div', { style: { fontSize: 13.5, fontWeight: 500, minHeight: 34, lineHeight: 1.3 } }, pr.name),
@@ -2022,11 +2043,12 @@ class Component extends DCLogic {
       specNote: cur[3],
       screens: SCREENS.map(x => ({ id: x[0], label: x[1] })),
       payments: ['Stripe', 'iPay88', 'FPX', "Touch 'n Go", 'PayNow', 'GrabPay'],
-      megaCols: this.catCategories().map(c => ({
+      megaCols: this.catCategories().map(c => { const go = c.id === 'packaging-boxes' ? 'packaging' : 'catopen:' + c.id; return {
         title: c.label,
-        go: c.id === 'packaging-boxes' ? 'packaging' : 'catopen:' + c.id,
-        items: this.catProducts(c.id).slice(0, 7).map(pr => ({ n: pr.name, go: 'open:' + pr.id })),
-      })),
+        go,
+        href: this.navHref(go),
+        items: this.catProducts(c.id).slice(0, 7).map(pr => ({ n: pr.name, go: 'open:' + pr.id, href: this.productPath(pr.id) })),
+      }; }),
       footerCols: [
         { title: 'Products', items: [['Business cards', 'category'], ['Stickers & labels', 'category'], ['Flyers & brochures', 'category'], ['Booklets', 'category'], ['Packaging & boxes', 'packaging'], ['Apparel & gifts', 'category']] },
         { title: 'Company', items: [['About Printoka', 'about'], ['Corporate accounts', 'corporate'], ['Partners', 'partners'], ['Membership', 'membership'], ['Terms & policies', 'terms']] },
@@ -2144,7 +2166,7 @@ class Component extends DCLogic {
           h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 16 } },
             this.catCategories().map(c => {
               const list = this.catProducts(c.id), cover = list[0] ? list[0].engName : 'card';
-              return h('div', { key: c.id, 'data-go': c.id === 'packaging-boxes' ? 'packaging' : 'catopen:' + c.id, style: { border: '1px solid ' + HAIR, borderRadius: 13, overflow: 'hidden', background: '#fff', cursor: 'pointer' } },
+              return h('a', { key: c.id, href: this.navHref(c.id === 'packaging-boxes' ? 'packaging' : 'catopen:' + c.id) || undefined, 'data-go': c.id === 'packaging-boxes' ? 'packaging' : 'catopen:' + c.id, style: { border: '1px solid ' + HAIR, borderRadius: 13, overflow: 'hidden', background: '#fff', cursor: 'pointer', display: 'block', color: 'inherit', textDecoration: 'none' } },
                 this.art(cover),
                 h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 15px' } },
                   h('span', { style: { fontWeight: 500, fontSize: 14 } }, c.label),
@@ -2156,7 +2178,7 @@ class Component extends DCLogic {
       this.sec('Popular right now', 'What customers order most', 'Best sellers, priced to the cent.',
         h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(190px,1fr))', gap: 14 } },
           BEST.map((p, i) => { const bid = this.pkIdByName(p[0]); const label = bid != null ? this.catName(bid) : p[0];
-            return h('div', { key: i, 'data-go': bid != null ? 'open:' + bid : 'category', style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', background: '#fff', display: 'flex', flexDirection: 'column', cursor: 'pointer' } },
+            return h(bid != null ? 'a' : 'div', { key: i, href: bid != null ? (this.productPath(bid) || undefined) : undefined, 'data-go': bid != null ? 'open:' + bid : 'category', style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', background: '#fff', display: 'flex', flexDirection: 'column', cursor: 'pointer', color: 'inherit', textDecoration: 'none' } },
             this.art(p[0]),
             h('div', { style: { padding: '11px 13px', display: 'flex', flexDirection: 'column', gap: 5 } },
               h('span', { style: { fontSize: 13.5, fontWeight: 500 } }, label),
@@ -2918,7 +2940,7 @@ class Component extends DCLogic {
           h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 16 } },
             items.map(p => {
               const from = this.catFromPrice(p.id), moq = this.catMoq(p.id);
-              return h('div', { key: p.id, 'data-go': 'open:' + p.id, style: { border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'pointer' } },
+              return h('a', { key: p.id, href: this.productPath(p.id) || undefined, 'data-go': 'open:' + p.id, style: { border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'pointer', color: 'inherit', textDecoration: 'none' } },
                 this.art(p.engName),
                 h('div', { style: { padding: '13px 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 } },
                   h('span', { style: { fontSize: 13.5, fontWeight: 500, lineHeight: 1.3, minHeight: 34 } }, p.name),
