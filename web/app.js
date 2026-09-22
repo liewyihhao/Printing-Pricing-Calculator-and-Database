@@ -3094,15 +3094,18 @@ class Component extends DCLogic {
             avail ? null : h('span', { style: { fontSize: 11.5, fontWeight: 400, color: '#bdbdbd' } }, 'Not available')));
       }) : [];
       return h('div', { key: key, style: { padding: '16px 0', borderTop: '1px solid ' + LINE } },
-        h('div', { style: { fontSize: 13.5, fontWeight: 600, marginBottom: 8 } }, fieldLabel),
-        note ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5, marginBottom: 8 } }, note) : null,
-        // the collapsed control: current value + chevron; click to open the option list
+        // the collapsed control: field label (+ note) on the left, current value + chevron on the
+        // right of the SAME row; click anywhere on the row to open the option list.
         h('div', { onClick: e => { e.stopPropagation(); toggle(); }, tabIndex: 0, role: 'combobox', 'aria-haspopup': 'listbox', 'aria-expanded': open ? 'true' : 'false', 'aria-label': fieldLabel + (isPh0 ? ' (not selected)' : ': ' + curText),
           onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); e.stopPropagation(); toggle(); } else if (e.key === 'ArrowDown' && !open) { e.preventDefault(); e.stopPropagation(); this.setState({ ddOpen: key }); } else if (e.key === 'Escape' && open) { e.preventDefault(); e.stopPropagation(); close(); } },
-          style: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 12, cursor: 'pointer', padding: '10px 2px', border: 'none', background: 'transparent' } },
-          h('span', { style: { flex: 1, textAlign: 'right', fontSize: 14, fontWeight: 500, color: isPh0 ? FAINT : INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, curText),
-          h('span', { 'aria-hidden': 'true', style: { flex: 'none', color: FAINT, fontSize: 10, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .12s' } }, '▼')),
-        open ? h('div', { style: { marginTop: 10 } },
+          style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, cursor: 'pointer' } },
+          h('div', { style: { flex: '1 1 auto', minWidth: 0 } },
+            h('div', { style: { fontSize: 13.5, fontWeight: 600 } }, fieldLabel),
+            note ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5, marginTop: 3 } }, note) : null),
+          h('div', { style: { flex: '0 1 auto', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, minWidth: 0 } },
+            h('span', { style: { fontSize: 14, fontWeight: 500, color: isPh0 ? FAINT : INK, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, curText),
+            h('span', { 'aria-hidden': 'true', style: { flex: 'none', color: FAINT, fontSize: 10, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .12s' } }, '▼'))),
+        open ? h('div', { style: { marginTop: 12 } },
           remark ? h('div', { style: { fontSize: 11.5, color: MUT, lineHeight: 1.55, background: ALT, borderRadius: 8, padding: '9px 12px', marginBottom: 12 } }, remark) : null,
           h('div', { role: 'radiogroup', 'aria-label': fieldLabel, style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 } }, cards)) : null);
     };
