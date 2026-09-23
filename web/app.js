@@ -2623,29 +2623,64 @@ class Component extends DCLogic {
           h('div', { style: { display: 'flex', flexDirection: 'column', gap: 7 } },
             l[2].map((b, bi) => h('div', { key: bi, style: { display: 'flex', gap: 9, fontSize: 13, color: MUT, lineHeight: 1.55 } },
               h('img', { src: window.__asset ? window.__asset('assets/icons/check-circle.svg') : 'assets/icons/check-circle.svg', alt: '', style: { height: 14, width: 14, display: 'block', flex: 'none', marginTop: 2 } }), b)))))),
-      h('div', { key: 'body', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 20, marginTop: 20, alignItems: 'start' } },
-        h('div', { style: { display: 'flex', flexDirection: 'column', gap: 16, maxWidth: 260 } },
-          h('div', { style: { border: '1px solid ' + HAIR, background: '#fff' } },
-            h('div', { style: { padding: '11px 14px', borderBottom: '1px solid ' + HAIR, fontSize: 12, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: FAINT } }, 'Box family'),
-            FAMILIES.map((f, i) => h('div', { key: i, style: { display: 'flex', justifyContent: 'space-between', gap: 10, padding: '9px 14px', borderTop: i ? '1px solid ' + LINE : 'none', fontSize: 13, cursor: 'pointer', background: '#fff', borderLeft: '2px solid ' + (i === 0 ? TEAL : 'transparent'), color: i === 0 ? TEAL : f[0].indexOf('—') === 0 ? MUT : INK, fontWeight: f[0].indexOf('—') === 0 ? 400 : 600, paddingLeft: f[0].indexOf('—') === 0 ? 24 : 14 } },
-              h('span', null, f[0].replace('— ', '')), h('span', { style: { color: FAINT, fontSize: 12 } }, f[1])))),
-          h('div', { style: { background: TEAL, color: '#fff', padding: '22px 20px', textAlign: 'center' } },
-            h('div', { style: { fontSize: 14.5, fontWeight: 600, lineHeight: 1.5, marginBottom: 12 } }, 'Can’t find the style you need?'),
-            h('span', { 'data-go': 'contact', style: { display: 'inline-block', background: '#fff', color: TEAL, fontSize: 13.5, fontWeight: 600, padding: '10px 20px', borderRadius: 2, cursor: 'pointer' } }, 'Get a custom quote'),
-            h('div', { style: { fontSize: 12, marginTop: 10, opacity: .9 } }, 'For fully bespoke packaging and die-lines'))),
-        h('div', null,
-          h('div', { style: { display: 'flex', gap: 22, borderBottom: '1px solid ' + HAIR, marginBottom: 16, flexWrap: 'wrap' } },
-            ['Box model', 'Product spec', 'Artwork spec', 'Tutorial'].map((t, i) =>
-              h('span', { key: i, style: { padding: '0 0 12px', fontSize: 13.5, fontWeight: 600, color: i ? MUT : TEAL, borderBottom: '2px solid ' + (i ? 'transparent' : TEAL), marginBottom: -1, cursor: 'pointer' } }, t))),
-          h('div', { style: { display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 14 } },
-            h('span', { style: { fontSize: 13, color: MUT } }, 'All boxes · 54 styles'),
-            h('span', { style: { fontSize: 13, color: MUT } }, 'Sort: Most popular')),
-          h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 16 } },
-            MODELS.map((m, i) => h('div', { key: i, 'data-go': 'set:pkTab:configure', style: { border: '1px solid ' + HAIR, background: '#fff', padding: '16px 16px 18px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4 } },
-              this.dieline(m[3]),
-              h('div', { style: { fontSize: 14.5, fontWeight: 600, color: TEAL, marginTop: 8 } }, m[0]),
-              h('div', { style: { fontSize: 12.5, fontWeight: 500 } }, m[1]),
-              h('div', { style: { fontSize: 12, color: MUT, lineHeight: 1.5 } }, m[2])))))),
+      (() => {
+        // fixed sidebar + flexible content (was auto-fit, which stretched the sidebar and left a
+        // big empty gap). The box family filters the grid; the inner tabs switch the sub-view.
+        const fam = st.pkFam || 'All boxes', libTab = st.pkLibTab || 'Box model';
+        const matchFam = m => { const f = fam.toLowerCase(), l = (m[1] + ' ' + m[3]).toLowerCase();
+          if (f.indexOf('basic') >= 0) return l.indexOf('basic') >= 0;
+          if (f.indexOf('window') >= 0) return l.indexOf('window') >= 0;
+          if (f.indexOf('gift') >= 0) return l.indexOf('gift') >= 0;
+          if (f.indexOf('hanging') >= 0) return l.indexOf('hanging') >= 0;
+          if (f.indexOf('tray') >= 0 || f.indexOf('telescope') >= 0) return l.indexOf('tray') >= 0;
+          if (f.indexOf('folder') >= 0 || f.indexOf('envelope') >= 0) return l.indexOf('folder') >= 0 || l.indexOf('envelope') >= 0;
+          if (f.indexOf('sleeve') >= 0) return l.indexOf('sleeve') >= 0;
+          if (f.indexOf('divider') >= 0) return l.indexOf('divider') >= 0;
+          if (f.indexOf('inner') >= 0) return l.indexOf('inner') >= 0 || l.indexOf('insert') >= 0;
+          return true; };
+        const famModels = fam === 'All boxes' ? MODELS : fam === 'Most popular' ? MODELS.slice(0, 5) : MODELS.filter(matchFam);
+        const INNER = ['Box model', 'Product spec', 'Artwork spec', 'Tutorial'];
+        const specRows = [['Materials', 'Gloss / matte art card, kraft, corrugated E-flute'], ['Weights', '250 – 400 GSM card · 3-ply E-flute'], ['Finishing', 'Lamination, spot UV, hot stamping, emboss, window patch'], ['Min order', '100 pcs short run · 1,000 pcs standard'], ['Lead time', '2 – 6 working days after die-line approval']];
+        const subViews = {
+          'Box model': h('div', null,
+            h('div', { style: { display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginBottom: 14 } },
+              h('span', { style: { fontSize: 13, color: MUT } }, fam + ' · ' + famModels.length + ' style' + (famModels.length === 1 ? '' : 's')),
+              h('span', { style: { fontSize: 13, color: MUT } }, 'Sort: Most popular')),
+            famModels.length ? h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(190px,1fr))', gap: 16 } },
+              famModels.map((m, i) => h('div', { key: i, 'data-go': 'set:pkTab:configure', style: { border: '1px solid ' + HAIR, borderRadius: 10, background: '#fff', padding: '16px 16px 18px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4 } },
+                this.dieline(m[3]),
+                h('div', { style: { fontSize: 14.5, fontWeight: 600, color: TEAL, marginTop: 8 } }, m[0]),
+                h('div', { style: { fontSize: 12.5, fontWeight: 500 } }, m[1]),
+                h('div', { style: { fontSize: 12, color: MUT, lineHeight: 1.5 } }, m[2]))))
+              : h('div', { style: { border: '1px dashed ' + HAIR, borderRadius: 10, padding: 30, textAlign: 'center', fontSize: 13, color: MUT } }, 'More ' + fam.toLowerCase() + ' styles are available on request — get a custom quote.')),
+          'Product spec': h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 10, overflow: 'hidden' } },
+            specRows.map((r, i) => h('div', { key: i, style: { display: 'grid', gridTemplateColumns: '150px 1fr', gap: 14, padding: '13px 16px', borderTop: i ? '1px solid ' + LINE : 'none' } },
+              h('span', { style: { fontSize: 13, fontWeight: 600, color: TEAL } }, r[0]), h('span', { style: { fontSize: 13, color: MUT, lineHeight: 1.6 } }, r[1])))),
+          'Artwork spec': h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 10, padding: 18, fontSize: 13.5, color: MUT, lineHeight: 1.8 } },
+            h('p', { style: { margin: '0 0 8px' } }, 'Every box comes with a free die-line — a vector file of the cut, crease and bleed lines at your exact size. Design straight on top of it.'),
+            h('ul', { style: { margin: 0, paddingLeft: 18 } }, ['3 mm bleed past every cut edge', 'CMYK, 300 dpi, fonts outlined', 'Keep text 4 mm clear of creases and cut lines'].map((x, i) => h('li', { key: i }, x)))),
+          'Tutorial': h('div', { style: { display: 'flex', flexDirection: 'column', gap: 10 } },
+            [['1', 'Pick a box style and set its exact size'], ['2', 'Choose material, finishing and quantity — see the price at each tier'], ['3', 'Download the die-line, add your artwork, and submit']].map((s, i) =>
+              h('div', { key: i, style: { display: 'flex', gap: 12, border: '1px solid ' + HAIR, borderRadius: 10, padding: '13px 15px' } },
+                h('span', { style: { flex: 'none', width: 24, height: 24, borderRadius: '50%', background: TEAL, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700 } }, s[0]),
+                h('span', { style: { fontSize: 13.5, color: INK, alignSelf: 'center' } }, s[1])))),
+        };
+        return h('div', { key: 'body', style: { display: 'grid', gridTemplateColumns: '256px minmax(0,1fr)', gap: 20, marginTop: 20, alignItems: 'start' } },
+          h('div', { style: { display: 'flex', flexDirection: 'column', gap: 16 } },
+            h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 10, overflow: 'hidden', background: '#fff' } },
+              h('div', { style: { padding: '11px 14px', borderBottom: '1px solid ' + HAIR, fontSize: 12, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: FAINT } }, 'Box family'),
+              FAMILIES.map((f, i) => { const name = f[0].replace('— ', ''), isSub = f[0].indexOf('—') === 0, on = fam === name;
+                return h('div', { key: i, 'data-go': 'set:pkFam:' + name, style: { display: 'flex', justifyContent: 'space-between', gap: 10, padding: '9px 14px', borderTop: i ? '1px solid ' + LINE : 'none', fontSize: 13, cursor: 'pointer', background: on ? '#fdf2f2' : '#fff', borderLeft: '2px solid ' + (on ? TEAL : 'transparent'), color: on ? TEAL : isSub ? MUT : INK, fontWeight: on ? 600 : isSub ? 400 : 600, paddingLeft: isSub ? 24 : 14 } },
+                  h('span', null, name), h('span', { style: { color: on ? TEAL : FAINT, fontSize: 12 } }, f[1])); })),
+            h('div', { style: { background: TEAL, color: '#fff', padding: '22px 20px', borderRadius: 10, textAlign: 'center' } },
+              h('div', { style: { fontSize: 14.5, fontWeight: 600, lineHeight: 1.5, marginBottom: 12 } }, 'Can’t find the style you need?'),
+              h('span', { 'data-go': 'contact', style: { display: 'inline-block', background: '#fff', color: TEAL, fontSize: 13.5, fontWeight: 600, padding: '10px 20px', borderRadius: 8, cursor: 'pointer' } }, 'Get a custom quote'),
+              h('div', { style: { fontSize: 12, marginTop: 10, opacity: .9 } }, 'For fully bespoke packaging and die-lines'))),
+          h('div', { style: { minWidth: 0 } },
+            h('div', { style: { display: 'flex', gap: 22, borderBottom: '1px solid ' + HAIR, marginBottom: 16, flexWrap: 'wrap' } },
+              INNER.map((t, i) => h('span', { key: i, 'data-go': 'set:pkLibTab:' + t, style: { padding: '0 0 12px', fontSize: 13.5, fontWeight: 600, color: libTab === t ? TEAL : MUT, borderBottom: '2px solid ' + (libTab === t ? TEAL : 'transparent'), marginBottom: -1, cursor: 'pointer' } }, t))),
+            subViews[libTab] || subViews['Box model']));
+      })(),
     ];
 
     const step = st.pkStep === undefined ? 0 : st.pkStep;
