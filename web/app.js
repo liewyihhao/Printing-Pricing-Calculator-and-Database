@@ -277,6 +277,9 @@ class Component extends DCLogic {
     if (v.indexOf('prod:') === 0) return this.setState({ prodId: Number(v.slice(5)), cfg: {}, qty: 1000, qtyChosen: false });
     if (v.indexOf('open:') === 0) { const pid = Number(v.slice(5)); if (typeof window !== 'undefined') window.scrollTo(0, 0); this.pushUrl(this.productPath(pid) || '/'); return this.setState({ prodId: pid, cfg: {}, qty: 1000, qtyChosen: false, route: 'product', megaOpen: false }); }
     if (v.indexOf('catopen:') === 0) { const cf = v.slice(8); if (typeof window !== 'undefined') window.scrollTo(0, 0); this.pushUrl(cf === 'all' ? '/products' : '/products/' + cf); return this.setState({ catFilter: cf, route: 'category', megaOpen: false }); }
+    // packaging: library landing + separate sub-pages (configure/quote/dielines) with their own URLs
+    if (v === 'packaging') { if (typeof window !== 'undefined') window.scrollTo(0, 0); this.pushUrl('/packaging'); return this.setState({ route: 'packaging', pkTab: 'library', megaOpen: false }); }
+    if (v.indexOf('pkgo:') === 0) { const t = v.slice(5); if (typeof window !== 'undefined') window.scrollTo(0, 0); this.pushUrl(t === 'library' ? '/packaging' : '/packaging/' + t); return this.setState({ route: 'packaging', pkTab: t, megaOpen: false }); }
     if (v.indexOf('blog:') === 0) return this.blogOpen(v.slice(5));
     if (v === 'addraddsave') return this.addressAdd();
     if (v.indexOf('addrdel:') === 0) return this.addressDelete(v.slice(8));
@@ -1459,7 +1462,9 @@ class Component extends DCLogic {
     if (!segs.length) { if (this.state.route !== 'home') this.setState({ route: 'home' }); return; }
     if (segs[0] === 'blog' && segs[1]) return this.blogOpen(segs[1]);
     // named top-level routes (so the SSR header/footer links resolve in the SPA)
-    const NAMED = { cart: 'cart', checkout: 'checkout', auth: 'auth', search: 'search', learn: 'learn', 'learning-hub': 'learn', membership: 'membership', contact: 'contact', about: 'about', 'about-us': 'about', support: 'support', downloads: 'downloads', partners: 'partners', terms: 'terms', track: 'track', packaging: 'packaging' };
+    const NAMED = { cart: 'cart', checkout: 'checkout', auth: 'auth', search: 'search', learn: 'learn', 'learning-hub': 'learn', membership: 'membership', contact: 'contact', about: 'about', 'about-us': 'about', support: 'support', downloads: 'downloads', partners: 'partners', terms: 'terms', track: 'track', artwork: 'artwork' };
+    // packaging: library landing at /packaging, configurator/quote/die-lines as their own sub-URLs
+    if (segs[0] === 'packaging') return this.setState({ route: 'packaging', pkTab: segs[1] || 'library' });
     if (segs.length === 1 && NAMED[segs[0]]) return this.setState({ route: NAMED[segs[0]] });
     // category listing: /products or /products/<catId>
     if (segs[0] === 'products') return this.setState({ route: 'category', catFilter: segs[1] || 'all' });
@@ -2537,12 +2542,12 @@ class Component extends DCLogic {
               h('span', { style: { color: AMBER, fontSize: 18, letterSpacing: 2 } }, '★★★★★'),
               h('span', { style: { fontSize: 13, color: MUT } }, '4.8 / 5 from verified reviews')),
             h('div', { style: { display: 'flex', gap: 11, flexWrap: 'wrap' } },
-              this.btn('Design your box →', 'amber', 'set:pkTab:configure', { padding: '13px 24px' }),
+              this.btn('Design your box →', 'amber', 'pkgo:configure', { padding: '13px 24px' }),
               this.btn('Get a custom quote', 'ghost', 'contact', { padding: '13px 24px' }))),
           h('div', { style: { flex: '0 1 320px', minWidth: 240, display: 'grid', placeItems: 'center' } },
             h('div', { style: { width: '100%', maxWidth: 300, transform: 'perspective(760px) rotateX(6deg) rotateY(-20deg)', filter: 'drop-shadow(0 16px 26px rgba(33,33,33,.18))' } }, this.dieline('carton', null, 220))))),
       // box types
-      this.pkBand('Box styles', 'What would you like to make?', TYPES, (t) => h('div', { key: t[1], 'data-go': 'set:pkTab:library', style: { border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', padding: '20px 18px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 9 } },
+      this.pkBand('Box styles', 'What would you like to make?', TYPES, (t) => h('div', { key: t[1], 'data-go': 'pkgo:configure', style: { border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', padding: '20px 18px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 9 } },
         h('span', { style: { height: 44, width: 44, borderRadius: 10, background: '#fdf2f2', display: 'grid', placeItems: 'center' } }, this.dashIcon(t[0], TEAL, 22)),
         h('div', { style: { fontSize: 15.5, fontWeight: 600 } }, t[1]),
         h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.6 } }, t[2]),
@@ -2589,7 +2594,6 @@ class Component extends DCLogic {
   s_packaging() {
     const st = this.state;
     const tab = st.pkTab || 'library';
-    const TABS = [['library', 'Box style library'], ['configure', 'Configurator'], ['quote', 'Spec, finishing & price'], ['dielines', 'Die-lines & orders']];
 
     const FAMILIES = [['All boxes', 54], ['Most popular', 5], ['— Basic boxes', 13], ['— Window boxes', 11], ['— Gift & display boxes', 9], ['— Hanging boxes', 8], ['— Tray & telescope', 3], ['— Folder & envelope', 1], ['— Sleeve', 1], ['Divider boxes', 4], ['Inner holding boxes', 7]];
     const MODELS = [
@@ -2647,7 +2651,7 @@ class Component extends DCLogic {
               h('span', { style: { fontSize: 13, color: MUT } }, fam + ' · ' + famModels.length + ' style' + (famModels.length === 1 ? '' : 's')),
               h('span', { style: { fontSize: 13, color: MUT } }, 'Sort: Most popular')),
             famModels.length ? h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(190px,1fr))', gap: 16 } },
-              famModels.map((m, i) => h('div', { key: i, 'data-go': 'set:pkTab:configure', style: { border: '1px solid ' + HAIR, borderRadius: 10, background: '#fff', padding: '16px 16px 18px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4 } },
+              famModels.map((m, i) => h('div', { key: i, 'data-go': 'pkgo:configure', style: { border: '1px solid ' + HAIR, borderRadius: 10, background: '#fff', padding: '16px 16px 18px', cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 4 } },
                 this.dieline(m[3]),
                 h('div', { style: { fontSize: 14.5, fontWeight: 600, color: TEAL, marginTop: 8 } }, m[0]),
                 h('div', { style: { fontSize: 12.5, fontWeight: 500 } }, m[1]),
@@ -2751,7 +2755,7 @@ class Component extends DCLogic {
           h('div', { style: { marginTop: 'auto' } },
             h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', background: ALT, borderTop: '1px solid ' + HAIR } },
               STEPS.map((s, i) => h('span', { key: i, 'data-go': 'set:pkStep:' + i, style: { padding: '14px 6px', textAlign: 'center', fontSize: 12, fontWeight: 600, color: i === step ? TEAL : MUT, borderBottom: '3px solid ' + (i === step ? TEAL : 'transparent'), cursor: 'pointer' } }, (i + 1) + '. ' + s))),
-            h('div', { 'data-go': 'set:pkTab:quote', style: { background: TEAL, color: '#fff', padding: '15px 18px', textAlign: 'center', fontSize: 15, fontWeight: 600, cursor: 'pointer' } }, 'Continue to get offer price')))),
+            h('div', { 'data-go': 'pkgo:quote', style: { background: TEAL, color: '#fff', padding: '15px 18px', textAlign: 'center', fontSize: 15, fontWeight: 600, cursor: 'pointer' } }, 'Continue to get offer price')))),
       h('div', { key: 'n', style: { marginTop: 14, border: '1px solid ' + HAIR, background: ALT, padding: 16, fontSize: 12.5, color: MUT, lineHeight: 1.75 } },
         h('b', { style: { color: INK } }, 'Artwork comes later: '), 'the die-line is generated from these dimensions, so the customer can download it, design against it and upload artwork after the order is placed — shipment and delivery dates firm up once artwork passes prepress.'),
     ];
@@ -2867,8 +2871,9 @@ class Component extends DCLogic {
                 h('span', { style: { height: 14, width: 14, border: '1px solid ' + HAIR, background: '#fff', flex: 'none', marginTop: 1 } }),
                 'I confirm I have read and understood the Terms and Conditions.'),
               h('div', { 'data-go': 'checkout', style: { background: TEAL, color: '#fff', padding: '12px 16px', textAlign: 'center', fontSize: 14, fontWeight: 600, cursor: 'pointer' } }, 'Submit order'),
-              h('div', { 'data-go': 'set:pkTab:dielines', style: { border: '1px solid ' + TEAL, background: '#fff', color: TEAL, padding: '11px 16px', textAlign: 'center', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' } }, 'Free die-line (29 downloads left)'),
-              h('div', { 'data-go': 'set:pkTab:configure', style: { border: '1px solid ' + HAIR, background: '#fff', padding: '11px 16px', textAlign: 'center', fontSize: 13.5, fontWeight: 600, color: MUT, cursor: 'pointer' } }, 'Back to configurator'))),
+              h('div', { 'data-go': 'artwork', style: { border: '1px solid ' + TEAL, background: '#fff', color: TEAL, padding: '11px 16px', textAlign: 'center', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' } }, 'Upload & check artwork'),
+              h('div', { 'data-go': 'pkgo:dielines', style: { border: '1px solid ' + HAIR, background: '#fff', padding: '11px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: MUT, cursor: 'pointer' } }, 'Free die-line (29 downloads left)'),
+              h('div', { 'data-go': 'pkgo:configure', style: { border: '1px solid ' + HAIR, background: '#fff', padding: '11px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: MUT, cursor: 'pointer' } }, 'Back to configurator'))),
           h('div', { style: { border: '1px solid ' + HAIR, background: '#fff' } },
             h('div', { style: { background: ALT, color: INK, padding: '12px 15px', borderBottom: '1px solid ' + HAIR, fontSize: 11.5, fontWeight: 600, letterSpacing: '.07em', textTransform: 'uppercase' } }, 'Nett price for deal'),
             [['Price before discount', this.money(laneTotal)], ['Membership discount · ' + this.tier() + ' ' + this.tierPct() + '%', '− ' + this.money(laneTotal * tierOff)], [this.taxLabel(), this.money(nett * sst)], ['Delivery fee', this.money(0)]]
@@ -2920,15 +2925,15 @@ class Component extends DCLogic {
               DROWS.map(r => [r[0], h('span', { style: { fontWeight: 600, color: TEAL } }, r[1]), r[2], r[3], r[4],
                 h('span', { style: { display: 'flex', gap: 12, justifyContent: 'flex-end' } },
                   h('span', { style: { fontSize: 12.5, fontWeight: 600, color: TEAL, cursor: 'pointer', whiteSpace: 'nowrap' } }, 'Download die-line'),
-                  h('span', { 'data-go': 'set:pkTab:quote', style: { fontSize: 12.5, fontWeight: 600, color: INK, cursor: 'pointer' } }, 'Re-order'))]),
+                  h('span', { 'data-go': 'pkgo:quote', style: { fontSize: 12.5, fontWeight: 600, color: INK, cursor: 'pointer' } }, 'Re-order'))]),
               ['16%', '9%', '20%', '20%', '11%', '24%'])
           : dtab === 'mockup'
             ? this.table(['Job', 'Model', 'Requested', 'Status', ''],
                 [['Studio North candle carton', 'M015', '08 Sep 2026', this.chip('Mockup in production', 'warn'), h('span', { style: { fontSize: 12.5, fontWeight: 600, color: TEAL, cursor: 'pointer', textAlign: 'right', display: 'block' } }, 'Track')]],
                 ['32%', '12%', '18%', '22%', '16%'])
             : this.table(['Order', 'Model', 'Quantity', 'Shipped', 'Total', ''],
-                [['PO-2026-04288', 'K024', '2,000', '30 Aug 2026', this.money(1204), h('span', { 'data-go': 'set:pkTab:quote', style: { fontSize: 12.5, fontWeight: 600, color: TEAL, cursor: 'pointer', textAlign: 'right', display: 'block' } }, 'Repeat · 5% off')],
-                 ['PO-2026-03960', 'O030', '5,000', '25 Jul 2026', this.money(2880.15), h('span', { 'data-go': 'set:pkTab:quote', style: { fontSize: 12.5, fontWeight: 600, color: TEAL, cursor: 'pointer', textAlign: 'right', display: 'block' } }, 'Repeat · 5% off')]],
+                [['PO-2026-04288', 'K024', '2,000', '30 Aug 2026', this.money(1204), h('span', { 'data-go': 'pkgo:quote', style: { fontSize: 12.5, fontWeight: 600, color: TEAL, cursor: 'pointer', textAlign: 'right', display: 'block' } }, 'Repeat · 5% off')],
+                 ['PO-2026-03960', 'O030', '5,000', '25 Jul 2026', this.money(2880.15), h('span', { 'data-go': 'pkgo:quote', style: { fontSize: 12.5, fontWeight: 600, color: TEAL, cursor: 'pointer', textAlign: 'right', display: 'block' } }, 'Repeat · 5% off')]],
                 ['22%', '11%', '13%', '17%', '15%', '22%']),
         h('div', { style: { display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap', marginTop: 14, fontSize: 12.5, color: MUT } },
           h('span', null, 'Show 10 entries'),
@@ -2937,15 +2942,36 @@ class Component extends DCLogic {
         h('b', { style: { color: INK } }, 'What the die-line PDF contains: '), 'a single-page vector file of cut, crease and bleed lines only — no artwork — at the exact dimensions ordered, so the customer’s designer can work straight on top of it and prepress can verify against the same record.'),
     ];
 
-    return h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '10px 20px 0' } },
+    const wrap = { maxWidth: 1180, margin: '0 auto', padding: '10px 20px 0' };
+
+    // LIBRARY LANDING — the box "category" page (hero + browsable box-style grid), mirrors how
+    // the product category page is laid out. The configurator lives on its own URL from here.
+    if (tab === 'library') {
+      return h('div', { style: wrap },
+        h('div', { style: { fontSize: 12.5, color: FAINT, marginBottom: 12 } },
+          h('span', { 'data-go': 'home', style: { color: TEAL, cursor: 'pointer' } }, 'Home'), ' › Products › Custom Packaging Boxes'),
+        this.packagingHero(),
+        h('div', { style: { fontSize: 11.5, fontWeight: 600, letterSpacing: '.09em', textTransform: 'uppercase', color: TEAL, margin: '10px 0 4px' } }, 'Box style library'),
+        h('h2', { style: { margin: '0 0 6px', fontSize: 22, fontWeight: 600, letterSpacing: '-.02em' } }, 'Choose a box style to configure'),
+        h('p', { style: { margin: '0 0 20px', fontSize: 13.5, color: MUT, maxWidth: '68ch', lineHeight: 1.7 } }, 'Browse the die-cut styles below and pick one to open the configurator. Set your size, material and finishing, then upload artwork once you download the free die-line.'),
+        P.library);
+    }
+
+    // CONFIGURATOR / QUOTE / DIE-LINES — separate pages reached from the library, each with a
+    // "back to box styles" link (like the product configurator being its own page).
+    const HEAD = {
+      configure: ['Box configurator', 'Pick your die-cut style, dimensions, material and finishing.'],
+      quote: ['Spec, finishing & price', 'Review the full spec and see your price at every membership tier.'],
+      dielines: ['Die-lines & orders', 'Download free die-lines and re-order past packaging jobs.'],
+    };
+    const hd = HEAD[tab] || HEAD.configure;
+    return h('div', { style: wrap },
       h('div', { style: { fontSize: 12.5, color: FAINT, marginBottom: 12 } },
-        h('span', { 'data-go': 'home', style: { color: TEAL } }, 'Home'), ' › Products › Custom Packaging Boxes'),
-      this.packagingHero(),
-      h('div', { style: { fontSize: 11.5, fontWeight: 600, letterSpacing: '.09em', textTransform: 'uppercase', color: TEAL, margin: '10px 0 4px' } }, 'Start your order'),
-      h('h2', { style: { margin: '0 0 6px', fontSize: 22, fontWeight: 600, letterSpacing: '-.02em' } }, 'Die-line-first box configurator'),
-      h('p', { style: { margin: '0 0 6px', fontSize: 13.5, color: MUT, maxWidth: '68ch', lineHeight: 1.7 } }, 'Pick a box style, set its size, and choose your material and finishing. See the price at every tier before you submit. Add artwork once you download the die-line.'),
-      h('div', { style: { display: 'flex', gap: 22, borderBottom: '1px solid ' + HAIR, margin: '20px 0 20px', flexWrap: 'wrap' } },
-        TABS.map(t => h('span', { key: t[0], 'data-go': 'set:pkTab:' + t[0], style: { padding: '0 0 12px', fontSize: 14, fontWeight: 600, color: tab === t[0] ? TEAL : MUT, borderBottom: '2px solid ' + (tab === t[0] ? TEAL : 'transparent'), marginBottom: -1, cursor: 'pointer' } }, t[1]))),
+        h('span', { 'data-go': 'home', style: { color: TEAL, cursor: 'pointer' } }, 'Home'), ' › ',
+        h('span', { 'data-go': 'pkgo:library', style: { color: TEAL, cursor: 'pointer' } }, 'Custom Packaging Boxes'), ' › ' + hd[0]),
+      h('span', { 'data-go': 'pkgo:library', style: { display: 'inline-block', fontSize: 13, fontWeight: 600, color: TEAL, cursor: 'pointer', marginBottom: 14 } }, '← Back to box styles'),
+      h('h1', { style: { margin: '0 0 6px', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em' } }, hd[0]),
+      h('p', { style: { margin: '0 0 22px', fontSize: 14, color: MUT, maxWidth: '68ch', lineHeight: 1.7 } }, hd[1]),
       P[tab],
       tab === 'quote'
         ? this.mobileBar('M015 · ' + QTY[qi] + ' pcs · ' + lane, this.money(nett), 'Submit order', 'checkout')
