@@ -63,9 +63,9 @@ let EXCARD_PRICES = {};
 const BC_PKG_N = { 'Normal': 1, '2in1': 2, '3in1': 3, '4in1': 4, '5in1': 5, '6in1': 6, '7in1': 7, '8in1': 8, '9in1': 9, '10in1': 10 };
 // Business Card price from the captured Excard table, for every card category. Price is
 // size-independent (standard sizes, custom size, fold open size and die-cut size all price
-// the same within a category); folds ignore creasing type. All applicable finishing is
-// price-neutral on Excard now (lamination/embossing/round-corner/hot-stamping/silkscreen)
-// EXCEPT hole punching (standard cards only). Package (N designs) = base × N.
+// the same within a category); folds ignore creasing type. Lamination, embossing, round corner
+// and silkscreen spot UV are price-neutral on Excard. Priced add-ons: hole punching (standard
+// cards only) and hot stamping (per foil colour, standard vs fold curve). Package (N designs) = ×N.
 function bcSegTable(T, cat) {
   if (cat === 'Standard') return T.standard;
   if (cat === 'Thin Fold') return T.fold && T.fold.thin_fold;
@@ -73,6 +73,10 @@ function bcSegTable(T, cat) {
   if (cat === 'Custom Die Cut') return T.die_cut;
   if (cat === 'Plastic Card') return T.plastic;
   return null;
+}
+// number of foil colours in a hot-stamping option: "2C (Front) + 1C (Back)" → 3, "No Hot Stamping" → 0
+function bcFoilColours(v) {
+  let n = 0; String(v || '').replace(/(\d)\s*C\b/g, (m, d) => { n += Number(d); return m; }); return n;
 }
 function bcPriceBase(cfg, qty) {
   const T = EXCARD_PRICES['Business Card']; if (!T) return null;
@@ -85,8 +89,16 @@ function bcPriceBase(cfg, qty) {
   // hole punching is a Standard-card-only add-on on Excard (qty curve, paper/diameter-independent)
   let hp = 0;
   if (cfg.category === 'Standard' && cfg.holepunching && !/^no/i.test(cfg.holepunching) && Array.isArray(A.holepunch) && A.holepunch[qi] != null) hp = A.holepunch[qi];
+  // hot stamping: per-colour charge × total foil colours (front + back, e.g. "1C (Front) + 2C (Back)" = 3);
+  // standard cards and fold cards have their own qty curves. Paper / block / foil colour don't matter.
+  let hs = 0;
+  const HS = A.hot_stamping, nCol = bcFoilColours(cfg.hot_stamping);
+  if (HS && nCol) {
+    const curve = cfg.category === 'Standard' ? HS.standard : (cfg.category === 'Thin Fold' || cfg.category === 'Fat Fold') ? HS.fold : null;
+    if (curve && curve[qi] != null) hs = curve[qi] * nCol;
+  }
   const N = BC_PKG_N[cfg.package] || 1;                    // N designs, same spec → ×N
-  return Math.round((base + hp) * N * 100) / 100;
+  return Math.round((base + hp + hs) * N * 100) / 100;
 }
 
 const CFG_OVERRIDES = {
@@ -95,7 +107,7 @@ const CFG_OVERRIDES = {
     // Excard's Business Card has no area inputs; the foil colour is a swatch picker (hs_colours widget)
     hide: ['hot_stamping_w', 'hot_stamping_h', 'embossing_w', 'embossing_h', 'hot_stamping_colour'],
     label: { lamination: 'Paper Lamination' },
-    // hot stamping is price-neutral online (block quoted separately) — safe to match Excard's list exactly
+    // hot stamping list matches Excard exactly; it is priced per foil colour in bcPriceBase
     optionsOverride: {
       hot_stamping: ['No Hot Stamping', '1C (Front)', '1C (Back)', '1C (Front) + 1C (Back)', '1C (Front) + 2C (Back)', '2C (Front)', '2C (Back)', '2C (Front) + 1C (Back)', '2C (Front) + 2C (Back)'],
       hot_stamping_colour: ['Gold', 'Silver', 'Green', 'Blue', 'Black', 'Red'],
@@ -133,8 +145,8 @@ const CFG_OVERRIDES = {
     optImages: { round_corner_position: 'assets/options/businesscard-roundcorner/' },
     // custom size prices exactly as the standard 54x89 card (dimension-independent, verified on Excard)
     priceSub: { size: { 'Other (Custom Size)': '54mm x 89mm' } },
-    // NOTE: Silkscreen Spot UV, embossing, round corner & hot stamping are all price-neutral
-    // on Excard now (captured 2026-09-21) — no priceAddon. Hole punching is priced inside
+    // NOTE: Silkscreen Spot UV, embossing & round corner are price-neutral on Excard (re-confirmed
+    // live 2026-09-24) — no priceAddon. Hole punching and hot stamping are priced inside
     // bcPriceBase. Base pricing comes entirely from the captured Excard table via priceBase.
     // Custom Size inputs appear only when Size = "Other (Custom Size)"; the ranges depend on the
     // card category (Standard / Thin Fold / Fat Fold). Creasing shows for fold cards.
@@ -164,9 +176,9 @@ const CFG_OVERRIDES = {
     placeholder: ['size', 'paper', 'lamination', 'quantity'],
     bestSellerQty: [300, 500, 1000],
     // Silkscreen Spot UV is only offered with Matte Lamination (Both) on Gloss Art Card
-    // 250/310gsm at qty >= 300 (Excard rule); otherwise only "No Required".
+    // 250/310gsm at qty 300, 500 or 1,000–10,000 (Excard's customRangeSpotUV); otherwise only "No Required".
     optGate: {
-      silkscreen_spot_uv: (cfg, qty) => cfg.lamination === 'Matte Lamination (Both)' && ['Gloss Art Card 250gsm', 'Gloss Art Card 310gsm'].indexOf(cfg.paper) >= 0 && (qty || 0) >= 300,
+      silkscreen_spot_uv: (cfg, qty) => cfg.lamination === 'Matte Lamination (Both)' && ['Gloss Art Card 250gsm', 'Gloss Art Card 310gsm'].indexOf(cfg.paper) >= 0 && [300, 500].concat([1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000]).indexOf(Number(qty)) >= 0,
     },
     remark: {
       silkscreen_spot_uv: 'Available with Matte Lamination (Both Sides) only. Gloss Art Card 250gsm & 310gsm only. Qty: 300, 500, 1,000 – 10,000.',
@@ -3353,13 +3365,17 @@ class Component extends DCLogic {
             quoteOnly
               ? h('div', { key: 'pr', style: { borderTop: '1px solid ' + LINE, paddingTop: 14, marginTop: 12 } }, h('span', { style: { fontSize: 22, fontWeight: 600, color: TEAL } }, 'Price on request'))
               : (ready
-                  ? h('div', { key: 'pr', style: { borderTop: '1px solid ' + LINE, paddingTop: 12, marginTop: 12, display: 'flex', flexDirection: 'column', gap: 7 } },
-                      [['Subtotal', this.money(p.gross), MUT], [this.tier() + ' member −' + this.tierPct() + '%', '−' + this.money(p.disc), TEAL], ['Est. shipping (Selangor)', this.money(12), MUT]]
-                        .map((r, i) => h('div', { key: i, style: { display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 12.5, lineHeight: 1.5, color: r[2] } }, h('span', null, r[0]), h('span', { style: { fontWeight: 500, color: r[2] === TEAL ? TEAL : INK } }, r[1]))),
-                      h('div', { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, borderTop: '1px solid ' + LINE, paddingTop: 11, marginTop: 4 } },
-                        h('span', { style: { fontSize: 15, fontWeight: 600 } }, 'Total'),
-                        h('span', { style: { fontSize: 30, fontWeight: 600, letterSpacing: '-.02em', color: TEAL } }, this.money(p.net))),
-                      h('div', { style: { fontSize: 11.5, color: FAINT } }, this.currency() + ' ' + (p.unit * this.fx()).toFixed(3) + ' per piece · incl. ' + this.taxLabel()))
+                  ? (() => {
+                      // same arithmetic as cartTotals(): tax on the discounted price, flat shipping on top
+                      const taxRate = ({ MY: 0.08, SG: 0.09, BN: 0 })[this.cc()] || 0, tax = p.net * taxRate, ship = 12;
+                      return h('div', { key: 'pr', style: { borderTop: '1px solid ' + LINE, paddingTop: 12, marginTop: 12, display: 'flex', flexDirection: 'column', gap: 7 } },
+                        [['Subtotal', this.money(p.gross), MUT], [this.tier() + ' member −' + this.tierPct() + '%', '−' + this.money(p.disc), TEAL], taxRate ? [this.taxLabel(), this.money(tax), MUT] : null, ['Est. shipping', this.money(ship), MUT]].filter(Boolean)
+                          .map((r, i) => h('div', { key: i, style: { display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 12.5, lineHeight: 1.5, color: r[2] } }, h('span', null, r[0]), h('span', { style: { fontWeight: 500, color: r[2] === TEAL ? TEAL : INK } }, r[1]))),
+                        h('div', { style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, borderTop: '1px solid ' + LINE, paddingTop: 11, marginTop: 4 } },
+                          h('span', { style: { fontSize: 15, fontWeight: 600 } }, 'Total'),
+                          h('span', { style: { fontSize: 30, fontWeight: 600, letterSpacing: '-.02em', color: TEAL } }, this.money(p.net + tax + ship))),
+                        h('div', { style: { fontSize: 11.5, color: FAINT } }, this.currency() + ' ' + (p.unit * this.fx()).toFixed(3) + ' per piece before ' + (taxRate ? 'tax & ' : '') + 'shipping'));
+                    })()
                   : h('div', { key: 'pr', style: { borderTop: '1px solid ' + LINE, paddingTop: 14, marginTop: 12, fontSize: 20, fontWeight: 600, color: MUT } }, 'Select your options')),
             // actions
             h('div', { key: 'e', style: { display: 'flex', flexDirection: 'column', gap: 9, marginTop: 16 } },
