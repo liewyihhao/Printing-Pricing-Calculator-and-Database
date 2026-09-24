@@ -229,7 +229,7 @@ const CFG_OVERRIDES = {
     },
     remark: {
       colour: '1C only for Simili 80gsm / 100gsm. 3 × A4, 4 × A4 and 4 × A5 are 2-sides printing only.',
-      hot_stamping: '1 side only (Front OR Back). Max 2 colours.',
+      hot_stamping: '1 side only (front or back). Max 2 colours.',
       hole_punching: '1 hole at centre of selected edge. Size: H 70–420mm × W 40–800mm. Not available for A1 / 4 × A4, and not with Folding / Creasing / Perforation.',
       perforation: '1–6 lines, minimum 45mm gap. A3 perforation is landscape only. A6 available in Standard spec only. Not with Folding / Creasing / Hole Punching.',
       fold: 'Open Size — Height 90–420mm, Width 120–630mm. After fold, width ≥ 25mm.',
@@ -290,6 +290,31 @@ const HOME_CAT_PANEL = {
   'cards-invitations': '6x8-Folded-Cards-1.png', 'large-format': 'Roll-Up-Banner.png',
   'packaging-boxes': 'Paperbag-290x200x95-1.png', 'apparel-gifts': 'lanyard.png',
 };
+// one consistent style for every configurator question label: Title Case, acronyms and codes
+// kept (UV, DTF, 4C…), units kept lowercase (mm, gsm…), raw data keys given friendly names
+const LABEL_NAMES = { size: 'Size', paper: 'Paper', colour: 'Print Colour', lamination: 'Lamination', category: 'Category', model: 'Model', sleeve: 'Sleeve', fabric: 'Fabric', uvdtfstickering: 'UV DTF Stickering' };
+const LABEL_KEEP = { UV: 1, DTF: 1, VDP: 1, NCR: 1, PVC: 1, PP: 1, PET: 1, OPP: 1, QR: 1, ID: 1, A1: 1, A2: 1, A3: 1, A4: 1, A5: 1, A6: 1, A7: 1, B5: 1, DL: 1, RM: 1, '1C': 1, '2C': 1, '4C': 1, CMYK: 1, RGB: 1 };
+const LABEL_LOWER = { mm: 1, cm: 1, gsm: 1, pcs: 1, pc: 1, kg: 1, g: 1, micron: 1 };
+const LABEL_SMALL = { of: 1, and: 1, or: 1, per: 1, to: 1, a: 1, an: 1, the: 1, in: 1, on: 1, with: 1, for: 1, at: 1, by: 1, x: 1 };
+function niceLabel(raw, key) {
+  const k = String(key || '').toLowerCase();
+  let s = String(raw == null || raw === '' ? key || '' : raw).trim();
+  if (LABEL_NAMES[k] && (!raw || String(raw).toLowerCase() === k || String(raw) === String(raw).toLowerCase() || String(raw) === String(raw).toUpperCase())) return LABEL_NAMES[k];
+  if (/_/.test(s)) s = s.replace(/_/g, ' ');
+  let i = 0;
+  const word = w => {
+    const first = i++ === 0, up = w.toUpperCase(), lo = w.toLowerCase();
+    if (LABEL_KEEP[up]) return up;
+    if (LABEL_LOWER[lo]) return lo;
+    if (!first && LABEL_SMALL[lo]) return lo;
+    if (w === up && w.length > 3) return w.charAt(0) + lo.slice(1); // SHOUTED word → Title
+    return w.charAt(0).toUpperCase() + w.slice(1);
+  };
+  // only the label itself is Title Cased — bracketed qualifiers like (mm) or (price-neutral) stay as written
+  return s.replace(/\([^)]*\)|[^()]+/g, seg => seg.charAt(0) === '(' ? seg : seg.replace(/[A-Za-z][A-Za-z0-9'’.-]*|\d+[A-Za-z]+/g, word));
+}
+// option text as shown: "- Not Required -" reads as "Not Required" like every other question
+const cleanOpt = v => String(v == null ? '' : v).replace(/^-\s*(.*?)\s*-$/, '$1').trim();
 // an option that means "this finishing / add-on is not applied" (Excard's optional questions)
 const OPT_NONE_RE = /^(-\s*)?(not required|no required|none|n\/a|not applicable|no [a-z ]+|without [a-z ]+|no|0)(\s*-)?$/i;
 const isNoneOpt = o => OPT_NONE_RE.test(String(Array.isArray(o) ? o[0] : o).trim());
@@ -951,7 +976,7 @@ class Component extends DCLogic {
     const ov = this.cfgOv(), cfg = this.pkV();
     let fields = []; try { fields = this.pkFields(); } catch (e) { fields = []; }
     const NONE_RE = /^(no|not required|no required|none|not applicable|no hot stamping|no hole punching|no round corner|no fold(ing)?)$/i;
-    const dispLabel = def => (ov.label && ov.label[def.key]) || def.label || def.key;
+    const dispLabel = def => niceLabel((ov.label && ov.label[def.key]) || def.label, def.key);
     const dispVal = (def, val) => { const m = (ov.optLabel && ov.optLabel[def.key]) || {}; return m[val] || val; };
     // combine the custom H/W input pairs into one dimension line instead of two rows
     const PAIRS = { custom_w: ['custom_h', 'Custom Size'], fold_w_thin: ['fold_h_thin', 'Open Size'], fold_w_fat: ['fold_h_fat', 'Open Size'] };
@@ -3514,7 +3539,7 @@ class Component extends DCLogic {
           style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, cursor: 'pointer', padding: '4px 6px', margin: '0 -6px', borderRadius: 8 } },
           h('div', { style: { flex: '1 1 auto', minWidth: 0 } },
             h('div', { style: { fontSize: 13.5, fontWeight: 600 } }, fieldLabel),
-            note ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5, marginTop: 3 } }, note) : null),
+            note ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5, marginTop: 3 } }, String(note).charAt(0).toUpperCase() + String(note).slice(1)) : null),
           h('div', { style: { flex: '0 1 auto', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, minWidth: 0 } },
             h('span', { style: { fontSize: 14, fontWeight: selected ? 600 : 400, color: selected ? INK : '#6f6f6f', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, curText),
             h('span', { 'aria-hidden': 'true', style: { flex: 'none', color: MUT, fontSize: 10, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .12s' } }, '▼'))),
@@ -3533,7 +3558,7 @@ class Component extends DCLogic {
     const PKI = window.PK_IMAGES, prodId = prod && prod.id;
     const pkOptImg = (key, val) => { const f = PKI && PKI.option(key, val, prodId); return f ? window.__asset(PKI.base + f) : null; };
     const optCards = (def, options, sel) => {
-      const label = (ov.label && ov.label[def.key]) || def.label;
+      const label = niceLabel((ov.label && ov.label[def.key]) || def.label, def.key);
       const isSizeField = def.key === 'size';
       const remark = (ov.remark && ov.remark[def.key]) || null;
       const optLabel = (ov.optLabel && ov.optLabel[def.key]) || {};
@@ -3542,7 +3567,7 @@ class Component extends DCLogic {
       dispOptions = (typeof dispOptions === 'function' ? (dispOptions(this.pkV(), options) || options) : (dispOptions || options));
       const chosen = isPh ? (this.state.cfg[def.key] != null ? this.state.cfg[def.key] : '') : (sel != null ? sel : (dispOptions[0] || ''));
       const isPh0 = isPh && (chosen === '' || chosen == null);
-      let curText = isPh0 ? 'Please Select' : (optLabel[chosen] || chosen);
+      let curText = isPh0 ? 'Please Select' : cleanOpt(optLabel[chosen] || chosen);
       // once a custom size is confirmed, the Size field reads "Custom Size: H mm × W mm"
       if (isSizeField && /other|custom/i.test(String(chosen)) && this.state.sizeConfirmed) { const d = activeDims(); if (d) curText = 'Custom Size: ' + d.h + 'mm × ' + d.w + 'mm'; }
       const note = (ov.noteOverride && Object.prototype.hasOwnProperty.call(ov.noteOverride, def.key)) ? ov.noteOverride[def.key] : (def.neutral ? null : (def.note || null));
@@ -3557,7 +3582,7 @@ class Component extends DCLogic {
       const dispSet = {}; dispOptions.forEach(v => { dispSet[Array.isArray(v) ? v[0] : v] = 1; });
       const reliable = validVals.length > 0 && validVals.every(v => dispSet[v]);
       const items = dispOptions.map(v => { const val = Array.isArray(v) ? v[0] : v;
-        return { val: val, label: optLabel[val] || val, on: chosen === val, avail: reliable ? !!availSet[val] : true, img: pkOptImg(def.key, val),
+        return { val: val, label: cleanOpt(optLabel[val] || val), on: chosen === val, avail: reliable ? !!availSet[val] : true, img: pkOptImg(def.key, val),
           onPick: () => this.setState(st => Object.assign({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) }, isSizeField ? { sizeConfirmed: false } : {})) }; });
       // "selected" = the customer set this field explicitly (placeholder chosen, or a value in
       // state.cfg); an untouched default is NOT selected, so it reads lighter.
@@ -3576,10 +3601,10 @@ class Component extends DCLogic {
     const qtyPh0 = qtyPh && !qtyChosen;
     const qtyCur = qtyPh0 ? 'Please Select' : (s.qty.toLocaleString() + ' pcs' + (bestSeller.indexOf(s.qty) >= 0 ? ' — Best Seller' : ''));
     const qtyItems = qopts.map(qn => ({ val: qn, label: qn.toLocaleString() + ' pcs' + (bestSeller.indexOf(qn) >= 0 ? ' · Best Seller' : ''), on: qtyChosen && s.qty === qn, avail: true, onPick: () => this.setState({ qty: qn, qtyChosen: true }) }));
-    const qtyField = cardGroup('quantity', 'Quantity', qtyCur, qtyPh0, qobj ? 'min. order ' + qobj.moq.toLocaleString() + ' pcs' : null, qtyRemark, qtyItems, qtyChosen);
+    const qtyField = cardGroup('quantity', 'Quantity', qtyCur, qtyPh0, qobj ? 'Minimum order ' + qobj.moq.toLocaleString() + (qobj.moq === 1 ? ' pc' : ' pcs') : null, qtyRemark, qtyItems, qtyChosen);
     // image picker: a selectable grid of option thumbnails (e.g. Round Corner Position)
     const imgPicker = (def, options, sel, base) => {
-      const label = (ov.label && ov.label[def.key]) || def.label;
+      const label = niceLabel((ov.label && ov.label[def.key]) || def.label, def.key);
       const optLabel = (ov.optLabel && ov.optLabel[def.key]) || {};
       return h('div', { key: def.key, 'data-cfgkey': def.key, 'data-cfgsel': sel != null && sel !== '' ? '1' : '0', 'data-cfgalways': '1', style: { padding: '15px 0', borderTop: '1px solid ' + LINE } },
         h('div', { style: { fontSize: 13.5, fontWeight: 600, marginBottom: 10 } }, label),
@@ -3606,7 +3631,7 @@ class Component extends DCLogic {
       if (def.min != null && def.max != null) hints.push('Between ' + def.min + unit + ' and ' + def.max + unit);
       else if (def.min != null) hints.push('Minimum ' + def.min + unit);
       else if (def.max != null) hints.push('Maximum ' + def.max + unit);
-      if (def.note) hints.push(def.note);
+      if (def.note) hints.push(String(def.note).charAt(0).toUpperCase() + String(def.note).slice(1));
       // Confirm button after the WIDTH input of a custom-size pair (both dimensions filled)
       const widthHK = WIDTH_KEYS[def.key];
       const bothFilled = widthHK && cfg[widthHK] != null && cfg[widthHK] !== '' && cfg[def.key] != null && cfg[def.key] !== '';
@@ -3614,10 +3639,10 @@ class Component extends DCLogic {
         onClick: e => { e.preventDefault(); e.stopPropagation(); if (bothFilled) this.setState({ sizeConfirmed: true, ddOpen: null }); },
         style: { marginTop: 4, alignSelf: 'flex-start', background: bothFilled ? TEAL : '#e9ecef', color: bothFilled ? '#fff' : MUT, border: 'none', borderRadius: 8, padding: '10px 22px', fontSize: 13.5, fontWeight: 600, cursor: bothFilled ? 'pointer' : 'not-allowed', font: '600 13.5px Montserrat,sans-serif' } }, 'Confirm size') : null;
       return h('div', { key: def.key, style: rowStyle },
-        labelCell(def.label, null),
+        labelCell(niceLabel(def.label, def.key), null),
         ctrlWrap(h('div', { style: { display: 'flex', flexDirection: 'column', gap: 5 } },
           h('input', { type: isNum ? 'number' : 'text', min: def.min != null ? def.min : undefined, max: def.max != null ? def.max : undefined,
-            value: cfg[def.key] || '', placeholder: def.placeholder || ('Enter ' + def.label.toLowerCase()), 'aria-label': def.label,
+            value: cfg[def.key] || '', placeholder: def.placeholder || ('Enter ' + String(def.label || def.key).toLowerCase()), 'aria-label': niceLabel(def.label, def.key),
             onChange: e => { const val = e.target.value; this.setState(st => ({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) })); },
             style: Object.assign({}, selStyle, { font: '400 14px Montserrat,sans-serif' }) }),
           hints.length ? h('div', { style: { fontSize: 11.5, color: FAINT, lineHeight: 1.5 } }, hints.join(' · ')) : null,
@@ -3827,7 +3852,7 @@ class Component extends DCLogic {
     }
     const prod = this.pkProduct(), NAME = prod ? this.catName(prod.id) : 'Business Cards';
     const rows = this.pkFields().map(({ def, options }) =>
-      [def.label, (options && options.length) ? options.join(' · ') : (this.state.cfg && this.state.cfg[def.key]) || '—']);
+      [niceLabel(def.label, def.key), (options && options.length) ? options.join(' · ') : (this.state.cfg && this.state.cfg[def.key]) || '—']);
     return h('div', null,
       h('h3', { style: { fontSize: 20, fontWeight: 600, margin: '0 0 6px' } }, 'Configurable Options'),
       h('p', { style: { fontSize: 13.5, color: MUT, margin: '0 0 16px' } }, 'Every option you can set for ' + NAME + ' when you order.'),
