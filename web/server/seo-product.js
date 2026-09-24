@@ -9,6 +9,13 @@
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+// original printoka.com product + option photos (shared with the SPA)
+const PKI = (function () { try { return require(path.join(__dirname, '..', 'product-images.js')); } catch (e) { return null; } })();
+const origImg = f => f ? '/assets/original/' + f : null;
+const optImg = (key, val, id) => PKI ? origImg(PKI.option(key, val, id)) : null;
+// finishing type → original finishing photo
+const FIN_IMG = [[/spot uv/i, 'matte-laminationspot-uv.jpg'], [/hot stamp/i, 'hot-stamping-gold.jpg'], [/round corner/i, 'round-corner.jpg'], [/emboss/i, 'emboss-finishing.jpg'],
+  [/matte? lamin/i, 'matte-lamination.jpg'], [/gloss lamin/i, 'gloss-lamination.jpg'], [/water ?base|varnish/i, 'gloss-waterbased.jpg']];
 
 // ---- design tokens (from the handoff, lifted from the live stylesheet) ----
 const T = { brand: '#E52220', brandDark: '#c71917', amber: '#FF9A2E', ink: '#212121', inkDark: '#231f20', muted: '#616161', hairline: '#eaeaea', line: '#eef1f4', alt: '#FAFAFA', white: '#ffffff' };
@@ -89,7 +96,7 @@ function facts(r) {
   let sample = qopts.slice(); if (sample.length > 6) { const pick = [0, (sample.length / 3) | 0, (2 * sample.length / 3) | 0, sample.length - 1]; sample = pick.map(i => sample[i]); }
   let from = null;
   sample.forEach(qn => { try { const q = E.localQuote(prod, cfg, qn); const cash = q && (q.printoka_cash != null ? q.printoka_cash : q.cash); if (cash != null && qn) { const pp = cash / qn; if (from == null || pp < from) from = pp; } } catch (e) {} });
-  return { name: r.name, catId: r.catId, catLabel: categoryLabel(r.catId), sizes, materials, finishing, types, typeKey, options, moq, qopts, from };
+  return { id: prod.id, sizeKey: sizeF ? sizeF.key : 'size', matKey: matF ? matF.key : 'paper', name: r.name, catId: r.catId, catLabel: categoryLabel(r.catId), sizes, materials, finishing, types, typeKey, options, moq, qopts, from };
 }
 
 // ---- CMS-style copy, generated (mirrors the client's productSeo / catWhy) ----
@@ -138,7 +145,7 @@ function page(slug, origin, opts) {
   const title = (h1 + ' | Printoka').slice(0, 60);
   const desc = c.intro.slice(0, 155);
   const catUrl = f.catId ? origin + '/products/' + f.catId : origin + '/products';
-  const asset = (function () { try { const p = path.join(__dirname, '..', 'assets', 'products', slugify(name) + '.jpg'); return fs.existsSync(p) ? '/assets/products/' + slugify(name) + '.jpg' : null; } catch (e) { return null; } })();
+  const asset = (PKI && PKI.products[f.id] && origImg(PKI.products[f.id])) || (function () { try { const p = path.join(__dirname, '..', 'assets', 'products', slugify(name) + '.jpg'); return fs.existsSync(p) ? '/assets/products/' + slugify(name) + '.jpg' : null; } catch (e) { return null; } })();
   const ogImg = origin + (asset || '/assets/social/og-default.png');
 
   // JSON-LD
@@ -180,7 +187,7 @@ function page(slug, origin, opts) {
   // Choose the type to configure (before "Why Printoka?"). More than 5 types => a horizontal
   // carousel (scroll left/right) instead of a wrapping grid.
   if (f.types.length) {
-    const cards = f.types.map(t => '<a class="pk-type" href="' + esc(configUrl + '?' + f.typeKey + '=' + encodeURIComponent(t)) + '"><div class="pk-type-ph" aria-hidden="true"><img src="/assets/icons/cropped-favicon-192x192.png" alt=""></div><div class="pk-type-l">' + esc(t) + '</div><span class="pk-btn pk-btn-sm">Check Price</span></a>').join('');
+    const cards = f.types.map(t => '<a class="pk-type" href="' + esc(configUrl + '?' + f.typeKey + '=' + encodeURIComponent(t)) + '">' + (optImg(f.typeKey, t, f.id) ? '<div class="pk-type-ph pk-type-photo"><img src="' + esc(optImg(f.typeKey, t, f.id)) + '" alt="' + esc(t + ' ' + name) + '" loading="lazy"></div>' : '<div class="pk-type-ph" aria-hidden="true"><img src="/assets/icons/cropped-favicon-192x192.png" alt=""></div>') + '<div class="pk-type-l">' + esc(t) + '</div><span class="pk-btn pk-btn-sm">Check Price</span></a>').join('');
     const body = f.types.length > 5
       ? '<div class="pk-carousel"><button type="button" class="pk-car-btn pk-car-prev" aria-label="Scroll left">‹</button><div class="pk-car-track">' + cards + '</div><button type="button" class="pk-car-btn pk-car-next" aria-label="Scroll right">›</button></div>'
       : '<div class="pk-grid pk-types">' + cards + '</div>';
@@ -215,8 +222,8 @@ function page(slug, origin, opts) {
     const parsed = f.sizes.map(s => ({ s, d: parseSize(s) }));
     const maxDim = Math.max.apply(null, parsed.filter(p => p.d).map(p => Math.max(p.d.w, p.d.h)).concat([1]));
     const scale = 120 / maxDim;
-    S.push(sec('sizes', '<h2>Our supported ' + esc(name) + ' sizes</h2><p class="pk-scale-note">Shown to scale.</p><div class="pk-grid pk-sizes">'
-      + parsed.map(p => '<div class="pk-size"><div class="pk-size-box">' + (p.d ? '<span style="width:' + (p.d.w * scale).toFixed(1) + 'px;height:' + (p.d.h * scale).toFixed(1) + 'px"></span>' : '<span class="pk-size-na"></span>') + '</div><div class="pk-size-l">' + esc(p.s) + '</div></div>').join('')
+    S.push(sec('sizes', '<h2>Our supported ' + esc(name) + ' sizes</h2>' + (parsed.some(p => optImg(f.sizeKey, p.s, f.id)) ? '' : '<p class="pk-scale-note">Shown to scale.</p>') + '<div class="pk-grid pk-sizes">'
+      + parsed.map(p => '<div class="pk-size"><div class="pk-size-box">' + (optImg(f.sizeKey, p.s, f.id) ? '<img src="' + esc(optImg(f.sizeKey, p.s, f.id)) + '" alt="' + esc(p.s + ' ' + name) + '" loading="lazy">' : p.d ? '<span style="width:' + (p.d.w * scale).toFixed(1) + 'px;height:' + (p.d.h * scale).toFixed(1) + 'px"></span>' : '<span class="pk-size-na"></span>') + '</div><div class="pk-size-l">' + esc(p.s) + '</div></div>').join('')
       + '</div><a class="pk-btn" href="' + esc(configUrl) + '">Configure your ' + esc(name) + '</a>'));
   }
   // materials (weight bars)
@@ -224,13 +231,13 @@ function page(slug, origin, opts) {
     const parsedW = f.materials.map(m => ({ m, w: parseWeight(m) }));
     const group = parsedW.filter(x => x.w).map(x => x.w);
     S.push(sec('materials', '<h2>Our supported ' + esc(name) + ' printing materials</h2><div class="pk-grid pk-mats">'
-      + parsedW.map(x => { const b = x.w ? weightBucket(x.w, group) : null; return '<div class="pk-mat"><div class="pk-mat-l">' + esc(x.m) + '</div>'
+      + parsedW.map(x => { const b = x.w ? weightBucket(x.w, group) : null; const mi = optImg(f.matKey, x.m, f.id); return '<div class="pk-mat' + (mi ? ' pk-has-img' : '') + '">' + (mi ? '<img class="pk-tile-img" src="' + esc(mi) + '" alt="' + esc(x.m) + '" loading="lazy">' : '') + '<div class="pk-mat-l">' + esc(x.m) + '</div>'
         + (b ? '<div class="pk-bars">' + [1, 2, 3].map(i => '<span class="' + (i <= b.bars ? 'on' : '') + '"></span>').join('') + '</div><div class="pk-mat-c">' + b.label + '</div>' : '<div class="pk-mat-c pk-mat-c-neutral">Stock option</div>') + '</div>'; }).join('') + '</div>'));
   }
   // finishing
   if (f.finishing.length) {
     S.push(sec('finishing', '<h2>Finishing for your ' + esc(name) + '</h2><div class="pk-grid pk-fins">'
-      + f.finishing.map(x => '<div class="pk-fin">' + esc(x) + '</div>').join('') + '</div>'));
+      + f.finishing.map(x => { const fi = (FIN_IMG.find(r => r[0].test(x)) || [])[1]; return fi ? '<div class="pk-fin pk-has-img"><img class="pk-tile-img" src="' + origImg(fi) + '" alt="' + esc(x + ' finishing') + '" loading="lazy"><div>' + esc(x) + '</div></div>' : '<div class="pk-fin">' + esc(x) + '</div>'; }).join('') + '</div>'));
   }
   // delivery — a full-width attention-catching banner (reassurance + states + CTA)
   S.push('<section id="delivery" class="pk-deliver"><div class="pk-deliver-in">'
@@ -356,6 +363,8 @@ function css() {
     '.pk-scale-note{font-size:11.5px;color:#9e9e9e;margin:-8px 0 14px}',
     '.pk-size{border:1px solid ' + T.hairline + ';border-radius:10px;padding:12px;text-align:center}.pk-size-box{height:128px;display:flex;align-items:center;justify-content:center}.pk-size-box span{background:#fff;border:1.5px solid ' + T.brand + ';border-radius:2px;display:block}.pk-size-na{width:60px;height:40px;border-style:dashed!important;border-color:' + T.hairline + '!important}.pk-size-l{font-size:12.5px;font-weight:500;margin-top:8px}',
     '.pk-mat{border:1px solid ' + T.hairline + ';border-radius:10px;padding:14px}.pk-mat-l{font-size:13.5px;font-weight:500}.pk-bars{display:flex;gap:4px;margin:9px 0 5px}.pk-bars span{height:6px;flex:1;border-radius:3px;background:' + T.hairline + '}.pk-bars span.on{background:' + T.brand + '}.pk-mat-c{font-size:11.5px;color:' + T.muted + '}.pk-mat-c-neutral{color:#9e9e9e}',
+    '.pk-has-img{padding:0 0 12px;overflow:hidden}.pk-has-img>*:not(img){padding-left:14px;padding-right:14px}.pk-tile-img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;margin-bottom:10px;border-bottom:1px solid ' + T.hairline + '}.pk-fin.pk-has-img{border-left:1px solid ' + T.hairline + ';padding-bottom:12px}',
+    '.pk-size-box img{max-height:128px;max-width:100%;object-fit:contain}.pk-type-photo{padding:0;background:#fff}.pk-type-photo img{height:150px;width:100%;object-fit:contain;opacity:1}',
     '.pk-fin{border:1px solid ' + T.hairline + ';border-left:3px solid ' + T.brand + ';border-radius:8px;padding:12px 14px;font-size:13.5px;font-weight:500}',
     // delivery banner (attention-catching: gradient band, white text, check-circle states, CTA)
     '.pk-deliver{background:linear-gradient(90deg,#FF9A2E,#F02B29);color:#fff;border-radius:16px;margin:40px 0;box-shadow:0 18px 40px rgba(229,34,32,.18)}',

@@ -273,7 +273,7 @@ const HOME_FEATURED = [
   ['Perfect Binding Booklets', 19, 'Booklet-Perfect-Cover.png'], ['Saddle Stitched Booklets', 19, 'Booklet-Staple-Cover.png'],
 ];
 // original product cut-outs for our products (product id → image); others fall back to art()
-const HOME_PRODUCT_IMG = {
+const HOME_PRODUCT_IMG_LOCAL = {
   1: 'Standard-Business-Card.png', 111: 'computer-form-multiply.png', 106: '4.5x9.5-White-Envelope-Window.png', 105: 'Letterhead-Cover.png',
   24: 'Carbonised-Form.png', 110: 'Book-Binded-1.png', 101: 'Folded-Brochure-8.png', 102: 'Flyers-Cropped.png', 50: 'Non-Folded-Brochure-1.png',
   21: 'Non-Folded-Brochure-2.png', 103: 'Non-Folded-Brochure-3.png', 60: 'Round-Sticker-Cover.png', 117: 'Car-Window-Sticker.png',
@@ -282,6 +282,7 @@ const HOME_PRODUCT_IMG = {
   125: 'Roll-Up-Banner.png', 162: 'Stand-Banner.png', 123: 'Hanging-Banner.png', 124: 'Stand-Banner.png', 127: 'Paperbag-290x200x95-1.png',
   174: 'lanyard.png', 133: 'HFS001.png', 132: 'Button-Badge.png', 139: 'N31A.png', 128: 'C20.png',
 };
+const HOME_PRODUCT_IMG = Object.assign({}, (window.PK_IMAGES || {}).products || {}, HOME_PRODUCT_IMG_LOCAL);
 // category rows: panel image + gradient (the original's three gradients, cycled)
 const HOME_CAT_PANEL = {
   'business-essentials': 'Standard-Business-Card.png', 'flyers-leaflets': 'Digital-Printing-Flyers-Cropped.png',
@@ -1877,6 +1878,14 @@ class Component extends DCLogic {
 
   // ---------- shared bits ----------
   art(kind, w) {
+    // the original printoka.com product photo when this product has one (product-images.js)
+    const PKI = window.PK_IMAGES;
+    if (PKI && typeof kind === 'string') {
+      const p = this.pkProducts().find(x => x.engName === kind || x.name === kind);
+      const f = p && PKI.products[p.id];
+      if (f) return React.createElement('img', { src: window.__asset(PKI.base + f), alt: kind + ' printing', loading: 'lazy',
+        style: { width: w || '100%', aspectRatio: '4 / 3', objectFit: 'contain', display: 'block', background: '#fff' } });
+    }
     const BY_NAME = {
       'Business Card': 'business-card.jpg', 'Kad Kahwin — Digital': 'greeting-cards.png',
       'Greeting Card — Litho': 'greeting-cards.png', 'Creative Cut Card — Digital': 'die-cut-card.png',
@@ -2393,7 +2402,7 @@ class Component extends DCLogic {
     const tile = p => h('a', { key: p.id, href: this.productPath(p.id) || undefined, 'data-go': 'open:' + p.id,
       style: { flex: '0 0 132px', scrollSnapAlign: 'start', padding: '14px 4px', textAlign: 'center', color: MUT, textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, borderRadius: 8 } },
       HOME_PRODUCT_IMG[p.id]
-        ? h('img', { src: this.homeImg(HOME_PRODUCT_IMG[p.id]), alt: p.name, loading: 'lazy', style: { height: 116, width: '100%', objectFit: 'contain', display: 'block' } })
+        ? h('img', { src: window.__asset('assets/original/' + HOME_PRODUCT_IMG[p.id]), alt: p.name, loading: 'lazy', style: { height: 116, width: '100%', objectFit: 'contain', display: 'block' } })
         : h('div', { style: { height: 116, width: '100%', overflow: 'hidden', borderRadius: 6, display: 'grid', placeItems: 'center' } }, this.art(p.engName)),
       h('span', { style: { fontSize: 14, lineHeight: 1.35 } }, p.name));
     // sticky: the category menu stays in view while the rows scroll, until the last row ends
@@ -3409,8 +3418,26 @@ class Component extends DCLogic {
       const open = this.state.ddOpen === key;
       const toggle = () => this.setState(st => ({ ddOpen: st.ddOpen === key ? null : key }));
       const close = () => this.setState({ ddOpen: null });
+      const withImg = open && items.some(it => it.img);
       const cards = open ? items.map((it, i) => {
         const on = it.on, avail = it.avail !== false || on;
+        if (withImg) return h(avail ? 'button' : 'div', {
+          key: it.val != null ? it.val : i, type: avail ? 'button' : undefined,
+          onClick: avail ? (e => { e.preventDefault(); e.stopPropagation(); it.onPick(); close(); }) : undefined,
+          role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-disabled': avail ? undefined : 'true',
+          tabIndex: avail ? 0 : -1, 'aria-label': fieldLabel + ': ' + it.label + (avail ? '' : ' (not available)'),
+          onKeyDown: avail ? (e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); e.stopPropagation(); it.onPick(); close(); } else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } }) : undefined,
+          style: { display: 'flex', flexDirection: 'column', textAlign: 'left', width: '100%', font: 'inherit', padding: 0, overflow: 'hidden',
+            border: '1px solid ' + (on ? TEAL : HAIR), borderRadius: 12, background: on ? '#fdf2f2' : (avail ? '#fff' : ALT),
+            boxShadow: on ? '0 0 0 1px ' + TEAL : 'none', cursor: avail ? 'pointer' : 'default', opacity: avail ? 1 : 0.6, outlineOffset: '2px' } },
+          it.img ? h('img', { src: it.img, alt: '', loading: 'lazy', style: { width: '100%', aspectRatio: '4 / 3', objectFit: 'cover', display: 'block', background: '#fff', borderBottom: '1px solid ' + LINE, filter: avail ? 'none' : 'grayscale(1)' } })
+            : h('div', { 'aria-hidden': 'true', style: { width: '100%', aspectRatio: '4 / 3', background: ALT, borderBottom: '1px solid ' + LINE, display: 'grid', placeItems: 'center', color: FAINT, fontSize: 12, fontWeight: 600, padding: 8, textAlign: 'center' } }, it.label),
+          h('span', { style: { display: 'flex', alignItems: 'center', gap: 8, padding: '10px 11px' } },
+            h('span', { 'aria-hidden': 'true', style: { flex: 'none', width: 16, height: 16, borderRadius: '50%', border: '2px solid ' + (on ? TEAL : '#cfcfcf'), background: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center' } },
+              on ? h('span', { style: { width: 7, height: 7, borderRadius: '50%', background: TEAL } }) : null),
+            h('span', { style: { display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 } },
+              h('span', { style: { fontSize: 12.5, fontWeight: 500, lineHeight: 1.3, color: avail ? INK : FAINT, textDecoration: avail ? 'none' : 'line-through' } }, it.label),
+              avail ? null : h('span', { style: { fontSize: 11, color: '#bdbdbd' } }, 'Not available'))));
         return h(avail ? 'button' : 'div', {
           key: it.val != null ? it.val : i, type: avail ? 'button' : undefined,
           onClick: avail ? (e => { e.preventDefault(); e.stopPropagation(); it.onPick(); close(); }) : undefined,
@@ -3440,7 +3467,7 @@ class Component extends DCLogic {
             h('span', { 'aria-hidden': 'true', style: { flex: 'none', color: MUT, fontSize: 10, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .12s' } }, '▼'))),
         open ? h('div', { style: { marginTop: 12 } },
           remark ? h('div', { style: { fontSize: 11.5, color: MUT, lineHeight: 1.55, background: ALT, borderRadius: 8, padding: '9px 12px', marginBottom: 12 } }, remark) : null,
-          h('div', { role: 'radiogroup', 'aria-label': fieldLabel, style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 } }, cards)) : null);
+          h('div', { role: 'radiogroup', 'aria-label': fieldLabel, style: { display: 'grid', gridTemplateColumns: withImg ? 'repeat(auto-fill,minmax(140px,1fr))' : 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 } }, cards)) : null);
     };
     // custom-size dimension fields: the H/W pairs shown when Size = "Other (Custom Size)".
     // After the user fills both and clicks Confirm, the Size field displays "Custom Size: HxW"
@@ -3449,6 +3476,9 @@ class Component extends DCLogic {
     const WIDTH_KEYS = { custom_w: 'custom_h', fold_w_thin: 'fold_h_thin', fold_w_fat: 'fold_h_fat' };
     const DIM_KEYS = { custom_h: 1, custom_w: 1, fold_h_thin: 1, fold_w_thin: 1, fold_h_fat: 1, fold_w_fat: 1 };
     const activeDims = () => { for (const p of DIM_PAIRS) { const hv = cfg[p[0]], wv = cfg[p[1]]; if (hv != null && hv !== '' && wv != null && wv !== '') return { hk: p[0], wk: p[1], h: hv, w: wv }; } return null; };
+    // original printoka.com option photos (materials, finishing, sizes, folds…) — product-images.js
+    const PKI = window.PK_IMAGES, prodId = prod && prod.id;
+    const pkOptImg = (key, val) => { const f = PKI && PKI.option(key, val, prodId); return f ? window.__asset(PKI.base + f) : null; };
     const optCards = (def, options, sel) => {
       const label = (ov.label && ov.label[def.key]) || def.label;
       const isSizeField = def.key === 'size';
@@ -3474,7 +3504,7 @@ class Component extends DCLogic {
       const dispSet = {}; dispOptions.forEach(v => { dispSet[Array.isArray(v) ? v[0] : v] = 1; });
       const reliable = validVals.length > 0 && validVals.every(v => dispSet[v]);
       const items = dispOptions.map(v => { const val = Array.isArray(v) ? v[0] : v;
-        return { val: val, label: optLabel[val] || val, on: chosen === val, avail: reliable ? !!availSet[val] : true,
+        return { val: val, label: optLabel[val] || val, on: chosen === val, avail: reliable ? !!availSet[val] : true, img: pkOptImg(def.key, val),
           onPick: () => this.setState(st => Object.assign({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) }, isSizeField ? { sizeConfirmed: false } : {})) }; });
       // "selected" = the customer set this field explicitly (placeholder chosen, or a value in
       // state.cfg); an untouched default is NOT selected, so it reads lighter.
