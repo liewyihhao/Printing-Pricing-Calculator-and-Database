@@ -155,6 +155,7 @@ function notificationsFor(user) {
     if (rc.type === 'customer') return user.type === 'customer' && rc.id === user.id;
     if (rc.type === 'outlet') return user.type === 'outlet' && user.outlet === rc.outlet;
     if (rc.type === 'role') return userCoversRole(user, rc.role);
+    if (rc.type === 'hub') return user.type === 'hub' && (!user.hub || user.hub === rc.hub);
     return false;
   });
 }
@@ -242,6 +243,7 @@ function createJob(body) {
     status: 'intake', paymentValidated: !!body.paymentValidated, paymentValidatedAt: body.paymentValidated ? now() : null,
     creditTerms: !!body.creditTerms, artwork: { file: body.artworkFile || 'artwork.pdf', checkStatus: 'pending' },
     artworkMatches: body.artworkMatches !== false, deadline: body.deadline || null, createdAt: now(), owner: {},
+    fulfillmentOutlet: body.outlet || null,
   };
   db.jobs.push(j);
   logEvent({ actor: body.actor || 'outlet', role: 'store_manager', action: 'create_order', jobId: jid, from: null, to: 'intake', note: 'Order created (' + j.channel + ') — ' + j.customer + ' · ' + j.product });
@@ -711,4 +713,4 @@ function updateCustomInvoice(cid, patch, actor) {
   save(); return { invoice: inv };
 }
 
-module.exports = { checkCoupon, load, save, reset, jobs, job, users, audit, applyTransition, logEvent, now, id, catalogue, setOverride, createJob, orders, order, createOrder, validateOrderPayment, orderView, registerCustomer, loginCustomer, sessionCustomer, logout, ordersForUser, publicCustomer, customers, findCustomer, getAddresses, addAddress, deleteAddress, setDefaultAddress, getCredit, creditEntry, vendorAccounts, requestVendorQuotes, submitVendorQuote, awardVendorPO, vendorRequests, quotes, quote, quotesForUser, createQuote, priceQuote, rejectQuote, acceptQuote, createManualQuote, setQuoteRemark, customInvoices, customInvoice, customInvoicesForUser, createCustomInvoice, updateCustomInvoice, notifications, notify, notificationsFor, markNotificationRead, viewQuote, createWalkinQuote, recordQuoteDecision, createCustomerByStaff, updateProfile, changePassword, settings, updateSettings, emailTemplates, emailOutbox, emailStats, setEmailActive, sendEmail };
+module.exports = { hashPassword, checkCoupon, load, save, reset, jobs, job, users, audit, applyTransition, logEvent, now, id, catalogue, setOverride, createJob, orders, order, createOrder, validateOrderPayment, orderView, registerCustomer, loginCustomer, sessionCustomer, logout, ordersForUser, publicCustomer, customers, findCustomer, getAddresses, addAddress, deleteAddress, setDefaultAddress, getCredit, creditEntry, vendorAccounts, requestVendorQuotes, submitVendorQuote, awardVendorPO, vendorRequests, quotes, quote, quotesForUser, createQuote, priceQuote, rejectQuote, acceptQuote, createManualQuote, setQuoteRemark, customInvoices, customInvoice, customInvoicesForUser, createCustomInvoice, updateCustomInvoice, notifications, notify, notificationsFor, markNotificationRead, viewQuote, createWalkinQuote, recordQuoteDecision, createCustomerByStaff, updateProfile, changePassword, settings, updateSettings, emailTemplates, emailOutbox, emailStats, setEmailActive, sendEmail };

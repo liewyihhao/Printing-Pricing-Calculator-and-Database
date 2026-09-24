@@ -10,6 +10,8 @@ const url = require('url');
 const zlib = require('zlib');
 const D = require('./domain');
 const store = require('./store');
+const ops = require('./ops');
+ops.migrate();
 const content = require('./content');
 const seoProduct = require('./seo-product');
 
@@ -27,6 +29,7 @@ function readBody(req) {
 
 // enrich a job for the client (queue label + actions available to the given role)
 function jobView(j, role) {
+  if (ops.normalizeJob(j)) store.save();
   return Object.assign({}, j, {
     statusLabel: (D.STATUS[j.status] || {}).label,
     queue: (D.STATUS[j.status] || {}).queue,
@@ -36,8 +39,19 @@ function jobView(j, role) {
 
 async function api(req, res, pathname, query) {
   const seg = pathname.replace(/^\/api\//, '').split('/').filter(Boolean);
-  const role = query.role || (req.headers['x-role']) || 'production_director';
-  const actor = query.actor || req.headers['x-actor'] || role;
+  const token = req.headers['x-token'] || query.token;
+  const staffMe = () => { const m = store.sessionCustomer(token); return m && m.type !== 'customer' ? m : null; };
+  // ops endpoints: staff session required; role + actor are derived server-side from it
+  const OPS = { queues: 1, jobs: 1, audit: 1, ops: 1, users: 1 };
+  let role = null, actor = 'system', me0 = null;
+  if (OPS[seg[0]] && !(seg[0] === 'ops' && seg[1] === 'outlets')) {
+    me0 = staffMe();
+    if (!me0) return send(res, 401, { error: 'staff sign-in required' });
+    role = D.opsRoleFor(me0);
+    if (!role) return send(res, 403, { error: 'your account has no operations role' });
+    if (me0.type === 'vendor' && seg[0] !== 'jobs') return send(res, 403, { error: 'not available to printers' });
+    actor = me0.name || me0.email;
+  }
 
   // GET /api/health
   if (seg[0] === 'health') return send(res, 200, { ok: true, ts: store.now() });
@@ -57,29 +71,64 @@ async function api(req, res, pathname, query) {
   // GET /api/jobs  (all)  |  POST /api/jobs  (create at intake)  |  GET /api/jobs/:id
   if (seg[0] === 'jobs' && !seg[1] && req.method === 'POST') {
     const body = await readBody(req);
-    const j = store.createJob(body);
+    body.actor = actor; if (!body.outlet && me0 && me0.outlet) body.outlet = me0.outlet;
+    const j = store.createJob(body); ops.normalizeJob(j); store.save();
     return send(res, 200, { ok: true, job: jobView(j, role) });
   }
   if (seg[0] === 'jobs' && !seg[1]) {
-    const jobs = store.jobs().slice().sort(D.priorityCompare).map(j => jobView(j, role));
-    return send(res, 200, { count: jobs.length, jobs });
+    let list = store.jobs().slice();
+    if (me0.type === 'vendor') list = list.filter(j => j.outsource && j.outsource.vendors.some(v => v.vendorId === me0.id));
+    if (me0.type === 'hub' && me0.hub) list = list.filter(j => j.hub === me0.hub || ((j.destination || {}).type === 'hub' && j.destination.id === me0.hub));
+    const jobs = list.sort(D.priorityCompare).map(j => jobView(j, role));
+    return send(res, 200, { count: jobs.length, role, jobs });
   }
   if (seg[0] === 'jobs' && seg[1] && !seg[2]) {
     const j = store.job(seg[1]); if (!j) return send(res, 404, { error: 'not found' });
-    return send(res, 200, { job: jobView(j, role), audit: store.audit({ jobId: seg[1] }) });
+    const o = j.orderId ? store.order(j.orderId) : null;
+    return send(res, 200, { job: jobView(j, role), audit: store.audit({ jobId: seg[1] }), order: o ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items } : null });
   }
   // POST /api/jobs/:id/transition  { action, payload }
   if (seg[0] === 'jobs' && seg[2] === 'transition' && req.method === 'POST') {
     const body = await readBody(req);
-    const r = store.applyTransition(seg[1], body.role || role, body.actor || actor, body.action, body.payload || {});
+    if (me0.type === 'vendor') { const j0 = store.job(seg[1]); if (!j0 || !j0.outsource || j0.outsource.awardedTo !== me0.id || body.action !== 'vendor_ship') return send(res, 403, { error: 'printers can only ship jobs awarded to them' }); }
+    const r = ops.transition(seg[1], role, actor, body.action, body.payload || {});
     if (r.error) return send(res, 400, r);
-    return send(res, 200, { ok: true, job: jobView(r.job, body.role || role), from: r.from, to: r.to });
+    return send(res, 200, { ok: true, job: jobView(store.job(seg[1]), role), from: r.from, to: r.to });
   }
+  // POST /api/jobs/:id/step  { group, key, done, note }  — interactive progress forms
+  if (seg[0] === 'jobs' && seg[2] === 'step' && req.method === 'POST') {
+    const b = await readBody(req); const r = ops.setStep(seg[1], b.group, b.key, b.done !== false, role, actor, b.note);
+    return r.error ? send(res, 400, r) : send(res, 200, { ok: true, job: jobView(r.job, role) });
+  }
+  // POST /api/jobs/:id/send-internal  { machine, destType, destId, instructions, parcels }  (Qn 752 CF1)
+  if (seg[0] === 'jobs' && seg[2] === 'send-internal' && req.method === 'POST') {
+    const r = ops.sendInternal(seg[1], role, actor, await readBody(req));
+    return r.error ? send(res, 400, r) : send(res, 200, { ok: true, job: jobView(r.job, role) });
+  }
+  // ---- ops settings (CMS), KPIs, sales, hub performance, action tracker ----
+  if (seg[0] === 'ops' && seg[1] === 'outlets') return send(res, 200, { outlets: ops.config().outlets.filter(o => o.pickup !== false).map(o => ({ id: o.id, name: o.name, address: o.address })) });
+  if (seg[0] === 'ops' && seg[1] === 'config') {
+    if (req.method === 'POST') {
+      if (['production_director', 'scheduler_manager', 'hub_manager', 'logistics_manager'].indexOf(role) < 0) return send(res, 403, { error: 'managers only' });
+      return send(res, 200, { config: ops.saveConfig(await readBody(req), actor) });
+    }
+    return send(res, 200, { config: ops.config() });
+  }
+  if (seg[0] === 'ops' && seg[1] === 'kpi') return send(res, 200, { kpi: ops.kpi(query.dept, query.days) });
+  if (seg[0] === 'ops' && seg[1] === 'sales') {
+    if (['production_director', 'scheduler_manager'].indexOf(role) < 0) return send(res, 403, { error: 'managers only' });
+    return send(res, 200, { sales: ops.sales(query.days) });
+  }
+  if (seg[0] === 'ops' && seg[1] === 'hub-performance') return send(res, 200, { performance: ops.hubPerformance(query.hub || (me0.type === 'hub' ? me0.hub : null), query.days) });
+  if (seg[0] === 'ops' && seg[1] === 'actions') {
+    const managerish = /manager|director/.test(role);
+    return send(res, 200, { actions: ops.actions(query.dept, { actor: (query.mine === '1' || !managerish) ? actor : null, days: Number(query.days) || 0 }) });
+  }
+  if (seg[0] === 'ops' && seg[1] === 'staff') return send(res, 200, { staff: store.customers().filter(c => c.type !== 'customer' && c.type !== 'vendor').map(c => ({ id: c.id, name: c.name, email: c.email, type: c.type, role: c.role, opsRole: D.opsRoleFor(c), outlet: c.outlet || null, hub: c.hub || null })) });
   // GET /api/audit?jobId=
   if (seg[0] === 'audit') return send(res, 200, { audit: store.audit(query.jobId ? { jobId: query.jobId } : null) });
 
   // ---- auth: customer accounts + sessions ----
-  const token = req.headers['x-token'] || query.token;
   if (seg[0] === 'auth' && seg[1] === 'register' && req.method === 'POST') {
     const r = store.registerCustomer(await readBody(req));
     return send(res, r.error ? 400 : 200, r);
@@ -129,7 +178,8 @@ async function api(req, res, pathname, query) {
       body.coupon = r.code; body.couponDiscount = r.discount;
     } else { body.couponDiscount = 0; }
     const o = store.createOrder(body);
-    return send(res, 200, { ok: true, order: o });
+    ops.onOrderCreated(o);
+    return send(res, 200, { ok: true, order: store.order(o.id) });
   }
   if (seg[0] === 'orders' && !seg[1]) {
     const me = store.sessionCustomer(token);
@@ -165,6 +215,7 @@ async function api(req, res, pathname, query) {
 
   // GET /api/orders/:id  — order + live job statuses (confirmation / tracking / management view)
   if (seg[0] === 'orders' && seg[1] && !seg[2]) {
+    if (store.order(seg[1])) { (store.order(seg[1]).jobIds || []).forEach(jid => { const jj = store.job(jid); if (jj) ops.normalizeJob(jj); }); ops.syncOrder(seg[1]); }
     const o = store.orderView(seg[1]); if (!o) return send(res, 404, { error: 'order not found' });
     // a signed-in customer may only read their own order; staff and public order-number tracking see it
     const me = store.sessionCustomer(token);
@@ -173,7 +224,9 @@ async function api(req, res, pathname, query) {
   }
   // POST /api/orders/:id/pay  — validate a pending (bank-transfer/test) payment
   if (seg[0] === 'orders' && seg[2] === 'pay' && req.method === 'POST') {
-    const r = store.validateOrderPayment(seg[1], actor);
+    const payer = staffMe(); if (!payer || payer.type === 'vendor' || payer.type === 'hub') return send(res, 401, { error: 'staff sign-in required' });
+    const r = store.validateOrderPayment(seg[1], payer.name || payer.email);
+    if (!r.error) { const o = store.order(seg[1]); (o.jobIds || []).forEach(jid => { const jj = store.job(jid); if (jj) { ops.normalizeJob(jj); jj.statusAt = Object.assign(jj.statusAt || {}, { [jj.status]: store.now() }); } }); ops.syncOrder(seg[1]); store.save(); }
     if (r.error) return send(res, 400, r);
     return send(res, 200, { ok: true, order: store.orderView(seg[1]) });
   }
@@ -232,10 +285,11 @@ async function api(req, res, pathname, query) {
   }
   if (seg[0] === 'quotes' && seg[2] === 'decision' && req.method === 'POST') {
     const me = store.sessionCustomer(token); if (!me || me.type !== 'outlet') return send(res, 401, { error: 'outlet sign-in required' });
-    const b = await readBody(req); const r = store.recordQuoteDecision(seg[1], b.decision, b.remark, me); return send(res, r.error ? 400 : 200, r);
+    const b = await readBody(req); const r = store.recordQuoteDecision(seg[1], b.decision, b.remark, me); if (r.order) ops.onOrderCreated(r.order); return send(res, r.error ? 400 : 200, r);
   }
   if (seg[0] === 'quotes' && !seg[1]) {
     const me = store.sessionCustomer(token);
+    if (!me) return send(res, 200, { quotes: [] });
     let list = store.quotes();
     if (me && me.type === 'customer') list = store.quotesForUser(me.id);
     else if (me && me.type === 'outlet') list = list.filter(q => q.outlet === me.outlet); // outlet sees only its own quotes
@@ -247,7 +301,7 @@ async function api(req, res, pathname, query) {
     const r = store.priceQuote(seg[1], await readBody(req), me.name || me.email); return send(res, r.error ? 400 : 200, r);
   }
   if (seg[0] === 'quotes' && seg[2] === 'accept' && req.method === 'POST') {
-    const me = store.sessionCustomer(token); const r = store.acceptQuote(seg[1], me ? me.email : 'customer'); return send(res, r.error ? 400 : 200, r);
+    const me = store.sessionCustomer(token); const r = store.acceptQuote(seg[1], me ? me.email : 'customer'); if (r.order) ops.onOrderCreated(r.order); return send(res, r.error ? 400 : 200, r);
   }
   if (seg[0] === 'quotes' && seg[2] === 'reject' && req.method === 'POST') {
     const b = await readBody(req); const me = store.sessionCustomer(token); const r = store.rejectQuote(seg[1], b.reason, me ? me.email : 'customer'); return send(res, r.error ? 400 : 200, r);
@@ -260,6 +314,7 @@ async function api(req, res, pathname, query) {
     return send(res, 200, { jobs: store.vendorRequests(me.id) });
   }
   if (seg[0] === 'jobs' && seg[2] === 'request-quotes' && req.method === 'POST') {
+    if (['production_director', 'scheduler_manager', 'scheduler_staff'].indexOf(role) < 0) return send(res, 403, { error: 'production staff only' });
     const b = await readBody(req); const r = store.requestVendorQuotes(seg[1], b.vendorIds, actor);
     return send(res, r.error ? 400 : 200, r);
   }
@@ -269,8 +324,16 @@ async function api(req, res, pathname, query) {
     return send(res, r.error ? 400 : 200, r);
   }
   if (seg[0] === 'jobs' && seg[2] === 'award' && req.method === 'POST') {
-    const b = await readBody(req); const r = store.awardVendorPO(seg[1], b.vendorId, actor);
-    return send(res, r.error ? 400 : 200, r);
+    if (['production_director', 'scheduler_manager', 'scheduler_staff'].indexOf(role) < 0) return send(res, 403, { error: 'production staff only' });
+    const r = ops.award(seg[1], role, actor, await readBody(req));
+    return r.error ? send(res, 400, r) : send(res, 200, { ok: true, job: jobView(r.job, role) });
+  }
+  // POST /api/vendor/jobs/:id/ship { courier, tracking } — the awarded printer ships with the Printoka label
+  if (seg[0] === 'vendor' && seg[1] === 'jobs' && seg[3] === 'ship' && req.method === 'POST') {
+    const vme = store.sessionCustomer(token); if (!vme || vme.type !== 'vendor') return send(res, 401, { error: 'vendor sign-in required' });
+    const j0 = store.job(seg[2]); if (!j0 || !j0.outsource || j0.outsource.awardedTo !== vme.id) return send(res, 403, { error: 'this job is not awarded to you' });
+    const b = await readBody(req); const r = ops.transition(seg[2], 'printer', vme.name, 'vendor_ship', { courier: b.courier, tracking: b.tracking });
+    return r.error ? send(res, 400, r) : send(res, 200, { ok: true, job: store.job(seg[2]) });
   }
 
   // ---- content: blog / Learning Hub + programmatic SEO landing pages ----
