@@ -1,0 +1,12 @@
+# Dependencies / build caches
+node_modules/
+.next/
+tsconfig.tsbuildinfo
+
+# Live data store (customers, password hashes, sessions, orders) and local secrets — never commit
+server/data.json
+.env.local
+.env
+
+# Generated pricing engine (built from ../crawler/output via pricing/build.sh — 21MB, not committed)
+pricing/engine.js
