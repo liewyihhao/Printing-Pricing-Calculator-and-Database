@@ -11,6 +11,7 @@ const zlib = require('zlib');
 const D = require('./domain');
 const store = require('./store');
 const ops = require('./ops');
+const admin = require('./admin');
 ops.migrate();
 const content = require('./content');
 const seoProduct = require('./seo-product');
@@ -164,10 +165,18 @@ async function api(req, res, pathname, query) {
     if (seg[1] === 'addresses' && seg[2] === 'default' && seg[3] && req.method === 'POST') return send(res, 200, store.setDefaultAddress(me.id, seg[3]));
     if (seg[1] === 'credit' && !seg[2]) {
       if (req.method === 'GET') return send(res, 200, store.getCredit(me.id));
-      if (req.method === 'POST') { const b = await readBody(req); return send(res, 200, store.creditEntry(me.id, { reason: b.reason, amount: b.amount, actor: b.actor || 'system', orderId: b.orderId })); }
+      if (req.method === 'POST') {
+        const b = await readBody(req); const amt = Math.round(Number(b.amount) * 100) / 100;
+        if (!(amt > 0) || amt > 20000) return send(res, 400, { error: 'Enter a top-up between RM 1 and RM 20,000.' });
+        if (admin.commerce().payments.testMode) return send(res, 200, store.creditEntry(me.id, { reason: 'TOPUP', amount: amt, actor: 'customer (test payment)' }));
+        const db0 = store.load(); db0.topups = db0.topups || [];
+        const tu = { id: 'TU-' + Date.now().toString(36).toUpperCase(), userId: me.id, name: me.name, email: me.email, amount: amt, status: 'pending', createdAt: store.now() };
+        db0.topups.unshift(tu); store.logEvent({ actor: me.email, role: 'customer', action: 'topup_request', jobId: null, from: null, to: null, note: tu.id + ' RM ' + amt }); store.save();
+        return send(res, 200, Object.assign(store.getCredit(me.id), { pending: tu, message: 'Top-up of RM ' + amt.toFixed(2) + ' recorded — it is added once your payment is confirmed.' }));
+      }
     }
     // POST /api/account/coupon {code, subtotal} → is this member code valid for this cart?
-    if (seg[1] === 'coupon' && req.method === 'POST') { const b = await readBody(req); return send(res, 200, store.checkCoupon(me.id, b.code, b.subtotal)); }
+    if (seg[1] === 'coupon' && req.method === 'POST') { const b = await readBody(req); return send(res, 200, admin.checkAnyCoupon(me.id, b.code, b.subtotal)); }
     if (seg[1] === 'profile' && req.method === 'POST') return send(res, 200, store.updateProfile(me.id, await readBody(req)));
     if (seg[1] === 'password' && req.method === 'POST') { const b = await readBody(req); const r = store.changePassword(me.id, b.current, b.next); return send(res, r.error ? 400 : 200, r); }
     return send(res, 404, { error: 'unknown account route' });
@@ -179,14 +188,21 @@ async function api(req, res, pathname, query) {
     const body = await readBody(req);
     if (!body.items || !body.items.length) return send(res, 400, { error: 'cart is empty' });
     const me = store.sessionCustomer(token); if (me) body.userId = me.id;
-    // member promo code: re-verify server-side (owner, minimum spend) and use the server's discount
+    // member promo code / store coupon: re-verify server-side (owner, minimum spend, limits) and use the server's discount
     if (body.coupon) {
-      const r = store.checkCoupon(body.userId, body.coupon, body.subtotal);
+      const r = admin.checkAnyCoupon(body.userId, body.coupon, body.subtotal);
+      if (r.storeWide) body._storeCoupon = r.code;
       if (!r.ok) return send(res, 400, { error: r.error });
       if (Math.abs((Number(body.couponDiscount) || 0) - r.discount) > 0.01) return send(res, 400, { error: 'Your discount code amount has changed. Please refresh your cart and try again.' });
       body.coupon = r.code; body.couponDiscount = r.discount;
     } else { body.couponDiscount = 0; }
+    const vt = admin.verifyTotals(body, me && me.type === 'customer' ? me : null);
+    if (vt.error) return send(res, 400, vt);
+    // store the server's own figures (rounded), never the browser's
+    body.memberDiscount = vt.memberDiscount; body.shipping = vt.shipping; body.total = vt.total;
+    body.tax = Math.round((Number(body.tax) || 0) * 100) / 100; body.subtotal = Math.round((Number(body.subtotal) || 0) * 100) / 100;
     const o = store.createOrder(body);
+    if (body._storeCoupon) admin.recordCouponUse(body._storeCoupon, body.userId);
     ops.onOrderCreated(o);
     return send(res, 200, { ok: true, order: store.order(o.id) });
   }
@@ -198,7 +214,7 @@ async function api(req, res, pathname, query) {
   if (seg[0] === 'admin') {
     const me = store.sessionCustomer(token);
     if (!me || me.type !== 'admin') return send(res, 401, { error: 'admin sign-in required' });
-    if (seg[1] === 'customers') return send(res, 200, { customers: store.customers().filter(c => c.type === 'customer').map(store.publicCustomer) });
+    if (seg[1] === 'customers' && !seg[2] && req.method === 'GET') return send(res, 200, { customers: store.customers().filter(c => c.type === 'customer').map(store.publicCustomer) });
     if (seg[1] === 'staff' && !seg[2] && req.method === 'GET') return send(res, 200, { staff: store.customers().filter(c => c.type !== 'customer').map(store.publicCustomer) });
     if (seg[1] === 'roles') return send(res, 200, { roles: D.ROLES, staffRoles: store.STAFF_ROLES });
     // WordPress Users → Add New / Edit role / disable / reset password
@@ -208,6 +224,40 @@ async function api(req, res, pathname, query) {
       if (req.method === 'GET') return send(res, 200, { templates: store.emailTemplates().map(t => Object.assign({}, t, store.emailStats(t.id))), outbox: store.emailOutbox(60) });
     }
     if (seg[1] === 'emails' && seg[2] && req.method === 'POST') { const b = await readBody(req); return send(res, 200, { templates: store.setEmailActive(seg[2], b.active, me.name || me.email).map(t => Object.assign({}, t, store.emailStats(t.id))) }); }
+    const who = me.name || me.email;
+    if (seg[1] === 'analytics') return send(res, 200, { analytics: admin.analytics(query.days) });
+    if (seg[1] === 'coupons' && !seg[2]) {
+      if (req.method === 'POST') { const r = admin.saveCoupon(await readBody(req), who); return send(res, r.error ? 400 : 200, r); }
+      return send(res, 200, { coupons: admin.coupons() });
+    }
+    if (seg[1] === 'coupons' && seg[3] === 'delete' && req.method === 'POST') { const r = admin.deleteCoupon(seg[2], who); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'orders' && seg[2] && req.method === 'POST') {
+      const b = await readBody(req); let r;
+      if (seg[3] === 'note') r = admin.orderNote(seg[2], b.text, b.toCustomer, who);
+      else if (seg[3] === 'cancel') r = admin.cancelOrder(seg[2], b.reason, who);
+      else if (seg[3] === 'refund') r = admin.refundOrder(seg[2], b.amount, b.method, b.reason, who);
+      else if (seg[3] === 'address') r = admin.updateOrderAddress(seg[2], b, who);
+      else if (seg[3] === 'resend') r = admin.resendConfirmation(seg[2], who);
+      else return send(res, 404, { error: 'unknown order action' });
+      if (!r.error && r.order) ops.syncOrder(seg[2]);
+      return send(res, r.error ? 400 : 200, r.error ? r : Object.assign({ ok: true }, r, r.order ? { order: store.orderView(seg[2]) } : {}));
+    }
+    if (seg[1] === 'customers' && seg[2] && !seg[3] && req.method === 'POST') { const r = admin.updateCustomer(seg[2], await readBody(req), who); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'customers' && seg[3] === 'wallet' && req.method === 'POST') { const b = await readBody(req); const r = admin.walletAdjust(seg[2], b.amount, b.note, who); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'customers' && seg[3] === 'login-as' && req.method === 'POST') { const r = admin.loginAs(seg[2], who); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'customers' && seg[2] && !seg[3]) { const c = store.findCustomer(seg[2]); if (!c) return send(res, 404, { error: 'not found' }); return send(res, 200, { customer: store.publicCustomer(c), orders: store.ordersForUser(c.id), credit: store.getCredit(c.id) }); }
+    if (seg[1] === 'posts' && !seg[2] && req.method === 'POST') { const r = admin.savePost(await readBody(req), who); content.reload(); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'posts' && seg[3] === 'delete' && req.method === 'POST') { const r = admin.deletePost(decodeURIComponent(seg[2]), who); content.reload(); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'faq' && !seg[2] && req.method === 'POST') { const r = admin.saveFaq(await readBody(req), who); content.reload(); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'faq' && seg[2] === 'delete' && req.method === 'POST') { const b = await readBody(req); const r = admin.deleteFaq(b.catId, b.index, who); content.reload(); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'media' && !seg[2] && req.method === 'POST') { const r = admin.uploadMedia(await readBody(req), who); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'media' && seg[2] === 'delete' && req.method === 'POST') { const b = await readBody(req); const r = admin.deleteMedia(b.file, who); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'topups' && !seg[2]) return send(res, 200, { topups: store.load().topups || [] });
+    if (seg[1] === 'topups' && seg[3] === 'approve' && req.method === 'POST') {
+      const tu = (store.load().topups || []).find(x => x.id === seg[2]); if (!tu || tu.status !== 'pending') return send(res, 400, { error: 'Top-up not pending.' });
+      store.creditEntry(tu.userId, { reason: 'TOPUP', amount: tu.amount, actor: who }); tu.status = 'approved'; tu.approvedAt = store.now(); tu.approvedBy = who; store.save();
+      return send(res, 200, { ok: true, topup: tu });
+    }
     return send(res, 404, { error: 'unknown admin route' });
   }
   // ---- custom invoices (staff prepare an invoice to a customer; customers see their own) ----
@@ -264,7 +314,7 @@ async function api(req, res, pathname, query) {
 
   // ---- store settings (announcement bar): public read, admin write ----
   if (seg[0] === 'settings' && !seg[1]) {
-    if (req.method === 'GET') return send(res, 200, { settings: store.settings() });
+    if (req.method === 'GET') { admin.commerce(); return send(res, 200, { settings: store.settings() }); }
     if (req.method === 'POST') { const me = store.sessionCustomer(token); if (!me || me.type !== 'admin') return send(res, 401, { error: 'admin sign-in required' }); return send(res, 200, { settings: store.updateSettings(await readBody(req), me.name || me.email) }); }
   }
 

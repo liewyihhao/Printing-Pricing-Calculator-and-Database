@@ -1064,9 +1064,9 @@ class Component extends DCLogic {
     const couponOn = !!(cp && subtotal >= cp.minSpend);
     const couponDiscount = couponOn ? (cp.amount ? Math.min(cp.amount, subtotal) : Math.round(subtotal * cp.pct) / 100) : 0;
     const afterDisc = subtotal - memberDiscount - couponDiscount;
-    const taxRate = ({ MY: 0.08, SG: 0.09, BN: 0 })[this.cc()] || 0;
-    const tax = afterDisc * taxRate;
-    const shipping = cart.length ? 12 : 0;
+    const taxRate = this.taxRate();
+    const tax = Math.round(afterDisc * taxRate * 100) / 100;
+    const shipping = cart.length ? this.shipFee(subtotal) : 0;
     return { subtotal, memberDiscount, couponCode: couponOn ? cp.code : null, couponPct: couponOn ? cp.pct : 0, couponOffLabel: couponOn ? this.couponOff(cp) : '', couponDiscount, couponShort: !!(cp && !couponOn), tax, shipping, total: afterDisc + tax + shipping, count: cart.length };
   }
   setField(k, v) { this.setState({ [k]: v }); }
@@ -3671,7 +3671,7 @@ class Component extends DCLogic {
               : (ready
                   ? (() => {
                       // same arithmetic as cartTotals(): tax on the discounted price, flat shipping on top
-                      const taxRate = ({ MY: 0.08, SG: 0.09, BN: 0 })[this.cc()] || 0, tax = p.net * taxRate, ship = 12;
+                      const taxRate = this.taxRate(), tax = p.net * taxRate, ship = this.shipFee(p.net);
                       return h('div', { key: 'pr', style: { borderTop: '1px solid ' + LINE, paddingTop: 12, marginTop: 12, display: 'flex', flexDirection: 'column', gap: 7 } },
                         [['Subtotal', this.money(p.gross), MUT], [this.tier() + ' member −' + this.tierPct() + '%', '−' + this.money(p.disc), TEAL], taxRate ? [this.taxLabel(), this.money(tax), MUT] : null, ['Est. shipping', this.money(ship), MUT]].filter(Boolean)
                           .map((r, i) => h('div', { key: i, style: { display: 'flex', justifyContent: 'space-between', gap: 12, fontSize: 12.5, lineHeight: 1.5, color: r[2] } }, h('span', null, r[0]), h('span', { style: { fontWeight: 500, color: r[2] === TEAL ? TEAL : INK } }, r[1]))),
@@ -5601,7 +5601,7 @@ class Component extends DCLogic {
         [null, null, '130px'])];
     return this.shell('Admin', navItems, activeLabel, [
       this.head(activeLabel, 'Role-scoped backoffice. Every destructive or financial change writes actor, timestamp and before/after values to the audit log.'),
-      h('div', { key: 'p', style: { marginTop: 18 } }, P[tab] || P.analytics),
+      h('div', { key: 'p', style: { marginTop: 18 } }, (this.adminSection && this.adminSection(tab)) || P[tab] || P.analytics),
     ]);
   }
 

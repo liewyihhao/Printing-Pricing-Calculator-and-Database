@@ -58,6 +58,7 @@ const STATUS = {
   at_hub: { label: 'At hub — check, relabel & forward', queue: 'hub' },
   ready_collect: { label: 'Ready for collection at outlet', queue: 'outlet' },
   completed: { label: 'Completed / delivered', queue: 'done' },
+  cancelled: { label: 'Cancelled', queue: 'done' },
 };
 
 const OUTLET = ['cs_walkin', 'print_consultant', 'store_manager'];
