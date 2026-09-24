@@ -2619,7 +2619,7 @@ class Component extends DCLogic {
 
     P.library = [
       h('div', { key: 'lanes', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 16 } },
-        LANES.map((l, i) => h('div', { key: i, style: { border: '1px solid ' + HAIR, borderTop: '3px solid ' + (i ? '#231f20' : TEAL), background: '#fff', padding: '20px 22px' } },
+        LANES.map((l, i) => h('div', { key: i, style: { border: '1px solid ' + HAIR, borderTop: '3px solid ' + (i ? TEALD : TEAL), borderRadius: 12, background: '#fff', padding: '20px 22px' } },
           h('div', { style: { display: 'flex', gap: 10, alignItems: 'baseline', flexWrap: 'wrap', marginBottom: 4 } },
             h('span', { style: { fontSize: 16.5, fontWeight: 600 } }, l[0]),
             h('span', { style: { fontSize: 12.5, fontWeight: 600, color: TEAL } }, l[1])),
@@ -2689,7 +2689,7 @@ class Component extends DCLogic {
 
     const step = st.pkStep === undefined ? 0 : st.pkStep;
     const STEPS = ['Size', 'Material', 'Processes', 'Quantity', 'Price'];
-    const opt = (label, on, go, note) => h('span', { key: label, 'data-go': go, style: { position: 'relative', display: 'inline-flex', flexDirection: 'column', gap: 2, border: '1px solid ' + (on ? TEAL : HAIR), background: '#fff', padding: '11px 18px', fontSize: 13.5, color: INK, cursor: 'pointer', flex: '0 1 auto', minWidth: 0, textAlign: 'center', alignItems: 'center' } },
+    const opt = (label, on, go, note) => h('span', { key: label, 'data-go': go, style: { position: 'relative', display: 'inline-flex', flexDirection: 'column', gap: 2, border: '1px solid ' + (on ? TEAL : HAIR), borderRadius: 8, background: on ? '#fdf2f2' : '#fff', padding: '11px 18px', fontSize: 13.5, fontWeight: on ? 600 : 400, color: on ? TEALD : INK, cursor: 'pointer', flex: '0 1 auto', minWidth: 0, textAlign: 'center', alignItems: 'center', overflow: 'hidden' } },
       label, note && h('span', { style: { fontSize: 11, color: FAINT } }, note),
       on && h('span', { style: { position: 'absolute', right: 0, bottom: 0, width: 0, height: 0, borderLeft: '9px solid transparent', borderBottom: '9px solid ' + TEAL } }));
     const row = (label, hint, children) => h('div', { key: label, style: { display: 'grid', gridTemplateColumns: 'minmax(120px,150px) minmax(0,1fr)', gap: 18, padding: '18px 0', borderTop: '1px solid ' + LINE, alignItems: 'start' } },
@@ -2698,7 +2698,7 @@ class Component extends DCLogic {
         hint && h('div', { style: { fontSize: 11.5, color: FAINT, marginTop: 3, lineHeight: 1.5 } }, hint)),
       h('div', { style: { display: 'flex', gap: 10, flexWrap: 'wrap' } }, children));
 
-    const dimField = (label, value, unit) => h('div', { key: label, style: { display: 'flex', border: '1px solid ' + HAIR, background: '#fff', flex: '1 1 220px', minWidth: 0, maxWidth: 320 } },
+    const dimField = (label, value, unit) => h('div', { key: label, style: { display: 'flex', border: '1px solid ' + HAIR, borderRadius: 8, overflow: 'hidden', background: '#fff', flex: '1 1 220px', minWidth: 0, maxWidth: 320 } },
       h('span', { style: { flex: '1 1 auto', minWidth: 0, background: ALT, padding: '10px 13px', fontSize: 13, color: MUT } }, label),
       h('span', { style: { flex: '0 0 auto', width: 78, padding: '10px 13px', fontSize: 13.5, fontWeight: 600, textAlign: 'right' } }, value),
       h('span', { style: { padding: '10px 13px', fontSize: 12.5, color: MUT, fontStyle: 'italic', borderLeft: '1px solid ' + HAIR } }, unit));
@@ -2717,13 +2717,13 @@ class Component extends DCLogic {
        row('Partial surface', 'Adds a die or plate charge', [opt('Embossing', false, 'set:pkStep:2'), opt('Spot UV', false, 'set:pkStep:2'), opt('Hot Stamping', false, 'set:pkStep:2')]),
        row('Others', null, [opt('Die-Cut', true, 'set:pkStep:2')])],
       [row('Quantity', 'Fixed break points — pricing is per print run', [
-         h('div', { key: 'q', style: { display: 'flex', border: '1px solid ' + HAIR } },
+         h('div', { key: 'q', style: { display: 'inline-flex', border: '1px solid ' + HAIR, borderRadius: 8, overflow: 'hidden' } },
            h('span', { style: { padding: '10px 16px', borderRight: '1px solid ' + HAIR, cursor: 'pointer', color: MUT } }, '−'),
            h('span', { style: { padding: '10px 26px', fontSize: 14, fontWeight: 600 } }, '300'),
            h('span', { style: { padding: '10px 16px', borderLeft: '1px solid ' + HAIR, cursor: 'pointer', color: MUT } }, '+'))]),
-       row('Job name', 'Shown on the order slip and in your dashboard', [h('span', { key: 'n', style: { border: '1px solid ' + HAIR, padding: '10px 13px', fontSize: 13, color: FAINT, flex: '1 1 auto', minWidth: 0, width: '100%' } }, 'e.g. Studio North candle carton')]),
-       row('Note to prepress', null, [h('span', { key: 'n', style: { border: '1px solid ' + HAIR, padding: '10px 13px', fontSize: 13, color: FAINT, flex: '1 1 auto', minWidth: 0, width: '100%', minHeight: 68, display: 'block' } }, 'Anything the operator should know before die-cutting')])],
-      [h('div', { key: 'sum', style: { border: '1px solid ' + HAIR } },
+       row('Job name', 'Shown on the order slip and in your dashboard', [h('span', { key: 'n', style: { border: '1px solid ' + HAIR, borderRadius: 8, padding: '10px 13px', fontSize: 13, color: FAINT, flex: '1 1 auto', minWidth: 0, width: '100%' } }, 'e.g. Studio North candle carton')]),
+       row('Note to prepress', null, [h('span', { key: 'n', style: { border: '1px solid ' + HAIR, borderRadius: 8, padding: '10px 13px', fontSize: 13, color: FAINT, flex: '1 1 auto', minWidth: 0, width: '100%', minHeight: 68, display: 'block' } }, 'Anything the operator should know before die-cutting')])],
+      [h('div', { key: 'sum', style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden' } },
         [['Box template ID', 'M015'], ['Size mode', 'Die-Cut'], ['Dimensions', 'Length 80 mm · Width 150 mm · Caliper 0.3 mm'], ['Materials', 'Main paper · Gloss Art Card 1 Side Coated (250 GSM)'], ['Processes', '4 Colour Printing · Gloss Lamination (Front) · Die-Cut'], ['Note', '—'], ['Quantity', '300']]
           .map((r, i) => h('div', { key: i, style: { display: 'grid', gridTemplateColumns: 'minmax(110px,150px) minmax(0,1fr) 22px', gap: 14, padding: '13px 16px', borderTop: i ? '1px solid ' + LINE : 'none', background: i % 2 ? ALT : '#fff', alignItems: 'center' } },
             h('span', { style: { fontSize: 13, fontWeight: 600 } }, r[0]),
@@ -2731,32 +2731,32 @@ class Component extends DCLogic {
             h('span', { 'data-go': 'set:pkStep:' + Math.min(i, 3), style: { fontSize: 13, color: TEAL, cursor: 'pointer', textAlign: 'right' } }, '›')))),
        h('div', { key: 'zone', style: { display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap', marginTop: 16 } },
          h('span', { style: { fontSize: 14, fontWeight: 600 } }, 'Delivery zone'),
-         h('span', { style: { border: '1px solid ' + HAIR, padding: '9px 14px', fontSize: 13, color: INK } }, 'West Malaysia'),
+         h('span', { style: { border: '1px solid ' + HAIR, borderRadius: 8, padding: '9px 14px', fontSize: 13, color: INK } }, 'West Malaysia'),
          h('span', { style: { fontSize: 12, color: FAINT } }, 'Zone sets the courier list and free-shipping threshold'))],
     ];
 
     P.configure = [
-      h('div', { key: 'w', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 0, border: '1px solid ' + HAIR, background: '#fff' } },
+      h('div', { key: 'w', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 0, border: '1px solid ' + HAIR, borderRadius: 14, overflow: 'hidden', background: '#fff' } },
         h('div', { style: { borderRight: '1px solid ' + HAIR, display: 'flex', flexDirection: 'column' } },
-          h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, padding: '11px 14px', background: '#231f20', color: '#fff' } },
-            h('span', { style: { fontSize: 11.5, fontWeight: 600, letterSpacing: '.06em' } }, 'JOB #1 · M015'),
-            h('span', { style: { fontSize: 11.5, opacity: .72, marginLeft: 'auto' } }, 'Fold preview')),
+          h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 15px', background: ALT, borderBottom: '1px solid ' + HAIR, color: INK } },
+            h('span', { style: { fontSize: 11.5, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: TEAL } }, 'Job #1 · M015'),
+            h('span', { style: { fontSize: 11.5, color: FAINT, marginLeft: 'auto' } }, 'Fold preview')),
           h('div', { style: { flex: 1, minHeight: 300, display: 'grid', placeItems: 'center', padding: 24, background: '#fff' } },
             h('div', { style: { width: '100%', maxWidth: 320, transform: 'perspective(700px) rotateX(8deg) rotateY(-22deg)', filter: 'drop-shadow(0 12px 18px rgba(33,33,33,.18))' } }, this.dieline('divider', null, 180))),
           h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderTop: '1px solid ' + HAIR, background: ALT, flexWrap: 'wrap' } },
-            ['Orbit', 'Pause'].map((c, i) => h('span', { key: i, style: { border: '1px solid ' + HAIR, background: '#fff', padding: '5px 10px', fontSize: 11.5, fontWeight: 600, color: MUT, cursor: 'pointer' } }, c)),
+            ['Orbit', 'Pause'].map((c, i) => h('span', { key: i, style: { border: '1px solid ' + HAIR, borderRadius: 6, background: '#fff', padding: '5px 10px', fontSize: 11.5, fontWeight: 600, color: MUT, cursor: 'pointer' } }, c)),
             h('span', { style: { flex: 1, minWidth: 90, height: 4, borderRadius: 999, background: LINE, position: 'relative' } },
               h('span', { style: { position: 'absolute', inset: 0, width: '45%', background: TEAL, borderRadius: 999 } }),
               h('span', { style: { position: 'absolute', left: '45%', top: -6, height: 16, width: 16, marginLeft: -8, borderRadius: '50%', background: '#fff', border: '1px solid ' + HAIR, boxShadow: '0 1px 4px rgba(33,33,33,.2)' } })),
             h('span', { style: { fontSize: 11.5, color: FAINT } }, 'Fold progress'))),
         h('div', { style: { display: 'flex', flexDirection: 'column' } },
-          h('div', { style: { padding: '12px 18px', background: '#231f20', color: '#fff', fontSize: 13, fontWeight: 600, letterSpacing: '.04em', textTransform: 'uppercase', textAlign: 'center' } }, (step + 1) + ' / 6 — ' + STEPS[step]),
+          h('div', { style: { padding: '12px 18px', background: TEAL, color: '#fff', fontSize: 12.5, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', textAlign: 'center' } }, (step + 1) + ' / 6 — ' + STEPS[step]),
           h('div', { style: { padding: '4px 18px 18px' } }, FORMS[step]),
           h('div', { style: { marginTop: 'auto' } },
             h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', background: ALT, borderTop: '1px solid ' + HAIR } },
               STEPS.map((s, i) => h('span', { key: i, 'data-go': 'set:pkStep:' + i, style: { padding: '14px 6px', textAlign: 'center', fontSize: 12, fontWeight: 600, color: i === step ? TEAL : MUT, borderBottom: '3px solid ' + (i === step ? TEAL : 'transparent'), cursor: 'pointer' } }, (i + 1) + '. ' + s))),
-            h('div', { 'data-go': 'pkgo:quote', style: { background: TEAL, color: '#fff', padding: '15px 18px', textAlign: 'center', fontSize: 15, fontWeight: 600, cursor: 'pointer' } }, 'Continue to get offer price')))),
-      h('div', { key: 'n', style: { marginTop: 14, border: '1px solid ' + HAIR, background: ALT, padding: 16, fontSize: 12.5, color: MUT, lineHeight: 1.75 } },
+            h('div', { 'data-go': 'pkgo:quote', style: { background: TEAL, color: '#fff', padding: '15px 18px', textAlign: 'center', fontSize: 15, fontWeight: 600, borderRadius: 8, cursor: 'pointer' } }, 'Continue to get offer price')))),
+      h('div', { key: 'n', style: { marginTop: 14, border: '1px solid ' + HAIR, borderRadius: 12, background: ALT, padding: 16, fontSize: 12.5, color: MUT, lineHeight: 1.75 } },
         h('b', { style: { color: INK } }, 'Artwork comes later: '), 'the die-line is generated from these dimensions, so the customer can download it, design against it and upload artwork after the order is placed — shipment and delivery dates firm up once artwork passes prepress.'),
     ];
 
@@ -2780,7 +2780,7 @@ class Component extends DCLogic {
     const nett = laneTotal * (1 - tierOff);
     const sst = this.cc() === 'MY' ? 0.08 : this.cc() === 'SG' ? 0.09 : 0;
     const QTY = RATES.map(r => r[0].toLocaleString('en-US'));
-    const laneCard = (name, total, per, days, on) => h('div', { key: name, 'data-go': 'set:pkLane:' + name, style: { border: '1px solid ' + (on ? TEAL : HAIR), background: on ? '#fdf6f6' : '#fff', padding: '22px 20px', cursor: 'pointer', position: 'relative' } },
+    const laneCard = (name, total, per, days, on) => h('div', { key: name, 'data-go': 'set:pkLane:' + name, style: { border: '1px solid ' + (on ? TEAL : HAIR), borderRadius: 12, background: on ? '#fdf6f6' : '#fff', padding: '22px 20px', cursor: 'pointer', position: 'relative' } },
       h('div', { style: { display: 'flex', alignItems: 'center', gap: 9, justifyContent: 'center', marginBottom: 14 } },
         h('span', { style: { height: 18, width: 18, borderRadius: '50%', border: '2px solid ' + (on ? TEAL : HAIR), background: on ? TEAL : '#fff', display: 'grid', placeItems: 'center', color: '#fff', fontSize: 10, fontWeight: 700 } }, on ? '✓' : ''),
         h('span', { style: { fontSize: 15.5, fontWeight: 600 } }, name)),
@@ -2794,7 +2794,7 @@ class Component extends DCLogic {
           h('div', { style: { fontSize: 11.5, color: FAINT } }, 'process days'))),
       h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } },
         [['Standard price', 0, 'Cash'], ['Discount 4%', .04, 'Silver'], ['Discount 8%', .08, 'Gold'], ['Discount 14%', .14, 'Platinum']].map((d, i) =>
-          h('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 11, border: '1px solid ' + HAIR, background: '#fff', padding: '9px 12px' } },
+          h('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 11, border: '1px solid ' + HAIR, borderRadius: 8, background: '#fff', padding: '9px 12px' } },
             h('span', { style: { flex: 'none', height: 26, width: 26, borderRadius: '50%', display: 'grid', placeItems: 'center', fontSize: 8, fontWeight: 700, color: '#fff', background: ['#9aa4ad', '#7f8992', AMBER, '#231f20'][i] } }, d[2].slice(0, 4).toUpperCase()),
             h('span', { style: { minWidth: 0 } },
               h('span', { style: { display: 'block', fontSize: 12.5, fontWeight: 600 } }, d[0]),
@@ -2803,12 +2803,12 @@ class Component extends DCLogic {
     P.quote = [
       h('div', { key: 'g', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 20, alignItems: 'start' } },
         h('div', { style: { display: 'flex', flexDirection: 'column', gap: 18 } },
-          h('div', { style: { border: '1px solid ' + HAIR } },
+          h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', background: '#fff' } },
             h('div', { style: { background: ALT, color: INK, padding: '12px 15px', borderBottom: '1px solid ' + HAIR, fontSize: 11.5, fontWeight: 600, letterSpacing: '.07em', textTransform: 'uppercase' } }, 'Product spec'),
             [['Box model', 'M015 · Divider box, partition lock'], ['Open size (H × W)', '401.2 mm × 150 mm'], ['Dimension (L × W × D)', '80 mm × 150 mm × 0.3 mm'], ['Paper', 'Gloss Art Card 250 gsm (1 side coated)'], ['Run', QTY[qi] + ' pcs · ' + lane + ' lane · ' + laneDays + ' process days']]
               .map((r, i) => h('div', { key: i, style: { display: 'grid', gridTemplateColumns: 'minmax(120px,170px) minmax(0,1fr)', gap: 14, padding: '12px 14px', borderTop: i ? '1px solid ' + LINE : 'none' } },
                 h('span', { style: { fontSize: 12.5, fontWeight: 600 } }, r[0]), h('span', { style: { fontSize: 12.5, color: MUT } }, r[1])))),
-          h('div', { style: { border: '1px solid ' + HAIR } },
+          h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', background: '#fff' } },
             h('div', { style: { background: ALT, color: INK, padding: '12px 15px', borderBottom: '1px solid ' + HAIR, fontSize: 11.5, fontWeight: 600, letterSpacing: '.07em', textTransform: 'uppercase' } }, 'Finishing'),
             h('div', { style: { padding: '12px 14px 2px', fontSize: 12, color: MUT, lineHeight: 1.6 } }, 'Change any finishing option here — the price recalculates immediately.'),
             h('div', { style: { padding: '0 14px 14px' } },
@@ -2816,7 +2816,7 @@ class Component extends DCLogic {
               row('Emboss', 'Adds an embossing die charge', [opt('Not required', false, 'set:pkTab:quote'), opt('Required', true, 'set:pkTab:quote'), dimField('Emboss size (H)', '40', 'mm'), dimField('Emboss size (W)', '25', 'mm')]),
               row('Spot UV', null, [opt('Not required', true, 'set:pkTab:quote'), opt('Required', false, 'set:pkTab:quote')]),
               row('Hot stamping', null, [opt('Not required', true, 'set:pkTab:quote'), opt('Required', false, 'set:pkTab:quote')]))),
-          h('div', { style: { border: '1px solid ' + HAIR } },
+          h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', background: '#fff' } },
             h('div', { style: { background: ALT, color: INK, padding: '12px 15px', borderBottom: '1px solid ' + HAIR, fontSize: 11.5, fontWeight: 600, letterSpacing: '.07em', textTransform: 'uppercase' } }, 'Ordering option & quantity'),
             h('div', { style: { padding: 14, display: 'flex', flexDirection: 'column', gap: 14 } },
               h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.7 } }, 'Request a sample for colour proofing and application testing before committing to the full run.'),
@@ -2824,26 +2824,26 @@ class Component extends DCLogic {
               h('div', null,
                 h('div', { style: { fontSize: 13, fontWeight: 600, marginBottom: 8 } }, 'Quantity (mass production)'),
                 h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap' } },
-                  QTY.map((q, i) => h('span', { key: i, 'data-go': 'set:pkQty:' + i, style: { border: '1px solid ' + ((st.pkQty || 0) === i ? TEAL : HAIR), background: (st.pkQty || 0) === i ? TEAL : '#fff', color: (st.pkQty || 0) === i ? '#fff' : INK, padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' } }, q)))),
+                  QTY.map((q, i) => h('span', { key: i, 'data-go': 'set:pkQty:' + i, style: { border: '1px solid ' + ((st.pkQty || 0) === i ? TEAL : HAIR), borderRadius: 8, background: (st.pkQty || 0) === i ? TEAL : '#fff', color: (st.pkQty || 0) === i ? '#fff' : INK, padding: '8px 14px', fontSize: 13, fontWeight: 600, cursor: 'pointer' } }, q)))),
               h('div', { style: { fontSize: 13, fontWeight: 600, marginTop: 4 } }, 'Choose your option according to the quantity chosen'),
               h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(230px,1fr))', gap: 14 } },
                 laneCard('Standard', rate[1], rate[2], rate[3], lane === 'Standard'),
                 shortRunOK
                   ? laneCard('Short Run', rate[4], rate[5], rate[6], lane === 'Short Run')
-                  : h('div', { key: 'sr', style: { border: '1px dashed ' + HAIR, background: ALT, padding: '22px 20px', display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center' } },
+                  : h('div', { key: 'sr', style: { border: '1px dashed ' + HAIR, borderRadius: 12, background: ALT, padding: '22px 20px', display: 'flex', flexDirection: 'column', gap: 8, justifyContent: 'center' } },
                       h('div', { style: { fontSize: 15.5, fontWeight: 600, color: MUT } }, 'Short Run'),
                       h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.7 } }, 'Not available at ' + QTY[qi] + ' pcs. Short Run covers 100 – 1,000 pcs on gloss art card only; above that the job runs on the Standard litho lane.'),
                       h('span', { 'data-go': 'set:pkQty:2', style: { alignSelf: 'flex-start', fontSize: 12.5, fontWeight: 600, color: TEAL, cursor: 'pointer' } }, 'Price 1,000 pcs instead'))))),
-          h('div', { style: { border: '1px solid ' + HAIR } },
+          h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', background: '#fff' } },
             h('div', { style: { background: ALT, color: INK, padding: '12px 15px', borderBottom: '1px solid ' + HAIR, fontSize: 11.5, fontWeight: 600, letterSpacing: '.07em', textTransform: 'uppercase' } }, 'Delivery'),
             h('div', { style: { padding: 14, display: 'flex', flexDirection: 'column', gap: 12 } },
               h('div', { style: { display: 'flex', gap: 20, flexWrap: 'wrap', fontSize: 12.5 } },
                 h('span', null, h('b', null, 'Country: '), 'West Malaysia'),
                 h('span', null, h('b', null, 'Courier: '), 'Appointed courier (free shipping)')),
-              h('div', { style: { border: '1px solid ' + HAIR, background: ALT, padding: 13, fontSize: 12.5, color: MUT, lineHeight: 1.7 } },
+              h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 8, background: ALT, padding: 13, fontSize: 12.5, color: MUT, lineHeight: 1.7 } },
                 h('div', { style: { fontWeight: 600, color: TEAL, marginBottom: 3 } }, 'Studio North Sdn Bhd · Aiman Lim'),
                 'Lot 8, Jalan Sungai Kayu Ara 32/38, Section 32, Berjaya Industrial Park, 40460 Shah Alam, Selangor'),
-              h('div', { style: { display: 'flex', gap: 10, flexWrap: 'wrap' } }, this.btn('Add new address', 'ghost', 'packaging', { borderRadius: 2 }), this.btn('Change', 'ghost', 'packaging', { borderRadius: 2 })),
+              h('div', { style: { display: 'flex', gap: 10, flexWrap: 'wrap' } }, this.btn('Add new address', 'ghost', 'packaging'), this.btn('Change', 'ghost', 'packaging')),
               h('div', { style: { fontSize: 13, fontWeight: 600, marginTop: 4 } }, 'Or self-pickup for an extra discount'),
               h('div', { style: { display: 'flex', flexDirection: 'column', gap: 7 } },
                 [['KL Damansara', true], ['Miri (own facility)', false], ['Johor Bahru', false], ['Seri Kembangan', false], ['Bandar Puteri Klang', true]]
@@ -2853,7 +2853,7 @@ class Component extends DCLogic {
                     h('span', { style: { fontSize: 11, fontWeight: 600, color: TEAL } }, 'Extra 5% off'),
                     o[1] && this.chip('New', 'ok'))))))),
         h('div', { style: { display: 'flex', flexDirection: 'column', gap: 16, position: 'sticky', top: 84 } },
-          h('div', { style: { border: '1px solid ' + HAIR, borderTop: '3px solid ' + TEAL, background: '#fff' } },
+          h('div', { style: { border: '1px solid ' + HAIR, borderTop: '3px solid ' + TEAL, borderRadius: 12, overflow: 'hidden', background: '#fff' } },
             h('div', { style: { background: TEAL, color: '#fff', padding: '12px 15px', fontSize: 11.5, fontWeight: 600, letterSpacing: '.07em', textTransform: 'uppercase', display: 'flex', justifyContent: 'space-between', gap: 10 } },
               h('span', null, 'Product · packaging'),
               h('span', { style: { cursor: 'pointer' } }, 'Slip ↓')),
@@ -2870,23 +2870,23 @@ class Component extends DCLogic {
               h('div', { style: { display: 'flex', gap: 9, fontSize: 11.5, color: MUT, lineHeight: 1.6 } },
                 h('span', { style: { height: 14, width: 14, border: '1px solid ' + HAIR, background: '#fff', flex: 'none', marginTop: 1 } }),
                 'I confirm I have read and understood the Terms and Conditions.'),
-              h('div', { 'data-go': 'checkout', style: { background: TEAL, color: '#fff', padding: '12px 16px', textAlign: 'center', fontSize: 14, fontWeight: 600, cursor: 'pointer' } }, 'Submit order'),
-              h('div', { 'data-go': 'artwork', style: { border: '1px solid ' + TEAL, background: '#fff', color: TEAL, padding: '11px 16px', textAlign: 'center', fontSize: 13.5, fontWeight: 600, cursor: 'pointer' } }, 'Upload & check artwork'),
-              h('div', { 'data-go': 'pkgo:dielines', style: { border: '1px solid ' + HAIR, background: '#fff', padding: '11px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: MUT, cursor: 'pointer' } }, 'Free die-line (29 downloads left)'),
-              h('div', { 'data-go': 'pkgo:configure', style: { border: '1px solid ' + HAIR, background: '#fff', padding: '11px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: MUT, cursor: 'pointer' } }, 'Back to configurator'))),
-          h('div', { style: { border: '1px solid ' + HAIR, background: '#fff' } },
+              h('div', { 'data-go': 'checkout', style: { background: TEAL, color: '#fff', padding: '12px 16px', textAlign: 'center', fontSize: 14, fontWeight: 600, borderRadius: 8, cursor: 'pointer' } }, 'Submit order'),
+              h('div', { 'data-go': 'artwork', style: { border: '1px solid ' + TEAL, background: '#fff', color: TEAL, padding: '11px 16px', textAlign: 'center', fontSize: 13.5, fontWeight: 600, borderRadius: 8, cursor: 'pointer' } }, 'Upload & check artwork'),
+              h('div', { 'data-go': 'pkgo:dielines', style: { border: '1px solid ' + HAIR, background: '#fff', padding: '11px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: MUT, borderRadius: 8, cursor: 'pointer' } }, 'Free die-line (29 downloads left)'),
+              h('div', { 'data-go': 'pkgo:configure', style: { border: '1px solid ' + HAIR, background: '#fff', padding: '11px 16px', textAlign: 'center', fontSize: 13, fontWeight: 600, color: MUT, borderRadius: 8, cursor: 'pointer' } }, 'Back to configurator'))),
+          h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', background: '#fff' } },
             h('div', { style: { background: ALT, color: INK, padding: '12px 15px', borderBottom: '1px solid ' + HAIR, fontSize: 11.5, fontWeight: 600, letterSpacing: '.07em', textTransform: 'uppercase' } }, 'Nett price for deal'),
             [['Price before discount', this.money(laneTotal)], ['Membership discount · ' + this.tier() + ' ' + this.tierPct() + '%', '− ' + this.money(laneTotal * tierOff)], [this.taxLabel(), this.money(nett * sst)], ['Delivery fee', this.money(0)]]
               .map((r, i) => h('div', { key: i, style: { display: 'flex', justifyContent: 'space-between', gap: 12, padding: '10px 14px', borderTop: i ? '1px solid ' + LINE : 'none', fontSize: 12.5, color: MUT } },
                 h('span', null, r[0]), h('span', { style: { whiteSpace: 'nowrap', color: INK } }, r[1]))),
             h('div', { style: { display: 'flex', justifyContent: 'space-between', gap: 12, padding: '12px 14px', borderTop: '1px solid ' + HAIR, background: ALT, fontSize: 14, fontWeight: 600 } },
               h('span', null, 'Total amount'), h('span', { style: { whiteSpace: 'nowrap' } }, this.money(nett * (1 + sst))))),
-          h('div', { style: { backgroundImage: 'linear-gradient(90deg,#FF9A2E,#F02B29)', color: '#fff', padding: '16px 18px' } },
+          h('div', { style: { backgroundImage: 'linear-gradient(90deg,#FF9A2E,#F02B29)', color: '#fff', padding: '16px 18px', borderRadius: 12 } },
             h('div', { style: { fontSize: 13.5, fontWeight: 600, marginBottom: 8 } }, 'Reach the next tier and pay less on this order'),
             [['Silver', 8], ['Gold', 10], ['Platinum', 15]].map((t, i) =>
               h('div', { key: i, style: { display: 'flex', justifyContent: 'space-between', gap: 10, padding: '6px 0', borderTop: i ? '1px solid rgba(255,255,255,.28)' : 'none', fontSize: 12.5 } },
                 h('span', null, t[0] + ' · ' + t[1] + '% off'), h('span', { style: { fontWeight: 600, whiteSpace: 'nowrap' } }, this.money(laneTotal * (1 - t[1] / 100))))),
-            h('span', { 'data-go': 'membership', style: { display: 'inline-block', marginTop: 10, background: '#fff', color: TEAL, fontSize: 12.5, fontWeight: 600, padding: '9px 16px', cursor: 'pointer' } }, 'See how tiers work')))),
+            h('span', { 'data-go': 'membership', style: { display: 'inline-block', marginTop: 10, background: '#fff', color: TEAL, fontSize: 12.5, fontWeight: 600, padding: '9px 16px', borderRadius: 8, cursor: 'pointer' } }, 'See how tiers work')))),
     ];
 
     const dtab = st.pkDtab || 'dieline';
@@ -2897,11 +2897,11 @@ class Component extends DCLogic {
     ];
     P.dielines = [
       h('div', { key: 'top', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 16 } },
-        h('div', { style: { backgroundImage: 'linear-gradient(90deg,#FF9A2E,#F02B29)', color: '#fff', padding: '28px 30px', display: 'flex', flexDirection: 'column', justifyContent: 'center' } },
+        h('div', { style: { backgroundImage: 'linear-gradient(90deg,#FF9A2E,#F02B29)', color: '#fff', padding: '28px 30px', borderRadius: 12, display: 'flex', flexDirection: 'column', justifyContent: 'center' } },
           h('div', { style: { fontSize: 11.5, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase' } }, 'Every packaging repeat order'),
           h('div', { style: { fontSize: 'clamp(21px,2.6vw,27px)', fontWeight: 600, margin: '8px 0 6px', letterSpacing: '-.01em' } }, '5% off, or min ' + this.money(100)),
           h('div', { style: { fontSize: 13, lineHeight: 1.6 } }, 'Not applicable to Short Run packaging')),
-        h('div', { style: { border: '1px solid ' + HAIR, background: '#fff', padding: '22px 26px', display: 'flex', gap: 22, alignItems: 'center', flexWrap: 'wrap' } },
+        h('div', { style: { border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', padding: '22px 26px', display: 'flex', gap: 22, alignItems: 'center', flexWrap: 'wrap' } },
           h('div', { style: { flex: 'none', height: 96, width: 96, borderRadius: '50%', background: 'conic-gradient(' + TEAL + ' 0 96.6%, ' + LINE + ' 0)', display: 'grid', placeItems: 'center' } },
             h('div', { style: { height: 74, width: 74, borderRadius: '50%', background: '#fff', display: 'grid', placeItems: 'center', textAlign: 'center' } },
               h('div', null,
@@ -2910,15 +2910,15 @@ class Component extends DCLogic {
           h('div', { style: { minWidth: 0 } },
             h('div', { style: { fontSize: 14.5, fontWeight: 600, marginBottom: 4 } }, 'Free die-line downloads'),
             h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.65, marginBottom: 10 } }, 'Your monthly balance by membership tier. Each download stays re-orderable until it expires.'),
-            this.btn('Upgrade to get more', 'teal', 'membership', { borderRadius: 2 })))),
+            this.btn('Upgrade to get more', 'teal', 'membership')))),
       h('div', { key: 'tabs', style: { display: 'flex', gap: 24, marginTop: 24, marginBottom: 18, flexWrap: 'wrap', borderBottom: '1px solid ' + HAIR } },
         [['mockup', 'Mockup orders', 1], ['complete', 'Complete orders', 6], ['dieline', 'Free die-lines', DROWS.length]].map(t =>
           h('span', { key: t[0], 'data-go': 'set:pkDtab:' + t[0], style: { display: 'flex', gap: 7, alignItems: 'center', padding: '0 0 12px', fontSize: 14, fontWeight: 600, cursor: 'pointer', color: dtab === t[0] ? TEAL : MUT, borderBottom: '2px solid ' + (dtab === t[0] ? TEAL : 'transparent'), marginBottom: -1 } },
             t[1], h('span', { style: { fontSize: 11.5, color: FAINT } }, t[2])))),
-      h('div', { key: 'panel', style: { border: '1px solid ' + HAIR, background: '#fff', padding: 18 } },
+      h('div', { key: 'panel', style: { border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', padding: 18 } },
         h('div', { style: { display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', marginBottom: 16 } },
-          h('span', { style: { border: '1px solid ' + HAIR, padding: '9px 14px', fontSize: 13, color: MUT } }, '10/03/2026 – 10/09/2026'),
-          this.btn('Search', 'teal', 'packaging', { borderRadius: 2 }),
+          h('span', { style: { border: '1px solid ' + HAIR, borderRadius: 8, padding: '9px 14px', fontSize: 13, color: MUT } }, '10/03/2026 – 10/09/2026'),
+          this.btn('Search', 'teal', 'packaging'),
           h('span', { style: { marginLeft: 'auto', fontSize: 12.5, color: FAINT } }, 'Showing 1 to ' + DROWS.length + ' of ' + DROWS.length + ' jobs')),
         dtab === 'dieline'
           ? this.table(['Downloaded', 'Model', 'Dimension (L × W × D)', 'Style', 'Expires', ''],
