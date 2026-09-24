@@ -1007,6 +1007,26 @@ class Component extends DCLogic {
         this.setState({ coupon: null, couponMsg: (d && d.error) || 'That code can’t be used.', couponOk: false });
       }).catch(() => this.setState({ couponMsg: 'Couldn’t check the code. Try again.', couponOk: false }));
   }
+  cfgAdvance(fromKey) {
+    this.setState({ ddOpen: null });
+    if (typeof document === 'undefined') return;
+    setTimeout(() => {
+      const els = Array.prototype.slice.call(document.querySelectorAll('[data-cfgkey]'));
+      const i = els.findIndex(e => e.getAttribute('data-cfgkey') === fromKey);
+      const next = els.slice(i + 1).find(e => e.getAttribute('data-cfgsel') !== '1');
+      if (!next) return;
+      const key = next.getAttribute('data-cfgkey');
+      if (!next.hasAttribute('data-cfgalways')) this.setState({ ddOpen: key });
+      setTimeout(() => {
+        const el = document.querySelector('[data-cfgkey="' + key + '"]'); if (!el) return;
+        const r = el.getBoundingClientRect();
+        if (r.top < 140 || r.top > window.innerHeight * 0.45) {
+          const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.scrollTo({ top: window.scrollY + r.top - 150, behavior: reduce ? 'auto' : 'smooth' });
+        }
+      }, 40);
+    }, 90);
+  }
   removeCoupon() { this.setState({ coupon: null, cartCoupon: '', couponMsg: null }); }
   couponOff(cp) { return cp.amount ? 'RM' + cp.amount : cp.pct + '%'; }
   // the signed-in customer's codes that can still be used (one-time codes drop out once spent)
@@ -3428,10 +3448,10 @@ class Component extends DCLogic {
         const on = it.on, avail = it.avail !== false || on;
         if (withImg) return h(avail ? 'button' : 'div', {
           key: it.val != null ? it.val : i, type: avail ? 'button' : undefined,
-          onClick: avail ? (e => { e.preventDefault(); e.stopPropagation(); it.onPick(); close(); }) : undefined,
+          onClick: avail ? (e => { e.preventDefault(); e.stopPropagation(); it.onPick(); this.cfgAdvance(key); }) : undefined,
           role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-disabled': avail ? undefined : 'true',
           tabIndex: avail ? 0 : -1, 'aria-label': fieldLabel + ': ' + it.label + (avail ? '' : ' (not available)'),
-          onKeyDown: avail ? (e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); e.stopPropagation(); it.onPick(); close(); } else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } }) : undefined,
+          onKeyDown: avail ? (e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); e.stopPropagation(); it.onPick(); this.cfgAdvance(key); } else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } }) : undefined,
           style: { display: 'flex', flexDirection: 'column', textAlign: 'left', width: '100%', font: 'inherit', padding: 0, overflow: 'hidden',
             border: '1px solid ' + (on ? TEAL : HAIR), borderRadius: 12, background: on ? '#fdf2f2' : (avail ? '#fff' : ALT),
             boxShadow: on ? '0 0 0 1px ' + TEAL : 'none', cursor: avail ? 'pointer' : 'default', opacity: avail ? 1 : 0.6, outlineOffset: '2px' } },
@@ -3445,10 +3465,10 @@ class Component extends DCLogic {
               avail ? null : h('span', { style: { fontSize: 11, color: '#bdbdbd' } }, 'Not available'))));
         return h(avail ? 'button' : 'div', {
           key: it.val != null ? it.val : i, type: avail ? 'button' : undefined,
-          onClick: avail ? (e => { e.preventDefault(); e.stopPropagation(); it.onPick(); close(); }) : undefined,
+          onClick: avail ? (e => { e.preventDefault(); e.stopPropagation(); it.onPick(); this.cfgAdvance(key); }) : undefined,
           role: 'radio', 'aria-checked': on ? 'true' : 'false', 'aria-disabled': avail ? undefined : 'true',
           tabIndex: avail ? 0 : -1, 'aria-label': fieldLabel + ': ' + it.label + (avail ? '' : ' (not available)'),
-          onKeyDown: avail ? (e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); e.stopPropagation(); it.onPick(); close(); } else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } }) : undefined,
+          onKeyDown: avail ? (e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); e.stopPropagation(); it.onPick(); this.cfgAdvance(key); } else if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); close(); } }) : undefined,
           style: { display: 'flex', alignItems: 'center', gap: 11, textAlign: 'left', width: '100%', font: 'inherit',
             border: '1px solid ' + (on ? TEAL : HAIR), borderRadius: 12, background: on ? '#fdf2f2' : (avail ? '#fff' : ALT),
             padding: '13px 14px', cursor: avail ? 'pointer' : 'default', opacity: avail ? 1 : 0.75, outlineOffset: '2px' } },
@@ -3458,7 +3478,14 @@ class Component extends DCLogic {
             h('span', { style: { fontSize: 13.5, fontWeight: 500, lineHeight: 1.3, color: avail ? INK : FAINT, textDecoration: avail ? 'none' : 'line-through' } }, it.label),
             avail ? null : h('span', { style: { fontSize: 11.5, fontWeight: 400, color: '#bdbdbd' } }, 'Not available')));
       }) : [];
-      return h('div', { key: key, style: { padding: '16px 0', borderTop: '1px solid ' + LINE } },
+      // the open question is lifted out as a raised card; the others dim slightly so it's clear
+      // which question is being answered
+      const anyOpen = this.state.ddOpen != null;
+      return h('div', { key: key, 'data-cfgkey': key, 'data-cfgsel': selected ? '1' : '0', className: open ? 'pk-q-open' : undefined,
+        style: open
+          ? { padding: '16px 18px 18px', margin: '8px -18px', border: '1px solid rgba(229,34,32,.22)', borderRadius: 14, background: '#fff', position: 'relative', zIndex: 3,
+              boxShadow: '0 18px 44px rgba(33,33,33,.14), 0 3px 10px rgba(33,33,33,.06)', animation: 'pkPop .32s cubic-bezier(.2,.9,.3,1.15)' }
+          : { padding: '16px 0', borderTop: '1px solid ' + LINE, opacity: anyOpen ? 0.5 : 1, transition: 'opacity .2s ease' } },
         // the collapsed control: field label (+ note) on the left, current value + chevron on the
         // right of the SAME row; click anywhere on the row to open the option list.
         h('div', { className: 'pk-ddctl', onClick: e => { e.stopPropagation(); toggle(); }, tabIndex: 0, role: 'combobox', 'aria-haspopup': 'listbox', 'aria-expanded': open ? 'true' : 'false', 'aria-label': fieldLabel + (isPh0 ? ' (not selected)' : ': ' + curText),
@@ -3470,7 +3497,7 @@ class Component extends DCLogic {
           h('div', { style: { flex: '0 1 auto', display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 10, minWidth: 0 } },
             h('span', { style: { fontSize: 14, fontWeight: selected ? 600 : 400, color: selected ? INK : '#6f6f6f', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, curText),
             h('span', { 'aria-hidden': 'true', style: { flex: 'none', color: MUT, fontSize: 10, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .12s' } }, '▼'))),
-        open ? h('div', { style: { marginTop: 12 } },
+        open ? h('div', { style: { marginTop: 12, animation: 'pkReveal .28s ease-out both' } },
           remark ? h('div', { style: { fontSize: 11.5, color: MUT, lineHeight: 1.55, background: ALT, borderRadius: 8, padding: '9px 12px', marginBottom: 12 } }, remark) : null,
           h('div', { role: 'radiogroup', 'aria-label': fieldLabel, style: { display: 'grid', gridTemplateColumns: withImg ? 'repeat(auto-fill,minmax(140px,1fr))' : 'repeat(auto-fill,minmax(200px,1fr))', gap: 12 } }, cards)) : null);
     };
@@ -3533,11 +3560,11 @@ class Component extends DCLogic {
     const imgPicker = (def, options, sel, base) => {
       const label = (ov.label && ov.label[def.key]) || def.label;
       const optLabel = (ov.optLabel && ov.optLabel[def.key]) || {};
-      return h('div', { key: def.key, style: { padding: '15px 0', borderTop: '1px solid ' + LINE } },
+      return h('div', { key: def.key, 'data-cfgkey': def.key, 'data-cfgsel': sel != null && sel !== '' ? '1' : '0', 'data-cfgalways': '1', style: { padding: '15px 0', borderTop: '1px solid ' + LINE } },
         h('div', { style: { fontSize: 13.5, fontWeight: 600, marginBottom: 10 } }, label),
         h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(92px,1fr))', gap: 10 } },
           options.map(v => { const val = Array.isArray(v) ? v[0] : v; const on = sel === val;
-            const pick = () => this.setState(st => ({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) }));
+            const pick = () => { this.setState(st => ({ cfg: Object.assign({}, st.cfg, { [def.key]: val }) })); this.cfgAdvance(def.key); };
             return h('div', { key: val, onClick: pick, tabIndex: 0, role: 'button', 'aria-pressed': on ? 'true' : 'false', 'aria-label': label + ': ' + (optLabel[val] || val),
               onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); pick(); } },
               style: { border: '2px solid ' + (on ? TEAL : HAIR), borderRadius: 8, overflow: 'hidden', cursor: 'pointer', background: '#fff' } },
@@ -3597,7 +3624,7 @@ class Component extends DCLogic {
     return h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '10px 20px 0' } },
       h('div', { style: { fontSize: 12.5, color: FAINT, marginBottom: 14 } },
         h('span', { 'data-go': 'home', style: { color: TEAL } }, 'Home'), ' › ', h('span', { 'data-go': prod ? ('catopen:' + this.catCategoryOf(prod.id)) : 'category', style: { color: TEAL } }, prod ? this.catCategoryLabel(this.catCategoryOf(prod.id)) : 'Products'), ' › ', NAME),
-      h('div', { style: { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 352px', gap: 28, alignItems: 'start' } },
+      h('div', { className: 'pk-cfg-grid', style: { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 352px', gap: 28, alignItems: 'start' } },
         h('div', null,
           h('div', { style: { display: 'flex', gap: 20, flexWrap: 'wrap', marginBottom: 26 } },
             h('div', { style: { flex: '0 0 300px', maxWidth: 340, filter: 'drop-shadow(0 12px 24px rgba(33,33,33,.12))' } }, this.art(prod ? prod.name : 'card')),
