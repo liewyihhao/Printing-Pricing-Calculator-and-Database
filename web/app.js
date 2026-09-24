@@ -290,6 +290,9 @@ const HOME_CAT_PANEL = {
   'cards-invitations': '6x8-Folded-Cards-1.png', 'large-format': 'Roll-Up-Banner.png',
   'packaging-boxes': 'Paperbag-290x200x95-1.png', 'apparel-gifts': 'lanyard.png',
 };
+// an option that means "this finishing / add-on is not applied" (Excard's optional questions)
+const OPT_NONE_RE = /^(-\s*)?(not required|no required|none|n\/a|not applicable|no [a-z ]+|without [a-z ]+|no|0)(\s*-)?$/i;
+const isNoneOpt = o => OPT_NONE_RE.test(String(Array.isArray(o) ? o[0] : o).trim());
 const HOME_GRADIENTS = ['linear-gradient(90deg,#F15A29,#EE3124)', 'linear-gradient(90deg,#F58220,#FDB515)', 'linear-gradient(90deg,#2BA6DE,#12CD8E)'];
 
 // "Guides for Closing Artwork" — the original support page guides, each a PDF (assets/guides/)
@@ -479,7 +482,7 @@ class Component extends DCLogic {
     return clauses.every(c => {
       const cur = cfg[c.field];
       if (c.values) return c.values.indexOf(cur) !== -1;
-      if (c.notValues) return c.notValues.indexOf(cur) === -1;
+      if (c.notValues) return cur != null && cur !== '' && c.notValues.indexOf(cur) === -1;
       if (c.value != null) return cur === c.value;
       if (c.notValue != null) return cur !== c.notValue;
       return true;
@@ -493,8 +496,9 @@ class Component extends DCLogic {
     const p = this.pkProduct(); const ov = (p && CFG_OVERRIDES[p.name]) || {};
     if (!p) return ov;
     if (!this._ovCache || this._ovCache.p !== p) {
-      const keys = (p.fields || []).map(f => f.key).filter(Boolean)
-        .concat((ov.addFields || []).filter(a => a.type !== 'number' && !a.widget).map(a => a.key))
+      const optional = f => (f.options || []).some(isNoneOpt);
+      const keys = (p.fields || []).filter(f => f.key && !optional(f)).map(f => f.key)
+        .concat((ov.addFields || []).filter(a => a.type !== 'number' && !a.widget && !optional(a)).map(a => a.key))
         .concat(['quantity']);
       this._ovCache = { p, ov: Object.assign({}, ov, { placeholder: keys }) };
     }
@@ -506,8 +510,10 @@ class Component extends DCLogic {
   pkReady() {
     const sc = this.state.cfg || {}; let fields = [];
     try { fields = this.pkFields(); } catch (e) { return false; }
+    const ph = this.cfgOv().placeholder || [];
     const ok = fields.every(f => { const d = f.def || {};
       if (d.type === 'number' || d.widget || !(f.options && f.options.length)) return true;
+      if (ph.indexOf(d.key) < 0) return true; // optional question: its "Not Required" default is a valid answer
       return sc[d.key] != null && sc[d.key] !== ''; });
     return ok && !!this.state.qtyChosen;
   }
@@ -682,7 +688,7 @@ class Component extends DCLogic {
         // value (e.g. a fold-card preset size not in the engine's list) isn't reset.
         if (ovOpts[f.key]) { try { const a = typeof ovOpts[f.key] === 'function' ? ovOpts[f.key](cfg, opts) : ovOpts[f.key]; if (a && a.length) opts = a; } catch (e) {} }
         if (!opts.length) continue;
-        if (cfg[f.key] == null || opts.indexOf(cfg[f.key]) < 0) { cfg[f.key] = opts[0]; changed = true; }
+        if (cfg[f.key] == null || opts.indexOf(cfg[f.key]) < 0) { const nn = opts.find(isNoneOpt); cfg[f.key] = nn != null ? (Array.isArray(nn) ? nn[0] : nn) : opts[0]; changed = true; }
       }
       if (!changed) break;
     }
@@ -3435,7 +3441,7 @@ class Component extends DCLogic {
     // (label + current value) over a responsive grid of selectable cards. Each card shows a
     // radio dot, the option label and a Select / Not available subtext; the chosen card is
     // highlighted, and options that are invalid for the current spec are greyed and disabled.
-    const cardGroup = (key, fieldLabel, curText, isPh0, note, remark, items, selected) => {
+    const cardGroup = (key, fieldLabel, curText, isPh0, note, remark, items, selected, optionalQ) => {
       // collapsible: the field shows only its current value until clicked; clicking reveals the
       // option cards, and picking one collapses it again (the original site's dropdown behaviour).
       // `selected` = the customer has actively chosen this field; when false the value reads in a
@@ -3481,7 +3487,7 @@ class Component extends DCLogic {
       // the open question is lifted out as a raised card; the others dim slightly so it's clear
       // which question is being answered
       const anyOpen = this.state.ddOpen != null;
-      return h('div', { key: key, 'data-cfgkey': key, 'data-cfgsel': selected ? '1' : '0', className: open ? 'pk-q-open' : undefined,
+      return h('div', { key: key, 'data-cfgkey': key, 'data-cfgsel': (selected || optionalQ) ? '1' : '0', className: open ? 'pk-q-open' : undefined,
         style: open
           ? { padding: '16px 18px 18px', margin: '8px -18px', border: '1px solid rgba(229,34,32,.22)', borderRadius: 14, background: '#fff', position: 'relative', zIndex: 3,
               boxShadow: '0 18px 44px rgba(33,33,33,.14), 0 3px 10px rgba(33,33,33,.06)', animation: 'pkPop .32s cubic-bezier(.2,.9,.3,1.15)' }
@@ -3542,7 +3548,7 @@ class Component extends DCLogic {
       // state.cfg); an untouched default is NOT selected, so it reads lighter.
       const uv = this.state.cfg[def.key];
       const selected = isPh ? !isPh0 : (uv != null && uv !== '');
-      return cardGroup(def.key, label, curText, isPh0, note, remark, items, selected);
+      return cardGroup(def.key, label, curText, isPh0, note, remark, items, selected, !isPh && dispOptions.some(isNoneOpt));
     };
     // quantity, straight from the engine's per-product model (moq / options)
     const qobj = this.pkQtyObj();
