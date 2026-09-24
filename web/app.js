@@ -325,7 +325,7 @@ class Component extends DCLogic {
     useCredit: true, catSort: 'Popularity', outletTab: 'all', vendorRow: 3, crmThread: 0,
   };
 
-  go = (id) => { if (!this.canAccess(id)) id = this.homeFor(); this.setState({ route: id, megaOpen: false }); if (typeof window !== 'undefined') window.scrollTo(0, 0); const r = this.opsRoleFor(id); if (r) this.opsLoad(this.opsActingRole()); if (id === 'learn') this.blogLoad(); if (id === 'support') this.loadFaq(); if (id === 'downloads') this.loadDownloads(); if (id === 'track' && this.state.order && !this.state.trackOrder) this.trackLookup(this.state.order.id); if (id === 'dash' && this.state.user) { this.loadUserOrders(); this.loadAccount(); this.loadQuotes(); this.loadCustomInvoices(); } if (id === 'invoices' && this.state.user) { this.loadUserOrders(); this.loadCustomInvoices(); } if (id === 'checkout' && this.state.user) this.loadAccount(); if (id === 'production') this.loadVendors(); if (id === 'vendor') this.loadVendorRequests(); if (id === 'admin') this.loadAdmin(); if (['outlet', 'prepress', 'production', 'logistics'].indexOf(id) >= 0) { this.loadNotifications(); this.loadQuotes(); } if (id === 'outlet') this.loadStaffOrders(); };
+  go = (id) => { if (!this.canAccess(id)) id = this.homeFor(); this.setState({ route: id, megaOpen: false }); if (typeof window !== 'undefined') window.scrollTo(0, 0); const r = this.opsRoleFor(id); if (r) this.opsLoad(this.opsActingRole()); if (id === 'learn') this.blogLoad(); if (id === 'support') this.loadFaq(); if (id === 'downloads') this.loadDownloads(); if (id === 'track' && this.state.order && !this.state.trackOrder) this.trackLookup(this.state.order.id); if (id === 'dash' && this.state.user) { this.loadUserOrders(); this.loadAccount(); this.loadQuotes(); this.loadCustomInvoices(); } if (id === 'invoices' && this.state.user) { this.loadUserOrders(); this.loadCustomInvoices(); } if (id === 'checkout' && this.state.user) this.loadAccount(); if (id === 'production' || id === 'scheduler') { this.loadVendors(); this.loadQuotes(); } if (id === 'vendor') this.loadVendorRequests(); if (id === 'admin') this.loadAdmin(); if (['outlet', 'prepress', 'production', 'scheduler', 'logistics', 'hub'].indexOf(id) >= 0) { this.loadNotifications(); this.loadQuotes(); } if (id === 'outlet') this.loadStaffOrders(); };
 
   onNav = (e) => {
     // any click that bubbles here (custom-dropdown clicks stopPropagation) closes an open dropdown
@@ -1268,11 +1268,11 @@ class Component extends DCLogic {
     this.loadUserOrders();
     this.loadAccount();
     this.loadNotifications();
-    if (['production', 'prepress', 'logistics', 'admin', 'outlet', 'dash'].indexOf(home) >= 0) this.loadQuotes();
+    if (['production', 'scheduler', 'prepress', 'logistics', 'hub', 'admin', 'outlet', 'dash'].indexOf(home) >= 0) this.loadQuotes();
     if (home === 'outlet') this.loadStaffOrders();
     const r = this.opsRoleFor(home);
-    if (r) fetch('/api/jobs?role=' + this.opsRoleForUser(d.customer)).then(x => x.json()).then(j => this.setState({ ops: { jobs: j.jobs || [], role: this.opsRoleForUser(d.customer), loaded: true } })).catch(() => {});
-    if (home === 'production') this.loadVendors();
+    if (r) this.opsLoad();
+    if (home === 'production' || home === 'scheduler') this.loadVendors();
     if (home === 'vendor') this.loadVendorRequests();
     if (home === 'admin') this.loadAdmin();
   }
@@ -1648,6 +1648,7 @@ class Component extends DCLogic {
     const NAMED = { cart: 'cart', checkout: 'checkout', auth: 'auth', search: 'search', learn: 'learn', 'learning-hub': 'learn', membership: 'membership', contact: 'contact', about: 'about', 'about-us': 'about', support: 'support', downloads: 'downloads', partners: 'partners', terms: 'terms', track: 'track', artwork: 'artwork', 'customized-printing-solutions': 'solutions' };
     // packaging: library landing at /packaging, configurator/quote/die-lines as their own sub-URLs
     if (segs[0] === 'packaging') return this.setState({ route: 'packaging', pkTab: segs[1] || 'library' });
+    if (segs[0] === 'account') { const pm = String(segs[1] || '').match(/^(printer|hub|outlet|production|admin)-login$/); return this.setState({ route: 'auth', authTab: segs[1] === 'register' ? 'register' : 'login', authRole: pm ? pm[1] : 'member', authErr: null, authErrPortal: null }); }
     if (segs.length === 1 && NAMED[segs[0]]) return this.setState({ route: NAMED[segs[0]] });
     // category listing: /products or /products/<catId>
     if (segs[0] === 'products') return this.setState({ route: 'category', catFilter: segs[1] || 'all' });
@@ -1664,6 +1665,13 @@ class Component extends DCLogic {
     if (LOC[segs[0]]) { locale = segs[0]; rest = segs.slice(1); }
     const slug = rest[0];
     if (slug && /(printing|solutions|packaging)/.test(slug)) return this.seoOpen(slug, locale);
+  }
+  // open a sign-in portal (and give it its own URL, like the original /account/printer-login/)
+  openPortal(p) {
+    const P = this.authPortal(p);
+    this.setState({ route: 'auth', authTab: 'login', authRole: p, authErr: null, authErrPortal: null });
+    try { if (typeof window !== 'undefined' && window.location.pathname !== P.path) window.history.pushState({}, '', P.path); } catch (e) {}
+    if (typeof window !== 'undefined') window.scrollTo(0, 0);
   }
   seoOpen(slug, locale) {
     if (typeof window !== 'undefined') window.scrollTo(0, 0);
@@ -2105,11 +2113,11 @@ class Component extends DCLogic {
   // white top-nav shell for staff dashboards (logo · tabs · identity), then a light-grey page
   staffPage(tabs, active, identity, children) {
     const nav = h('header', { style: { background: '#fff', borderBottom: '1px solid ' + HAIR } },
-      h('div', { style: { maxWidth: 1280, margin: '0 auto', padding: '0 24px', display: 'flex', alignItems: 'center', gap: 20, minHeight: 64 } },
+      h('div', { style: { maxWidth: 1280, margin: '0 auto', padding: '0 16px', display: 'flex', alignItems: 'center', gap: '0 18px', minHeight: 64, flexWrap: 'wrap' } },
         this.brandLogo(),
-        h('nav', { style: { display: 'flex', gap: 4, marginLeft: 18, flexWrap: 'wrap', flex: 1 } },
-          tabs.map(t => { const on = t === active; return h('span', { key: t, 'data-go': 'set:sTab:' + t, style: { position: 'relative', fontSize: 14, fontWeight: on ? 600 : 500, color: on ? INK : MUT, padding: '20px 10px', cursor: 'pointer', borderBottom: '3px solid ' + (on ? '#E52220' : 'transparent') } }, t); })),
-        identity ? h('div', { style: { display: 'flex', alignItems: 'center', gap: 10 } },
+        h('nav', { className: 'pk-staffnav', style: { display: 'flex', gap: 2, flexWrap: 'nowrap', overflowX: 'auto', flex: '1 1 300px', minWidth: 0, order: 1 } },
+          tabs.map(t => { const on = t === active; return h('span', { key: t, 'data-go': 'set:sTab:' + t, style: { position: 'relative', fontSize: 14, whiteSpace: 'nowrap', flex: 'none', fontWeight: on ? 600 : 500, color: on ? INK : MUT, padding: '16px 10px', cursor: 'pointer', borderBottom: '3px solid ' + (on ? '#E52220' : 'transparent') } }, t); })),
+        identity ? h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, order: 2, marginLeft: 'auto', padding: '8px 0' } },
           h('span', { style: { height: 34, width: 34, borderRadius: '50%', background: '#e1f5f2', display: 'grid', placeItems: 'center' } }, this.dashIcon('printer', '#12B3A6', 18)),
           h('div', { style: { lineHeight: 1.25 } }, h('div', { style: { fontSize: 13.5, fontWeight: 700 } }, identity.title), identity.sub ? h('div', { style: { fontSize: 12, color: FAINT } }, identity.sub) : null)) : null));
     return h('div', { style: { background: '#f4f5f6', minHeight: '100vh' } }, nav,
@@ -2235,7 +2243,7 @@ class Component extends DCLogic {
       staff: this.userType() !== 'guest' && this.userType() !== 'customer',
       // the 5 role dashboards render their own white top-nav (staffPage) — hide the storefront header.
       // use the EFFECTIVE route (same redirect renderScreen applies) so a not-yet-synced route still counts.
-      bareStaff: ['outlet', 'prepress', 'production', 'logistics', 'vendor'].indexOf(this.canAccess(this.state.route) ? this.state.route : this.homeFor()) >= 0,
+      bareStaff: ['outlet', 'prepress', 'production', 'scheduler', 'logistics', 'hub', 'vendor'].indexOf(this.canAccess(this.state.route) ? this.state.route : this.homeFor()) >= 0,
       signedIn: !!this.state.user,
       userName: this.state.user ? this.state.user.name : '',
       tierLabel: this.tier().toUpperCase(),
@@ -2307,8 +2315,8 @@ class Component extends DCLogic {
     // top-nav in staffPage() (matching the original outlet dashboard aesthetic).
     if (type !== 'admin') return null;
     const role = this.userRole();
-    const LABEL = { admin: 'Admin', outlet: 'Outlet', prepress: 'Prepress', production: 'Scheduler', logistics: 'Logistics', vendor: 'Vendor / Hub', crm: 'Chat CRM', home: 'View site' };
-    const links = type === 'admin' ? ['admin', 'outlet', 'prepress', 'production', 'logistics', 'vendor', 'crm', 'home']
+    const LABEL = { scheduler: 'Scheduler', hub: 'Hub', admin: 'Admin', outlet: 'Outlet', prepress: 'Prepress', production: 'Production', logistics: 'Logistics', vendor: 'Vendor / Hub', crm: 'Chat CRM', home: 'View site' };
+    const links = type === 'admin' ? ['admin', 'outlet', 'prepress', 'scheduler', 'production', 'logistics', 'hub', 'vendor', 'crm', 'home']
       : type === 'outlet' ? ['outlet']
       : type === 'vendor' || type === 'hub' ? ['vendor']
       : ({ prepress: ['prepress'], scheduler: ['production', 'vendor'], logistics: ['logistics'], production_manager: ['prepress', 'production', 'logistics', 'vendor'] }[role] || ['prepress']);
@@ -2631,15 +2639,16 @@ class Component extends DCLogic {
       ['icon__credit.svg', 'Credit Terms for Corporate Members'], ['value__time.svg', 'Instant Price Quotation'],
       ['value__shield.svg', 'Professional Print Experts at your service'], ['value__store.svg', 'Membership Plans'],
     ];
-    const roleCopy = { member: 'Login', printer: 'Printer / Vendor login', hub: 'Hub login' }[role];
+    const PT = this.authPortal ? this.authPortal(role) : { title: 'Login', bg: '#E52220', accent: '#E52220' };
+    const roleCopy = PT.title;
     const inp = { border: '1px solid ' + HAIR, borderRadius: 8, padding: '12px 14px', fontSize: 14, font: '400 14px Montserrat,sans-serif', width: '100%', background: '#f4f6fb' };
     const lbl = (t, req) => h('div', { style: { fontSize: 13, fontWeight: 500, color: INK, marginBottom: 6 } }, t, req ? h('span', { style: { color: '#E52220' } }, ' *') : null);
     const err = this.state.authErr ? h('div', { key: 'e', style: { fontSize: 12.5, color: '#c0392b', background: '#fdecec', border: '1px solid #f5c8c7', borderRadius: 8, padding: '9px 11px' } }, this.state.authErr) : null;
-    const google = h('div', { key: 'g', style: { textAlign: 'center' } },
+    const google = role !== 'member' ? null : h('div', { key: 'g', style: { textAlign: 'center' } },
       h('span', { title: 'Google sign-in plugs in here (OAuth)', style: { display: 'inline-grid', placeItems: 'center', height: 46, width: 46, borderRadius: '50%', border: '1px solid ' + HAIR, cursor: 'pointer', fontFamily: 'Georgia,serif', fontSize: 22, fontWeight: 700, color: '#4285F4' } }, 'G'),
       h('div', { style: { fontSize: 12.5, color: FAINT, marginTop: 10 } }, 'or ' + (mode === 'login' ? 'login' : 'register') + ' with email address'));
     const card = h('div', { style: { background: '#fff', borderRadius: '28px 28px 16px 16px', padding: '30px 34px 34px', boxShadow: '0 20px 50px rgba(0,0,0,.18)', width: '100%', maxWidth: 460 } },
-      h('div', { style: { height: 4, width: 34, background: '#E52220', borderRadius: 2, margin: '0 auto 10px' } }),
+      h('div', { style: { height: 4, width: 34, background: PT.accent, borderRadius: 2, margin: '0 auto 10px' } }),
       h('h2', { style: { textAlign: 'center', fontSize: 22, fontWeight: 600, margin: '0 0 18px' } }, mode === 'login' ? roleCopy : 'Register'),
       google,
       h('div', { style: { display: 'flex', flexDirection: 'column', gap: 14, marginTop: 18 } },
@@ -2651,12 +2660,15 @@ class Component extends DCLogic {
             h('span', { onClick: () => this.setField('lgShow', !this.state.lgShow), style: { position: 'absolute', right: 12, top: 12, cursor: 'pointer', color: FAINT, fontSize: 14 } }, this.state.lgShow ? '🙈' : '👁'))),
           h('div', { key: 'fp', style: { fontSize: 13 } }, h('span', { 'data-go': 'contact', style: { color: '#2f6fd0', cursor: 'pointer' } }, 'Forgot your password?')),
           h('label', { key: 'rm', style: { display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: MUT, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!this.state.lgRemember, onChange: e => this.setField('lgRemember', e.target.checked) }), 'Remember me?'),
-          h('span', { key: 'b', 'data-go': 'dologin', style: { display: 'block', textAlign: 'center', background: '#E52220', color: '#fff', fontWeight: 600, fontSize: 15, padding: '13px', borderRadius: 8, cursor: 'pointer' } }, this.state.authBusy ? 'Signing in…' : 'Login'),
-          h('div', { key: 'reg', style: { textAlign: 'center', fontSize: 13.5, color: MUT } }, 'New member? ', h('span', { 'data-go': 'set:authTab:register', style: { color: '#2f6fd0', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' } }, 'Register'), ' here'),
-          h('div', { key: 'alt', style: { textAlign: 'center', fontSize: 13.5, display: 'flex', gap: 16, justifyContent: 'center' } },
-            h('span', { onClick: () => this.setState({ authRole: role === 'printer' ? 'member' : 'printer', authErr: null }), style: { color: '#2f6fd0', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' } }, 'Printer Login'),
-            h('span', { onClick: () => this.setState({ authRole: role === 'hub' ? 'member' : 'hub', authErr: null }), style: { color: '#2f6fd0', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' } }, 'Hub Login')),
-          role !== 'member' ? h('div', { key: 'hint', style: { textAlign: 'center', fontSize: 12, color: FAINT } }, 'Sign in with your ' + (role === 'printer' ? 'printer / vendor' : 'hub') + ' account — you’ll land on your ' + (role === 'printer' ? 'vendor' : 'hub') + ' dashboard.') : null,
+          h('span', { key: 'b', 'data-go': 'dologin', style: { display: 'block', textAlign: 'center', background: PT.accent, color: '#fff', fontWeight: 600, fontSize: 15, padding: '13px', borderRadius: 8, cursor: 'pointer' } }, this.state.authBusy ? 'Signing in…' : 'Login'),
+          this.state.authErrPortal && this.state.authErrPortal !== role ? h('div', { key: 'gp', style: { textAlign: 'center', fontSize: 13 } }, h('span', { onClick: () => this.openPortal(this.state.authErrPortal), style: { color: '#2f6fd0', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' } }, 'Go to the ' + this.authPortal(this.state.authErrPortal).title + ' page →')) : null,
+          role === 'member' ? h('div', { key: 'reg', style: { textAlign: 'center', fontSize: 13.5, color: MUT } }, 'New member? ', h('span', { 'data-go': 'set:authTab:register', style: { color: '#2f6fd0', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' } }, 'Register'), ' here') : null,
+          role === 'member' ? h('div', { key: 'alt', style: { textAlign: 'center', fontSize: 13.5, display: 'flex', gap: 16, justifyContent: 'center' } },
+            h('a', { href: '/account/printer-login/', onClick: e => { e.preventDefault(); this.openPortal('printer'); }, style: { color: '#2f6fd0', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' } }, 'Printer Login'),
+            h('a', { href: '/account/hub-login/', onClick: e => { e.preventDefault(); this.openPortal('hub'); }, style: { color: '#2f6fd0', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' } }, 'Hub Login')) : null,
+          role === 'member' ? h('div', { key: 'staff', style: { textAlign: 'center', fontSize: 12, color: FAINT, display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' } }, 'Staff:',
+            ['outlet', 'production', 'admin'].map(p => h('a', { key: p, href: this.authPortal(p).path, onClick: e => { e.preventDefault(); this.openPortal(p); }, style: { color: FAINT, textDecoration: 'underline', cursor: 'pointer' } }, this.authPortal(p).title))) : null,
+          role !== 'member' ? h('div', { key: 'back', style: { textAlign: 'center', fontSize: 13 } }, h('a', { href: '/account/', onClick: e => { e.preventDefault(); this.openPortal('member'); }, style: { color: '#2f6fd0', cursor: 'pointer', textDecoration: 'underline' } }, '← Customer login')) : null,
         ] : [
           h('div', { key: 'nm' }, lbl('Full name', true), h('input', { value: this.state.rgName || '', onChange: e => this.setField('rgName', e.target.value), style: inp })),
           h('div', { key: 'em' }, lbl('Email', true), h('input', { type: 'email', value: this.state.rgEmail || '', onChange: e => this.setField('rgEmail', e.target.value), style: inp })),
@@ -2669,13 +2681,16 @@ class Component extends DCLogic {
           h('span', { key: 'b', 'data-go': 'doregister', style: { display: 'block', textAlign: 'center', background: '#E52220', color: '#fff', fontWeight: 600, fontSize: 15, padding: '13px', borderRadius: 8, cursor: 'pointer' } }, this.state.authBusy ? 'Creating…' : 'Create my account'),
           h('div', { key: 'log', style: { textAlign: 'center', fontSize: 13.5, color: MUT } }, 'Already a member? ', h('span', { 'data-go': 'set:authTab:login', style: { color: '#2f6fd0', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' } }, 'Login'), ' here'),
         ]));
-    return h('div', { style: { background: '#E52220', margin: '-10px -20px 0', minHeight: 560 } },
+    return h('div', { 'data-portal': role, style: { background: PT.bg, margin: '-10px -20px 0', minHeight: 560 } },
       h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '48px 24px 60px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 40, alignItems: 'center' } },
         h('div', { style: { color: '#fff', maxWidth: 440 } },
-          h('h1', { style: { fontSize: 'clamp(26px,3vw,34px)', fontWeight: 700, letterSpacing: '-.01em', margin: '0 0 8px' } }, 'Sign up for some member deals!'),
-          h('p', { style: { margin: '0 0 24px', fontSize: 15, opacity: .95 } }, 'Sign up for some member deals!'),
+          h('h1', { style: { fontSize: 'clamp(26px,3vw,34px)', fontWeight: 700, letterSpacing: '-.01em', margin: '0 0 8px' } }, PT.head || 'Sign up for some member deals!'),
+          h('p', { style: { margin: '0 0 24px', fontSize: 15, opacity: .95 } }, PT.sub || 'Sign up for some member deals!'),
           h('div', { style: { display: 'flex', flexDirection: 'column', gap: 16 } },
-            feats.map((f, i) => h('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 14 } },
+            PT.feats ? PT.feats.map((f, i) => h('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 14 } },
+              h('span', { style: { height: 40, width: 40, borderRadius: '50%', background: '#fff', display: 'grid', placeItems: 'center', flex: 'none' } }, this.dashIcon(f[1], PT.accent, 18)),
+              h('span', { style: { fontSize: 15.5 } }, f[0])))
+            : feats.map((f, i) => h('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 14 } },
               h('span', { style: { height: 40, width: 40, borderRadius: '50%', background: '#fff', display: 'grid', placeItems: 'center', flex: 'none' } }, h('img', { src: MEDIA + f[0], alt: '', style: { height: 18, width: 18, display: 'block' } })),
               h('span', { style: { fontSize: 15.5 } }, f[1]))))),
         h('div', { style: { display: 'flex', justifyContent: 'center' } }, card)));
@@ -4084,6 +4099,12 @@ class Component extends DCLogic {
                   h('div', { style: { fontSize: 13, fontWeight: 600, display: 'flex', gap: 8, alignItems: 'center' } },
                     h('span', { style: { height: 14, width: 14, borderRadius: '50%', border: '1px solid ' + (fulfil === o[0] ? TEAL : '#eaeaea'), background: fulfil === o[0] ? TEAL : '#fff', flex: 'none' } }), o[1]),
                   h('div', { style: { fontSize: 12, color: MUT, marginTop: 6 } }, o[2])))),
+            fulfil === 'pickup' && h('div', { key: 'po', style: { marginTop: 12 } },
+              h('div', { style: { fontSize: 12.5, fontWeight: 600, marginBottom: 6 } }, 'Pick up at'),
+              (() => { const outs = this.state.pickupOutlets; if (!outs && typeof fetch === 'function' && !this._poLoading) { this._poLoading = true; fetch('/api/ops/outlets').then(r => r.json()).then(d => this.setState({ pickupOutlets: d.outlets || [], coOutlet: this.state.coOutlet || ((d.outlets || [])[0] || {}).id || '' })).catch(() => {}); }
+                return h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 8 } }, (outs || []).map(o => { const on = (this.state.coOutlet || '') === o.id;
+                  return h('div', { key: o.id, 'data-go': 'set:coOutlet:' + o.id, style: { border: '1px solid ' + (on ? TEAL : HAIR), background: on ? '#fdf2f2' : '#fff', borderRadius: 8, padding: '10px 12px', fontSize: 12, color: MUT, cursor: 'pointer', lineHeight: 1.5 } },
+                    h('div', { style: { fontWeight: 600, color: on ? TEAL : INK } }, o.name), o.address || ''); })); })()),
             fulfil === 'delivery' && h('div', { key: 'a', style: { marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 } },
               (this.state.addresses && this.state.addresses.length) ? h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 8 } },
                 this.state.addresses.map(a => { const on = (this.state.coAddrId || (this.state.addresses.find(x => x.isDefault) || {}).id) === a.id;
@@ -4699,7 +4720,7 @@ class Component extends DCLogic {
 
   // ===== ORDER TRACKING =====
   trackStage(status) {
-    const map = { intake: 0, prepress: 1, prepress_issue: 1, escalated: 1, rejected: 1, scheduling: 2, printing: 2, outsourcing: 2, logistics: 3, dispatched: 3, completed: 4 };
+    const map = { intake: 0, prepress: 1, prepress_issue: 1, escalated: 1, rejected: 1, scheduling: 2, printing: 2, outsourcing: 2, logistics: 3, dispatched: 3, at_hub: 3, ready_collect: 3, completed: 4 };
     return map[status] != null ? map[status] : 0;
   }
   s_track() {
@@ -4750,7 +4771,7 @@ class Component extends DCLogic {
     const outletName = (u.outlet || 'KL-Damansara').replace(/-/g, ' ');
     const code = '0' + (Array.from(outletName).reduce((a, c) => a + c.charCodeAt(0), 0) % 90000 + 10000);
     const identity = { title: outletName + ' Outlet', sub: code };
-    const tabs = ['Dashboard', 'Sales performance', 'Orders', 'Custom quotes', 'Follow-ups'];
+    const tabs = ['Dashboard', 'Collections', 'Sales performance', 'Orders', 'Custom quotes', 'Follow-ups'];
     const tab = tabs.indexOf(this.state.sTab) >= 0 ? this.state.sTab : 'Dashboard';
     const quotes = this.state.quotesList || [];
     const orders = this.state.staffOrders || [];
@@ -4764,7 +4785,9 @@ class Component extends DCLogic {
     const salesLink = h('span', { 'data-go': 'set:sTab:Sales performance', style: { fontSize: 14, fontWeight: 600, color: '#E52220', cursor: 'pointer' } }, 'Sales performance ›');
 
     let content;
-    if (tab === 'Dashboard') {
+    if (tab === 'Collections') {
+      content = this.outletCollections();
+    } else if (tab === 'Dashboard') {
       content = [
         card([
           h('div', { key: 'q', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 1, background: HAIR } },
