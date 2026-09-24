@@ -193,7 +193,9 @@ function page(slug, origin, opts) {
       : '<div class="pk-grid pk-types">' + cards + '</div>';
     S.push(sec('types', '<h2>Choose the type of ' + esc(name) + ' to configure</h2>' + body));
   } else {
-    S.push(sec('types', '<h2>Configure your ' + esc(name) + '</h2><p>' + esc(c.sizesCopy) + '</p><a class="pk-btn pk-btn-lg" href="' + esc(configUrl) + '">Check Price Now</a>'));
+    // a product with no type choice still shows its one item as a card (same layout as the multi-type grid)
+    const one = '<a class="pk-type" href="' + esc(configUrl) + '">' + (asset ? '<div class="pk-type-ph pk-type-photo"><img src="' + esc(asset) + '" alt="' + esc(name) + '" loading="lazy"></div>' : '<div class="pk-type-ph" aria-hidden="true"><img src="/assets/icons/cropped-favicon-192x192.png" alt=""></div>') + '<div class="pk-type-l">' + esc(name) + '</div><span class="pk-btn pk-btn-sm">Check Price</span></a>';
+    S.push(sec('types', '<h2>Choose the type of ' + esc(name) + ' to configure</h2><div class="pk-grid pk-types pk-types-one">' + one + '</div>'));
   }
   // Why Printoka? — light band with six icon benefits
   const ICON = {
@@ -349,7 +351,7 @@ function css() {
     '.pk-why-icon{width:56px;height:56px;border-radius:50%;border:1.5px solid ' + T.brand + ';display:flex;align-items:center;justify-content:center;background:#fff}',
     '.pk-why-l{font-size:14px;font-weight:500;color:' + T.ink + ';line-height:1.4;max-width:20ch}.pk-why-note{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:' + T.muted + '}',
     // grids
-    '.pk-grid{display:grid;gap:14px}.pk-types{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}.pk-sizes{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.pk-mats{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}.pk-fins{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}',
+    '.pk-grid{display:grid;gap:14px}.pk-types{grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}.pk-types-one{grid-template-columns:minmax(200px,240px);justify-content:center}.pk-sizes{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.pk-mats{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}.pk-fins{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}',
     '.pk-type{display:flex;flex-direction:column;border:1px solid ' + T.hairline + ';border-radius:10px;overflow:hidden;background:#fff;color:' + T.ink + '}.pk-type:hover{color:' + T.ink + '}',
     '.pk-type-ph{background:' + T.alt + ';padding:30px 8px;display:flex;align-items:center;justify-content:center}.pk-type-ph img{height:36px;width:auto;opacity:.16}.pk-type-l{font-weight:600;font-size:14px;padding:12px 14px 8px}',
     // secondary (outline) CTA on type cards — dials back the repeated solid red; fills on card hover
