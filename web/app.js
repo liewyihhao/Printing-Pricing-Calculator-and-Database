@@ -195,6 +195,8 @@ const CFG_OVERRIDES = {
       holepunching: { '3mm': 'Hole Punching - Diameter 3mm', '5mm': 'Hole Punching - Diameter 5mm' },
     },
     placeholder: ['size', 'paper', 'lamination', 'quantity'],
+    // the crawl engine's note says embossing is priced; on Excard it's free (confirmed live 2026-09-24)
+    noteOverride: { embossing: null },
     bestSellerQty: [300, 500, 1000],
     // Silkscreen Spot UV is only offered with Matte Lamination (Both) on Gloss Art Card
     // 250/310gsm at qty 300, 500 or 1,000–10,000 (Excard's customRangeSpotUV); otherwise only "No Required".
@@ -434,10 +436,31 @@ class Component extends DCLogic {
     });
   }
   // per-product configurator override (display-only corrections vs the live source form)
-  cfgOv() { const p = this.pkProduct(); return (p && CFG_OVERRIDES[p.name]) || {}; }
+  // Every product starts with ALL option fields (and quantity) unselected — "Please Select" —
+  // so nothing is pre-chosen for the customer. Number inputs (custom sizes) and widgets keep
+  // their own empty state and are not in this list.
+  cfgOv() {
+    const p = this.pkProduct(); const ov = (p && CFG_OVERRIDES[p.name]) || {};
+    if (!p) return ov;
+    if (!this._ovCache || this._ovCache.p !== p) {
+      const keys = (p.fields || []).map(f => f.key).filter(Boolean)
+        .concat((ov.addFields || []).filter(a => a.type !== 'number' && !a.widget).map(a => a.key))
+        .concat(['quantity']);
+      this._ovCache = { p, ov: Object.assign({}, ov, { placeholder: keys }) };
+    }
+    return this._ovCache.ov;
+  }
   pkHidden(key) { const ov = this.cfgOv(); return !!(ov.hide && ov.hide.indexOf(key) >= 0); }
-  // are all "please select" fields chosen yet? (gates the live price, like the source form)
-  pkReady() { const ov = this.cfgOv(); const ph = ov.placeholder || []; const sc = this.state.cfg || {}; const hw = ov.hideWhen || {}; const hidden = k => { try { return hw[k] ? !!hw[k](sc) : false; } catch (e) { return false; } }; return ph.every(k => hidden(k) ? true : (k === 'quantity' ? !!this.state.qtyChosen : (sc[k] != null && sc[k] !== ''))); }
+  // has the customer chosen every option field currently on screen, plus quantity? (gates the
+  // live price, like the source form). Fields hidden for the current spec don't block.
+  pkReady() {
+    const sc = this.state.cfg || {}; let fields = [];
+    try { fields = this.pkFields(); } catch (e) { return false; }
+    const ok = fields.every(f => { const d = f.def || {};
+      if (d.type === 'number' || d.widget || !(f.options && f.options.length)) return true;
+      return sc[d.key] != null && sc[d.key] !== ''; });
+    return ok && !!this.state.qtyChosen;
+  }
   // live size simulator: a proportional diagram of the selected size (standard or custom),
   // with Width/Height dimension lines — so the customer can see exactly what they picked.
   sizeSim() {
@@ -883,6 +906,9 @@ class Component extends DCLogic {
       if (SKIP_H[k]) continue;                          // folded into its width partner
       if (PAIRS[k]) { const [hk, tag] = PAIRS[k]; if (cfg[hk] && cfg[k]) lines.push([tag, cfg[hk] + 'mm × ' + cfg[k] + 'mm']); continue; }
       let val = cfg[k]; if (val == null || val === '') continue;
+      // not chosen yet ("Please Select"): leave it out rather than listing a default
+      const ph = ov.placeholder || [], sc = this.state.cfg || {};
+      if (ph.indexOf(k) >= 0 && (sc[k] == null || sc[k] === '') && (f.options || []).length) continue;
       if (NONE_RE.test(String(val))) continue;   // drop "No/Not Required" selections (geometry fields are never none-like)
       // the size field's "Other (Custom Size)" is already covered by the combined Custom/Open Size line
       if (k === 'size' && /other|custom/i.test(String(val)) && (cfg.custom_w || cfg.fold_w_thin || cfg.fold_w_fat)) continue;
@@ -3294,9 +3320,9 @@ class Component extends DCLogic {
     // quantity, straight from the engine's per-product model (moq / options)
     const qobj = this.pkQtyObj();
     let qopts = (qobj && qobj.options && qobj.options.length) ? qobj.options.slice() : QTYS.slice();
-    if (qopts.indexOf(s.qty) < 0) qopts = [s.qty].concat(qopts).sort((a, b) => a - b);
     const qtyPh = !!(ov.placeholder && ov.placeholder.indexOf('quantity') >= 0);
     const qtyChosen = !qtyPh || this.state.qtyChosen;
+    if (qtyChosen && qopts.indexOf(s.qty) < 0) qopts = [s.qty].concat(qopts).sort((a, b) => a - b);
     const bestSeller = ov.bestSellerQty || [];
     const qtyRemark = ov.remark && ov.remark.quantity;
     const qtyPh0 = qtyPh && !qtyChosen;
@@ -3322,7 +3348,7 @@ class Component extends DCLogic {
     const renderField = ({ def, options }) => {
       if (def.widget === 'foilColours') return this.foilColourPicker(def, cfg);
       const imgBase = ov.optImages && ov.optImages[def.key];
-      if (imgBase && options && options.length) return imgPicker(def, options, cfg[def.key], imgBase);
+      if (imgBase && options && options.length) return imgPicker(def, options, (this.state.cfg || {})[def.key], imgBase);  // nothing highlighted until picked
       if (options && options.length) return optCards(def, options, cfg[def.key]);
       // custom-size dimension inputs collapse once the size is confirmed
       if (DIM_KEYS[def.key] && this.state.sizeConfirmed) return null;
