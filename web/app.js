@@ -256,6 +256,41 @@ const CAT_PRODUCTS = [
   ['Voucher — Litho','Cards','card',165.00,'Exact price','6 working days'],
 ];
 
+// ---- homepage content carried over from the original printoka.com (images in assets/home/) ----
+// promo banners shown above the 4 steps, in the original order: [image, link token, alt]
+const HOME_BANNERS = [
+  ['banner-sm-01.jpg', 'signup', '15% discount for all members: sign up for your code'],
+  ['banner-sm-03.jpg', 'catopen:flyers-leaflets', 'More folding options than ever: configure now'],
+  ['banner-sm-02.jpg', 'signup', 'Grab RM30 off your first order when you sign up'],
+];
+// "Featured Hot Selling Printing Products in Malaysia" — the original's list, mapped to our products
+const HOME_FEATURED = [
+  ['Business Card', 1, 'Standard-Business-Card.png'], ['Stickers and Labels', 60, 'Round-Sticker-Cover.png'],
+  ['Flyers', 102, 'Flyers-Cropped.png'], ['Stand Banners', 162, 'Stand-Banner.png'],
+  ['Brochures and Leaflets', 101, 'Folded-Brochure-8.png'], ['Ticket & Voucher', 110, 'Book-Binded-1.png'],
+  ['Car Window Stickers', 117, 'Car-Window-Sticker.png'], ['Roll Up Banners', 125, 'Roll-Up-Banner.png'],
+  ['Digital Printing Booklet', 37, 'Booklet-Staple-Content.png'], ['Hanging Banners', 123, 'Hanging-Banner.png'],
+  ['Perfect Binding Booklets', 19, 'Booklet-Perfect-Cover.png'], ['Saddle Stitched Booklets', 19, 'Booklet-Staple-Cover.png'],
+];
+// original product cut-outs for our products (product id → image); others fall back to art()
+const HOME_PRODUCT_IMG = {
+  1: 'Standard-Business-Card.png', 111: 'computer-form-multiply.png', 106: '4.5x9.5-White-Envelope-Window.png', 105: 'Letterhead-Cover.png',
+  24: 'Carbonised-Form.png', 110: 'Book-Binded-1.png', 101: 'Folded-Brochure-8.png', 102: 'Flyers-Cropped.png', 50: 'Non-Folded-Brochure-1.png',
+  21: 'Non-Folded-Brochure-2.png', 103: 'Non-Folded-Brochure-3.png', 60: 'Round-Sticker-Cover.png', 117: 'Car-Window-Sticker.png',
+  61: 'Round-Corner-Sticker.png', 37: 'Booklet-Staple-Content.png', 19: 'Booklet-Perfect-Cover.png', 121: 'soft-stand-table-calendar.png',
+  166: '6x8-Folded-Cards-1.png', 114: 'Non-folded-Invitation-Cards.png', 138: 'Money-Pack-Vertical-3.png', 115: 'A5-Size-Folded-Cards.png',
+  125: 'Roll-Up-Banner.png', 162: 'Stand-Banner.png', 123: 'Hanging-Banner.png', 124: 'Stand-Banner.png', 127: 'Paperbag-290x200x95-1.png',
+  174: 'lanyard.png', 133: 'HFS001.png', 132: 'Button-Badge.png', 139: 'N31A.png', 128: 'C20.png',
+};
+// category rows: panel image + gradient (the original's three gradients, cycled)
+const HOME_CAT_PANEL = {
+  'business-essentials': 'Standard-Business-Card.png', 'flyers-leaflets': 'Digital-Printing-Flyers-Cropped.png',
+  'labels-stickers': 'Round-Corner-Sticker.png', 'books-stationery': 'Saddle-Stitched-Booklets-Cropped.png',
+  'cards-invitations': '6x8-Folded-Cards-1.png', 'large-format': 'Roll-Up-Banner.png',
+  'packaging-boxes': 'Paperbag-290x200x95-1.png', 'apparel-gifts': 'lanyard.png',
+};
+const HOME_GRADIENTS = ['linear-gradient(90deg,#F15A29,#EE3124)', 'linear-gradient(90deg,#F58220,#FDB515)', 'linear-gradient(90deg,#2BA6DE,#12CD8E)'];
+
 const BEST = [
   ['Business Card','card','from RM 38'],['Label Sticker — Digital','sticker','from RM 45'],
   ['Flyer','flyer','from RM 88'],['Booklet — Litho (Offset)','book','from RM 420'],
@@ -326,6 +361,7 @@ class Component extends DCLogic {
     if (v === 'addraddsave') return this.addressAdd();
     if (v.indexOf('addrdel:') === 0) return this.addressDelete(v.slice(8));
     if (v.indexOf('addrdefault:') === 0) return this.addressDefault(v.slice(12));
+    if (v === 'signup') { this.setState({ authTab: 'register', authErr: null }); return this.go('auth'); }
     if (v === 'dologin') return this.login();
     if (v === 'doregister') return this.register();
     if (v === 'dologout') return this.logout();
@@ -2263,7 +2299,13 @@ class Component extends DCLogic {
             h('div', { style: { filter: 'drop-shadow(0 14px 26px rgba(33,33,33,.14))', marginTop: -12 } }, this.art('box')),
             h('div', { style: { filter: 'drop-shadow(0 14px 26px rgba(33,33,33,.14))', marginTop: 12 } }, this.art('banner'))))),
 
+      this.homeBanners(),
+
       this.homeSteps(),
+
+      this.homeFeatured(),
+
+      this.homeCategories(),
 
       this.sec('Instant quote', 'See your price right here', 'Pick a category and quantity to get a starting price.',
         h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 14, alignItems: 'end', border: '1px solid ' + HAIR, borderRadius: 14, padding: 20, background: '#fff' } },
@@ -2274,29 +2316,6 @@ class Component extends DCLogic {
             h('span', { style: { fontSize: 12, color: FAINT } }, 'From'),
             h('span', { style: { fontSize: 27, fontWeight: 600, letterSpacing: '-.02em', color: TEAL } }, this.money(168))),
           this.btn('Open configurator →', 'amber', 'product', { justifyContent: 'center' })), { alt: true }),
-
-      this.sec('Shop by category', 'Find your product by category', this.pkProducts().length + ' products, every one priced online with specs and artwork guides.',
-        h('div', null,
-          h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 16 } },
-            this.catCategories().map(c => {
-              const list = this.catProducts(c.id), cover = list[0] ? list[0].engName : 'card';
-              return h('a', { key: c.id, href: this.navHref(c.id === 'packaging-boxes' ? 'packaging' : 'catopen:' + c.id) || undefined, 'data-go': c.id === 'packaging-boxes' ? 'packaging' : 'catopen:' + c.id, style: { border: '1px solid ' + HAIR, borderRadius: 13, overflow: 'hidden', background: '#fff', cursor: 'pointer', display: 'block', color: 'inherit', textDecoration: 'none' } },
-                this.art(cover),
-                h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '13px 15px' } },
-                  h('span', { style: { fontWeight: 500, fontSize: 14 } }, c.label),
-                  h('span', { style: { fontSize: 12, color: FAINT } }, list.length + ' products')));
-            })),
-          h('div', { style: { display: 'flex', justifyContent: 'center', marginTop: 24 } },
-            this.btn('Browse all ' + this.pkProducts().length + ' products →', 'teal', 'catopen:all', { justifyContent: 'center', padding: '13px 26px' })))),
-
-      this.sec('Popular right now', 'What customers order most', 'Best sellers, priced to the cent.',
-        h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(190px,1fr))', gap: 14 } },
-          BEST.map((p, i) => { const bid = this.pkIdByName(p[0]); const label = bid != null ? this.catName(bid) : p[0];
-            return h(bid != null ? 'a' : 'div', { key: i, href: bid != null ? (this.productPath(bid) || undefined) : undefined, 'data-go': bid != null ? 'open:' + bid : 'category', style: { border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', background: '#fff', display: 'flex', flexDirection: 'column', cursor: 'pointer', color: 'inherit', textDecoration: 'none' } },
-            this.art(p[0]),
-            h('div', { style: { padding: '11px 13px', display: 'flex', flexDirection: 'column', gap: 5 } },
-              h('span', { style: { fontSize: 13.5, fontWeight: 500 } }, label),
-              h('span', { style: { fontSize: 12.5, color: TEAL, fontWeight: 600 } }, p[2]))); })), { alt: true }),
 
       this.sec('Membership', 'Save up to 15% on every order', 'The more you order, the more you save. Your tier rises with your accumulated orders.',
         h('div', null,
@@ -2328,6 +2347,77 @@ class Component extends DCLogic {
                 h('div', { style: { fontSize: 15, fontWeight: 500, margin: '7px 0 6px', lineHeight: 1.35 } }, a[1]),
                 h('div', { style: { fontSize: 12.5, color: MUT } }, a[2]))))), { alt: true }),
     );
+  }
+
+  // horizontal strip with grey ‹ › arrows overlaid on its edges (the original's slider look)
+  hScroller(children, arrowTop) {
+    const arrow = (dir) => h('button', { type: 'button', 'aria-label': dir < 0 ? 'Scroll left' : 'Scroll right',
+      onClick: e => { const t = e.currentTarget.parentElement.querySelector('[data-strip]'); if (t) t.scrollBy({ left: dir * Math.max(220, t.clientWidth * 0.8), behavior: 'auto' }); },
+      style: { position: 'absolute', top: arrowTop || '50%', transform: 'translateY(-50%)', [dir < 0 ? 'left' : 'right']: -18, zIndex: 2, width: 40, height: 40, borderRadius: '50%', border: 'none', background: 'rgba(120,120,120,.55)', color: '#fff', fontSize: 20, lineHeight: 1, cursor: 'pointer', display: 'grid', placeItems: 'center' } }, dir < 0 ? '←' : '→');
+    return h('div', { style: { position: 'relative' } },
+      arrow(-1),
+      h('div', { 'data-strip': '1', style: { display: 'flex', gap: 14, overflowX: 'auto', scrollSnapType: 'x proximity', scrollbarWidth: 'none', padding: '2px 0' } }, children),
+      arrow(1));
+  }
+  homeImg(file) { return window.__asset('assets/home/' + file); }
+
+  // three promo banners (original site), above the 4 steps
+  homeBanners() {
+    return h('section', { key: 'banners', style: { maxWidth: 1180, margin: '0 auto', padding: '34px 20px 6px' } },
+      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 18 } },
+        HOME_BANNERS.map((b, i) => h('a', { key: i, href: b[1] === 'signup' ? '/auth' : (this.navHref(b[1]) || undefined), 'data-go': b[1], 'aria-label': b[2],
+          style: { display: 'block', borderRadius: 12, overflow: 'hidden', border: '1px solid ' + HAIR, cursor: 'pointer', background: '#fff' } },
+          h('img', { src: this.homeImg(b[0]), alt: b[2], width: 400, height: 267, loading: 'lazy', style: { display: 'block', width: '100%', height: 'auto' } })))));
+  }
+
+  // "Featured Hot Selling Printing Products in Malaysia" — the original's list on its blue-green band
+  homeFeatured() {
+    return h('section', { key: 'featured', style: { maxWidth: 1180, margin: '0 auto', padding: '10px 20px 34px' } },
+      h('div', { style: { background: HOME_GRADIENTS[2], borderRadius: 14, padding: '26px 30px 30px' } },
+        h('h2', { style: { margin: '0 0 20px', textAlign: 'center', color: '#fff', fontSize: 22, fontWeight: 600, letterSpacing: '-.01em' } }, 'Featured Hot Selling Printing Products in Malaysia'),
+        this.hScroller(HOME_FEATURED.map((f, i) => h('a', { key: i, href: this.productPath(f[1]) || undefined, 'data-go': 'open:' + f[1],
+          style: { flex: '0 0 184px', scrollSnapAlign: 'start', background: '#fff', borderRadius: 8, padding: '16px 12px 18px', textAlign: 'center', color: INK, textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 } },
+          h('img', { src: this.homeImg(f[2]), alt: f[0], loading: 'lazy', style: { height: 130, width: '100%', objectFit: 'contain', display: 'block' } }),
+          h('span', { style: { fontSize: 15, lineHeight: 1.35 } }, f[0]))))));
+  }
+
+  // category browser (original layout): sidebar of categories + membership card, and one row per
+  // category — gradient panel with the category name and image, then a sideways-scrolling strip
+  homeCategories() {
+    const cats = this.catCategories();
+    const open = this.state.homeCatOpen;
+    const tile = p => h('a', { key: p.id, href: this.productPath(p.id) || undefined, 'data-go': 'open:' + p.id,
+      style: { flex: '0 0 132px', scrollSnapAlign: 'start', padding: '14px 4px', textAlign: 'center', color: MUT, textDecoration: 'none', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, borderRadius: 8 } },
+      HOME_PRODUCT_IMG[p.id]
+        ? h('img', { src: this.homeImg(HOME_PRODUCT_IMG[p.id]), alt: p.name, loading: 'lazy', style: { height: 116, width: '100%', objectFit: 'contain', display: 'block' } })
+        : h('div', { style: { height: 116, width: '100%', overflow: 'hidden', borderRadius: 6, display: 'grid', placeItems: 'center' } }, this.art(p.engName)),
+      h('span', { style: { fontSize: 14, lineHeight: 1.35 } }, p.name));
+    const sidebar = h('aside', { style: { flex: '0 1 280px', minWidth: 240, display: 'flex', flexDirection: 'column', gap: 22 } },
+      h('div', null, cats.map(c => { const on = open === c.id; const list = this.catProducts(c.id);
+        return h('div', { key: c.id },
+          h('button', { type: 'button', 'aria-expanded': on ? 'true' : 'false', onClick: () => this.setState({ homeCatOpen: on ? null : c.id }),
+            style: { width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10, background: 'none', border: 'none', padding: '13px 10px', font: '500 15.5px Montserrat,sans-serif', color: on ? TEAL : INK, cursor: 'pointer', textAlign: 'left' } },
+            h('span', null, c.label), h('span', { 'aria-hidden': 'true', style: { fontSize: 11, color: on ? TEAL : INK, transform: on ? 'rotate(180deg)' : 'none', transition: 'transform .15s' } }, '▼')),
+          on ? h('div', { style: { display: 'flex', flexDirection: 'column', padding: '0 10px 10px 18px', gap: 2 } },
+            list.map(p => h('a', { key: p.id, href: this.productPath(p.id) || undefined, 'data-go': 'open:' + p.id, style: { fontSize: 13.5, color: MUT, padding: '5px 0', textDecoration: 'none' } }, p.name)),
+            h('span', { 'data-go': c.id === 'packaging-boxes' ? 'packaging' : 'catopen:' + c.id, style: { fontSize: 13, fontWeight: 600, color: TEAL, padding: '6px 0', cursor: 'pointer' } }, 'View all →')) : null); })),
+      h('div', { style: { background: 'linear-gradient(160deg,#fff,#eeeeee)', border: '1px solid ' + HAIR, borderRadius: 12, padding: '22px 20px 0', overflow: 'hidden' } },
+        h('div', { style: { fontSize: 19, fontWeight: 500, lineHeight: 1.35, marginBottom: 8 } }, 'Premium membership plan'),
+        h('div', { style: { fontSize: 14.5, color: MUT, lineHeight: 1.6, marginBottom: 16 } }, 'Sign up now and get an exclusive rate for you.'),
+        this.btn('Sign up', 'teal', 'signup'),
+        h('img', { src: this.homeImg('membership.png'), alt: '', loading: 'lazy', style: { display: 'block', width: '100%', marginTop: 18 } })));
+    const rows = h('div', { style: { flex: '1 1 600px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 20 } },
+      cats.map((c, i) => { const list = this.catProducts(c.id).slice().sort((a, b) => (HOME_PRODUCT_IMG[b.id] ? 1 : 0) - (HOME_PRODUCT_IMG[a.id] ? 1 : 0));
+        const go = c.id === 'packaging-boxes' ? 'packaging' : 'catopen:' + c.id;
+        return h('div', { key: c.id, style: { background: HOME_GRADIENTS[i % 3], borderRadius: 12, display: 'flex', flexWrap: 'wrap', overflow: 'hidden', minHeight: 250 } },
+          h('div', { style: { flex: '0 0 220px', position: 'relative', padding: '20px 18px', color: '#fff', minHeight: 110 } },
+            h('a', { href: this.navHref(go) || undefined, 'data-go': go, style: { position: 'relative', zIndex: 1, display: 'block', color: '#fff', fontSize: 20, fontWeight: 500, lineHeight: 1.35, textDecoration: 'none' } }, c.label + ' Printing'),
+            HOME_CAT_PANEL[c.id] ? h('img', { className: 'pk-hide-sm', src: this.homeImg(HOME_CAT_PANEL[c.id]), alt: '', loading: 'lazy', style: { position: 'absolute', left: 0, bottom: 0, width: 210, maxHeight: 170, objectFit: 'contain', objectPosition: 'left bottom' } }) : null),
+          h('div', { style: { flex: '1 1 320px', minWidth: 0, padding: 18 } },
+            h('div', { style: { background: '#fff', borderRadius: 8, padding: '4px 26px' } }, this.hScroller(list.map(tile)))));
+      }));
+    return h('section', { key: 'homecats', style: { maxWidth: 1180, margin: '0 auto', padding: '10px 20px 40px' } },
+      h('div', { style: { display: 'flex', gap: 28, alignItems: 'flex-start', flexWrap: 'wrap' } }, sidebar, rows));
   }
 
   // "General FAQs" — the original homepage's FAQ, verbatim (web/content/faq.json, served at
