@@ -12,6 +12,7 @@ const D = require('./domain');
 const store = require('./store');
 const ops = require('./ops');
 const admin = require('./admin');
+const files = require('./files');
 ops.migrate();
 const content = require('./content');
 const seoProduct = require('./seo-product');
@@ -78,7 +79,7 @@ async function api(req, res, pathname, query) {
   }
   if (seg[0] === 'jobs' && !seg[1]) {
     let list = store.jobs().slice();
-    if (me0.type === 'vendor') list = list.filter(j => j.outsource && j.outsource.vendors.some(v => v.vendorId === me0.id));
+    if (me0.type === 'vendor') list = list.filter(j => j.outsource && j.outsource.vendors.some(v => v.vendorId === (me0.vendorId || me0.id)));
     if (me0.type === 'hub' && me0.hub) list = list.filter(j => j.hub === me0.hub || ((j.destination || {}).type === 'hub' && j.destination.id === me0.hub));
     const jobs = list.sort(D.priorityCompare).map(j => jobView(j, role));
     return send(res, 200, { count: jobs.length, role, jobs });
@@ -91,7 +92,7 @@ async function api(req, res, pathname, query) {
   // POST /api/jobs/:id/transition  { action, payload }
   if (seg[0] === 'jobs' && seg[2] === 'transition' && req.method === 'POST') {
     const body = await readBody(req);
-    if (me0.type === 'vendor') { const j0 = store.job(seg[1]); if (!j0 || !j0.outsource || j0.outsource.awardedTo !== me0.id || body.action !== 'vendor_ship') return send(res, 403, { error: 'printers can only ship jobs awarded to them' }); }
+    if (me0.type === 'vendor') { const j0 = store.job(seg[1]); if (!j0 || !j0.outsource || j0.outsource.awardedTo !== (me0.vendorId || me0.id) || body.action !== 'vendor_ship') return send(res, 403, { error: 'printers can only ship jobs awarded to them' }); }
     const r = ops.transition(seg[1], role, actor, body.action, body.payload || {});
     if (r.error) return send(res, 400, r);
     return send(res, 200, { ok: true, job: jobView(store.job(seg[1]), role), from: r.from, to: r.to });
@@ -275,6 +276,17 @@ async function api(req, res, pathname, query) {
   }
   if (seg[0] === 'custom-invoices' && seg[1]) { const inv = store.customInvoice(seg[1]); return inv ? send(res, 200, { invoice: inv }) : send(res, 404, { error: 'not found' }); }
 
+  // order files: artworks per line + payment proof — private, owner or staff only
+  if (seg[0] === 'orders' && seg[1] && seg[2] === 'files' && !seg[3] && req.method === 'POST') {
+    const fme = store.sessionCustomer(token); if (!fme) return send(res, 401, { error: 'Please sign in to upload files.' });
+    const r = files.saveFile(seg[1], await readBody(req), fme); return send(res, r.error ? 400 : 200, r);
+  }
+  if (seg[0] === 'orders' && seg[1] && seg[2] === 'files' && seg[3]) {
+    const fme = store.sessionCustomer(token); if (!fme) return send(res, 401, { error: 'Please sign in.' });
+    const r = files.readFile(seg[1], seg[3], fme); if (r.error) return send(res, r.code || 400, { error: r.error });
+    res.writeHead(200, { 'Content-Type': r.type, 'Content-Length': r.data.length, 'Content-Disposition': (query.download ? 'attachment' : 'inline') + '; filename="' + r.file.name.replace(/"/g, '') + '"', 'Cache-Control': 'private, no-store' });
+    return res.end(r.data);
+  }
   // GET /api/orders/:id  — order + live job statuses (confirmation / tracking / management view)
   if (seg[0] === 'orders' && seg[1] && !seg[2]) {
     if (store.order(seg[1])) { (store.order(seg[1]).jobIds || []).forEach(jid => { const jj = store.job(jid); if (jj) ops.normalizeJob(jj); }); ops.syncOrder(seg[1]); }
