@@ -299,6 +299,8 @@ function createOrder(body) {
     if (applied > 0) { o.creditApplied = Math.round(applied * 100) / 100; o.total = Math.round((o.total - applied) * 100) / 100; }
   }
   orders().push(o);
+  // a one-time code is spent once an order is placed with it
+  if (o.coupon && body.userId) { const cu = findCustomer(body.userId); const used = cu && (cu.coupons || []).find(x => x.code === o.coupon); if (used && !used.multiUse) { used.usedAt = now(); used.orderId = oid; } }
   if (o.creditApplied) creditEntry(body.userId, { reason: 'ORDER_OFFSET', amount: -o.creditApplied, actor: 'customer', orderId: oid });
   // web order successfully placed & paid → prepress is notified an order is in their queue
   if (paid) notify({ type: 'role', role: 'prepress' }, { kind: 'order_placed', title: 'A fresh order just landed for artwork check', body: 'Order ' + oid + ' has come in for ' + (cust.name || 'a customer') + ' (' + items.length + ' item' + (items.length === 1 ? '' : 's') + ')' + (body.fromQuote ? ', from quote ' + body.fromQuote : '') + '. Have a look at the files whenever you’re ready.', cta: 'Open the order →', orderId: oid });
@@ -375,6 +377,14 @@ const WELCOME_COUPON = { pct: 15, minSpend: 800, multiUse: true, expires: null, 
 function newWelcomeCoupon() {
   return Object.assign({ code: 'WELCOME15-' + crypto.randomBytes(3).toString('hex').toUpperCase(), createdAt: now() }, WELCOME_COUPON);
 }
+// New sign-up voucher (the original homepage banner): RM30 off, for purchases of RM 180 or more,
+// once per account. Marked used when an order is placed with it.
+const SIGNUP_COUPON = { amount: 30, minSpend: 180, multiUse: false, expires: null, label: 'RM30 new sign-up discount' };
+function newSignupCoupon() {
+  return Object.assign({ code: 'NEW30-' + crypto.randomBytes(3).toString('hex').toUpperCase(), createdAt: now() }, SIGNUP_COUPON);
+}
+// what a coupon takes off this subtotal: a fixed amount (never more than the subtotal) or a percentage
+function couponValue(cp, sub) { return cp.amount ? Math.min(cp.amount, sub) : Math.round(sub * cp.pct) / 100; }
 // is `code` one of this customer's coupons, and does `subtotal` qualify? → { ok, code, pct, discount } | { error }
 function checkCoupon(userId, code, subtotal) {
   const c = userId && findCustomer(userId);
@@ -385,8 +395,8 @@ function checkCoupon(userId, code, subtotal) {
   if (cp.expires && new Date(cp.expires) < new Date()) return { error: 'That code has expired.' };
   if (!cp.multiUse && cp.usedAt) return { error: 'That code has already been used.' };
   const sub = Number(subtotal) || 0;
-  if (sub < cp.minSpend) return { error: 'This code applies to orders of RM ' + cp.minSpend + ' or more.', code: cp.code, pct: cp.pct, minSpend: cp.minSpend };
-  return { ok: true, code: cp.code, pct: cp.pct, minSpend: cp.minSpend, discount: Math.round(sub * cp.pct) / 100 };
+  if (sub < cp.minSpend) return { error: 'This code applies to orders of RM ' + cp.minSpend + ' or more.', code: cp.code, pct: cp.pct || 0, amount: cp.amount || 0, minSpend: cp.minSpend };
+  return { ok: true, code: cp.code, pct: cp.pct || 0, amount: cp.amount || 0, minSpend: cp.minSpend, discount: couponValue(cp, sub) };
 }
 function registerCustomer(body) {
   const email = String(body.email || '').trim().toLowerCase();
@@ -398,12 +408,12 @@ function registerCustomer(body) {
     id: 'C-' + crypto.randomBytes(4).toString('hex').toUpperCase(), email, passHash: hash, salt, type: 'customer', role: 'customer',
     name: body.name || email.split('@')[0], phone: body.phone || '', company: body.company || '',
     tier: 'Standard', spend12mo: 0, creditBalance: 0, addresses: [], creditLedger: [], createdAt: now(),
-    coupons: [newWelcomeCoupon()],
+    coupons: [newSignupCoupon(), newWelcomeCoupon()],
   };
   customers().push(c);
-  const cp = c.coupons[0];
-  logEvent({ actor: email, role: 'customer', action: 'register', jobId: null, from: null, to: null, note: 'New customer account ' + c.id + ' · promo ' + cp.code });
-  sendEmail('new-account', { to: c.email, name: c.name, subject: 'Welcome to Printoka — here’s your 15% discount code', body: 'Hi ' + c.name + ',\n\nYour Printoka account is ready. As a welcome, here’s your member discount code:\n\n' + cp.code + '\n\n15% off every order of RM ' + cp.minSpend + ' or more. No expiry, use it as many times as you like, on all products. Enter it in your cart.\n\nHappy printing,\nThe Printoka team' });
+  const cpNew = c.coupons[0], cp = c.coupons[1];
+  logEvent({ actor: email, role: 'customer', action: 'register', jobId: null, from: null, to: null, note: 'New customer account ' + c.id + ' · promo ' + cpNew.code + ', ' + cp.code });
+  sendEmail('new-account', { to: c.email, name: c.name, subject: 'Welcome to Printoka — here are your RM30 and 15% discount codes', body: 'Hi ' + c.name + ',\n\nYour Printoka account is ready. As a welcome, here are your discount codes:\n\n' + cpNew.code + '\nRM30 off your order of RM ' + cpNew.minSpend + ' or more. One-time use, on all products.\n\n' + cp.code + '\n15% off every order of RM ' + cp.minSpend + ' or more. No expiry, use it as many times as you like, on all products.\n\nOne code per order. Enter it in your cart.\n\nHappy printing,\nThe Printoka team' });
   save();
   return { customer: publicCustomer(c), token: newSession(c.id) };
 }

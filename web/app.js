@@ -1003,23 +1003,27 @@ class Component extends DCLogic {
     const subtotal = this.cartTotals().subtotal;
     fetch('/api/account/coupon', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, this.authHeaders()), body: JSON.stringify({ code, subtotal }) })
       .then(r => r.json()).then(d => {
-        if (d && d.ok) return this.setState({ coupon: { code: d.code, pct: d.pct, minSpend: d.minSpend }, couponMsg: d.pct + '% off applied with ' + d.code + '.', couponOk: true });
+        if (d && d.ok) return this.setState({ coupon: { code: d.code, pct: d.pct, amount: d.amount, minSpend: d.minSpend }, couponMsg: this.couponOff(d) + ' off applied with ' + d.code + '.', couponOk: true });
         this.setState({ coupon: null, couponMsg: (d && d.error) || 'That code can’t be used.', couponOk: false });
       }).catch(() => this.setState({ couponMsg: 'Couldn’t check the code. Try again.', couponOk: false }));
   }
   removeCoupon() { this.setState({ coupon: null, cartCoupon: '', couponMsg: null }); }
+  couponOff(cp) { return cp.amount ? 'RM' + cp.amount : cp.pct + '%'; }
+  // the signed-in customer's codes that can still be used (one-time codes drop out once spent)
+  usableCoupons() { const u = this.state.user; return ((u && u.coupons) || []).filter(cp => cp.multiUse || !cp.usedAt); }
   // a member promo code as a ticket: code, terms, copy button (dismissable on the welcome card)
   couponTicket(cp, dismissable) {
     const copy = () => { try { navigator.clipboard.writeText(cp.code); } catch (e) {} this.setState({ couponCopied: cp.code }); };
     return h('div', { style: { display: 'flex', alignItems: 'stretch', border: '1px solid ' + HAIR, borderRadius: 12, overflow: 'hidden', background: '#fff' } },
       h('div', { style: { flex: 'none', width: 104, background: 'linear-gradient(135deg,' + TEAL + ',#F0572B)', color: '#fff', display: 'grid', placeItems: 'center', textAlign: 'center', padding: '14px 8px' } },
-        h('div', null, h('div', { style: { fontSize: 26, fontWeight: 700, lineHeight: 1 } }, cp.pct + '%'), h('div', { style: { fontSize: 11.5, fontWeight: 600, marginTop: 3, letterSpacing: '.06em' } }, 'OFF'))),
+        h('div', null, h('div', { style: { fontSize: cp.amount ? 22 : 26, fontWeight: 700, lineHeight: 1 } }, this.couponOff(cp)), h('div', { style: { fontSize: 11.5, fontWeight: 600, marginTop: 3, letterSpacing: '.06em' } }, 'OFF'))),
       h('div', { style: { flex: 1, minWidth: 0, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 6 } },
         h('div', { style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' } },
           h('span', { style: { fontSize: 16, fontWeight: 700, letterSpacing: '.04em', color: INK, border: '1px dashed ' + TEAL, borderRadius: 6, padding: '4px 10px', background: '#fdf2f2' } }, cp.code),
           h('span', { role: 'button', tabIndex: 0, onClick: copy, style: { fontSize: 12.5, fontWeight: 600, color: TEAL, cursor: 'pointer' } }, this.state.couponCopied === cp.code ? 'Copied' : 'Copy code'),
           dismissable ? h('span', { role: 'button', tabIndex: 0, onClick: () => this.setState({ welcomeCoupon: null }), style: { marginLeft: 'auto', fontSize: 12.5, color: FAINT, cursor: 'pointer' } }, 'Dismiss') : null),
-        h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.6 } }, 'For orders of RM ' + (cp.minSpend || 0).toLocaleString() + ' or more · no expiry · use it as many times as you like · all products. Enter it in your cart.')));
+        h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.6 } }, (!cp.multiUse && cp.usedAt) ? 'Used' + (cp.orderId ? ' on order ' + cp.orderId : '') + '.'
+          : 'For orders of RM ' + (cp.minSpend || 0).toLocaleString() + ' or more · ' + (cp.multiUse ? 'no expiry · use it as many times as you like' : 'new sign-up offer · one-time use') + ' · all products. Enter it in your cart.')));
   }
   downloadQuotation() {
     // a cart-level quotation mirrors the price the configurator/checkout/invoice all read
@@ -1032,12 +1036,12 @@ class Component extends DCLogic {
     // member promo code stacks with the membership discount (same base), while the cart meets its minimum
     const cp = this.state.coupon;
     const couponOn = !!(cp && subtotal >= cp.minSpend);
-    const couponDiscount = couponOn ? Math.round(subtotal * cp.pct) / 100 : 0;
+    const couponDiscount = couponOn ? (cp.amount ? Math.min(cp.amount, subtotal) : Math.round(subtotal * cp.pct) / 100) : 0;
     const afterDisc = subtotal - memberDiscount - couponDiscount;
     const taxRate = ({ MY: 0.08, SG: 0.09, BN: 0 })[this.cc()] || 0;
     const tax = afterDisc * taxRate;
     const shipping = cart.length ? 12 : 0;
-    return { subtotal, memberDiscount, couponCode: couponOn ? cp.code : null, couponPct: couponOn ? cp.pct : 0, couponDiscount, couponShort: !!(cp && !couponOn), tax, shipping, total: afterDisc + tax + shipping, count: cart.length };
+    return { subtotal, memberDiscount, couponCode: couponOn ? cp.code : null, couponPct: couponOn ? cp.pct : 0, couponOffLabel: couponOn ? this.couponOff(cp) : '', couponDiscount, couponShort: !!(cp && !couponOn), tax, shipping, total: afterDisc + tax + shipping, count: cart.length };
   }
   setField(k, v) { this.setState({ [k]: v }); }
   placeOrder() {
@@ -1058,7 +1062,8 @@ class Component extends DCLogic {
     this.setState({ placing: true, orderErr: null });
     fetch('/api/orders', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, this.authHeaders()), body: JSON.stringify(body) })
       .then(r => r.json()).then(d => {
-        if (d && d.order) { this.setState({ order: d.order, placing: false, cart: [] }); this.saveCart([]); this.go('confirm'); }
+        if (d && d.order) { this.setState({ order: d.order, placing: false, cart: [], coupon: null, cartCoupon: '', couponMsg: null }); this.saveCart([]); this.go('confirm');
+          fetch('/api/auth/me', { headers: this.authHeaders() }).then(r => r.ok ? r.json() : null).then(m => { if (m && m.customer) this.setState({ user: m.customer }); }).catch(() => {}); }
         else this.setState({ placing: false, orderErr: (d && d.error) || 'Could not place the order.' });
       }).catch(() => this.setState({ placing: false }));
   }
@@ -1507,8 +1512,8 @@ class Component extends DCLogic {
         if (!d.token) return this.setState({ authErr: d.error || 'Could not register.', authBusy: false });
         this.authSetSession(d);
         // new account → show its member promo code straight away and pre-fill it in the cart
-        const cp = d.customer && d.customer.coupons && d.customer.coupons[0];
-        if (cp) this.setState({ welcomeCoupon: cp, cartCoupon: cp.code });
+        const cps = (d.customer && d.customer.coupons) || [];
+        if (cps.length) this.setState({ welcomeCoupon: cps, cartCoupon: cps[0].code });
       })
       .catch(() => this.setState({ authErr: 'Network error.', authBusy: false }));
   }
@@ -2633,8 +2638,8 @@ class Component extends DCLogic {
           h('div', { key: 'pw' }, lbl('Password', true), h('input', { type: 'password', value: this.state.rgPass || '', onChange: e => this.setField('rgPass', e.target.value), style: inp }), h('div', { style: { fontSize: 11.5, color: FAINT, marginTop: 4 } }, 'Minimum 6 characters')),
           h('label', { key: 'ag', style: { display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 12.5, color: MUT, cursor: 'pointer', lineHeight: 1.5 } }, h('input', { type: 'checkbox', checked: !!this.state.rgAgree, onChange: e => this.setField('rgAgree', e.target.checked), style: { marginTop: 3 } }), 'I agree to the Terms and consent to Printoka processing my data under the PDPA.'),
           h('div', { key: 'promo', style: { display: 'flex', gap: 10, alignItems: 'center', background: '#fdf2f2', border: '1px dashed ' + TEAL, borderRadius: 8, padding: '10px 12px', fontSize: 13, color: INK } },
-            h('span', { style: { flex: 'none', fontWeight: 700, color: TEAL, fontSize: 15 } }, '15%'),
-            h('span', null, 'Sign up and get a 15% discount code instantly, for orders of RM 800 or more.')),
+            h('span', { style: { flex: 'none', fontWeight: 700, color: TEAL, fontSize: 15 } }, 'RM30'),
+            h('span', null, 'Sign up and get RM30 off your order of RM 180 or more, plus a 15% code for orders of RM 800 or more.')),
           h('span', { key: 'b', 'data-go': 'doregister', style: { display: 'block', textAlign: 'center', background: '#E52220', color: '#fff', fontWeight: 600, fontSize: 15, padding: '13px', borderRadius: 8, cursor: 'pointer' } }, this.state.authBusy ? 'Creating…' : 'Create my account'),
           h('div', { key: 'log', style: { textAlign: 'center', fontSize: 13.5, color: MUT } }, 'Already a member? ', h('span', { 'data-go': 'set:authTab:login', style: { color: '#2f6fd0', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' } }, 'Login'), ' here'),
         ]));
@@ -3970,12 +3975,18 @@ class Component extends DCLogic {
                     h('span', { onClick: () => this.removeCoupon(), style: { fontSize: 12.5, fontWeight: 600, color: MUT, cursor: 'pointer' } }, 'Remove'))
                 : h('div', { style: { display: 'flex', gap: 8 } },
                     h('input', { placeholder: 'Discount code', value: this.state.cartCoupon || '', onChange: e => this.setField('cartCoupon', e.target.value), style: { flex: 1, minWidth: 0, font: '400 13.5px Montserrat,sans-serif', padding: '10px 12px', border: '1px solid ' + HAIR, borderRadius: 8 } }),
-                    h('span', { onClick: () => this.applyCoupon(), style: { background: TEAL, color: '#fff', fontWeight: 600, fontSize: 13.5, borderRadius: 8, padding: '10px 18px', cursor: 'pointer', whiteSpace: 'nowrap' } }, 'Apply'))),
+                    h('span', { onClick: () => this.applyCoupon(), style: { background: TEAL, color: '#fff', fontWeight: 600, fontSize: 13.5, borderRadius: 8, padding: '10px 18px', cursor: 'pointer', whiteSpace: 'nowrap' } }, 'Apply')),
+              (!this.state.coupon && this.usableCoupons().length) ? h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 8 } },
+                h('span', { style: { fontSize: 11.5, color: FAINT, alignSelf: 'center' } }, 'Your codes:'),
+                this.usableCoupons().map(cp => h('button', { key: cp.code, type: 'button', onClick: () => this.setState({ cartCoupon: cp.code }, () => this.applyCoupon()),
+                  title: this.couponOff(cp) + ' off orders of RM ' + cp.minSpend + ' or more',
+                  style: { font: '600 11.5px Montserrat,sans-serif', color: TEAL, background: '#fff', border: '1px dashed ' + TEAL, borderRadius: 6, padding: '4px 8px', cursor: 'pointer' } },
+                  this.couponOff(cp) + ' off · RM ' + cp.minSpend + '+'))) : null),
             t.couponShort
-              ? h('div', { key: 'cm', style: { fontSize: 12, color: '#a1660a', marginBottom: 10 } }, 'Add ' + this.money(this.state.coupon.minSpend - t.subtotal) + ' more to use your ' + this.state.coupon.pct + '% code.')
+              ? h('div', { key: 'cm', style: { fontSize: 12, color: '#a1660a', marginBottom: 10 } }, 'Add ' + this.money(this.state.coupon.minSpend - t.subtotal) + ' more to use your ' + this.couponOff(this.state.coupon) + ' code.')
               : (this.state.couponMsg ? h('div', { key: 'cm', style: { fontSize: 12, color: this.state.couponOk ? '#3d8b40' : '#c0392b', marginBottom: 10 } }, this.state.couponMsg) : null),
             h('div', { key: 'b', style: { display: 'flex', flexDirection: 'column', gap: 9, fontSize: 13, borderTop: '1px solid ' + LINE, paddingTop: 12 } },
-              [['Subtotal', this.money(t.subtotal)], [this.tier() + ' member −' + this.tierPct() + '%', '−' + this.money(t.memberDiscount), TEAL], t.couponCode ? ['Code ' + t.couponCode + ' −' + t.couponPct + '%', '−' + this.money(t.couponDiscount), TEAL] : null, [this.taxLabel(), this.money(t.tax)], ['Estimated shipping', this.money(t.shipping)]].filter(Boolean)
+              [['Subtotal', this.money(t.subtotal)], [this.tier() + ' member −' + this.tierPct() + '%', '−' + this.money(t.memberDiscount), TEAL], t.couponCode ? ['Code ' + t.couponCode + ' −' + t.couponOffLabel, '−' + this.money(t.couponDiscount), TEAL] : null, [this.taxLabel(), this.money(t.tax)], ['Estimated shipping', this.money(t.shipping)]].filter(Boolean)
                 .map((r, i) => h('div', { key: i, style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, lineHeight: 1.5, color: r[2] || MUT } }, h('span', { style: { flex: '1 1 auto', minWidth: 0 } }, r[0]), h('span', { style: { flex: 'none', fontWeight: 500, whiteSpace: 'nowrap', color: r[2] || INK } }, r[1])))),
             h('div', { key: 'e', style: { borderTop: '1px solid ' + HAIR, marginTop: 14, paddingTop: 14, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' } },
               h('span', { style: { fontSize: 13, fontWeight: 600 } }, 'Total'),
@@ -4035,7 +4046,7 @@ class Component extends DCLogic {
           this.card([
             h('div', { key: 'a', style: { fontSize: 12.5, fontWeight: 600, marginBottom: 12 } }, cart.length + ' job' + (cart.length > 1 ? 's' : '') + ' in this order'),
             h('div', { key: 'b', style: { display: 'flex', flexDirection: 'column', gap: 9, fontSize: 13 } },
-              [['Subtotal', this.money(t.subtotal)], [this.tier() + ' member −' + this.tierPct() + '%', '−' + this.money(t.memberDiscount), TEAL], t.couponCode ? ['Code ' + t.couponCode + ' −' + t.couponPct + '%', '−' + this.money(t.couponDiscount), TEAL] : null, [this.taxLabel(), this.money(t.tax)], ['Shipping', this.money(t.shipping)]].filter(Boolean)
+              [['Subtotal', this.money(t.subtotal)], [this.tier() + ' member −' + this.tierPct() + '%', '−' + this.money(t.memberDiscount), TEAL], t.couponCode ? ['Code ' + t.couponCode + ' −' + t.couponOffLabel, '−' + this.money(t.couponDiscount), TEAL] : null, [this.taxLabel(), this.money(t.tax)], ['Shipping', this.money(t.shipping)]].filter(Boolean)
                 .map((r, i) => h('div', { key: i, style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 12, lineHeight: 1.5, color: r[2] || MUT } }, h('span', { style: { flex: '1 1 auto', minWidth: 0 } }, r[0]), h('span', { style: { flex: 'none', fontWeight: 500, whiteSpace: 'nowrap', color: r[2] || INK } }, r[1])))),
             (function () {
               const avail = (this.state.credit && this.state.credit.balance) || 0;
@@ -4622,8 +4633,9 @@ class Component extends DCLogic {
     // just signed up → show the member promo code they were issued, above whatever tab is open
     if (this.state.welcomeCoupon) content = [h('div', { key: 'welcome', style: { marginBottom: 6 } },
       h('div', { style: { fontSize: 18, fontWeight: 600, marginBottom: 4 } }, 'Welcome to Printoka!'),
-      h('div', { style: { fontSize: 13.5, color: MUT, marginBottom: 12 } }, 'Here’s your member discount code. It’s also in your email and under My Coupons.'),
-      this.couponTicket(this.state.welcomeCoupon, true))].concat(content);
+      h('div', { style: { fontSize: 13.5, color: MUT, marginBottom: 12 } }, 'Here are your discount codes. One code per order. They’re also in your email and under My Coupons.'),
+      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: 12 } },
+        [].concat(this.state.welcomeCoupon).map((cp, i) => h('div', { key: i }, this.couponTicket(cp, i === 0)))))].concat(content);
     return this.customerPage(tabs, navActive, content);
   }
 
