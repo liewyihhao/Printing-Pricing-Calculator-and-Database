@@ -46,6 +46,9 @@
   @keyframes pkReveal{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
   @media(prefers-reduced-motion:reduce){.pkfloat,.pkshine{animation:none!important}.pk-q-open,.pk-q-open *{animation:none!important}}
   .pk-staffnav{scrollbar-width:none}.pk-staffnav::-webkit-scrollbar{display:none}
+  .pk-ping{position:relative}.pk-ping::after{content:"";position:absolute;inset:0;border-radius:50%;background:inherit;animation:pkPing 1.4s cubic-bezier(0,0,.2,1) infinite}
+  @keyframes pkPing{75%,100%{transform:scale(2.4);opacity:0}}
+  .pk-acc summary::-webkit-details-marker{display:none}.pk-acc:not([open]) .pk-acc-chev{transform:rotate(-90deg)}.pk-acc-chev{transition:transform .2s}
   .pk-mobilebar{display:none}
   /* configurator: summary column stacks under the questions on tablets / phones */
   @media(max-width:760px){.pk-cfgb-img{height:130px!important}.pk-cfgb-lg{font-size:30px!important}.pk-cfgb-sm{font-size:20px!important}.pk-cfgb-md{font-size:22px!important}}
@@ -76,6 +79,7 @@
 <script src="ops.js"></script>
 <script src="admin.js"></script>
 <script src="docs.js"></script>
+<script src="account.js"></script>
 <script>
   // Render the app immediately (React + app.js are small), THEN load the ~20MB pricing
   // engine in the background so it never blocks first paint / LCP. The app is null-safe

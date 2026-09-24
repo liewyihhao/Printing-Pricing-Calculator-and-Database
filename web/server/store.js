@@ -646,7 +646,7 @@ function createCustomerByStaff(body, staff) {
   if (reg.error) return reg;
   const c = findCustomer(reg.customer.id);
   if (c) {
-    c.createdByOutlet = (staff && staff.outlet) || null; c.walkinCreated = true; c.promoOptIn = !!body.promo;
+    c.createdByOutlet = (staff && staff.outlet) || null; c.createdByStaffId = (staff && staff.id) || null; c.walkinCreated = true; c.promoOptIn = !!body.promo;
     if (body.address || body.city || body.country) c.addresses = [{ id: 'A-' + crypto.randomBytes(3).toString('hex').toUpperCase(), label: 'Home', name, phone: body.phone || '', line1: body.address || '', line2: '', city: body.city || '', postcode: body.postcode || '', state: body.state || '', country: body.country || 'MY', isDefault: true }];
     save();
   }

@@ -13,6 +13,7 @@ const store = require('./store');
 const ops = require('./ops');
 const admin = require('./admin');
 const files = require('./files');
+const outlet = require('./outlet');
 ops.migrate();
 const content = require('./content');
 const seoProduct = require('./seo-product');
@@ -300,6 +301,7 @@ async function api(req, res, pathname, query) {
   if (seg[0] === 'orders' && seg[2] === 'pay' && req.method === 'POST') {
     const payer = staffMe(); if (!payer || payer.type === 'vendor' || payer.type === 'hub') return send(res, 401, { error: 'staff sign-in required' });
     const r = store.validateOrderPayment(seg[1], payer.name || payer.email);
+    if (!r.error) outlet.onPaid(store.order(seg[1]));
     if (!r.error) { const o = store.order(seg[1]); (o.jobIds || []).forEach(jid => { const jj = store.job(jid); if (jj) { ops.normalizeJob(jj); jj.statusAt = Object.assign(jj.statusAt || {}, { [jj.status]: store.now() }); } }); ops.syncOrder(seg[1]); store.save(); }
     if (r.error) return send(res, 400, r);
     return send(res, 200, { ok: true, order: store.orderView(seg[1]) });
@@ -369,13 +371,46 @@ async function api(req, res, pathname, query) {
     else if (me && me.type === 'outlet') list = list.filter(q => q.outlet === me.outlet); // outlet sees only its own quotes
     return send(res, 200, { quotes: list });
   }
-  if (seg[0] === 'quotes' && seg[1] && !seg[2]) { const q = store.quote(seg[1]); return q ? send(res, 200, { quote: q }) : send(res, 404, { error: 'not found' }); }
+  // a quote is visible to its requester, the staff, and (for outlet quotes) that outlet only
+  const quoteAccess = (q, me) => !!(q && me && (me.type === 'admin' || me.type === 'production' || (me.type === 'customer' && (q.userId === me.id || (q.customer && q.customer.email && q.customer.email === me.email))) || (me.type === 'outlet' && (!q.outlet || q.outlet === me.outlet))));
+  if (seg[0] === 'quotes' && seg[1] && (!seg[2] || seg[2] === 'accept' || seg[2] === 'reject')) {
+    const q = store.quote(seg[1]); if (!q) return send(res, 404, { error: 'not found' });
+    if (!quoteAccess(q, store.sessionCustomer(token))) return send(res, 403, { error: 'Access denied: You are not authorized to view this.' });
+  }
+  if (seg[0] === 'quotes' && seg[1] && !seg[2]) return send(res, 200, { quote: store.quote(seg[1]) });
   if (seg[0] === 'quotes' && seg[2] === 'price' && req.method === 'POST') {
     const me = store.sessionCustomer(token); if (!me || me.type === 'customer' || me.type === 'vendor') return send(res, 401, { error: 'staff sign-in required' });
-    const r = store.priceQuote(seg[1], await readBody(req), me.name || me.email); return send(res, r.error ? 400 : 200, r);
+    const r = store.priceQuote(seg[1], await readBody(req), me.name || me.email);
+    if (!r.error && r.quote && r.quote.outlet) outlet.onIssued(r.quote);
+    return send(res, r.error ? 400 : 200, r);
+  }
+  // ---- outlet account (the original printoka.com outlet dashboard) ----
+  if (seg[0] === 'outlet') {
+    const me = store.sessionCustomer(token);
+    if (!me || (me.type !== 'outlet' && me.type !== 'admin')) return send(res, 401, { error: 'Outlet sign-in required.' });
+    const b = req.method === 'POST' ? await readBody(req) : {};
+    const out = r => send(res, r && r.error ? 400 : 200, r);
+    if (seg[1] === 'dashboard') return out(outlet.dashboard(me));
+    if (seg[1] === 'customers') return out({ customers: outlet.searchCustomers(query.q) });
+    if (seg[1] === 'staff') return out({ staff: outlet.staffList(me) });
+    if (seg[1] === 'performance') return out(outlet.performance(me, query.individual === '1', query.staff || null));
+    if (seg[1] === 'quotes' && !seg[2] && req.method === 'POST') return out(outlet.saveSpec(null, b, me));
+    if (seg[1] === 'quotes' && !seg[2]) return out({ quotes: outlet.listQuotes(me) });
+    if (seg[1] === 'quotes' && seg[2] && !seg[3]) return out(outlet.getQuote(seg[2], me));
+    if (seg[1] === 'quotes' && seg[3] === 'spec') return out(outlet.saveSpec(seg[2], b, me));
+    if (seg[1] === 'quotes' && seg[3] === 'price') return out(outlet.outletPrice(seg[2], b, me));
+    if (seg[1] === 'quotes' && seg[3] === 'follow-up') return out(outlet.followUp(seg[2], me));
+    if (seg[1] === 'quotes' && seg[3] === 'reject') return out(outlet.rejectQuote(seg[2], b.reasons, me));
+    if (seg[1] === 'quotes' && seg[3] === 'artwork') { const r = outlet.quoteArtwork(seg[2], me); if (r.error) return out(r); res.writeHead(200, { 'Content-Type': 'application/octet-stream', 'Content-Disposition': 'attachment; filename="' + r.name.replace(/"/g, '') + '"', 'Cache-Control': 'private, no-store' }); return res.end(r.data); }
+    if (seg[1] === 'orders' && !seg[2]) return out({ orders: outlet.outletOrders(me).map(outlet.orderListView).sort((x, y) => String(y.date).localeCompare(String(x.date))) });
+    if (seg[1] === 'orders' && seg[2] && !seg[3]) return out(outlet.orderDetail(seg[2], me));
+    if (seg[1] === 'orders' && seg[3] === 'status') return out(outlet.orderAction(seg[2], b.status, me));
+    if (seg[1] === 'orders' && seg[3] === 'note') return out(outlet.orderNote(seg[2], b.note, me));
+    if (seg[1] === 'orders' && seg[3] === 'address') return out(outlet.orderAddress(seg[2], b, me));
+    return send(res, 404, { error: 'unknown outlet route' });
   }
   if (seg[0] === 'quotes' && seg[2] === 'accept' && req.method === 'POST') {
-    const me = store.sessionCustomer(token); const r = store.acceptQuote(seg[1], me ? me.email : 'customer'); if (r.order) ops.onOrderCreated(r.order); return send(res, r.error ? 400 : 200, r);
+    const me = store.sessionCustomer(token); const r = store.acceptQuote(seg[1], me ? me.email : 'customer'); if (r.order) { outlet.onAccepted(r.quote, store.order(r.order.id)); ops.onOrderCreated(r.order); } return send(res, r.error ? 400 : 200, r);
   }
   if (seg[0] === 'quotes' && seg[2] === 'reject' && req.method === 'POST') {
     const b = await readBody(req); const me = store.sessionCustomer(token); const r = store.rejectQuote(seg[1], b.reason, me ? me.email : 'customer'); return send(res, r.error ? 400 : 200, r);
