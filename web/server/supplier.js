@@ -65,6 +65,7 @@ function jobFiles(j) { const out = []; const o = j.outsource || {};
   (o.vendors || []).forEach(v => { if (v.document) out.push(Object.assign({ kind: 'quote', vendorId: v.vendorId }, v.document)); });
   (o.draftHistory || []).concat(o.draft && o.draft.file ? [o.draft.file] : []).forEach(f => out.push(Object.assign({ kind: 'draft', vendorId: o.awardedTo }, f)));
   if (j.hubDelivery && j.hubDelivery.document) out.push(Object.assign({ kind: 'delivery-order' }, j.hubDelivery.document));
+  if (j.dispatchDelivery && j.dispatchDelivery.document) out.push(Object.assign({ kind: 'dispatch-order' }, j.dispatchDelivery.document));
   return out; }
 function readJobFile(j, fid, me) {
   const f = jobFiles(j).find(x => x.id === fid); if (!f) return { error: 'File not found.', code: 404 };
@@ -93,7 +94,7 @@ function activities(j, me) {
   });
   return out.sort((a, b) => String(b.at).localeCompare(String(a.at)));
 }
-const ACT_TITLE = { submit_quote: 'Quote submitted', award_po: 'Printer assigned', award_direct: 'Printer assigned', draft_upload: 'Draft uploaded', draft_approve: 'Draft approved', draft_reject: 'Draft rejected', vendor_ship: 'Shipped to hub', hub_delivery: 'Shipped', vendor_paid: 'Paid', request_quotes: 'Quote requested', receive_hub: 'Received at hub', forward: 'Forwarded from hub' };
+const ACT_TITLE = { submit_quote: 'Quote submitted', award_po: 'Printer assigned', award_direct: 'Printer assigned', draft_upload: 'Draft uploaded', draft_approve: 'Draft approved', draft_reject: 'Draft rejected', vendor_ship: 'Shipped to hub', hub_delivery: 'Shipped', dispatch_details: 'Delivery details', vendor_paid: 'Paid', request_quotes: 'Quote requested', receive_hub: 'Received at hub', forward: 'Forwarded from hub' };
 function documents(j, me) {
   const o = j.outsource || {}; const d = [];
   const staff = me.type !== 'vendor' && me.type !== 'hub';
@@ -123,6 +124,7 @@ function view(j, me) {
     draft: o.draft ? { file: pub(o.draft.file), at: o.draft.at, by: o.draft.by, approvedAt: o.draft.approvedAt || null, approvedBy: o.draft.approvedBy || null, rejectedAt: o.draft.rejectedAt || null, rejectReason: o.draft.rejectReason || '' } : null,
     job: (me.type === 'vendor' && o.awardedTo && o.awardedTo !== co) ? Object.assign(jobDetails(j), { artworks: [] }) : jobDetails(j), hub: hubDetails(j), documents: documents(j, me), activities: activities(j, me),
     hubDelivery: j.hubDelivery ? { tracking: j.hubDelivery.tracking, company: j.hubDelivery.company, document: pub(j.hubDelivery.document), at: j.hubDelivery.at, by: j.hubDelivery.by } : null,
+    dispatchDelivery: j.dispatchDelivery && me.type !== 'vendor' ? { tracking: j.dispatchDelivery.tracking, company: j.dispatchDelivery.company, document: pub(j.dispatchDelivery.document), at: j.dispatchDelivery.at, by: j.dispatchDelivery.by } : null,
   };
   if (me.type === 'vendor') {
     v.myQuote = mine ? { amount: mine.price, leadDays: mine.leadDays, note: mine.note, submittedAt: mine.submittedAt, document: pub(mine.document), awardedAmount: o.awardedTo === co ? mine.price : null } : null;
@@ -208,25 +210,37 @@ function shipToHub(jid, me, b) {
   const last = (j.shipments || []).slice(-1)[0]; if (last) last.byVendor = co;
   store.save(); return { ok: true, message: 'Status update successfully!' };
 }
-// hub "Delivery Details" card: tracking numbers + delivery company + delivery order → Shipped
-function hubDelivery(jid, me, role, b) {
+// "Delivery Details" card (original hub card, reused by logistics): tracking numbers + delivery company
+// + delivery order. Hub: at hub → forward ("Shipped"). Logistics: packed → dispatch. Afterwards: edit the details.
+const HUB_ROLES = ['hub', 'hub_manager', 'production_director'], LOG_ROLES = ['logistics_staff', 'logistics_manager', 'production_director'];
+function deliveryStage(j) { if (j.status === 'at_hub') return 'hub'; if (j.status === 'logistics') return 'logistics'; if (j.hubDelivery) return 'hub'; if (j.dispatchDelivery) return 'logistics'; return null; }
+function deliveryDetails(jid, me, role, b) {
   const j = store.job(jid); if (!j) return { error: 'Job not found.' };
-  if (me.type === 'hub' && !hubCanSee(j, me)) return { error: 'This job is not at your hub.' };
+  const stage = deliveryStage(j);
+  if (!stage) return { error: j.status === 'dispatched' ? 'Receive the parcel at the hub first.' : 'This job is not ready to ship yet.' };
+  if (stage === 'hub' && (HUB_ROLES.indexOf(role) < 0 || (me.type === 'hub' && !hubCanSee(j, me)))) return { error: 'Only the hub team can update the hub delivery details.' };
+  if (stage === 'logistics' && LOG_ROLES.indexOf(role) < 0) return { error: 'Only the logistics team can dispatch from production.' };
+  const key = stage === 'hub' ? 'hubDelivery' : 'dispatchDelivery';
   const tracking = String(b.tracking || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   if (!tracking.length) return { error: 'Please enter tracking number' };
   const company = String(b.company || '').trim(); if (!company) return { error: 'Please fill in the required field.' };
-  let doc = j.hubDelivery && j.hubDelivery.document;
+  let doc = j[key] && j[key].document;
   if (b.documentData) { const f = saveBlob(path.join(ROOT, jid), { data: b.documentData, name: b.documentName || 'delivery-order.pdf' }, 'O'); if (f.error) return f; doc = f; }
-  const prev = j.hubDelivery;
+  const prev = j[key];
   if (prev && prev.tracking.join('\n') === tracking.join('\n') && prev.company === company && doc === prev.document) return { error: 'No changes required.' };
-  if (j.status === 'at_hub') {
-    const r = ops().transition(jid, role, me.name, 'forward', { courier: company, tracking: tracking.join(', '), destType: b.destType, destId: b.destId });
+  const leaving = (stage === 'hub' && j.status === 'at_hub') || (stage === 'logistics' && j.status === 'logistics');
+  if (leaving) {
+    const r = ops().transition(jid, role, me.name, stage === 'hub' ? 'forward' : 'dispatch', { courier: company, tracking: tracking.join(', '), destType: stage === 'hub' ? b.destType : undefined, destId: stage === 'hub' ? b.destId : undefined });
     if (r.error) return r;
-  } else if (!(prev && ['dispatched', 'ready_collect', 'completed'].indexOf(j.status) >= 0)) return { error: 'Receive the parcel at the hub first.' };
-  else { const last = (j.shipments || []).slice(-1)[0]; if (last) { last.courier = company; last.tracking = tracking.join(', '); } j.courier = company; j.tracking = tracking.join(', '); }
-  j.hubDelivery = { tracking, company, document: doc || null, at: now(), by: me.name };
-  store.logEvent({ actor: me.name, role, action: 'hub_delivery', jobId: jid, from: null, to: null, note: company + ' · ' + tracking.join(', ') });
-  store.save(); return { ok: true, message: 'Delivery details update successfully!' };
+  } else {
+    // already on its way: correct the courier / tracking on that leg
+    const legs = j.shipments || []; const leg = stage === 'hub' ? legs[legs.length - 1] : legs[0];
+    if (leg) { leg.courier = company; leg.tracking = tracking.join(', '); }
+    j.courier = company; j.tracking = tracking.join(', ');
+  }
+  j[key] = { tracking, company, document: doc || null, at: now(), by: me.name };
+  store.logEvent({ actor: me.name, role, action: stage === 'hub' ? 'hub_delivery' : 'dispatch_details', jobId: jid, from: null, to: null, note: company + ' · ' + tracking.join(', ') });
+  store.save(); return { ok: true, message: 'Delivery details update successfully!', stage };
 }
 function markPaid(jid, actor, role, b) {
   const j = store.job(jid); if (!j || !j.outsource || !j.outsource.awardedTo) return { error: 'No printer assigned.' };
@@ -301,5 +315,5 @@ function readCustomQuoteDoc(qid, vendorId, me) {
   return { file: p.document, data: fs.readFileSync(f), type: MIME[(p.document.name.split('.').pop() || '').toLowerCase()] || 'application/octet-stream' };
 }
 
-module.exports = { STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, uploadDraft, decideDraft, shipToHub, hubDelivery, markPaid, documentData, readJobFile,
+module.exports = { STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, uploadDraft, decideDraft, shipToHub, deliveryDetails, markPaid, documentData, readJobFile,
   requestPrinterQuotes, vendorCustomQuotes, vendorCustomQuote, submitCustomQuote, readCustomQuoteDoc };

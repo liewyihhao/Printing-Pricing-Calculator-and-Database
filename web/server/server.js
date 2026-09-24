@@ -111,7 +111,7 @@ async function api(req, res, pathname, query) {
       return out(supplier.decideDraft(seg[1], b.decision, b.reason, actor, role));
     }
     if (seg[2] === 'ship-to-hub') return me0.type === 'vendor' ? out(supplier.shipToHub(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
-    if (seg[2] === 'delivery') return (me0.type === 'hub' || role === 'production_director') ? out(supplier.hubDelivery(seg[1], me0, role, b)) : send(res, 403, { error: 'hub staff only' });
+    if (seg[2] === 'delivery') return me0.type === 'vendor' ? send(res, 403, { error: 'not available to printers' }) : out(supplier.deliveryDetails(seg[1], me0, role, b));
     if (seg[2] === 'vendor-paid') return ['scheduler_manager', 'production_manager', 'production_director'].indexOf(role) >= 0 ? out(supplier.markPaid(seg[1], actor, role, b)) : send(res, 403, { error: 'managers only' });
   }
   // POST /api/jobs/:id/transition  { action, payload }

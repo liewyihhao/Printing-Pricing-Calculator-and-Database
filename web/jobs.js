@@ -47,11 +47,14 @@
   const origDone = P.opsDone;
   P.opsDone = function (d, okText) { const r = origDone.call(this, d, okText); if (r) this.acDrop('job_'); return r; };
   // jobs open as full pages (the original single-page pattern) instead of the details pop-up
-  // the hub forwards through the Delivery Details card on the job page (original flow)
+  // the hub forwards and logistics dispatches through the Delivery Details card on the job page (original flow)
   const origAction = P.opsAction;
-  P.opsAction = function (j, a) { if (a.action === 'forward') return this.acOpen({ kind: 'job', id: j.id }); return origAction.call(this, j, a); };
+  P.opsAction = function (j, a) { if (a.action === 'forward' || a.action === 'dispatch') return this.acOpen({ kind: 'job', id: j.id }); return origAction.call(this, j, a); };
   const origOpen = P.opsOpen;
-  P.opsOpen = function (kind, j, extra) { if (kind === 'job' && j && j.id) return this.acOpen({ kind: 'job', id: j.id }); return origOpen.call(this, kind, j, extra); };
+  P.opsOpen = function (kind, j, extra) {
+    if (j && j.id && (kind === 'job' || (kind === 'ship' && extra && (extra.action === 'dispatch' || extra.action === 'forward')))) return this.acOpen({ kind: 'job', id: j.id });
+    return origOpen.call(this, kind, j, extra);
+  };
 
   // ---------------------------------------------------------------- production / hub shell
   const SHELL = { production: ['linear-gradient(180deg,#1f3b73,#2e6bd9)', 'printer'], scheduler: ['linear-gradient(180deg,#1f3b73,#2e6bd9)', 'layers'], prepress: ['linear-gradient(180deg,#1f3b73,#2e6bd9)', 'check'], logistics: ['linear-gradient(180deg,#1f3b73,#2e6bd9)', 'truck'], hub: ['linear-gradient(180deg,#F4732F,#FFB600)', 'truck'] };
@@ -91,7 +94,9 @@
     // at the hub, "forward" is the Delivery Details card below (original flow), not a separate button
     // (actions for a different destination — e.g. "Receive at hub" on a parcel bound for an outlet — are not shown)
     const wrongDest = a => !a.enabled && (a.blockedBy || []).some(b => /not addressed|not the customer/.test(b));
-    const seen = {}; const acts = (j.actions || []).filter(a => a.permitted && !wrongDest(a) && !(a.action === 'forward' && (isHub || admin))).filter(a => { const l = this.oActLabel(a.action); if (seen[l]) return false; seen[l] = 1; return true; });
+    const isLog = /^logistics/.test(role);
+    const viaCard = a => (a.action === 'forward' && (isHub || admin)) || (a.action === 'dispatch' && (isLog || admin));
+    const seen = {}; const acts = (j.actions || []).filter(a => a.permitted && !wrongDest(a) && !viaCard(a)).filter(a => { const l = this.oActLabel(a.action); if (seen[l]) return false; seen[l] = 1; return true; });
     const main = [];
     // Status — the department's next actions (open the existing pop-up forms)
     if (acts.length || (j.outsource && j.status === 'scheduling' && approver)) main.push(this.acC('Status', [
@@ -128,7 +133,10 @@
           h('td', { style: { padding: '9px 10px', borderTop: '1px solid ' + LINE } }, q.awarded ? this.pillDot('Assigned', 'ok') : '')))))),
       pr.po ? muted('Purchase order ' + pr.po + (pr.poNumber ? ' (No. ' + pr.poNumber + ')' : '')) : null]));
     // hub: Delivery Details (original card) — tracking numbers, delivery company, delivery order → Shipped
-    if ((isHub || admin) && (j.status === 'at_hub' || pr.hubDelivery)) main.push(this.hubDeliveryCard(j, pr));
+    // Delivery Details (original hub card; logistics dispatches through the same card)
+    const dStage = deliveryStage(j, pr);
+    if (dStage === 'hub' && (isHub || admin)) main.push(this.deliveryCard(j, pr, 'hub'));
+    if (dStage === 'logistics' && (isLog || admin)) main.push(this.deliveryCard(j, pr, 'logistics'));
     // HQ pays the printer (original status "Paid")
     if (manager && pr.awarded && pr.status && ['shipped-to-hub', 'shipped'].indexOf(pr.status.id) >= 0) main.push(this.acC('Printer payment', [
       muted('Once the printer has been paid for ' + (pr.po || 'this job') + ', record it here — the printing job moves to “Paid”.'),
@@ -153,20 +161,26 @@
     const home = tabs[0], typeTab = tabs.indexOf('Orders') >= 0 ? 'Orders' : tabs[1];
     return this.acSingle({ home, type: typeTab, title: '#' + id, statusNode: h('span', { style: { display: 'inline-flex', gap: 8, flexWrap: 'wrap' } }, this.pillDot(j.statusLabel || j.status, j.status === 'completed' ? 'ok' : j.status === 'rejected' ? 'bad' : 'teal'), pr.status ? jobPill(pr.status) : null) }, main, aside);
   };
-  P.hubDeliveryCard = function (j, pr) {
+  // which Delivery Details card a job has now: the hub's (at hub → forward) or logistics' (packed → dispatch)
+  const deliveryStage = (j, pr) => j.status === 'at_hub' ? 'hub' : j.status === 'logistics' ? 'logistics' : pr.hubDelivery ? 'hub' : pr.dispatchDelivery ? 'logistics' : null;
+  P.deliveryCard = function (j, pr, stage) {
     const cfg = this.state.opsConfig || { couriers: [], outlets: [] };
-    const hd = pr.hubDelivery || {}; const at = j.status === 'at_hub';
+    const hd = (stage === 'hub' ? pr.hubDelivery : pr.dispatchDelivery) || {};
+    const at = stage === 'hub' ? j.status === 'at_hub' : j.status === 'logistics';
     const F = (k, def) => this.acF(k) !== '' ? this.acF(k) : def;
     const tracking = F('hdTracking', (hd.tracking || []).join('\n')), company = F('hdCompany', hd.company || cfg.couriers[0] || '');
     const destType = F('hdDest', (j.finalDestination && j.finalDestination.type) || 'customer');
-    const prog = (j.progress && j.progress.hub) || {}; const ready = !at || ['checked', 'qc', 'relabelled'].every(k => prog[k]);
+    const steps = stage === 'hub' ? ['checked', 'qc', 'relabelled'] : ['picked', 'packed', 'labelled'];
+    const prog = (j.progress && j.progress[stage]) || {}; const ready = !at || steps.every(k => prog[k]);
+    const dest = j.destination || {};
     return this.acC('Delivery Details', [
+      stage === 'logistics' ? this.acDL([['Deliver to', (dest.name || dest.type || '—') + (dest.address ? ', ' + dest.address : '')], j.instructions ? ['Instructions', j.instructions] : null]) : null,
       FG('Delivery Order / Tracking Number', h('textarea', { rows: 6, value: tracking, onChange: e => this.acSetF('hdTracking', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1, 'Enter a least 1 tracking number. Enter new line for additional tracking numbers.'),
       FG('Delivery Company', h('select', { value: company, onChange: e => this.acSetF('hdCompany', e.target.value), style: inp }, (cfg.couriers.length ? cfg.couriers : [company]).map(c => h('option', { key: c, value: c }, c))), 1),
-      at ? FG('Deliver to', h('select', { value: destType, onChange: e => this.acSetF('hdDest', e.target.value), style: inp }, [['customer', 'Customer — ' + ((j.finalDestination && j.finalDestination.type === 'customer' && j.finalDestination.address) || 'delivery address')], ['outlet', 'Outlet — ' + ((j.finalDestination && j.finalDestination.type === 'outlet' && j.finalDestination.name) || 'pickup outlet')]].map(o => h('option', { key: o[0], value: o[0] }, o[1])))) : null,
+      at && stage === 'hub' ? FG('Deliver to', h('select', { value: destType, onChange: e => this.acSetF('hdDest', e.target.value), style: inp }, [['customer', 'Customer — ' + ((j.finalDestination && j.finalDestination.type === 'customer' && j.finalDestination.address) || 'delivery address')], ['outlet', 'Outlet — ' + ((j.finalDestination && j.finalDestination.type === 'outlet' && j.finalDestination.name) || 'pickup outlet')]].map(o => h('option', { key: o[0], value: o[0] }, o[1])))) : null,
       FG('Delivery Order', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, hd.document ? link('📄 ' + hd.document.name, () => this.jDownload('/api/jobs/' + j.id + '/files/' + hd.document.id, hd.document.name)) : null, this.jPickFile('hdDoc'))),
-      !ready ? muted('Tick every step of the hub progress form before shipping.') : null,
-      h('div', { key: 'b' }, Btn('Save Changes', () => this.jPost('/api/jobs/' + j.id + '/delivery', { tracking, company, destType: at ? destType : undefined, destId: at && j.finalDestination && j.finalDestination.type === destType ? j.finalDestination.id : undefined, documentData: this.acF('hdDocData') || undefined, documentName: this.acF('hdDocName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !ready || !tracking.trim())),
+      !ready ? muted(stage === 'hub' ? 'Tick every step of the hub progress form before shipping.' : 'Tick picked, packed and labelled in the logistics status update before dispatching.') : null,
+      h('div', { key: 'b' }, Btn(at && stage === 'logistics' ? 'Dispatch' : 'Save Changes', () => this.jPost('/api/jobs/' + j.id + '/delivery', { tracking, company, destType: at && stage === 'hub' ? destType : undefined, destId: at && stage === 'hub' && j.finalDestination && j.finalDestination.type === destType ? j.finalDestination.id : undefined, documentData: this.acF('hdDocData') || undefined, documentName: this.acF('hdDocName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !ready || !tracking.trim())),
     ]);
   };
 

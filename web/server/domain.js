@@ -85,6 +85,15 @@ const GATES = {
     const missing = ['setup', 'printing', 'finishing', 'qc'].filter(k => !steps[k]);
     return missing.length ? 'Complete the production progress form first (' + missing.join(', ') + ').' : null;
   },
+  // logistics packing form / hub progress form: every step ticked before the parcel leaves
+  logisticsDone: job => {
+    const s = (job.progress && job.progress.logistics) || {}; const missing = ['picked', 'packed', 'labelled'].filter(k => !s[k]);
+    return missing.length ? 'Complete the logistics status update first (' + missing.join(', ') + ').' : null;
+  },
+  hubDone: job => {
+    const s = (job.progress && job.progress.hub) || {}; const missing = ['checked', 'qc', 'relabelled'].filter(k => !s[k]);
+    return missing.length ? 'Complete the hub progress form first (' + missing.join(', ') + ').' : null;
+  },
   // original supplier flow: the printer prints only after HQ approves its draft
   draftApproved: job => (!job.outsource || !job.outsource.awardedTo || (job.outsource.draft && job.outsource.draft.approvedAt))
     ? null : 'Please wait for admin approve the draft before start printing.',
@@ -140,7 +149,7 @@ const TRANSITIONS = {
   ],
   logistics: [
     { action: 'dispatch', to: 'dispatched', roles: LOGISTICS,
-      requires: ['courier'], note: 'Pack, label, assign courier, dispatch (Logistics §4.5).' },
+      gates: ['logisticsDone'], requires: ['courier'], note: 'Pack, label, assign courier, dispatch (Logistics §4.5).' },
   ],
   dispatched: [
     { action: 'deliver', to: 'completed', roles: LOGISTICS, gates: ['destCustomer'],
@@ -151,7 +160,7 @@ const TRANSITIONS = {
       note: 'Outlet received the parcel — customer notified it is ready for collection.' },
   ],
   at_hub: [
-    { action: 'forward', to: 'dispatched', roles: HUB, requires: ['courier'],
+    { action: 'forward', to: 'dispatched', roles: HUB, gates: ['hubDone'], requires: ['courier'],
       note: 'Checked, relabelled/repacked and forwarded to the final destination.' },
   ],
   ready_collect: [
