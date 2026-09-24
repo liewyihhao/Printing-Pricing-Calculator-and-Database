@@ -108,6 +108,8 @@ async function api(req, res, pathname, query) {
       if (req.method === 'GET') return send(res, 200, store.getCredit(me.id));
       if (req.method === 'POST') { const b = await readBody(req); return send(res, 200, store.creditEntry(me.id, { reason: b.reason, amount: b.amount, actor: b.actor || 'system', orderId: b.orderId })); }
     }
+    // POST /api/account/coupon {code, subtotal} → is this member code valid for this cart?
+    if (seg[1] === 'coupon' && req.method === 'POST') { const b = await readBody(req); return send(res, 200, store.checkCoupon(me.id, b.code, b.subtotal)); }
     if (seg[1] === 'profile' && req.method === 'POST') return send(res, 200, store.updateProfile(me.id, await readBody(req)));
     if (seg[1] === 'password' && req.method === 'POST') { const b = await readBody(req); const r = store.changePassword(me.id, b.current, b.next); return send(res, r.error ? 400 : 200, r); }
     return send(res, 404, { error: 'unknown account route' });
@@ -119,6 +121,13 @@ async function api(req, res, pathname, query) {
     const body = await readBody(req);
     if (!body.items || !body.items.length) return send(res, 400, { error: 'cart is empty' });
     const me = store.sessionCustomer(token); if (me) body.userId = me.id;
+    // member promo code: re-verify server-side (owner, minimum spend) and use the server's discount
+    if (body.coupon) {
+      const r = store.checkCoupon(body.userId, body.coupon, body.subtotal);
+      if (!r.ok) return send(res, 400, { error: r.error });
+      if (Math.abs((Number(body.couponDiscount) || 0) - r.discount) > 0.01) return send(res, 400, { error: 'Your discount code amount has changed. Please refresh your cart and try again.' });
+      body.coupon = r.code; body.couponDiscount = r.discount;
+    } else { body.couponDiscount = 0; }
     const o = store.createOrder(body);
     return send(res, 200, { ok: true, order: o });
   }
