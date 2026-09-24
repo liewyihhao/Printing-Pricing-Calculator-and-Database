@@ -101,6 +101,27 @@ function bcPriceBase(cfg, qty) {
   return Math.round((base + hp + hs) * N * 100) / 100;
 }
 
+// Flyer (Litho Offset loose sheet) base price from Excard's live price list, captured per
+// size × paper × print colour × lamination → [[qty, cash], …] (web/pricing/excard_flyer.json).
+// Keys use Excard's own codes, so the configurator's labels are translated here.
+function flyerCodes(cfg) {
+  const size = String(cfg.size || '').split(' ')[0];                       // "A4 (210mm x 297mm)" → "A4"
+  const p = String(cfg.paper || ''), g = (p.match(/(\d+)gsm/) || [])[1];
+  const paper = !g ? null : /Simili/i.test(p) ? 'simili_' + g : /Gloss Art Card/i.test(p) ? 'gloss_art_card_' + g
+    : /Gloss Art Paper/i.test(p) ? 'gloss_art_' + g : /Matte Art Paper/i.test(p) ? 'matte_art_' + g : null;
+  const c = String(cfg.colour || ''), n = (c.match(/^(\d)C/) || [])[1];
+  const colour = n ? n + 'c_' + (/Both/i.test(c) ? 2 : 1) + '_sides' : null;
+  const LAM = { 'Gloss Lamination (Both)': 'gloss_lam_both', 'Gloss Lamination (Front)': 'gloss_lam_front', 'Matte Lamination (Both)': 'matt_lam_both', 'Matte Lamination (Front)': 'matt_lam_front', 'UV Varnish (Both)': 'uv_varnish_both', 'UV Varnish (Front)': 'uv_varnish_front', 'Gloss Waterbase Varnish (Front)': 'gloss_wb_varnish_front', 'Not Required': '' };
+  const lam = cfg.lamination == null ? '' : LAM[cfg.lamination];
+  return { size, paper, colour, lam };
+}
+function flyerPriceBase(cfg, qty) {
+  const T = EXCARD_PRICES['Flyer']; if (!T || !T.tables) return null;
+  const c = flyerCodes(cfg); if (!c.paper || !c.colour || c.lam == null) return null;
+  const rows = T.tables[[c.size, c.paper, c.colour, c.lam].join('|')]; if (!rows) return null;
+  const row = rows.find(r => r[0] === qty); return row ? row[1] : null;
+}
+
 const CFG_OVERRIDES = {
   'Business Card': {
     priceBase: bcPriceBase,
@@ -291,14 +312,12 @@ class Component extends DCLogic {
     if (v.indexOf('catopen:') === 0) { const cf = v.slice(8); if (typeof window !== 'undefined') window.scrollTo(0, 0); this.pushUrl(cf === 'all' ? '/products' : '/products/' + cf); return this.setState({ catFilter: cf, route: 'category', megaOpen: false }); }
     // packaging: library landing + separate sub-pages (configure/quote/dielines) with their own URLs
     if (v === 'packaging') { if (typeof window !== 'undefined') window.scrollTo(0, 0); this.pushUrl('/packaging'); return this.setState({ route: 'packaging', pkTab: 'library', megaOpen: false }); }
-    // box-style library on the Packaging & Boxes category page, optionally pre-filtered by family
+    // custom box-style picker (its own page, /packaging/styles), optionally pre-filtered by family
     if (v.indexOf('pkfam:') === 0) {
       const fam = v.slice(6) || 'All boxes';
-      this.pushUrl('/products/packaging-boxes');
-      this.setState({ route: 'category', catFilter: 'packaging-boxes', pkFam: fam, pkLibTab: 'Box model', megaOpen: false }, () => {
-        try { const el = document.getElementById('box-styles'); if (el) el.scrollIntoView(); else window.scrollTo(0, 0); } catch (e) {}
-      });
-      return;
+      if (typeof window !== 'undefined') window.scrollTo(0, 0);
+      this.pushUrl('/packaging/styles');
+      return this.setState({ route: 'packaging', pkTab: 'styles', pkFam: fam, pkLibTab: 'Box model', megaOpen: false });
     }
     if (v.indexOf('pkgo:') === 0) { const t = v.slice(5); if (typeof window !== 'undefined') window.scrollTo(0, 0); this.pushUrl(t === 'library' ? '/packaging' : '/packaging/' + t); return this.setState({ route: 'packaging', pkTab: t, megaOpen: false }); }
     if (v.indexOf('blog:') === 0) return this.blogOpen(v.slice(5));
@@ -664,7 +683,8 @@ class Component extends DCLogic {
     // captured Excard live price tables → EXCARD_PRICES (drives priceBase). forceUpdate so any
     // already-rendered configurator re-prices once the table lands.
     if (typeof fetch === 'function')
-      fetch('/pricing/excard_bc.json').then(r => r.json()).then(d => { if (d) { EXCARD_PRICES['Business Card'] = d; if (this.state.route === 'product') this.forceUpdate(); } }).catch(() => {});
+      [['Business Card', 'excard_bc.json'], ['Flyer', 'excard_flyer.json']].forEach(([name, file]) =>
+        fetch('/pricing/' + file).then(r => r.ok ? r.json() : null).then(d => { if (d) { EXCARD_PRICES[name] = d; if (this.state.route === 'product') this.forceUpdate(); } }).catch(() => {}));
     // the ~20MB pricing engine loads async (after first paint); re-render prices when it lands,
     // and re-resolve the URL (a product deep-link can't map its slug→id until products exist)
     if (typeof window !== 'undefined' && !window.PricingEngine)
@@ -1850,7 +1870,7 @@ class Component extends DCLogic {
     return h('div', { style: { display: 'flex', alignItems: 'flex-end', gap: 16, flexWrap: 'wrap' } },
       h('div', { style: { flex: '1 1 320px', minWidth: 0 } },
         h('h1', { style: { margin: '0 0 6px', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em' } }, title),
-        h('p', { style: { margin: 0, fontSize: 14, color: MUT, maxWidth: '76ch', lineHeight: 1.7 } }, sub)),
+        sub ? h('p', { style: { margin: 0, fontSize: 14, color: MUT, maxWidth: '76ch', lineHeight: 1.7 } }, sub) : null),
       actions && h('div', { style: { display: 'flex', gap: 9, flexWrap: 'wrap' } }, actions));
   }
 
@@ -2979,12 +2999,23 @@ class Component extends DCLogic {
         h('div', { style: { fontSize: 11.5, fontWeight: 600, letterSpacing: '.09em', textTransform: 'uppercase', color: TEAL, margin: '10px 0 4px' } }, 'Production lanes'),
         h('h2', { style: { margin: '0 0 16px', fontSize: 22, fontWeight: 600, letterSpacing: '-.02em' } }, 'Short run or standard'),
         P.library,
-        // the box-style library itself lives on the Packaging & Boxes category page
+        // the box-style picker is its own page (/packaging/styles)
         h('div', { style: { display: 'flex', justifyContent: 'center', margin: '28px 0 8px' } },
           this.btn('Browse all box styles →', 'teal', 'pkfam:All boxes', { padding: '13px 26px' })));
     }
 
-    // CONFIGURATOR / QUOTE / DIE-LINES — separate pages reached from the library, each with a
+    // BOX STYLES — the custom box-style picker, its own page (from the Packaging & Boxes banner)
+    const crumbLink = (label, go) => h('span', { 'data-go': go, style: { color: TEAL, cursor: 'pointer' } }, label);
+    if (tab === 'styles') {
+      return h('div', { style: wrap },
+        h('div', { style: { fontSize: 12.5, color: FAINT, marginBottom: 12 } },
+          crumbLink('Home', 'home'), ' › ', crumbLink('Packaging & Boxes', 'catopen:packaging-boxes'), ' › Custom box styles'),
+        h('span', { 'data-go': 'catopen:packaging-boxes', style: { display: 'inline-block', fontSize: 13, fontWeight: 600, color: TEAL, cursor: 'pointer', marginBottom: 14 } }, '← Back to Packaging & Boxes'),
+        this.head('Custom box styles', 'Pick a die-cut style to configure it to your exact size.', [this.btn('How custom boxes work', 'ghost', 'packaging')]),
+        this.pkBoxLibrary());
+    }
+
+    // CONFIGURATOR / QUOTE / DIE-LINES — separate pages reached from the box styles, each with a
     // "back to box styles" link (like the product configurator being its own page).
     const HEAD = {
       configure: ['Box configurator', 'Pick your die-cut style, dimensions, material and finishing.'],
@@ -2994,8 +3025,8 @@ class Component extends DCLogic {
     const hd = HEAD[tab] || HEAD.configure;
     return h('div', { style: wrap },
       h('div', { style: { fontSize: 12.5, color: FAINT, marginBottom: 12 } },
-        h('span', { 'data-go': 'home', style: { color: TEAL, cursor: 'pointer' } }, 'Home'), ' › ',
-        h('span', { 'data-go': 'pkgo:library', style: { color: TEAL, cursor: 'pointer' } }, 'Custom Packaging Boxes'), ' › ' + hd[0]),
+        crumbLink('Home', 'home'), ' › ', crumbLink('Packaging & Boxes', 'catopen:packaging-boxes'), ' › ',
+        crumbLink('Custom box styles', 'pkfam:' + (st.pkFam || 'All boxes')), ' › ' + hd[0]),
       h('span', { 'data-go': 'pkfam:' + (st.pkFam || 'All boxes'), style: { display: 'inline-block', fontSize: 13, fontWeight: 600, color: TEAL, cursor: 'pointer', marginBottom: 14 } }, '← Back to box styles'),
       h('h1', { style: { margin: '0 0 6px', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em' } }, hd[0]),
       h('p', { style: { margin: '0 0 22px', fontSize: 14, color: MUT, maxWidth: '68ch', lineHeight: 1.7 } }, hd[1]),
@@ -3020,31 +3051,36 @@ class Component extends DCLogic {
           return h('div', { key: c.id, 'data-go': 'set:catFilter:' + c.id, style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, padding: '11px 14px', borderTop: i ? '1px solid ' + LINE : 'none', borderLeft: '3px solid ' + (on ? TEAL : 'transparent'), background: on ? '#fdf2f2' : '#fff', color: on ? TEAL : INK, fontSize: 13.5, fontWeight: on ? 600 : 500, cursor: 'pointer' } },
             h('span', null, c.label), h('span', { style: { fontSize: 11.5, color: on ? TEAL : FAINT } }, n));
         })),
-      h('div', { 'data-go': 'packaging', style: { marginTop: 10, border: '1px solid ' + HAIR, borderRadius: 12, padding: '13px 14px', background: ALT, cursor: 'pointer' } },
+      h('div', { 'data-go': 'pkfam:All boxes', style: { marginTop: 10, border: '1px solid ' + HAIR, borderRadius: 12, padding: '13px 14px', background: ALT, cursor: 'pointer' } },
         h('div', { style: { fontSize: 13.5, fontWeight: 600, marginBottom: 3 } }, 'Custom Packaging Boxes →'),
-        h('div', { style: { fontSize: 12, color: MUT, lineHeight: 1.55 } }, 'Design your own box, sleeve or E-flute mailer.')));
+        h('div', { style: { fontSize: 12, color: MUT, lineHeight: 1.55 } }, 'Design your own boxes, sleeves, or mailer box')));
     const seo = this.categorySeo(active);
     return h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '10px 20px 0' } },
       h('div', { style: { fontSize: 12.5, color: FAINT, marginBottom: 12 } },
         h('span', { 'data-go': 'home', style: { color: TEAL } }, 'Home'), ' › Products', active !== 'all' ? ' › ' + this.catCategoryLabel(active) : ''),
-      this.head(active === 'all' ? 'Online Printing' : this.catCategoryLabel(active) + ' Printing',
-        active === 'all'
-          ? 'Browse every product Printoka prints. ' + this.pkProducts().length + ' products across ' + this.catCategories().length + ' categories, each priced online in seconds.'
-          : seo.lead),
+      this.head(active === 'all' ? 'Online Printing' : this.catCategoryLabel(active) + ' Printing', null),
       h('div', { style: { display: 'grid', gridTemplateColumns: '232px minmax(0,1fr)', gap: 26, alignItems: 'start', marginTop: 18 } },
         sidebar,
         h('div', null,
+          // Packaging & Boxes: banner into the custom box-style picker (its own page)
+          active === 'packaging-boxes' ? h('div', { key: 'boxbanner', 'data-go': 'pkfam:All boxes', role: 'link', tabIndex: 0, 'aria-label': 'Custom Packaging Boxes: choose a box style',
+            style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 20, flexWrap: 'wrap', background: 'linear-gradient(100deg,' + TEAL + ' 0%,#F0572B 100%)', color: '#fff', borderRadius: 14, padding: '26px 28px', marginBottom: 22, cursor: 'pointer', overflow: 'hidden' } },
+            h('div', { style: { minWidth: 0, flex: '1 1 300px' } },
+              h('div', { style: { fontSize: 11.5, fontWeight: 600, letterSpacing: '.09em', textTransform: 'uppercase', opacity: .85, marginBottom: 6 } }, 'Made to your size'),
+              h('div', { style: { fontSize: 24, fontWeight: 600, letterSpacing: '-.02em', marginBottom: 6 } }, 'Custom Packaging Boxes'),
+              h('div', { style: { fontSize: 14.5, opacity: .92, marginBottom: 16 } }, 'Design your own boxes, sleeves, or mailer box'),
+              h('span', { style: { display: 'inline-block', background: '#fff', color: TEAL, fontSize: 13.5, fontWeight: 600, padding: '10px 18px', borderRadius: 8 } }, 'Choose a box style →')),
+            h('div', { 'aria-hidden': 'true', className: 'pk-hide-sm', style: { flex: '0 0 auto', width: 190, background: '#fff', borderRadius: 12, padding: '12px 14px' } }, this.dieline('carton', null, 90))) : null,
           h('div', { key: 'count', style: { fontSize: 13, color: MUT, marginBottom: 14 } }, items.length + ' products' + (active === 'all' ? '' : ' in ' + this.catCategoryLabel(active))),
           (() => {
             // more than 5 products => a horizontal carousel (scroll left/right); else a grid
             const carousel = items.length > 5;
             const card = p => {
-              const from = this.catFromPrice(p.id), moq = this.catMoq(p.id);
+              const from = this.catFromPrice(p.id);
               return h('a', { key: p.id, href: this.productPath(p.id) || undefined, 'data-go': 'open:' + p.id, style: Object.assign({ border: '1px solid ' + HAIR, borderRadius: 12, background: '#fff', overflow: 'hidden', display: 'flex', flexDirection: 'column', cursor: 'pointer', color: 'inherit', textDecoration: 'none' }, carousel ? { display: 'inline-flex', width: '216px', verticalAlign: 'top', whiteSpace: 'normal', marginRight: '16px', scrollSnapAlign: 'start' } : {}) },
                 this.art(p.engName),
                 h('div', { style: { padding: '13px 14px', display: 'flex', flexDirection: 'column', gap: 6, flex: 1 } },
                   h('span', { style: { fontSize: 13.5, fontWeight: 500, lineHeight: 1.3, minHeight: 34 } }, p.name),
-                  h('span', { style: { fontSize: 11, color: FAINT } }, moq != null ? ('Min. order ' + moq.toLocaleString() + ' pcs') : this.catCategoryLabel(p.cat)),
                   h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginTop: 'auto', paddingTop: 4 } },
                     h('span', { style: { fontSize: 14.5, fontWeight: 600, color: TEAL } }, from != null ? ('from ' + this.money(from) + '/pc') : 'Quote'),
                     this.chip(from != null ? 'Instant' : 'On request', from != null ? 'ok' : 'warn'))));
@@ -3057,14 +3093,6 @@ class Component extends DCLogic {
               h('div', { style: { flex: 1, minWidth: 0, overflowX: 'auto', whiteSpace: 'nowrap', scrollSnapType: 'x proximity', padding: '2px 0' } }, items.map(card)),
               h('button', { type: 'button', 'aria-label': 'Scroll right', onClick: e => scroll(e.currentTarget, 1), style: carBtn }, '›'));
           })())),
-      // Packaging & Boxes: the custom box-style library (family filter + model grid), full width
-      active === 'packaging-boxes' ? h('section', { id: 'box-styles', style: { marginTop: 40, scrollMarginTop: 130 } },
-        h('div', { style: { display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' } },
-          h('div', null,
-            h('h2', { style: { margin: '0 0 6px', fontSize: 20, fontWeight: 600, letterSpacing: '-.01em' } }, 'Custom box styles'),
-            h('p', { style: { margin: 0, fontSize: 14, color: MUT, lineHeight: 1.7 } }, 'Pick a die-cut style to configure it to your exact size.')),
-          this.btn('How custom boxes work', 'ghost', 'packaging')),
-        this.pkBoxLibrary()) : null,
       // SEO content section above the footer
       h('section', { style: { borderTop: '1px solid ' + HAIR, marginTop: 46, paddingTop: 34, maxWidth: 900 } },
         h('h2', { style: { margin: '0 0 18px', fontSize: 20, fontWeight: 600, letterSpacing: '-.01em' } }, seo.heading),
