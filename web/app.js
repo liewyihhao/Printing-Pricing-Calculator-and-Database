@@ -2282,6 +2282,8 @@ class Component extends DCLogic {
                   h('div', { style: { fontSize: 13.5, color: MUT, lineHeight: 1.6 } }, t[2]))))),
           h('div', { style: { marginTop: 26, display: 'flex', gap: 11, flexWrap: 'wrap' } }, this.btn('See full comparison', 'ghost', 'membership'), this.btn('Register free', 'teal', 'dash')))),
 
+      this.homeFaq(),
+
       this.sec('Learning Hub', 'Get your artwork right first time', 'Free guides on bleed, paper and setup for every product.',
         h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 16 } },
           [['Artwork Guides', 'How to set up bleed, trim and safe area', '3 mm bleed on every side'],
@@ -2294,6 +2296,39 @@ class Component extends DCLogic {
                 h('div', { style: { fontSize: 15, fontWeight: 500, margin: '7px 0 6px', lineHeight: 1.35 } }, a[1]),
                 h('div', { style: { fontSize: 12.5, color: MUT } }, a[2]))))), { alt: true }),
     );
+  }
+
+  // "General FAQs" — the original homepage's FAQ, verbatim (web/content/faq.json, served at
+  // /api/content/faq): category list on the left, the chosen category's questions as an
+  // accordion on the right.
+  homeFaq() {
+    if (!this.state.faq && !this._faqAsked) { this._faqAsked = true; setTimeout(() => this.loadFaq(), 0); }
+    const cats = this.state.faq || [];
+    if (!cats.length) return null;
+    const active = cats.find(c => c.id === this.state.faqCat) || cats[0];
+    const openQ = this.state.faqOpen;
+    return h('section', { key: 'faq', id: 'faqs', style: { background: ALT, padding: '52px 0' } },
+      h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '0 20px' } },
+        h('div', { style: { textAlign: 'center', marginBottom: 34 } },
+          h('h2', { style: { margin: '0 0 8px', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em' } }, 'General FAQs'),
+          h('p', { style: { margin: 0, fontSize: 14.5, color: MUT } }, 'Four Easy Steps, Just clicks of Time, and your Order is ready for Printing!')),
+        h('div', { style: { display: 'flex', gap: 28, flexWrap: 'wrap', alignItems: 'flex-start' } },
+          h('div', { role: 'tablist', 'aria-label': 'FAQ categories', style: { flex: '0 1 300px', minWidth: 240, display: 'flex', flexDirection: 'column' } },
+            cats.map(c => { const on = c.id === active.id;
+              return h('button', { key: c.id, type: 'button', role: 'tab', 'aria-selected': on ? 'true' : 'false',
+                onClick: () => this.setState({ faqCat: c.id, faqOpen: null }),
+                style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, background: 'none', border: 'none', padding: '14px 12px', font: (on ? 600 : 500) + ' 15px Montserrat,sans-serif', color: on ? TEAL : INK, textAlign: 'left', cursor: 'pointer', borderRadius: 8 } },
+                h('span', null, c.title), h('span', { 'aria-hidden': 'true', style: { color: on ? TEAL : FAINT, fontSize: 16 } }, '›')); })),
+          h('div', { role: 'tabpanel', style: { flex: '1 1 480px', minWidth: 0, background: '#fff', borderRadius: 14, padding: '26px 28px' } },
+            h('div', { style: { fontSize: 17, fontWeight: 600, marginBottom: 10 } }, active.title),
+            active.questions.map((qa, i) => { const open = openQ === active.id + ':' + i;
+              return h('div', { key: i, style: { borderBottom: i < active.questions.length - 1 ? '1px solid ' + LINE : 'none' } },
+                h('button', { type: 'button', 'aria-expanded': open ? 'true' : 'false',
+                  onClick: () => this.setState({ faqOpen: open ? null : active.id + ':' + i }),
+                  style: { width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16, background: 'none', border: 'none', padding: '18px 0', font: '500 15px Montserrat,sans-serif', color: INK, textAlign: 'left', cursor: 'pointer', lineHeight: 1.45 } },
+                  h('span', null, qa.q),
+                  h('span', { 'aria-hidden': 'true', style: { flex: 'none', color: FAINT, fontSize: 11, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' } }, '▼')),
+                open ? h('div', { style: { padding: '0 0 18px', fontSize: 14, color: MUT, lineHeight: 1.75, whiteSpace: 'pre-line' } }, qa.a) : null); })))));
   }
 
   // "Fast and Easy Ways to Print Online" — the original homepage's 4-step how-it-works band,
