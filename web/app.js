@@ -2240,15 +2240,21 @@ class Component extends DCLogic {
               h('span', { style: { fontSize: 13.5, fontWeight: 500 } }, label),
               h('span', { style: { fontSize: 12.5, color: TEAL, fontWeight: 600 } }, p[2]))); })), { alt: true }),
 
-      this.sec('Membership', 'Save up to 15% on every order', 'Your discount grows with your yearly spend, and stacks with vouchers and referral credit.',
+      this.sec('Membership', 'Save up to 15% on every order', 'The more you order, the more you save. Your tier rises with your accumulated orders.',
         h('div', null,
-          h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12 } },
-            TIERS.map((t, i) => h('div', { key: i, style: { border: '1px solid ' + (i === 3 ? TEAL : HAIR), borderRadius: 12, padding: 16, background: i === 3 ? '#fdf2f2' : '#fff' } },
-              h('div', { style: { fontSize: 14.5, fontWeight: 600, display: 'flex', alignItems: 'center', gap: 8 } }, t[0], i === 3 ? this.chip('You', 'ok') : null),
-              h('div', { style: { fontSize: 12.5, color: FAINT, margin: '4px 0 8px' } }, t[1]),
-              h('div', { style: { fontSize: 22, fontWeight: 600, color: TEAL, letterSpacing: '-.02em' } }, t[2]),
-              h('div', { style: { fontSize: 12, color: MUT, marginTop: 8, lineHeight: 1.55 } }, t[3])))),
-          h('div', { style: { marginTop: 18, display: 'flex', gap: 11 } }, this.btn('See full comparison', 'ghost', 'membership'), this.btn('Register free', 'teal', 'dash')))),
+          h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: '30px 34px' } },
+            [['standard-1.png', 'Standard Member', 'With accumulated orders below RM 1,000, and certain seasonal promotions.'],
+             ['bronze.png', 'Bronze Member', 'With accumulated orders from RM 1,000 to RM 2,999, enjoy up to 5% discount.'],
+             ['silver.png', 'Silver Member', 'With accumulated orders from RM 3,000 to RM 4,999, enjoy up to 8% discount.'],
+             ['gold.png', 'Gold Member', 'With accumulated orders from RM 5,000 to RM 9,999, enjoy up to 10% discount.'],
+             ['platinum.png', 'Platinum Member', 'With accumulated orders above RM 10,000, enjoy up to 15% discount.'],
+             ['corporate.png', 'Corporate Member', 'With credit term facilities, and additional discount packages tailored for your company. Subject to application.']]
+              .map((t, i) => h('div', { key: i, style: { display: 'flex', alignItems: 'center', gap: 18 } },
+                h('img', { src: window.__asset('assets/home/' + t[0]), alt: t[1] + ' medallion', loading: 'lazy', width: 84, height: 84, style: { flex: 'none', width: 84, height: 84, display: 'block' } }),
+                h('div', { style: { minWidth: 0 } },
+                  h('div', { style: { fontSize: 15, fontWeight: 600, marginBottom: 4 } }, t[1]),
+                  h('div', { style: { fontSize: 13.5, color: MUT, lineHeight: 1.6 } }, t[2]))))),
+          h('div', { style: { marginTop: 26, display: 'flex', gap: 11, flexWrap: 'wrap' } }, this.btn('See full comparison', 'ghost', 'membership'), this.btn('Register free', 'teal', 'dash')))),
 
       this.sec('Learning Hub', 'Get your artwork right first time', 'Free guides on bleed, paper and setup for every product.',
         h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 16 } },
@@ -2264,14 +2270,14 @@ class Component extends DCLogic {
     );
   }
 
-  // "Fast and Easy Ways to Print Online" — the original homepage's 4-step how-it-works
-  // band (step copy preserved verbatim from the live site; brand-styled step icons).
+  // "Fast and Easy Ways to Print Online" — the original homepage's 4-step how-it-works band,
+  // with the original site's step illustrations (assets/home/step-N.jpg).
   homeSteps() {
     const STEPS = [
-      ['sliders', 'Customise your print', 'Pick your product, size, material and quantity.'],
-      ['upload', 'Upload your artwork', 'Drop in your print-ready files.'],
-      ['credit-card', 'See the price and pay', 'Get the exact price, then check out online.'],
-      ['truck', 'We print and ship', 'We produce your order and deliver to your door.'],
+      ['step-1.jpg', 'Customise your print', 'Pick your product, size, material and quantity.'],
+      ['step-4.jpg', 'Upload your artwork', 'Drop in your print-ready files.'],          // same order as the live site
+      ['step-3.jpg', 'See the price and pay', 'Get the exact price, then check out online.'],
+      ['step-2.jpg', 'We print and ship', 'We produce your order and deliver to your door.'],
     ];
     return h('section', { style: { background: '#fff', padding: '48px 0' } },
       h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '0 20px' } },
@@ -2280,9 +2286,9 @@ class Component extends DCLogic {
           h('p', { style: { margin: 0, fontSize: 14.5, color: MUT } }, 'Set it up online in minutes.')),
         h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 26 } },
           STEPS.map((st, i) => h('div', { key: i, style: { textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 } },
-            h('div', { style: { position: 'relative', height: 76, width: 76, borderRadius: '50%', background: '#fdf2f2', display: 'grid', placeItems: 'center' } },
-              this.dashIcon(st[0], TEAL, 30),
-              h('span', { style: { position: 'absolute', top: -6, right: -6, height: 26, width: 26, borderRadius: '50%', background: TEAL, color: '#fff', fontSize: 13, fontWeight: 700, display: 'grid', placeItems: 'center' } }, i + 1)),
+            h('div', { style: { position: 'relative', width: '100%', maxWidth: 220, marginBottom: 14 } },
+              h('img', { src: window.__asset('assets/home/' + st[0]), alt: '', loading: 'lazy', width: 220, height: 220, style: { display: 'block', width: '100%', height: 'auto' } }),
+              h('span', { style: { position: 'absolute', left: '50%', bottom: -14, transform: 'translateX(-50%)', height: 34, width: 34, borderRadius: '50%', background: TEAL, color: '#fff', fontSize: 14, fontWeight: 700, display: 'grid', placeItems: 'center', boxShadow: '0 0 0 4px #fff' } }, i + 1)),
             h('div', { style: { fontSize: 15.5, fontWeight: 600, lineHeight: 1.3, maxWidth: 220 } }, st[1]),
             h('div', { style: { fontSize: 13, color: MUT, lineHeight: 1.65, maxWidth: 240 } }, st[2])))),
         h('div', { style: { display: 'flex', justifyContent: 'center', gap: 11, marginTop: 32 } },
