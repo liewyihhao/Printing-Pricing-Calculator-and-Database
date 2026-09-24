@@ -85,6 +85,9 @@ const GATES = {
     const missing = ['setup', 'printing', 'finishing', 'qc'].filter(k => !steps[k]);
     return missing.length ? 'Complete the production progress form first (' + missing.join(', ') + ').' : null;
   },
+  // original supplier flow: the printer prints only after HQ approves its draft
+  draftApproved: job => (!job.outsource || !job.outsource.awardedTo || (job.outsource.draft && job.outsource.draft.approvedAt))
+    ? null : 'Please wait for admin approve the draft before start printing.',
   destCustomer: job => destType(job) === 'customer' ? null : 'This parcel is going to a ' + destType(job) + ', not the customer.',
   destOutlet: job => destType(job) === 'outlet' ? null : 'This parcel is not addressed to an outlet.',
   destHub: job => destType(job) === 'hub' ? null : 'This parcel is not addressed to a hub.',
@@ -133,7 +136,7 @@ const TRANSITIONS = {
   ],
   outsourcing: [
     { action: 'vendor_ship', to: 'dispatched', roles: PRODUCTION.concat(['printer'], LOGISTICS),
-      requires: ['courier'], note: 'Printer shipped the parcel with the Printoka label to its destination.' },
+      gates: ['draftApproved'], requires: ['courier'], note: 'Printer shipped the parcel with the Printoka label to its destination.' },
   ],
   logistics: [
     { action: 'dispatch', to: 'dispatched', roles: LOGISTICS,

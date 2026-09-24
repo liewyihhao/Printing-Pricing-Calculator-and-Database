@@ -14,6 +14,7 @@ const ops = require('./ops');
 const admin = require('./admin');
 const files = require('./files');
 const outlet = require('./outlet');
+const supplier = require('./supplier');
 ops.migrate();
 const content = require('./content');
 const seoProduct = require('./seo-product');
@@ -58,8 +59,8 @@ async function api(req, res, pathname, query) {
 
   // GET /api/health
   if (seg[0] === 'health') return send(res, 200, { ok: true, ts: store.now() });
-  // POST /api/seed  — reset demo data
-  if (seg[0] === 'seed' && req.method === 'POST') { store.reset(); return send(res, 200, { ok: true, reset: true }); }
+  // POST /api/seed  — reset demo data (administrators only)
+  if (seg[0] === 'seed' && req.method === 'POST') { const a = store.sessionCustomer(token); if (!a || a.type !== 'admin') return send(res, 403, { error: 'administrators only' }); store.reset(); return send(res, 200, { ok: true, reset: true }); }
   // GET /api/roles
   if (seg[0] === 'roles') return send(res, 200, { roles: D.ROLES });
   // GET /api/users
@@ -80,20 +81,44 @@ async function api(req, res, pathname, query) {
   }
   if (seg[0] === 'jobs' && !seg[1]) {
     let list = store.jobs().slice();
-    if (me0.type === 'vendor') list = list.filter(j => j.outsource && j.outsource.vendors.some(v => v.vendorId === (me0.vendorId || me0.id)));
-    if (me0.type === 'hub' && me0.hub) list = list.filter(j => j.hub === me0.hub || ((j.destination || {}).type === 'hub' && j.destination.id === me0.hub));
-    const jobs = list.sort(D.priorityCompare).map(j => jobView(j, role));
+    // printers see only the jobs they were asked to quote — without the customer's details
+    if (me0.type === 'vendor') { const vj = list.filter(j => supplier.vendorCanSee(j, me0)).sort(D.priorityCompare).map(j => Object.assign(supplier.vendorJob(j, me0), { printing: supplier.listRow(j, me0), actions: [] })); return send(res, 200, { count: vj.length, role, jobs: vj }); }
+    if (me0.type === 'hub' && me0.hub) list = list.filter(j => supplier.hubCanSee(j, me0));
+    const jobs = list.sort(D.priorityCompare).map(j => Object.assign(jobView(j, role), j.outsource ? { printing: supplier.listRow(j, me0) } : {}));
     return send(res, 200, { count: jobs.length, role, jobs });
   }
   if (seg[0] === 'jobs' && seg[1] && !seg[2]) {
     const j = store.job(seg[1]); if (!j) return send(res, 404, { error: 'not found' });
+    if (!supplier.canSee(j, me0)) return send(res, 403, { error: 'Access denied: You are not authorized to view this.' });
+    if (me0.type === 'vendor') return send(res, 200, { job: supplier.vendorJob(j, me0), printing: supplier.view(j, me0), audit: [], order: null });
     const o = j.orderId ? store.order(j.orderId) : null;
-    return send(res, 200, { job: jobView(j, role), audit: store.audit({ jobId: seg[1] }), order: o ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items } : null });
+    return send(res, 200, { job: jobView(j, role), printing: supplier.view(j, me0), audit: store.audit({ jobId: seg[1] }), order: o && me0.type !== 'hub' ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items, files: (o.files || []).filter(f => f.kind === 'artwork') } : null });
+  }
+  // ---- printers & hubs (original printoka-3rd-party-supplier flow) ----
+  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'draft', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files'].indexOf(seg[2]) >= 0) {
+    const j0 = store.job(seg[1]); if (!j0) return send(res, 404, { error: 'not found' });
+    if (!supplier.canSee(j0, me0)) return send(res, 403, { error: 'Access denied: You are not authorized to view this.' });
+    const out = r => send(res, r && r.error ? (r.code || 400) : 200, r);
+    const APPROVERS = ['scheduler_staff', 'scheduler_manager', 'production_manager', 'production_director'];
+    if (seg[2] === 'doc') return out(supplier.documentData(j0, seg[3], me0));
+    if (seg[2] === 'files') { const r = supplier.readJobFile(j0, seg[3], me0); if (r.error) return out(r); res.writeHead(200, { 'Content-Type': r.type, 'Content-Disposition': 'attachment; filename="' + r.file.name.replace(/"/g, '') + '"', 'Cache-Control': 'private, no-store' }); return res.end(r.data); }
+    if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
+    const b = await readBody(req);
+    if (seg[2] === 'vendor-quote') return me0.type === 'vendor' ? out(supplier.submitQuote(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
+    if (seg[2] === 'draft') {
+      if (me0.type === 'vendor') return out(supplier.uploadDraft(seg[1], me0, b));
+      if (APPROVERS.indexOf(role) < 0) return send(res, 403, { error: 'Only the scheduler, production manager or admin can approve a printer draft.' });
+      return out(supplier.decideDraft(seg[1], b.decision, b.reason, actor, role));
+    }
+    if (seg[2] === 'ship-to-hub') return me0.type === 'vendor' ? out(supplier.shipToHub(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
+    if (seg[2] === 'delivery') return (me0.type === 'hub' || role === 'production_director') ? out(supplier.hubDelivery(seg[1], me0, role, b)) : send(res, 403, { error: 'hub staff only' });
+    if (seg[2] === 'vendor-paid') return ['scheduler_manager', 'production_manager', 'production_director'].indexOf(role) >= 0 ? out(supplier.markPaid(seg[1], actor, role, b)) : send(res, 403, { error: 'managers only' });
   }
   // POST /api/jobs/:id/transition  { action, payload }
   if (seg[0] === 'jobs' && seg[2] === 'transition' && req.method === 'POST') {
     const body = await readBody(req);
     if (me0.type === 'vendor') { const j0 = store.job(seg[1]); if (!j0 || !j0.outsource || j0.outsource.awardedTo !== (me0.vendorId || me0.id) || body.action !== 'vendor_ship') return send(res, 403, { error: 'printers can only ship jobs awarded to them' }); }
+    if (me0.type === 'hub' && !supplier.canSee(store.job(seg[1]), me0)) return send(res, 403, { error: 'This job is not at your hub.' });
     const r = ops.transition(seg[1], role, actor, body.action, body.payload || {});
     if (r.error) return send(res, 400, r);
     return send(res, 200, { ok: true, job: jobView(store.job(seg[1]), role), from: r.from, to: r.to });
@@ -420,7 +445,7 @@ async function api(req, res, pathname, query) {
   if (seg[0] === 'vendors' && !seg[1]) return send(res, 200, { vendors: store.vendorAccounts().filter(v => !v.vendorId).map(v => ({ id: v.id, name: v.name, internal: !!v.internal })) });
   if (seg[0] === 'vendor' && seg[1] === 'requests') {
     const me = store.sessionCustomer(token); if (!me || me.type !== 'vendor') return send(res, 401, { error: 'vendor sign-in required' });
-    return send(res, 200, { jobs: store.vendorRequests(me.vendorId || me.id), company: me.vendorId || me.id, canQuote: me.role !== 'printer_staff' });
+    return send(res, 200, { jobs: store.vendorRequests(me.vendorId || me.id).map(j => Object.assign(supplier.vendorJob(j, me), { printing: supplier.listRow(j, me) })), company: me.vendorId || me.id, canQuote: me.role !== 'printer_staff' });
   }
   if (seg[0] === 'jobs' && seg[2] === 'request-quotes' && req.method === 'POST') {
     if (['production_director', 'scheduler_manager', 'scheduler_staff', 'production_manager'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });
@@ -430,8 +455,23 @@ async function api(req, res, pathname, query) {
   if (seg[0] === 'jobs' && seg[2] === 'quote' && req.method === 'POST') {
     const me = store.sessionCustomer(token); if (!me || me.type !== 'vendor') return send(res, 401, { error: 'vendor sign-in required' });
     if (me.role === 'printer_staff') return send(res, 403, { error: 'Only your printer manager can submit prices.' });
-    const b = await readBody(req); const r = store.submitVendorQuote(seg[1], me.vendorId || me.id, b);
-    return send(res, r.error ? 400 : 200, r);
+    const b = await readBody(req); const r = supplier.submitQuote(seg[1], me, b);
+    return send(res, r.error ? 400 : 200, r.error ? r : Object.assign(r, { job: supplier.vendorJob(store.job(seg[1]), me) }));
+  }
+  // printer custom quotes (HQ asks printers to price a customer's custom quote; one-time submission)
+  if (seg[0] === 'vendor' && seg[1] === 'custom-quotes') {
+    const me = store.sessionCustomer(token); if (!me || me.type !== 'vendor') return send(res, 401, { error: 'vendor sign-in required' });
+    const out = r => send(res, r && r.error ? (r.code || 400) : 200, r);
+    if (!seg[2]) return out({ quotes: supplier.vendorCustomQuotes(me) });
+    if (seg[3] === 'document') { const r = supplier.readCustomQuoteDoc(seg[2], me.vendorId || me.id, me); if (r.error) return out(r); res.writeHead(200, { 'Content-Type': r.type, 'Content-Disposition': 'attachment; filename="' + r.file.name.replace(/"/g, '') + '"', 'Cache-Control': 'private, no-store' }); return res.end(r.data); }
+    if (req.method === 'POST') return out(supplier.submitCustomQuote(seg[2], me, await readBody(req)));
+    return out(supplier.vendorCustomQuote(seg[2], me));
+  }
+  if (seg[0] === 'quotes' && seg[2] === 'printer-quotes') {
+    const me = store.sessionCustomer(token); if (!me || ['admin', 'production'].indexOf(me.type) < 0) return send(res, 401, { error: 'staff sign-in required' });
+    if (seg[3] && seg[4] === 'document') { const r = supplier.readCustomQuoteDoc(seg[1], seg[3], me); if (r.error) return send(res, r.code || 400, r); res.writeHead(200, { 'Content-Type': r.type, 'Content-Disposition': 'attachment; filename="' + r.file.name.replace(/"/g, '') + '"', 'Cache-Control': 'private, no-store' }); return res.end(r.data); }
+    if (req.method === 'POST') { const r = supplier.requestPrinterQuotes(seg[1], await readBody(req), me.name || me.email); return send(res, r.error ? 400 : 200, r); }
+    const q = store.quote(seg[1]); return q ? send(res, 200, { printerQuotes: q.printerQuotes || null }) : send(res, 404, { error: 'not found' });
   }
   if (seg[0] === 'jobs' && seg[2] === 'award' && req.method === 'POST') {
     if (['production_director', 'scheduler_manager', 'scheduler_staff', 'production_manager'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });

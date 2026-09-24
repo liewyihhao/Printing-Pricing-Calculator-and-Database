@@ -2227,8 +2227,8 @@ class Component extends DCLogic {
   // shared production/vendor "Dashboard" tab: stat cards + throughput chart + notifications
   opsStatGrid(cards) {
     return h('div', { style: { background: '#fff', borderRadius: 12, border: '1px solid ' + HAIR, overflow: 'hidden' } },
-      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 1, background: HAIR } },
-        cards.map(c => this.statCard(c[0], String(c[1]), { icon: c[2], accent: c[3], note: c[4], badge: c[5], dot: c[6] }))));
+      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', background: '#fff' } },
+        cards.map(c => h('div', { key: c[0], style: { boxShadow: '1px 1px 0 ' + HAIR } }, this.statCard(c[0], String(c[1]), { icon: c[2], accent: c[3], note: c[4], badge: c[5], dot: c[6] })))));
   }
   opsDashTab(cards, chartLabel) {
     const MONTHS = ['APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP'];

@@ -100,7 +100,7 @@
     return h('div', { style: { display: 'flex', flexDirection: 'column' } }, items.map((s, i) => h('div', { key: i, style: { display: 'flex', gap: 12, alignItems: 'center', padding: i === 0 ? '0 0 8px' : i === items.length - 1 ? '8px 0 0' : '8px 0', position: 'relative' } },
       i ? h('span', { style: { position: 'absolute', left: 3, top: 0, height: '50%', width: 2, background: '#d8d8d8' } }) : null,
       h('span', { style: { width: 8, height: 8, borderRadius: '50%', background: i === 0 ? TEAL : '#c9c9c9', flex: 'none', zIndex: 1 } }),
-      h('div', { style: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 } }, h('b', null, s.title), h('span', { title: when(s.at), style: { fontSize: 12, color: FAINT } }, ago(s.at) + ' ago' + (s.by && s.by !== 'system' ? ' by ' + s.by : '')), s.text ? h('span', { style: { fontSize: 12, color: MUT } }, s.text) : null),
+      h('div', { style: { display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 } }, h('b', null, s.title), h('span', { title: when(s.at), style: { fontSize: 12, color: FAINT } }, (ago(s.at) === 'just now' ? 'just now' : ago(s.at) + ' ago') +(s.by && s.by !== 'system' ? ' by ' + s.by : '')), s.text ? h('span', { style: { fontSize: 12, color: MUT } }, s.text) : null),
       i < items.length - 1 ? h('span', { style: { position: 'absolute', left: 3, bottom: 0, height: '50%', width: 2, background: '#d8d8d8' } }) : null)));
   };
   // single page: crumbs · title + pill · main + aside
@@ -110,7 +110,7 @@
         h('p', { style: { margin: 0, fontSize: 13, fontWeight: 600, display: 'flex', gap: 8 } },
           h('span', { onClick: () => this.setState({ acView: null, sTab: o.home }), style: { color: TEAL, cursor: 'pointer' } }, 'Dashboard'), h('span', { style: { color: FAINT } }, '/'),
           h('span', { onClick: () => this.setState({ acView: null, sTab: o.type }), style: { color: TEAL, cursor: 'pointer' } }, o.type)),
-        h('div', { style: { display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' } }, h('h1', { style: { fontSize: 34, fontWeight: 600, margin: 0, letterSpacing: '-.02em' } }, o.title), o.status ? this.pillDot(o.status, BADGE(o.status)) : null)),
+        h('div', { style: { display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' } }, h('h1', { style: { fontSize: 34, fontWeight: 600, margin: 0, letterSpacing: '-.02em' } }, o.title), o.statusNode || (o.status ? this.pillDot(o.status, BADGE(o.status)) : null))),
       h('div', { key: 'bd', className: 'pk-acsingle', style: { display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' } },
         h('div', { style: { flex: '1 1 520px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 20 } }, main),
         h('div', { style: { flex: '1 1 300px', maxWidth: 360, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 20 } }, aside)),

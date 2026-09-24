@@ -445,6 +445,7 @@
         kv([['Quote', q.id], ['Customer', q.customer && q.customer.name], ['Email', q.customer && q.customer.email], ['Phone', q.customer && q.customer.phone], ['Outlet', q.outlet], ['Product', r.product], ['Quantity', r.qty], ['Size', r.size], ['Material', r.material], ['Finishing', r.finishing], ['Price', q.price != null ? this.rm(q.price) : null], ['Lead time', q.leadDays ? q.leadDays + ' days' : null], ['Order', q.orderId]]),
         r.remarks || r.quoteData ? h('div', { key: 'rm', style: { whiteSpace: 'pre-wrap', fontSize: 12.5, color: MUT, background: ALT, borderRadius: 8, padding: '10px 12px' } }, r.quoteData || r.remarks) : null,
         h('div', { key: 'hi' }, sub2('History'), (q.history || []).slice().reverse().map((e, i) => h('div', { key: i, style: { fontSize: 12.5, color: MUT, padding: '5px 0', borderTop: i ? '1px solid ' + LINE : 'none' } }, when(e.ts) + ' · ' + (e.actor || '') + ' · ' + (e.action || '') + (e.price ? ' · ' + this.rm(e.price) : '') + (e.note ? ' — ' + e.note : '')))),
+        this.oPrinterQuotes && ['admin', 'production'].indexOf(this.userType()) >= 0 && ['accepted', 'rejected', 'declined'].indexOf(q.status) < 0 ? this.oPrinterQuotes(q) : null,
       ], [B('Open quote PDF', () => this.openDoc(q.id, 'quote'), 'ghost'), B('Close', close, 'primary')], true);
     }
     return null;
@@ -534,7 +535,7 @@
   // ops settings (CMS): hubs, outlets, machines, couriers
   P.oSettings = function () {
     const c = this.state.opsConfig; if (!c) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading settings…')];
-    const D = this.state.opsCfgDraft || { machines: c.machines.join('\n'), couriers: c.couriers.join('\n'), hubs: JSON.stringify(c.hubs.map(x => ({ id: x.id, name: x.name, address: x.address, states: x.states })), null, 1), outlets: JSON.stringify(c.outlets, null, 1) };
+    const D = this.state.opsCfgDraft || { machines: c.machines.join('\n'), couriers: c.couriers.join('\n'), hubs: JSON.stringify(c.hubs.map(x => ({ id: x.id, name: x.name, address: x.address, phone: x.phone || '', states: x.states, countries: x.countries || [] })), null, 1), outlets: JSON.stringify(c.outlets, null, 1) };
     const setD = (k, v) => this.setState({ opsCfgDraft: Object.assign({}, D, { [k]: v }) });
     const save = () => { let hubs, outlets; try { hubs = JSON.parse(D.hubs); outlets = JSON.parse(D.outlets); } catch (e) { return this.opsToastSet(true, 'Hubs / outlets must be valid JSON.'); }
       this.opsFetch('/api/ops/config', { machines: D.machines.split('\n').map(x => x.trim()).filter(Boolean), couriers: D.couriers.split('\n').map(x => x.trim()).filter(Boolean), hubs, outlets })
@@ -543,7 +544,7 @@
     return [title('Operations settings', 'The lists every department picks from. Hubs decide which parcels route where (by state); outlets appear at checkout for self-pickup.'),
       h('div', { key: 'g', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 16 } },
         box([field('Machines / production lines (one per line)', ta('machines', 7))]), box([field('Couriers (one per line)', ta('couriers', 7))])),
-      box([field('Hubs (id, name, address, states served)', ta('hubs', 12))]), box([field('Outlets (id, name, address, hub, pickup)', ta('outlets', 12))]),
+      box([field('Hubs (id, name, address, phone, states and countries served)', ta('hubs', 12))]), box([field('Outlets (id, name, address, hub, pickup)', ta('outlets', 12))]),
       h('div', { key: 'b' }, B('Save settings', save, 'primary'))];
   };
 

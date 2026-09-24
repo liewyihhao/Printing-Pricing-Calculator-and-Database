@@ -20,7 +20,10 @@
   const loadLibs = () => libsP || (libsP = LIBS.reduce((p, l) => p.then(() => window[l[0]] ? null : loadScript(l[1])), Promise.resolve()));
 
   // ---------------------------------------------------------------- template backgrounds
-  const TPL = { invoice: 'assets/docs/invoice-template.svg', slip: 'assets/docs/order-slip-template.svg' };
+  const TPL = { invoice: 'assets/docs/invoice-template.svg', slip: 'assets/docs/order-slip-template.svg',
+    // original printoka-3rd-party-supplier templates (A4 portrait · A5 landscape · A6 landscape)
+    'purchase-order': 'assets/docs/purchase-order-template.svg', 'shipping-label': 'assets/docs/shipping-label-template.svg', 'hub-label': 'assets/docs/hub-label-template.svg' };
+  const PAGE = { invoice: [210, 297], slip: [210, 297], 'purchase-order': [210, 297], 'shipping-label': [210, 148], 'hub-label': [148, 105] };
   const tplCache = {};
   function templateSvg(kind) {
     if (tplCache[kind]) return tplCache[kind];
@@ -29,20 +32,20 @@
       return { svg, txt };
     }));
   }
-  function rasterize(txt) { // fallback: 300 dpi JPEG of the letterhead
+  function rasterize(txt, W, H) { // fallback: 300 dpi JPEG of the letterhead
     return new Promise((res, rej) => {
       const img = new Image(); const url = URL.createObjectURL(new Blob([txt], { type: 'image/svg+xml' }));
-      img.onload = () => { const c = document.createElement('canvas'); c.width = 2480; c.height = 3508; const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', 0.92)); };
+      img.onload = () => { const c = document.createElement('canvas'); c.width = Math.round(W / 25.4 * 300); c.height = Math.round(H / 25.4 * 300); const x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', 0.92)); };
       img.onerror = rej; img.src = url;
     });
   }
   async function drawTemplate(doc, kind) {
-    const t = await templateSvg(kind);
+    const t = await templateSvg(kind); const W = PAGE[kind][0], H = PAGE[kind][1];
     if (!t.jpeg && typeof doc.svg === 'function' && !t.svgFailed) {
-      try { await doc.svg(t.svg.cloneNode(true), { x: 0, y: 0, width: 210, height: 297 }); return; } catch (e) { t.svgFailed = true; }
+      try { await doc.svg(t.svg.cloneNode(true), { x: 0, y: 0, width: W, height: H }); return; } catch (e) { t.svgFailed = true; }
     }
-    if (!t.jpeg) t.jpeg = await rasterize(t.txt);
-    doc.addImage(t.jpeg, 'JPEG', 0, 0, 210, 297, kind + '-tpl', 'FAST');
+    if (!t.jpeg) t.jpeg = await rasterize(t.txt, W, H);
+    doc.addImage(t.jpeg, 'JPEG', 0, 0, W, H, kind + '-tpl', 'FAST');
   }
 
   // ---------------------------------------------------------------- helpers
@@ -141,6 +144,63 @@
       doc.setTextColor(33, 33, 33);
     }
     return doc;
+  };
+
+  // ---------------------------------------------------------------- printing-job documents (original supplier plugin)
+  // TCPDF writeHTMLCell(x, y) places the top of the first line at y; jsPDF draws on the baseline.
+  const cellText = (doc, lines, x, y, size, ratio, width) => {
+    const lh = size * PT * ratio; let n = 0;
+    lines.filter(l => l != null && l !== '').forEach(l => (width ? doc.splitTextToSize(String(l), width) : [String(l)]).forEach(s => { doc.text(s, x, y + size * PT + n * lh); n++; }));
+    return n;
+  };
+  const jobLines = j => [j.product ? j.product : null].concat(String(j.spec || '').split(/\s·\s|\n/).map(s => s.trim()).filter(Boolean), [j.qty ? 'Quantity: ' + Number(j.qty).toLocaleString('en-US') : null, j.instructions ? 'Instructions: ' + j.instructions : null]);
+  P.buildJobDoc = async function (d) {
+    await loadLibs();
+    const { jsPDF } = window.jspdf; const kind = d.kind, S = PAGE[kind];
+    const doc = new jsPDF({ unit: 'mm', format: [S[0], S[1]], orientation: S[0] > S[1] ? 'landscape' : 'portrait', compress: true });
+    await drawTemplate(doc, kind);
+    doc.setTextColor(33, 33, 33); doc.setFont('helvetica', 'normal');
+    const J = d.job || {};
+    if (kind === 'purchase-order') {
+      doc.setFontSize(6); doc.setTextColor(223, 8, 8); doc.textWithLink('print@printoka.com', 60.866, 35.4 + 6 * PT, { url: 'mailto:print@printoka.com' }); doc.setTextColor(33, 33, 33);
+      doc.setFontSize(7);
+      cellText(doc, [String(d.poNumber || '')], 145, 27.5, 7, 1.4);
+      cellText(doc, [d.vendor && d.vendor.name].concat(String((d.vendor && d.vendor.address) || '').split(/\n|,\s*(?=\d{5})/)), 15, 53, 7, 1.4, 60);
+      const sh = d.shipping || {}; cellText(doc, [sh.name].concat(String(sh.address || '').split(/\n/), [sh.phone]), 100, 53, 7, 1.4, 60);
+      doc.setFont('helvetica', 'bold'); cellText(doc, [J.product], 25, 110, 7, 1.4, 90); doc.setFont('helvetica', 'normal');
+      cellText(doc, jobLines(J).slice(1), 25, 110 + 7 * PT * 1.4, 7, 1.4, 90);
+      const amt = d.amount != null ? Number(d.amount).toFixed(2) : '';
+      cellText(doc, ['1'], 126, 110, 7, 1.4); cellText(doc, [amt], 148, 110, 7, 1.4); cellText(doc, [amt], 173, 110, 7, 1.4); cellText(doc, [amt], 173, 272.5, 7, 1.4);
+    } else if (kind === 'shipping-label') {
+      const o = d.order || {};
+      doc.setFontSize(9);
+      cellText(doc, ['Printoka'], 25, 30, 9, 1.4);
+      cellText(doc, ['Lot 1565, Piasau Industrial Estate,', '98000 Miri, Sarawak,', 'Malaysia'], 25, 40, 9, 1.4);
+      cellText(doc, ['014-969 0799'], 25, 70, 9, 1.4);
+      cellText(doc, [o.name], 25, 90, 9, 1.4, 105);
+      cellText(doc, String(o.address || '').split(/,\s*/).reduce((a, p) => { const last = a[a.length - 1]; if (last && (last + ', ' + p).length < 42) a[a.length - 1] = last + ', ' + p; else a.push(p); return a; }, []), 25, 100, 9, 1.4, 105);
+      cellText(doc, [o.phone], 25, 130, 9, 1.4);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(16); cellText(doc, [o.postcode], 85, 130, 16, 1.4);
+      doc.setFontSize(12); cellText(doc, [o.orderNumber], 165, 11, 12, 1.4);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); cellText(doc, jobLines(J), 140, 30, 8, 1.75, 60);
+    } else if (kind === 'hub-label') {
+      const hb = d.hub || {};
+      doc.setFontSize(7.5);
+      cellText(doc, [hb.name], 25, 30.5, 7.5, 1.5, 70);
+      cellText(doc, String(hb.address || '').split(/\n|,\s*(?=\d{5})/), 25, 40.5, 7.5, 1.5, 70);
+      cellText(doc, [hb.phone], 25, 90.5, 7.5, 1.5);
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(10); cellText(doc, [String(d.poNumber || '')], 112, 10, 10, 1.4);
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); cellText(doc, jobLines(J), 100, 30, 7, 1.4, 40);
+    }
+    doc.setProperties({ title: ({ 'purchase-order': 'Purchase Order ', 'shipping-label': 'Shipping Label ', 'hub-label': 'Hub Label ' })[kind] + (d.poNumber || d.jobId), author: 'Printoka', creator: 'Printoka' });
+    return doc;
+  };
+  P.openJobDoc = function (jobId, kind) {
+    const win = window.open('', '_blank'); if (win) win.document.write('<p style="font:14px sans-serif;padding:20px">Preparing document…</p>');
+    fetch('/api/jobs/' + encodeURIComponent(jobId) + '/doc/' + kind, { headers: this.authHeaders() }).then(r => r.json())
+      .then(d => { if (d.error) throw new Error(d.error); return this.buildJobDoc(d).then(doc => [doc, d]); })
+      .then(([doc, d]) => { const blob = doc.output('blob'); const name = kind + '-' + (d.poNumber || jobId) + '.pdf'; if (win) win.location.href = URL.createObjectURL(blob); else this.saveBlob(blob, name); })
+      .catch(e => { if (win) win.close(); this.setState({ acMsg: { bad: true, text: 'Could not open the document: ' + e.message } }); });
   };
 
   // ---------------------------------------------------------------- open / download

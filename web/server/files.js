@@ -54,6 +54,9 @@ function readFile(oid, fileId, me) {
   const o = store.order(oid); if (!o) return { error: 'Order not found.', code: 404 };
   if (!canAccess(o, me)) return { error: 'Not allowed.', code: 403 };
   const f = (o.files || []).find(x => x.id === fileId); if (!f) return { error: 'File not found.', code: 404 };
+  // printers get only the artwork of the lines awarded to them; hubs get no files; payment proofs stay with the owner, outlet and HQ
+  if (me.type === 'vendor') { const co = me.vendorId || me.id; const j = store.job((o.jobIds || [])[(f.line || 1) - 1]); if (f.kind !== 'artwork' || !j || !j.outsource || j.outsource.awardedTo !== co) return { error: 'Not allowed.', code: 403 }; }
+  if (me.type === 'hub') return { error: 'Not allowed.', code: 403 };
   const p = path.join(ROOT, oid, f.stored); if (!p.startsWith(ROOT) || !fs.existsSync(p)) return { error: 'File missing on disk.', code: 404 };
   return { file: f, data: fs.readFileSync(p), type: MIME[(f.name.split('.').pop() || '').toLowerCase()] || 'application/octet-stream' };
 }
