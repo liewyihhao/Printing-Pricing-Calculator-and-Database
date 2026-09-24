@@ -291,6 +291,13 @@ const HOME_CAT_PANEL = {
 };
 const HOME_GRADIENTS = ['linear-gradient(90deg,#F15A29,#EE3124)', 'linear-gradient(90deg,#F58220,#FDB515)', 'linear-gradient(90deg,#2BA6DE,#12CD8E)'];
 
+// "Guides for Closing Artwork" — the original support page guides, each a PDF (assets/guides/)
+const ARTWORK_GUIDES = [["Colour, Images, Text, and Line","Understanding the minimum requirements of the Colour, Images, Text and Line setting for the best print quality.","assets/guides/Color-images-text-and-line_compressed.pdf"],["Using Our Templates","Guiding you step by step on how can you utilize our Templates to get your artwork done.","assets/guides/Using-Our-Template-min.pdf"],["Artwork Orientation","Understanding the requirements of artwork according to the orientation.","assets/guides/Artwork-Orientation_compressed.pdf"],["Spot Colour Artwork Preparation","Whenever there is spot colour job, this is how the artwork should be prepared.","assets/guides/Spot-Colour-Artwork-Preparation-Guide_compressed.pdf"],["Final Artwork Preparation Guide","This is how you are going to get everything done and ready for submission.","assets/guides/Final-Artwork-Preparation-Guide_compressed-1.pdf"],["PDF File Setting","PDF is the most consistent file type as it minimize the risk of images lost, fonts issue, and etc. This is how you can set your file into PDF.","assets/guides/PDF-File-Setting_compressed.pdf"],["Sending File to Us","When your artwork is ready, this is how to turn your artwork into reality.","assets/guides/Sending-File-to-Us_compressed.pdf"],["Hot Stamping","Hot Stamping can be done at custom request. Here is how the artwork should be prepared and what you should know about it.","assets/guides/Hot-Stamping-Artwork-Preparation_compressed.pdf"],["Preparing Hot Stamping Format","This shall be a guide to prepare a Hot Stamping artwork.","assets/guides/Preparing-Hot-Stamping-Format_compressed.pdf"],["Fine Paper Artwork Requirement","Whenever there is any special paper material used for your prints, this is what you should know about it.","assets/guides/Fine-Paper-Artwork-Requirements_compressed.pdf"],["Applying Solid Black in your Artwork","Solid black can be a huge enhancement to your print. This is how you should do to get it at the optimum quality.","assets/guides/Applying-Solid-Black-In-Your-Artwork_compressed.pdf"],["Artwork preparation for jobs with Hot Stamping and Spot UV","Spot UV and Hot Stamping can be done at Custom request. Here are the guides to prepare the artwork.","assets/guides/Artwork-Preparation-for-Jobs-with-Hot-stamping-And-Spot-UV_compressed.pdf"],["Artwork preparation for Spot UV","Spot UV can be done at Custom request. Here is how you can do to prepare the artwork.","assets/guides/Artwork-Preparation-for-Spot-UV_compressed-1.pdf"],["Possible Issues for Spot UV Artwork","Whenever there is some neglected issues, these are the possible outcomes, and the steps to prevent it.","assets/guides/Possible-Issues-on-Spot-UV-Artwork_compressed.pdf"],["Checklist for Spot UV jobs","This is what you should do and check whenever you are applying Spot UV to your prints.","assets/guides/Checklist-for-Spot-UV-jobs_compressed.pdf"],["Artwork Preparation for Round Corner Job","The guide shall show you on what you should be aware of when you are applying round corner to your prints.","assets/guides/Artwork-Preparation-for-Round-Corner-Job_compressed-1.pdf"],["Embossing Artwork Specification","Here are some guides and tips to get your embossing prints outstanding.","assets/guides/Embossing-Artwork-Specification_compressed.pdf"]];
+
+// Customized Printing Solutions — the original site's four request-for-quotation questionnaires
+// (web/content/custom-quote-forms.json, copied verbatim from printoka.com)
+const CUSTOM_QUOTE_FORMS = [{"id":"book","card":"Book Printing","title":"Request Custom Quote","sub":"For Book Printing","img":"Perfect-Binding-Booklets-Cropped.png","sections":[{"t":"About the Book","f":[{"l":"Book Orientation","type":"select","req":true,"o":["Portrait","Landscape"]},{"l":"Book Size (Closed Size)","type":"select","req":true,"o":["A4 Size","A5 Size","Custom Size"]},{"l":"If Custom Size","type":"dims","d":["Height","Width"]},{"l":"Printing Pages (Including Cover)","type":"text","req":true},{"l":"Binding","type":"select","req":true,"o":["Perfect Binding","Saddle Stitch (Staple Middle Binding)"]}]},{"t":"About the Book Cover","f":[{"l":"Cover Material","type":"select","req":true,"o":["Simili 80gsm","Simili 100gsm","Gloss Art Paper 100gsm","Gloss Art Paper 128gsm","Gloss Art Paper 157gsm","Gloss Art Card 230gsm (2 Side Coated)","Gloss Art Card 250gsm (2 Side Coated)","Gloss Art Card 300gsm (2 Side Coated)"]},{"l":"Cover Printing","type":"select","req":true,"o":["4C Outer Only","4C Outer + Inner"]},{"l":"Cover Finishing (For Art Card Cover Only)","type":"select","o":["Gloss Laminating","Matte Laminating","Matte Laminating + 1 Side Spot UV","Gloss Waterbase Varnish Front","Gloss Waterbase Varnish Both","UV Varnish Front","UV Varnish Both"]}]},{"t":"About the Book Content","f":[{"l":"Content Material","type":"select","req":true,"o":["Simili 80gsm","Simili 100gsm","Gloss Art Paper 100gsm","Gloss Art Paper 128gsm","Gloss Art Paper 157gsm"]},{"l":"Content Printing","type":"select","req":true,"o":["1C Both","4C Both"]}]},{"t":"Delivery Location","f":[{"l":"Delivery to","type":"select","req":true,"o":["West Malaysia","East Malaysia","Singapore","Brunei (Pickup in Miri Only)"]}]},{"t":"Contact and Quantity Required","f":[{"l":"Price Expectation (RM)","type":"text","req":true},{"l":"Phone Number","type":"phone","req":true,"key":"phone"},{"l":"Quantity","type":"number","req":true,"key":"quantity"}]}]},{"id":"loose-sheet","card":"Loose Sheet Printing","title":"Request Custom Quote","sub":"For Loose Sheet Printing","img":"Digital-Printing-Flyers-Cropped.png","sections":[{"t":"About the Item","f":[{"l":"What are you Printing?","type":"select","req":true,"o":["Book Jacket","Bookmark","Brochure","Business Card","Calendar","Certificate","Company Profile","Coupon","Direct Mailer","Flyer","Form","Join Ups","Label","Letterhead","Manual","Menu","Thank You Card","Greeting Card","Wedding Card","Invitation Card","Contact Card","Discount Card","Appointment Card","Postcard","Punch Card","Photo Card","Member Card","Privilege Card","Portfolio","Voucher","Wrapping Paper","Others"]}]},{"t":"Product Size","f":[{"l":"Open Size (mm x mm)","type":"select","req":true,"o":["594mm x 840mm (A1)","420mm x 594mm (A2)","297mm x 420mm (A3)","210mm x 297mm (A4)","148mm x 210mm (A5)","210mm x 594mm","297mm x 630mm (3 x A4)","297mm x 840mm (4 x A4)","210mm x 594mm (4 x A5)","Custom Size"]},{"l":"If its a Custom Size","type":"dims","d":["Height","Width"]}]},{"t":"Product Material","f":[{"l":"Paper Material","type":"select","o":["Simili 80gsm","Simili 100gsm","Simili 140gsm","Gloss Art Paper 100gsm","Gloss Art Paper 128gsm","Gloss Art Paper 157gsm","Matte Art Paper 130gsm","Gloss Art Card 230gsm (2 Side Coated)","Gloss Art Card 250gsm (2 Side Coated)","Gloss Art Card 310gsm (2 Side Coated)","Gloss Art Card 360gsm (2 Side Coated)"]}]},{"t":"Product Printing and Finishing","f":[{"l":"Printing","type":"select","o":["4C Front","4C Both"]},{"l":"Laminating (For Art Card Only)","type":"select","o":["Matte Lamination Front","Matte Lamination Both","Gloss Lamination Front","Gloss Lamination Both","UV Varnish Front","UV Varnish Both","Gloss Waterbase Varnish (Both)","Matte Laminating + Spot UV Front","Matte Laminating Both + Spot UV Both"]},{"l":"Folding","type":"select","o":["Not Required","Required"]}]},{"t":"Artwork References","f":[{"l":"Artwork Link (WeTransfer Link)","type":"text"}]},{"t":"Delivery Location","f":[{"l":"Delivery to","type":"select","o":["West Malaysia","East Malaysia","Singapore","Brunei (Pickup in Miri Only)"]}]},{"t":"Contact and Quantity Required","f":[{"l":"Price Expectation (RM)","type":"text","req":true},{"l":"Phone Number","type":"phone","req":true,"key":"phone"},{"l":"Quantity","type":"number","req":true,"key":"quantity"}]}]},{"id":"box","card":"Box Packaging","title":"Request Custom Quote","sub":"For Box Packaging","img":"A001.png","sections":[{"t":"About the Box","f":[{"l":"Packaging Type","type":"select","req":true,"o":["Basic Packaging","Creative Packaging"]}]},{"t":"Box Size","f":[{"l":"Box Open Size (mm x mm)","type":"dims","req":true,"d":["Height","Width"]},{"l":"Box Size When Assembled (mm x mm)","type":"dims","req":true,"d":["Length","Width","Depth"]}]},{"t":"Box Material","f":[{"l":"Paper Material","type":"select","req":true,"o":["Art Card 250gsm (1 Side Coated)","Art Card 300gsm (1 Side Coated)","Art Card 350gsm (1 Side Coated)","Art Card 400gsm (1 Side Coated)","Art Card 260gsm (1 Side Coated)","Art Card 310gsm (1 Side Coated)","Art Card 360gsm (1 Side Coated)","Box Board Grey Back 300gsm","Box Board Grey Back 350gsm","Box Board Grey Back 400gsm","Box Board Grey Back 450gsm","Silver Foil Board 250gsm","Silver Foil Board 300gsm","Art Card (1 Side Coated) 230gsm + E-Flute Brown 290gsm","Box Board Grey Back (1 Side Coated) 280gsm + E-Flute Brown 290gsm"]}]},{"t":"Box Printing","f":[{"l":"Printing Colour","type":"select","req":true,"o":["No Printing","4C Front","4C Both"]}]},{"t":"Box Finishing","f":[{"l":"Lamination","type":"select","req":true,"o":["Not Required","Gloss Lamination (Front)","Matte Lamination (Front)","Gloss Waterbase Varnish (Front)","UV Varnish (Front)","Gloss Lamination (Both)","Matte Lamination (Both)","Gloss Waterbase Varnish (Both)","UV Varnish (Both)"]},{"l":"Spot UV","type":"select","req":true,"o":["Not Required","Spot UV (Front)"]},{"l":"Embossing","type":"select","req":true,"o":["Not Required","Required"]},{"l":"Hot Stamping","type":"select","req":true,"o":["Not Required","Required"]},{"l":"Window","type":"select","req":true,"o":["Not Required","1 Window","2 Window","3 Window","4 Window","5 Window"]},{"l":"Glueing","type":"select","req":true,"o":["Not Required","Required"]},{"l":"Die-Cutting","type":"select","req":true,"o":["Compulsory"]}]},{"t":"Artwork References","f":[{"l":"Artwork Link (WeTransfer Link)","type":"text","req":true},{"l":"Dieline Link (WeTransfer Link)","type":"text","req":true}]},{"t":"Delivery Location","f":[{"l":"Delivery to","type":"select","o":["West Malaysia","East Malaysia","Singapore","Brunei (Pick Up in Miri Only)"]}]},{"t":"Contact and Quantity","f":[{"l":"Price Expectation (RM)","type":"text","req":true},{"l":"Phone Number","type":"phone","req":true,"key":"phone"},{"l":"Quantity","type":"number","req":true,"key":"quantity"}]}]},{"id":"sticker","card":"Sticker Label Printing","title":"Request Custom Quote","sub":"For Sticker Label Printing","img":"Round-Sticker-Cover.png","sections":[{"t":"About the Stickers","f":[{"l":"How is your Sticker to be Printed","type":"select","req":true,"o":["Sticker Sheets (Placed on A3 / A4 Sheets)","Kiss Cut Stickers"]}]},{"t":"Sticker Size","f":[{"l":"Sticker Size in mm x mm (Small Sticker Size)","type":"dims","req":true,"d":["Height","Width"]}]},{"t":"Sticker Material","f":[{"l":"Sticker Material","type":"select","req":true,"o":["Mirrorkorte Stickers (Best Seller)","White PP (Gloss) - Waterproof","White PP (Matte) - Waterproof","Woodfree Matte"]}]},{"t":"Sticker Finishing","f":[{"l":"Print Colour","type":"select","req":true,"o":["1C","4C"]},{"l":"Sticker Lamination","type":"select","req":true,"o":["Gloss Laminate","Matte Laminate","Not Required"]}]},{"t":"Delivery Location","f":[{"l":"Delivery to","type":"select","req":true,"o":["West Malaysia","East Malaysia","Singapore","Brunei (Pickup in Miri Only)"]}]},{"t":"Contact and Quantity","f":[{"l":"Price Expectation (RM)","type":"text","req":true},{"l":"Phone Number","type":"phone","req":true,"key":"phone"},{"l":"Quantity","type":"number","req":true,"key":"quantity"}]}]}];
+
 const BEST = [
   ['Business Card','card','from RM 38'],['Label Sticker — Digital','sticker','from RM 45'],
   ['Flyer','flyer','from RM 88'],['Booklet — Litho (Offset)','book','from RM 420'],
@@ -329,6 +336,7 @@ class Component extends DCLogic {
     // other real <a href> cards (categories, blog): let modified/middle clicks open a new tab,
     // but intercept a plain left-click so it routes in-app instead of a full page reload.
     if (el.tagName === 'A' && el.getAttribute('href') && (e.button == null || e.button === 0) && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) e.preventDefault();
+    if (v === '_noop') return;   // visual button inside a real external link (e.g. WhatsApp)
     if (v === '_mega') return this.setState(s => ({ megaOpen: !s.megaOpen }));
     if (v === '_dismiss') return this.setState({ banner: false });
     if (v === '_locale') { const L = ['EN', 'ZH', 'MS']; return this.setState(s => ({ locale: L[(L.indexOf(s.locale || 'EN') + 1) % 3] })); }
@@ -361,6 +369,11 @@ class Component extends DCLogic {
     if (v === 'addraddsave') return this.addressAdd();
     if (v.indexOf('addrdel:') === 0) return this.addressDelete(v.slice(8));
     if (v.indexOf('addrdefault:') === 0) return this.addressDefault(v.slice(12));
+    // SEO landing page (e.g. footer "Online Printing Malaysia")
+    if (v.indexOf('seo:') === 0) { const slug = v.slice(4); this.pushUrl('/' + slug); return this.seoOpen(slug, 'my'); }
+    // footer "Guides for Closing Artwork" → Support page, scrolled to the guides
+    if (v === 'guides') { this.pushUrl('/support'); this.go('support'); setTimeout(() => { try { const el = document.getElementById('guides-for-closing-artwork'); if (el) el.scrollIntoView({ block: 'start' }); } catch (e) {} }, 60); return; }
+    if (v === 'solutions') { this.pushUrl('/customized-printing-solutions'); return this.go('solutions'); }
     if (v === 'signup') { this.setState({ authTab: 'register', authErr: null }); return this.go('auth'); }
     if (v === 'dologin') return this.login();
     if (v === 'doregister') return this.register();
@@ -857,7 +870,7 @@ class Component extends DCLogic {
   seoData() {
     const route = this.state.route, C = 'Malaysia, Singapore & Brunei';
     const ctx = 'https://schema.org', origin = (typeof location !== 'undefined' ? location.origin : 'https://printoka.com');
-    const org = { '@context': ctx, '@type': 'Organization', name: 'Printoka', url: origin, logo: origin + '/assets/icons/logomark.svg' };
+    const org = { '@context': ctx, '@type': 'Organization', name: 'Printoka', url: origin, logo: origin + '/assets/icons/logo.png' };
     const IDX = 'index,follow', NOIDX = 'noindex,follow', money0 = n => this.money(n);
     if (route === 'product') {
       const prod = this.pkProduct(), name = prod ? this.catName(prod.id) : 'Business Card';
@@ -892,6 +905,7 @@ class Component extends DCLogic {
     if (route === 'packaging') return { title: 'Custom Packaging Boxes Printing | Design Your Own | Printoka', description: 'Design custom packaging boxes, sleeves and mailers online in ' + C + '. Choose your size, material and finishing, with a free die-line to design on.', robots: IDX, jsonld: org };
     if (route === 'membership') return { title: 'Printoka Membership — Save Up to 15% on Every Order', description: 'Earn Bronze, Silver, Gold or Platinum status as you print with Printoka. Automatic tier discounts, priority queue placement, and a dedicated account manager at Platinum.', robots: IDX, jsonld: { '@context': ctx, '@type': 'FAQPage', mainEntity: [{ '@type': 'Question', name: 'How do Printoka membership tiers work?', acceptedAnswer: { '@type': 'Answer', text: 'Your tier is set by trailing-12-month spend and applies automatically at checkout: Bronze 5%, Silver 8%, Gold 10% and Platinum 15%.' } }] } };
     if (route === 'about' || route === 'corporate') return { title: 'About Printoka | Malaysia’s Trusted Printing Marketplace', description: 'Printoka connects partner printers across ' + C + ' with instant online pricing for 100+ products.', robots: IDX, jsonld: org };
+    if (route === 'solutions') return { title: 'Customized Printing Solutions | Printoka', description: 'Get a quotation for your customized print job: book printing, loose sheet printing, box packaging and sticker label printing.', robots: IDX, jsonld: org };
     if (route === 'support') return { title: 'Support & FAQ | Printoka', description: 'Artwork prep tips, FAQs and support for every Printoka product — free to read before you upload.', robots: IDX, jsonld: org };
     if (route === 'learn') return { title: 'Printing Guides & Artwork Tips | Printoka Learning Hub', description: 'Bleed and margin guides, paper stock explainers, and artwork prep tips for every Printoka product — free to read before you upload.', robots: IDX, jsonld: org };
     if (route === 'article') return { title: (this.state.article && this.state.article.title ? this.state.article.title : 'Article') + ' | Printoka Learning Hub', description: (this.state.article && this.state.article.excerpt) || 'A printing guide from the Printoka Learning Hub.', robots: IDX, jsonld: org };
@@ -1174,7 +1188,7 @@ class Component extends DCLogic {
       h('div', { onClick: e => e.stopPropagation(), role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Announcement', style: { position: 'relative', maxWidth: 460, width: '100%', borderRadius: 16, overflow: 'hidden', boxShadow: '0 24px 60px rgba(33,33,33,.35)', background: 'linear-gradient(135deg,#FF9A2E,#F02B29)', color: '#fff' } },
         h('span', { onClick: close, role: 'button', tabIndex: 0, 'aria-label': 'Close announcement', onKeyDown: e => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); close(); } }, style: { position: 'absolute', top: 12, right: 14, fontSize: 22, lineHeight: 1, cursor: 'pointer', color: 'rgba(255,255,255,.9)' } }, '×'),
         h('div', { style: { padding: '30px 28px 26px', textAlign: 'center' } },
-          h('img', { src: window.__asset('assets/icons/logomark.svg'), alt: '', style: { height: 40, width: 'auto', filter: 'brightness(0) invert(1)', marginBottom: 14 } }),
+          h('img', { src: window.__asset('assets/icons/cropped-favicon-192x192.png'), alt: '', style: { height: 48, width: 48, borderRadius: 12, background: '#fff', marginBottom: 14 } }),
           h('div', { style: { fontSize: 12, fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', opacity: .85, marginBottom: 10 } }, 'Announcement'),
           h('div', { style: { fontSize: 17, fontWeight: 600, lineHeight: 1.5, marginBottom: 20 } }, a.text),
           h('span', { onClick: goCta, style: { display: 'inline-block', background: '#fff', color: '#E52220', fontWeight: 700, fontSize: 14.5, padding: '11px 26px', borderRadius: 999, cursor: 'pointer' } }, (a.cta || 'Find out more') + ' →'),
@@ -1214,7 +1228,9 @@ class Component extends DCLogic {
   }
   authSetSession(d) {
     try { localStorage.setItem('pk_token', d.token); } catch (e) {}
-    const home = this.homeFor(d.customer);
+    // return to the page that sent the customer to sign in (e.g. the custom quote page), else their home
+    const home = (d.customer && d.customer.type === 'customer' && this.state.afterAuth) || this.homeFor(d.customer);
+    if (this.state.afterAuth) this.setState({ afterAuth: null });
     // set user + route together so access checks see the new identity synchronously
     this.setState({ user: d.customer, route: home, authErr: null, authBusy: false, megaOpen: false, ops: null });
     this.loadUserOrders();
@@ -1345,7 +1361,7 @@ class Component extends DCLogic {
   }
   docHeader(title, ref, date, statusChip) {
     return h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 20, borderBottom: '2px solid ' + INK, paddingBottom: 14 } },
-      h('div', null, h('div', { style: { fontSize: 20, fontWeight: 700, letterSpacing: '.14em' } }, 'printoka'), h('div', { style: { fontSize: 11.5, color: MUT, marginTop: 3 } }, 'Printoka Sdn Bhd · Miri, Sarawak · print@printoka.com')),
+      h('div', null, h('div', { style: { fontSize: 20, fontWeight: 700, letterSpacing: '.14em' } }, 'printoka'), h('div', { style: { fontSize: 11.5, color: MUT, marginTop: 3 } }, 'Yushan Corporation Sdn Bhd (561674-X) · Lot 1565, Piasau Industrial Estate, 98000 Miri, Sarawak, Malaysia · print@printoka.com')),
       h('div', { style: { textAlign: 'right' } }, h('div', { style: { fontSize: 15, fontWeight: 700, textTransform: 'uppercase' } }, title), h('div', { style: { fontSize: 12.5, color: MUT, marginTop: 3 } }, ref), h('div', { style: { fontSize: 11.5, color: FAINT } }, (date || '').slice(0, 10)), statusChip ? h('div', { style: { marginTop: 5 } }, statusChip) : null));
   }
   docDialog() {
@@ -1597,7 +1613,7 @@ class Component extends DCLogic {
     if (!segs.length) { if (this.state.route !== 'home') this.setState({ route: 'home' }); return; }
     if (segs[0] === 'blog' && segs[1]) return this.blogOpen(segs[1]);
     // named top-level routes (so the SSR header/footer links resolve in the SPA)
-    const NAMED = { cart: 'cart', checkout: 'checkout', auth: 'auth', search: 'search', learn: 'learn', 'learning-hub': 'learn', membership: 'membership', contact: 'contact', about: 'about', 'about-us': 'about', support: 'support', downloads: 'downloads', partners: 'partners', terms: 'terms', track: 'track', artwork: 'artwork' };
+    const NAMED = { cart: 'cart', checkout: 'checkout', auth: 'auth', search: 'search', learn: 'learn', 'learning-hub': 'learn', membership: 'membership', contact: 'contact', about: 'about', 'about-us': 'about', support: 'support', downloads: 'downloads', partners: 'partners', terms: 'terms', track: 'track', artwork: 'artwork', 'customized-printing-solutions': 'solutions' };
     // packaging: library landing at /packaging, configurator/quote/die-lines as their own sub-URLs
     if (segs[0] === 'packaging') return this.setState({ route: 'packaging', pkTab: segs[1] || 'library' });
     if (segs.length === 1 && NAMED[segs[0]]) return this.setState({ route: NAMED[segs[0]] });
@@ -2044,9 +2060,7 @@ class Component extends DCLogic {
   }
   // original-site brand mark + wordmark (same asset & weight as the storefront header) — standardised
   brandLogo() {
-    return h('div', { style: { display: 'flex', alignItems: 'center', gap: 9 } },
-      h('img', { src: window.__asset('assets/icons/logomark.svg'), alt: '', style: { height: 26, width: 'auto', display: 'block', flex: 'none' } }),
-      h('span', { style: { fontSize: 18, fontWeight: 500, letterSpacing: '.16em', color: '#231f20' } }, 'printoka'));
+    return h('img', { src: window.__asset('assets/icons/logo.png'), alt: 'Printoka', width: 125, height: 38, style: { height: 38, width: 'auto', display: 'block' } });
   }
   // white top-nav shell for staff dashboards (logo · tabs · identity), then a light-grey page
   staffPage(tabs, active, identity, children) {
@@ -2214,7 +2228,7 @@ class Component extends DCLogic {
   userType() { return (this.state.user && this.state.user.type) || 'guest'; }
   userRole() { return (this.state.user && this.state.user.role) || 'guest'; }
   access() {
-    const STORE = ['home', 'category', 'product', 'packaging', 'artwork', 'cart', 'checkout', 'learn', 'article', 'seo', 'membership', 'contact', 'search', 'about', 'auth', 'confirm', 'track', 'corporate', 'partners', 'support', 'downloads', 'terms'];
+    const STORE = ['home', 'category', 'product', 'packaging', 'artwork', 'cart', 'checkout', 'learn', 'article', 'seo', 'membership', 'contact', 'search', 'about', 'auth', 'confirm', 'track', 'corporate', 'partners', 'support', 'downloads', 'terms', 'solutions'];
     const type = this.userType(), role = this.userRole();
     if (type === 'guest') return STORE;
     if (type === 'customer') return STORE.concat(['dash', 'invoices']);
@@ -2307,16 +2321,6 @@ class Component extends DCLogic {
 
       this.homeCategories(),
 
-      this.sec('Instant quote', 'See your price right here', 'Pick a category and quantity to get a starting price.',
-        h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 14, alignItems: 'end', border: '1px solid ' + HAIR, borderRadius: 14, padding: 20, background: '#fff' } },
-          [['Category', 'Cards'], ['Product', 'Business Card'], ['Quantity', '1,000 pcs']].map((f, i) =>
-            h('label', { key: i, style: { display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, fontWeight: 600, color: MUT } }, f[0],
-              h('div', { style: { border: '1px solid #eaeaea', borderRadius: 8, padding: '11px 13px', fontSize: 14, fontWeight: 400, color: INK, display: 'flex', justifyContent: 'space-between' } }, f[1], h('span', { style: { color: FAINT, fontSize: 10 } }, '▼')))),
-          h('div', { style: { display: 'flex', flexDirection: 'column', gap: 4 } },
-            h('span', { style: { fontSize: 12, color: FAINT } }, 'From'),
-            h('span', { style: { fontSize: 27, fontWeight: 600, letterSpacing: '-.02em', color: TEAL } }, this.money(168))),
-          this.btn('Open configurator →', 'amber', 'product', { justifyContent: 'center' })), { alt: true }),
-
       this.sec('Membership', 'Save up to 15% on every order', 'The more you order, the more you save. Your tier rises with your accumulated orders.',
         h('div', null,
           h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: '30px 34px' } },
@@ -2392,7 +2396,8 @@ class Component extends DCLogic {
         ? h('img', { src: this.homeImg(HOME_PRODUCT_IMG[p.id]), alt: p.name, loading: 'lazy', style: { height: 116, width: '100%', objectFit: 'contain', display: 'block' } })
         : h('div', { style: { height: 116, width: '100%', overflow: 'hidden', borderRadius: 6, display: 'grid', placeItems: 'center' } }, this.art(p.engName)),
       h('span', { style: { fontSize: 14, lineHeight: 1.35 } }, p.name));
-    const sidebar = h('aside', { style: { flex: '0 1 280px', minWidth: 240, display: 'flex', flexDirection: 'column', gap: 22 } },
+    // sticky: the category menu stays in view while the rows scroll, until the last row ends
+    const sidebar = h('aside', { style: { flex: '0 1 280px', minWidth: 240, display: 'flex', flexDirection: 'column', gap: 22, position: 'sticky', top: 128, alignSelf: 'flex-start', maxHeight: 'calc(100vh - 140px)', overflowY: 'auto' } },
       h('div', null, cats.map(c => { const on = open === c.id; const list = this.catProducts(c.id);
         return h('div', { key: c.id },
           h('button', { type: 'button', 'aria-expanded': on ? 'true' : 'false', onClick: () => this.setState({ homeCatOpen: on ? null : c.id }),
@@ -4161,15 +4166,15 @@ class Component extends DCLogic {
   s_support() {
     const topics = [
       ['Track an order', 'Live production and delivery status by order number.', 'truck', 'track'],
-      ['Artwork & guides', 'Bleed, resolution, colour and file-prep guides per product.', 'layers', 'learn'],
-      ['Request a quote', 'Non-standard job? Tell us the spec and we’ll price it.', 'edit-3', 'contact'],
+      ['Artwork & guides', 'Bleed, resolution, colour and file-prep guides per product.', 'layers', 'guides'],
+      ['Request a quote', 'Non-standard job? Tell us the spec and we’ll price it.', 'edit-3', 'solutions'],
       ['Membership & rewards', 'How tiers, discounts and credit work.', 'clock', 'membership'],
       ['Payments & invoices', 'Methods, tax invoices, statements and credit terms.', 'dollar-sign', 'contact'],
       ['Template downloads', 'Print-ready AI, PSD & PDF templates per product size.', 'file', 'downloads'],
     ];
     return this.pageWrap([
       this.head('Support', 'Pick a topic below, or reach us on WhatsApp, email or the contact form.',
-        [this.btn('WhatsApp us', 'amber', 'contact'), this.btn('Contact form', 'ghost', 'contact')]),
+        [h('a', { key: 'wa', href: 'https://wa.me/60149690799', target: '_blank', rel: 'noopener noreferrer', style: { textDecoration: 'none' } }, this.btn('WhatsApp us', 'amber', '_noop')), this.btn('Contact form', 'ghost', 'contact')]),
       h('div', { key: 'g', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 16, marginTop: 22 } },
         topics.map((t, i) => h('div', { key: i, 'data-go': t[3], style: { cursor: 'pointer' } }, this.card([
           h('div', { key: 'i', style: { height: 40, width: 40, borderRadius: '50%', background: '#e1f5f2', display: 'grid', placeItems: 'center', marginBottom: 12 } }, this.dashIcon(t[2], '#12B3A6', 20)),
@@ -4177,11 +4182,134 @@ class Component extends DCLogic {
           h('div', { key: 'b', style: { fontSize: 13, color: MUT, lineHeight: 1.7 } }, t[1]),
           h('div', { key: 'c', style: { fontSize: 12.5, color: TEAL, fontWeight: 600, marginTop: 8 } }, 'Open →'),
         ])))),
+      this.guidesSection(),
       this.faqSection(),
       h('div', { key: 'c', style: { marginTop: 24, border: '1px solid ' + HAIR, borderRadius: 12, padding: 20, background: ALT, display: 'flex', flexWrap: 'wrap', gap: 20, justifyContent: 'space-between' } },
-        [['WhatsApp', '+60 3-1234 5678'], ['Email', 'hello@printoka.com'], ['Hours', 'Mon–Fri 9am–6pm (MYT)']].map((r, i) =>
+        [['WhatsApp', '+60 14 969 0799'], ['Email', 'print@printoka.com'], ['Hours', 'Mon–Fri 9am–6pm (MYT)']].map((r, i) =>
           h('div', { key: i }, h('div', { style: { fontSize: 11.5, fontWeight: 600, letterSpacing: '.06em', textTransform: 'uppercase', color: FAINT } }, r[0]), h('div', { style: { fontSize: 14, fontWeight: 600, marginTop: 4 } }, r[1])))),
     ]);
+  }
+  // WhatsApp contact banner (original site): heading, subtitle, tap-to-call number, photo
+  whatsAppBanner(title, sub) {
+    return h('section', { key: 'wa-banner', style: { display: 'flex', alignItems: 'stretch', flexWrap: 'wrap', background: '#f7f7f7', borderRadius: 4, overflow: 'hidden', margin: '40px 0 0' } },
+      h('div', { style: { flex: '1 1 380px', padding: '40px 44px', display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 10 } },
+        h('div', { style: { fontSize: 28, fontWeight: 500, color: INK, letterSpacing: '-.01em' } }, title || 'Can’t find what you need?'),
+        h('div', { style: { fontSize: 15, color: MUT } }, sub || 'Chat with us using Whatsapp'),
+        h('a', { href: 'tel:+60149690799', style: { display: 'inline-flex', alignItems: 'center', gap: 14, marginTop: 14, color: TEAL, fontSize: 30, textDecoration: 'none' } },
+          h('span', { 'aria-hidden': 'true', style: { height: 38, width: 38, borderRadius: '50%', background: TEAL, display: 'grid', placeItems: 'center', flex: 'none' } },
+            h('img', { src: window.__asset('assets/icons/phone.svg'), alt: '', style: { height: 16, width: 16, filter: 'brightness(0) invert(1)' } })),
+          '+60 14 969 0799')),
+      h('div', { className: 'pk-hide-sm', style: { flex: '0 1 440px', minHeight: 260, background: 'url(' + window.__asset('assets/icons/question.jpg') + ') center/cover no-repeat', clipPath: 'polygon(18% 0, 100% 0, 100% 100%, 0 100%)' } }));
+  }
+
+  // ===== CUSTOMIZED PRINTING SOLUTIONS (original /customized-printing-solutions) =====
+  s_solutions() {
+    return this.pageWrap([
+      h('h1', { key: 'h', style: { margin: '10px 0 30px', textAlign: 'center', fontSize: 28, fontWeight: 500, letterSpacing: '-.01em' } }, 'Get a Quotation for your Customized Print Job Now'),
+      h('div', { key: 'cards', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(170px,1fr))', gap: 20 } },
+        CUSTOM_QUOTE_FORMS.map(fm => h('button', { key: fm.id, type: 'button', onClick: () => this.openCustomQuote(fm.id),
+          style: { background: '#fff', border: '1px solid ' + HAIR, borderRadius: 10, padding: '26px 18px 22px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, cursor: 'pointer', font: 'inherit', color: INK } },
+          h('img', { src: window.__asset('assets/home/' + fm.img), alt: fm.card, loading: 'lazy', style: { height: 170, width: '100%', objectFit: 'contain', display: 'block' } }),
+          h('span', { style: { fontSize: 16, fontWeight: 500 } }, fm.card),
+          h('span', { style: { background: TEAL, color: '#fff', fontSize: 14, fontWeight: 500, padding: '10px 20px', borderRadius: 3 } }, 'Request Custom Quote')))),
+      this.whatsAppBanner('Questions?', 'Drop us a Message using Whatsapp'),
+      this.customQuoteModal(),
+    ]);
+  }
+  openCustomQuote(id) {
+    // the original requires an account for custom quotes (the card links to /account/ when signed out)
+    if (!this.state.user) { this.setState({ authTab: 'login', authErr: 'Please sign in or create an account to request a custom quote.', afterAuth: 'solutions' }); return this.go('auth'); }
+    this.setState({ cq: id, cqv: {}, cqErr: null, cqDone: null, cqBusy: false });
+  }
+  customQuoteModal() {
+    const fm = CUSTOM_QUOTE_FORMS.find(f => f.id === this.state.cq); if (!fm) return null;
+    const v = this.state.cqv || {}; const set = (k, val) => this.setState(st => ({ cqv: Object.assign({}, st.cqv, { [k]: val }), cqErr: null }));
+    const inp = { font: '400 14px Montserrat,sans-serif', padding: '12px 13px', border: '1px solid ' + HAIR, borderRadius: 2, width: '100%', background: '#fff', color: INK };
+    const lbl = (t, req) => h('div', { style: { fontSize: 13.5, color: MUT, marginBottom: 8 } }, t, req ? h('span', { style: { color: TEAL, marginLeft: 6 } }, '*') : null);
+    const field = (sec, f, i) => {
+      const k = f.key || (sec.t + ' / ' + f.l);
+      if (f.type === 'dims') return h('div', { key: i, style: { marginBottom: 18 } }, lbl(f.l, f.req),
+        h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(' + f.d.length + ',1fr)', gap: 16 } },
+          f.d.map(d => h('label', { key: d, style: { display: 'block' } }, h('div', { style: { fontSize: 13, color: MUT, marginBottom: 6 } }, d),
+            h('input', { type: 'number', min: 0, value: v[k + ' — ' + d] || '', onChange: e => set(k + ' — ' + d, e.target.value), style: inp, 'aria-label': f.l + ' ' + d })))));
+      if (f.type === 'select') return h('label', { key: i, style: { display: 'block', marginBottom: 18 } }, lbl(f.l, f.req),
+        h('select', { value: v[k] || '', onChange: e => set(k, e.target.value), style: Object.assign({}, inp, { appearance: 'auto' }) },
+          h('option', { value: '' }, 'Please Select'), f.o.map(o => h('option', { key: o, value: o }, o))));
+      return h('label', { key: i, style: { display: 'block', marginBottom: 18 } }, lbl(f.l, f.req),
+        h('input', { type: f.type === 'number' ? 'number' : f.type === 'phone' ? 'tel' : 'text', value: v[k] || '', onChange: e => set(k, e.target.value), style: inp }));
+    };
+    const close = () => this.setState({ cq: null });
+    return h('div', { key: 'cq', role: 'dialog', 'aria-modal': 'true', 'aria-label': fm.title + ' ' + fm.sub, onClick: close,
+        style: { position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,.5)', display: 'grid', placeItems: 'center', padding: 16 } },
+      h('div', { onClick: e => e.stopPropagation(), style: { background: '#fff', width: 'min(800px,100%)', maxHeight: '92vh', overflowY: 'auto', borderRadius: 4, padding: '26px 30px 30px', position: 'relative' } },
+        h('button', { type: 'button', 'aria-label': 'Close', onClick: close, style: { position: 'absolute', top: 18, right: 20, border: 'none', background: 'none', fontSize: 26, lineHeight: 1, cursor: 'pointer', color: INK } }, '×'),
+        h('div', { style: { height: 3, width: 24, background: TEAL, marginBottom: 12 } }),
+        h('div', { style: { fontSize: 19, fontWeight: 500 } }, fm.title),
+        h('div', { style: { fontSize: 14.5, color: MUT, margin: '8px 0 20px' } }, fm.sub),
+        this.state.cqDone
+          ? h('div', { style: { padding: '30px 0', textAlign: 'center' } },
+              h('div', { style: { fontSize: 17, fontWeight: 600, marginBottom: 8 } }, 'Thank you, custom quote submit successfully.'),
+              h('div', { style: { fontSize: 14, color: MUT, marginBottom: 18 } }, 'Quote ' + this.state.cqDone + ' is in My Quotations. We’ll price it and let you know.'),
+              h('div', { style: { display: 'flex', gap: 10, justifyContent: 'center' } }, this.btn('View My Quotations', 'teal', 'dash'), h('span', { onClick: close, style: { alignSelf: 'center', fontSize: 14, fontWeight: 600, color: MUT, cursor: 'pointer' } }, 'Close')))
+          : h('div', null,
+              fm.sections.map((sec, si) => h('div', { key: si },
+                h('div', { style: { fontSize: 15.5, fontWeight: 500, color: INK, padding: '14px 0', borderBottom: '1px solid ' + HAIR, marginBottom: 18 } }, sec.t),
+                sec.f.map((f, i) => field(sec, f, i)))),
+              this.state.cqErr ? h('div', { role: 'alert', style: { fontSize: 13.5, color: '#c0392b', margin: '4px 0 14px' } }, this.state.cqErr) : null,
+              h('button', { type: 'button', disabled: this.state.cqBusy, onClick: () => this.submitCustomQuote(fm),
+                style: { background: TEAL, color: '#fff', border: 'none', borderRadius: 3, padding: '13px 30px', fontSize: 15, fontWeight: 500, cursor: 'pointer', font: '500 15px Montserrat,sans-serif' } }, this.state.cqBusy ? 'Submitting…' : 'Submit'))));
+  }
+  submitCustomQuote(fm) {
+    const v = this.state.cqv || {}; const answers = []; const missing = [];
+    fm.sections.forEach(sec => sec.f.forEach(f => {
+      const k = f.key || (sec.t + ' / ' + f.l);
+      if (f.type === 'dims') {
+        const vals = f.d.map(d => v[k + ' — ' + d] || '');
+        if (f.req && vals.some(x => !x)) missing.push(f.l);
+        if (vals.some(Boolean)) answers.push([sec.t, f.l, f.d.map((d, i) => d + ' ' + (vals[i] || '—')).join(' × ') + ' mm']);
+      } else {
+        const val = (v[k] || '').trim();
+        if (f.req && !val) missing.push(f.l);
+        if (val) answers.push([sec.t, f.l, val]);
+      }
+    }));
+    if (missing.length) return this.setState({ cqErr: 'Please fill in: ' + missing.slice(0, 3).join(', ') + (missing.length > 3 ? ' and ' + (missing.length - 3) + ' more' : '') + '.' });
+    const phone = (v.phone || '').replace(/\s+/g, '');
+    if (!(phone.length > 9 && /\(?([0-9]{3})\)?([ .-]?)([0-9]{3})\2([0-9]{4})/.test(phone))) return this.setState({ cqErr: 'Please specify a valid phone number.' });
+    const pick = re => answers.filter(a => re.test(a[1])).map(a => a[1] + ': ' + a[2]).join(' · ');
+    const u = this.state.user || {};
+    const body = {
+      form: fm.id, product: fm.card + ' (custom quote)', answers,
+      customer: { name: u.name || '', email: u.email || '', phone: v.phone, company: u.company || '' },
+      size: pick(/size|open size|assembled/i), material: pick(/material/i), finishing: pick(/finishing|laminat|spot uv|emboss|stamping|window|glueing|folding|printing|colour/i),
+      qty: v.quantity || '', remarks: answers.map(a => a[0] + ' — ' + a[1] + ': ' + a[2]).join('\n'),
+    };
+    this.setState({ cqBusy: true, cqErr: null });
+    fetch('/api/quotes', { method: 'POST', headers: Object.assign({ 'Content-Type': 'application/json' }, this.authHeaders()), body: JSON.stringify(body) })
+      .then(r => r.json()).then(d => { if (d && d.quote) { this.setState({ cqBusy: false, cqDone: d.quote.id }); this.loadQuotes && this.loadQuotes(); } else this.setState({ cqBusy: false, cqErr: (d && d.error) || 'Custom quote submit failed, please try again later.' }); })
+      .catch(() => this.setState({ cqBusy: false, cqErr: 'Custom quote submit failed, please try again later.' }));
+  }
+
+  // "Guides for Closing Artwork" (original support page): a card per guide; Read More opens its PDF
+  guidesSection() {
+    const open = this.state.guidePdf;
+    return h('section', { key: 'guides', id: 'guides-for-closing-artwork', style: { marginTop: 34, scrollMarginTop: 130 } },
+      h('h2', { style: { margin: '0 0 16px', fontSize: 20, fontWeight: 600, letterSpacing: '-.01em' } }, 'Guides for Closing Artwork'),
+      h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(240px,1fr))', gap: 16 } },
+        ARTWORK_GUIDES.map((g, i) => h('button', { key: i, type: 'button', onClick: () => this.setState({ guidePdf: g }),
+          style: { textAlign: 'left', background: '#fff', border: '1px solid ' + HAIR, borderRadius: 12, padding: 18, cursor: 'pointer', display: 'flex', flexDirection: 'column', gap: 8, font: 'inherit', color: INK } },
+          h('span', { style: { height: 40, width: 40, borderRadius: 10, background: '#fdf2f2', display: 'grid', placeItems: 'center' } }, this.dashIcon('file', TEAL, 20)),
+          h('span', { style: { fontSize: 15, fontWeight: 600, lineHeight: 1.35 } }, g[0]),
+          h('span', { style: { fontSize: 13, color: MUT, lineHeight: 1.6 } }, g[1]),
+          h('span', { style: { fontSize: 13.5, color: TEAL, fontWeight: 600, marginTop: 'auto' } }, 'Read More')))),
+      open ? h('div', { role: 'dialog', 'aria-modal': 'true', 'aria-label': open[0], onClick: () => this.setState({ guidePdf: null }),
+          style: { position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,.55)', display: 'grid', placeItems: 'center', padding: 20 } },
+        h('div', { onClick: e => e.stopPropagation(), style: { background: '#fff', borderRadius: 12, width: 'min(920px,100%)', height: 'min(88vh,1100px)', display: 'flex', flexDirection: 'column', overflow: 'hidden' } },
+          h('div', { style: { display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderBottom: '1px solid ' + HAIR } },
+            h('span', { style: { fontSize: 15, fontWeight: 600, flex: 1 } }, open[0]),
+            h('a', { href: window.__asset(open[2]), target: '_blank', rel: 'noopener', style: { fontSize: 13, fontWeight: 600, color: TEAL, textDecoration: 'none' } }, 'Open PDF'),
+            h('button', { type: 'button', 'aria-label': 'Close', onClick: () => this.setState({ guidePdf: null }), style: { border: 'none', background: 'none', fontSize: 22, lineHeight: 1, cursor: 'pointer', color: MUT } }, '×')),
+          h('iframe', { title: open[0], src: window.__asset(open[2]), style: { flex: 1, border: 'none', width: '100%' } }))) : null);
   }
   // FAQ accordions (migrated verbatim from printoka.com/support) — one open per category
   faqSection() {
@@ -4281,8 +4409,8 @@ class Component extends DCLogic {
           this.card([
             h('div', { key: 'a', style: { fontSize: 13, fontWeight: 600, marginBottom: 9 } }, 'Talk to us'),
             h('div', { key: 'b', style: { fontSize: 12.5, color: MUT, lineHeight: 1.8 } },
-              h('div', null, 'Web chat · 9am–6pm MYT'), h('div', null, 'WhatsApp · +60 3-1234 5678'),
-              h('div', null, 'hello@printoka.com'), h('div', null, 'Miri facility + 30 partner vendors')),
+              h('div', null, 'Web chat · 9am–6pm MYT'), h('div', null, 'WhatsApp · +60 14 969 0799'),
+              h('div', null, 'print@printoka.com'), h('div', null, 'Miri facility + 30 partner vendors')),
           ]),
           this.card([
             h('div', { key: 'a', style: { fontSize: 13, fontWeight: 600, marginBottom: 9 } }, 'Already have a quote?'),

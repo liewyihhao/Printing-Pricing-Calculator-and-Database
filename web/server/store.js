@@ -465,7 +465,7 @@ function settings() {
   if (!db.settings) db.settings = {};
   const s = db.settings;
   if (!s.announcement) s.announcement = { text: 'Members save up to 15% on every order — sign in to see your price. Free delivery on orders over RM 300.', cta: 'Find out more', link: 'membership', hidden: false };
-  if (!s.store) s.store = { name: 'Printoka', supportEmail: 'hello@printoka.com', supportPhone: '+60 3-1234 5678', countries: 'Malaysia, Singapore, Brunei', currency: 'MYR (RM)' };
+  if (!s.store) s.store = { name: 'Printoka', supportEmail: 'print@printoka.com', supportPhone: '+60 14 969 0799', countries: 'Malaysia, Singapore, Brunei', currency: 'MYR (RM)' };
   if (!s.theme) s.theme = { primary: '#E52220', heroTitle: 'Custom printing, priced instantly.', heroSub: 'Configure any of 100+ products and see the exact price in seconds.' };
   return s;
 }
@@ -538,6 +538,8 @@ function createQuote(body, user) {
   const q = {
     id: qid, userId: user ? user.id : null, channel: (user && user.type === 'outlet') ? 'outlet' : 'online', customer: cust,
     requirement: { product: body.product || '', size: body.size || '', material: body.material || '', finishing: body.finishing || '', qty: body.qty || '', remarks: body.remarks || '' },
+    // custom-quote questionnaire (Customized Printing Solutions): form id + every [section, question, answer]
+    form: body.form || null, answers: Array.isArray(body.answers) ? body.answers.slice(0, 80).map(a => [String(a[0] || ''), String(a[1] || ''), String(a[2] || '')]) : null,
     artworkFile: body.artworkFile || null, status: 'requested', price: null, leadDays: null, note: '', orderId: null,
     createdAt: now(), history: [{ ts: now(), actor: (user && user.email) || cust.email || 'guest', action: 'requested' }],
   };

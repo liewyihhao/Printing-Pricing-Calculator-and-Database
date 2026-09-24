@@ -180,7 +180,7 @@ function page(slug, origin, opts) {
   // Choose the type to configure (before "Why Printoka?"). More than 5 types => a horizontal
   // carousel (scroll left/right) instead of a wrapping grid.
   if (f.types.length) {
-    const cards = f.types.map(t => '<a class="pk-type" href="' + esc(configUrl + '?' + f.typeKey + '=' + encodeURIComponent(t)) + '"><div class="pk-type-ph" aria-hidden="true"><img src="/assets/icons/logomark.svg" alt=""></div><div class="pk-type-l">' + esc(t) + '</div><span class="pk-btn pk-btn-sm">Check Price</span></a>').join('');
+    const cards = f.types.map(t => '<a class="pk-type" href="' + esc(configUrl + '?' + f.typeKey + '=' + encodeURIComponent(t)) + '"><div class="pk-type-ph" aria-hidden="true"><img src="/assets/icons/cropped-favicon-192x192.png" alt=""></div><div class="pk-type-l">' + esc(t) + '</div><span class="pk-btn pk-btn-sm">Check Price</span></a>').join('');
     const body = f.types.length > 5
       ? '<div class="pk-carousel"><button type="button" class="pk-car-btn pk-car-prev" aria-label="Scroll left">‹</button><div class="pk-car-track">' + cards + '</div><button type="button" class="pk-car-btn pk-car-next" aria-label="Scroll right">›</button></div>'
       : '<div class="pk-grid pk-types">' + cards + '</div>';
@@ -240,6 +240,9 @@ function page(slug, origin, opts) {
     + '<a class="pk-btn pk-btn-lg" href="' + esc(configUrl) + '">Configure your ' + esc(name) + '</a>'
     + '</div></section>');
   // FAQ — native <details> accordion styled like the printoka.com FAQ (no JS needed)
+  S.push('<section class="pk-wa"><div class="pk-wa-txt"><div class="pk-wa-h">Can’t find what you need?</div><div class="pk-wa-s">Chat with us using Whatsapp</div>'
+    + '<a class="pk-wa-tel" href="tel:+60149690799"><span aria-hidden="true"><img src="/assets/icons/phone.svg" alt="" height="16"></span>+60 14 969 0799</a></div>'
+    + '<div class="pk-wa-img" role="img" aria-label="Printoka customer service"></div></section>');
   S.push('<section id="faq" class="pk-faq-sec"><h2>' + esc(name) + ' printing FAQ</h2><div class="pk-faq">'
     + c.faq.map((q, i) => '<details class="pk-faq-item"' + (i === 0 ? ' open' : '') + '><summary>' + esc(q[0]) + '<span class="pk-faq-ch" aria-hidden="true">▾</span></summary><div class="pk-faq-a">' + esc(q[1]) + '</div></details>').join('')
     + '</div><a class="pk-btn" href="/contact">Ask a question</a></section>');
@@ -248,7 +251,7 @@ function page(slug, origin, opts) {
   // button, search, locale, login, cart, country), so the SEO page matches the storefront.
   const navCats = ['business-essentials', 'flyers-leaflets', 'labels-stickers', 'books-stationery', 'cards-invitations', 'large-format', 'packaging-boxes', 'apparel-gifts'];
   const header = '<div class="pk-headwrap"><header class="pk-head"><div class="pk-head-in">'
-    + '<a class="pk-logo" href="/"><img src="/assets/icons/logomark.svg" alt="" height="26"><span>printoka</span></a>'
+    + '<a class="pk-logo" href="/" aria-label="Printoka home"><img src="/assets/icons/logo.png" alt="Printoka" width="125" height="38"></a>'
     + '<a class="pk-products" href="/products">Products <img src="/assets/icons/dropdown.svg" alt="" height="7"></a>'
     + '<form class="pk-search" action="/search" method="get" role="search"><input name="q" placeholder="Search products" aria-label="Search products"><button type="submit" aria-label="Search"><img src="/assets/icons/search.svg" alt="" height="13"></button></form>'
     + '<div class="pk-head-r"><span class="pk-loc">EN</span><span class="pk-div"></span>'
@@ -256,21 +259,25 @@ function page(slug, origin, opts) {
     + '<a class="pk-cart" href="/cart" aria-label="Cart"><img src="/assets/icons/cart.svg" alt="" height="19"></a>'
     + '<span class="pk-country"><img src="/assets/icons/flag-my.jpg" alt="Malaysia" width="22" height="15">MY</span></div>'
     + '</div></header></div>';
-  // footer — replica of the app footer (red band + link columns + contact + policy bar)
-  const fcol = (title, items) => '<div class="pk-fcol"><div class="pk-fcol-h">' + esc(title) + '</div>' + items.map(i => '<a href="' + esc(i[1]) + '">' + esc(i[0]) + '</a>').join('') + '</div>';
-  const footer = '<div class="pk-fpromo"><div class="pk-fpromo-in">'
-    + '<div class="pk-fp"><div class="pk-fp-h">Follow us</div><div class="pk-social"><a href="#" aria-label="Facebook">FB</a><a href="#" aria-label="Instagram">IG</a><a href="#" aria-label="LinkedIn">in</a><a href="#" aria-label="YouTube">YT</a></div></div>'
-    + '<div class="pk-fp"><div class="pk-fp-h">Subscribe for latest promotion and updates</div><div class="pk-sub"><span>Your email address</span><b>Subscribe</b></div></div>'
-    + '<div class="pk-fp"><div class="pk-fp-h">Be a Printoka printer</div><a class="pk-join" href="/partners">Join our network</a></div>'
+  // footer — identical to the original printoka.com footer (links, company details); same as runtime.js
+  const flink = (l) => '<a href="' + esc(l[1]) + '">' + esc(l[0]) + '</a>';
+  const fcol = (title, items) => '<div class="pk-fcol"><div class="pk-fcol-h">' + esc(title) + '</div>' + items.map(flink).join('') + '</div>';
+  const ext = ' target="_blank" rel="noopener noreferrer"';
+  const footer = '<footer class="pk-foot"><div class="pk-foot-in">'
+    + fcol('Printoka', [['About Us', '/about-us'], ['Customized Printing Solutions', '/customized-printing-solutions'], ['Become Our Printers', '/partners'], ['Printoka Membership Plans', '/membership'], ['Terms & Conditions', '/terms']])
+    + fcol('Support', [['General FAQs', '/support'], ['Blog', '/learn'], ['Guides for Closing Artwork', '/support#guides-for-closing-artwork'], ['Templates Download', '/downloads']])
+    + '<div class="pk-fcol"><div class="pk-fcol-h">Country</div><div class="pk-flags">'
+    + [['flag-my.jpg', 'Malaysia', '/'], ['flag-sg.jpg', 'Singapore', 'https://printokasingapore.com/'], ['flag-bn.jpg', 'Brunei', 'https://printokabrunei.com/'], ['flag-au.jpg', 'Australia', '/au/'], ['flag-nz.jpg', 'New Zealand', '/nz/']].map(c => '<a href="' + c[2] + '"' + (/^https?:/.test(c[2]) ? ext : '') + ' title="' + c[1] + '"><img src="/assets/icons/' + c[0] + '" alt="' + c[1] + '" width="34" height="22"></a>').join('')
+    + '</div><div class="pk-fcol-h">Follow us</div><div class="pk-social">'
+    + [['facebook.svg', 'Facebook', 'https://www.facebook.com/Printoka-Malaysia-414898672398006/', '#3b5998'], ['instagram-line.svg', 'Instagram', 'https://www.instagram.com/printoka_group', '#e1306c'], ['linkedin-fill.svg', 'LinkedIn', 'https://www.linkedin.com/company/51652879/', '#0e76a8']].map(x => '<a href="' + x[2] + '"' + ext + ' aria-label="' + x[1] + '" style="background:' + x[3] + '"><img src="/assets/icons/' + x[0] + '" alt="" width="20" height="20"></a>').join('')
     + '</div></div>'
-    + '<footer class="pk-foot"><div class="pk-foot-in">'
-    + fcol('Products', navCats.map(id => [categoryLabel(id), '/products/' + id]))
-    + fcol('Company', [['About Printoka', '/about-us'], ['Membership', '/membership'], ['Partners', '/partners'], ['Terms & policies', '/terms']])
-    + fcol('Support', [['Learning Hub', '/learn'], ['Track an order', '/track'], ['Contact us', '/contact'], ['All products', '/products']])
-    + '<div class="pk-fcol"><div class="pk-flogo"><img src="/assets/icons/logomark.svg" alt="" height="24"><span>printoka</span></div>'
-    + '<div class="pk-fcol-h">Contact us</div><a href="mailto:hello@printoka.com" style="color:' + T.brand + '">hello@printoka.com</a>'
-    + '<p class="pk-fhours"><b>Working Hours</b><br>Monday to Friday: 8.30am to 6.00pm<br>Weekend &amp; Public Holidays: Closed</p></div>'
-    + '</div><div class="pk-foot-bar">All rights reserved &copy; 2013–2022 Printoka.com | Managed and operated by Yushan Corporation Sdn Bhd (561674-X), Lot 1565, Piasau Industrial Estate, 98000 Miri, Sarawak, Malaysia</div></footer>';
+    + '<div class="pk-fcol"><img class="pk-flogo" src="/assets/icons/logo.png" alt="Printoka" width="158" height="48">'
+    + '<div class="pk-fneed">Can’t find what you need?</div><div class="pk-fneed-s">Chat with us using Whatsapp</div>'
+    + '<a class="pk-fcontact" href="https://wa.me/60149690799"' + ext + '><img src="/assets/icons/whatsapp.svg" alt="" width="16" height="16">Contact us</a></div>'
+    + '</div><div class="pk-foot-in2">'
+    + fcol('What we Do', [['Online Printing Malaysia', '/online-printing-malaysia'], ['Stickers Printing Malaysia', '/digital-stickers-and-labels-printing'], ['Business Card Printing Malaysia', '/business-cards-printing'], ['Packaging Printing Malaysia', '/packaging-printing-in-malaysia'], ['Brochure and Flyer Printing Malaysia', '/brochure-and-flyer-printing-malaysia']])
+    + '<img class="pk-fart" src="/assets/icons/footer-1.png" alt="" loading="lazy" width="580" height="300"></div>'
+    + '<div class="pk-foot-bar">All rights reserved &copy; 2013-2022 Printoka.com | This website is managed and operated by Yushan Corporation Sdn Bhd (561674-X) |<br>Registered address: Lot 1565, Piasau Industrial Estate, 98000 Miri, Sarawak, Malaysia</div></footer>';
 
   const html = '<!doctype html><html lang="en-MY"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
     + '<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
@@ -285,7 +292,7 @@ function page(slug, origin, opts) {
     + '<meta property="og:title" content="' + esc(title) + '"><meta property="og:description" content="' + esc(desc) + '">'
     + '<meta property="og:url" content="' + esc(productUrl) + '"><meta property="og:image" content="' + esc(ogImg) + '">'
     + '<meta name="twitter:card" content="summary_large_image">'
-    + '<link rel="icon" href="/assets/icons/logomark.svg">'
+    + '<link rel="icon" href="/assets/icons/cropped-favicon-32x32.png" sizes="32x32"><link rel="icon" href="/assets/icons/cropped-favicon-192x192.png" sizes="192x192"><link rel="apple-touch-icon" href="/assets/icons/cropped-favicon-180x180.png">'
     + (asset ? '<link rel="preload" as="image" href="' + esc(asset) + '">' : '')
     + jsonld.map(j => '<script type="application/ld+json">' + JSON.stringify(j) + '</script>').join('')
     + '<style>' + css() + '</style></head><body>'
@@ -297,6 +304,12 @@ function page(slug, origin, opts) {
 
 function css() {
   return [
+    '.pk-foot{margin-top:56px;border-top:16px solid ' + T.brand + ';background:#fff}.pk-foot-in{max-width:1240px;margin:0 auto;padding:44px 20px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:28px 40px;align-items:start}.pk-foot-in2{max-width:1240px;margin:0 auto;padding:24px 20px 0;display:flex;gap:30px;flex-wrap:wrap;align-items:flex-end}.pk-foot-in2 .pk-fcol{flex:0 1 300px;padding-bottom:30px}.pk-fart{flex:1 1 480px;max-width:580px;width:100%;height:auto;margin:0 auto;display:block}',
+    '.pk-fcol-h{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#4a4a4a;margin:0 0 14px}.pk-fcol a{display:block;font-size:15px;color:' + T.ink + ';text-decoration:none;padding:6px 0}.pk-flags{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:26px}.pk-flags a{padding:0}.pk-flags img{display:block;width:34px;height:22px;object-fit:cover}',
+    '.pk-social{display:flex;gap:12px}.pk-social a{height:42px;width:42px;border-radius:50%;display:grid;place-items:center;padding:0}.pk-social img{filter:brightness(0) invert(1)}.pk-flogo{height:48px;width:auto;display:block;margin-bottom:30px}.pk-fneed{font-size:19px;font-weight:500;margin-bottom:8px}.pk-fneed-s{font-size:14px;color:' + T.muted + ';margin-bottom:18px}',
+    '.pk-fcontact{display:inline-flex!important;align-items:center;gap:8px;background:' + T.brand + ';color:#fff!important;font-size:15px;font-weight:500;padding:11px 26px!important;border-radius:3px}.pk-fcontact img{filter:brightness(0) invert(1)}.pk-foot-bar{background:#f7f7f7;padding:16px 20px;text-align:center;font-size:13.5px;color:#555;line-height:1.7}',
+    '.pk-wa{max-width:1180px;margin:40px auto 44px;display:flex;flex-wrap:wrap;background:#f7f7f7;border-radius:4px;overflow:hidden}.pk-wa-txt{flex:1 1 380px;padding:40px 44px;display:flex;flex-direction:column;justify-content:center;gap:10px}.pk-wa-h{font-size:28px;font-weight:500;letter-spacing:-.01em}.pk-wa-s{font-size:15px;color:' + T.muted + '}',
+    '.pk-wa-tel{display:inline-flex;align-items:center;gap:14px;margin-top:14px;color:' + T.brand + ';font-size:30px;text-decoration:none}.pk-wa-tel span{height:38px;width:38px;border-radius:50%;background:' + T.brand + ';display:grid;place-items:center}.pk-wa-tel img{filter:brightness(0) invert(1)}.pk-wa-img{flex:0 1 440px;min-height:260px;background:url(/assets/icons/question.jpg) center/cover no-repeat;clip-path:polygon(18% 0,100% 0,100% 100%,0 100%)}@media(max-width:760px){.pk-wa-img,.pk-fart{display:none}.pk-wa-txt{padding:28px 22px}.pk-wa-tel{font-size:22px}}',
     '*{box-sizing:border-box}body{margin:0;font-family:Montserrat,system-ui,sans-serif;-webkit-font-smoothing:antialiased;color:' + T.ink + ';background:' + T.white + ';line-height:1.6}',
     'a{color:' + T.brand + ';text-decoration:none}a:hover{color:' + T.brandDark + '}img{max-width:100%;height:auto}',
     ':where(a,button):focus-visible{outline:2px solid ' + T.brand + ';outline-offset:2px}',
@@ -307,7 +320,7 @@ function css() {
     // header (matches runtime.js chrome)
     '.pk-headwrap{position:sticky;top:0;z-index:60}.pk-head{background:rgba(255,255,255,.96);backdrop-filter:blur(8px);border-bottom:1px solid ' + T.hairline + '}',
     '.pk-head-in{max-width:1180px;margin:0 auto;padding:10px 20px;min-height:64px;display:flex;align-items:center;flex-wrap:wrap;gap:10px 18px}',
-    '.pk-logo{display:flex;align-items:center;gap:9px;font-weight:500;font-size:18px;letter-spacing:.16em;color:' + T.inkDark + ';white-space:nowrap}.pk-logo img{display:block;flex:none;height:26px;width:auto}',
+    '.pk-logo{display:flex;align-items:center;white-space:nowrap}.pk-logo img{display:block;flex:none;height:38px;width:auto}',
     '.pk-products{display:flex;align-items:center;gap:6px;background:' + T.brand + ';color:#fff;font-weight:600;font-size:13.5px;border-radius:3px;padding:9px 15px;white-space:nowrap}.pk-products:hover{color:#fff}.pk-products img{height:7px;width:auto;filter:brightness(0) invert(1)}',
     '.pk-search{display:flex;align-items:center;flex:1 1 260px;min-width:120px;border:1px solid ' + T.hairline + ';border-radius:3px;overflow:hidden}.pk-search input{flex:1;border:0;padding:0 12px;font:400 13px Montserrat,sans-serif;color:' + T.ink + ';min-width:0;outline:none}.pk-search button{border:0;background:' + T.brand + ';padding:11px 15px;display:flex;cursor:pointer}.pk-search button img{height:13px;width:auto;filter:brightness(0) invert(1)}',
     '.pk-head-r{display:flex;align-items:center;gap:14px;font-size:13px;color:' + T.inkDark + ';white-space:nowrap}.pk-head-r a{color:' + T.inkDark + '}.pk-loc{cursor:default}.pk-div{width:1px;height:16px;background:' + T.hairline + '}',
@@ -358,15 +371,6 @@ function css() {
     '.pk-faq-ch{flex:none;color:' + T.brand + ';font-size:13px;transition:transform .15s}.pk-faq-item[open] .pk-faq-ch{transform:rotate(180deg)}',
     '.pk-faq-a{padding:0 2px 18px;font-size:13.5px;color:' + T.muted + ';line-height:1.75}.pk-faq-sec .pk-btn{margin-top:20px}',
     // footer (matches app footer)
-    '.pk-fpromo{margin-top:56px;background:' + T.brand + ';color:#fff}.pk-fpromo-in{max-width:1180px;margin:0 auto;padding:30px 20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:26px;align-items:start}',
-    '.pk-fp{display:flex;flex-direction:column;gap:12px;text-align:center}.pk-fp-h{font-size:17px;font-weight:600}',
-    '.pk-social{display:flex;gap:10px;justify-content:center}.pk-social a{height:34px;width:34px;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:600}',
-    '.pk-sub{display:flex;background:#fff;border-radius:2px;overflow:hidden}.pk-sub span{flex:1;padding:11px 13px;font-size:13px;color:' + T.muted + ';text-align:left}.pk-sub b{padding:11px 20px;font-size:13.5px;color:' + T.brand + ';border-left:1px solid ' + T.hairline + '}',
-    '.pk-join{background:#fff;color:' + T.brand + ';font-weight:600;font-size:13.5px;border-radius:2px;padding:11px 22px;align-self:center}.pk-join:hover{color:' + T.brand + '}',
-    '.pk-foot{border-top:1px solid #e9ecef;background:#fff}.pk-foot-in{max-width:1180px;margin:0 auto;padding:40px 20px 30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:30px}',
-    '.pk-fcol{display:flex;flex-direction:column;gap:9px}.pk-fcol-h{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:' + T.ink + '}.pk-fcol a{font-size:12.5px;color:' + T.muted + '}',
-    '.pk-flogo{display:flex;align-items:center;gap:9px;font-weight:500;font-size:17px;letter-spacing:.16em;color:' + T.ink + '}.pk-flogo img{height:24px;width:auto}.pk-fhours{margin:0;font-size:12px;color:' + T.muted + ';line-height:1.7}.pk-fhours b{color:' + T.ink + '}',
-    '.pk-foot-bar{max-width:1180px;margin:0 auto;padding:20px 20px 34px;border-top:1px solid ' + T.hairline + ';font-size:12px;color:' + T.muted + ';line-height:1.7}',
     '@media(max-width:760px){.pk-search{order:5;flex:1 1 100%}}',
   ].join('');
 }

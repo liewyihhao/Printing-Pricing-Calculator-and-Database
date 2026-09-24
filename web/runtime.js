@@ -24,15 +24,15 @@
     if (v.bareStaff) return null;
     if (v.staff) return h('header', { style: { position: 'sticky', top: 0, zIndex: 60, background: '#fff', borderBottom: '1px solid ' + HAIR } },
       h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '12px 20px', display: 'flex', alignItems: 'center', gap: 12 } },
-        h('a', { 'data-go': 'home', style: { display: 'flex', alignItems: 'center', gap: 9, fontWeight: 500, fontSize: 18, letterSpacing: '.16em', color: '#231f20', textDecoration: 'none', cursor: 'pointer' } },
-          img('assets/icons/logomark.svg', { height: 24, width: 'auto', display: 'block' }), 'printoka'),
+        h('a', { 'data-go': 'home', 'aria-label': 'Printoka home', style: { display: 'flex', alignItems: 'center', textDecoration: 'none', cursor: 'pointer' } },
+          h('img', { src: A('assets/icons/logo.png'), alt: 'Printoka', width: 106, height: 32, style: { height: 32, width: 'auto', display: 'block' } })),
         h('span', { style: { fontSize: 12, color: MUT, borderLeft: '1px solid ' + HAIR, paddingLeft: 12 } }, 'Staff console')));
     return h('div', { style: { position: 'sticky', top: 0, zIndex: 60, display: 'flex', flexDirection: 'column' } },
       h('header', { style: { background: 'rgba(255,255,255,.96)', backdropFilter: 'blur(8px)', borderBottom: '1px solid ' + HAIR } },
         h('div', { role: 'navigation', 'aria-label': 'Primary', style: { maxWidth: 1180, margin: '0 auto', padding: '10px 20px', minHeight: 64, display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '10px 18px' } },
           // logo
-          h('a', { 'data-go': 'home', href: '#', onClick: function (e) { e.preventDefault(); }, style: { display: 'flex', alignItems: 'center', gap: 9, fontWeight: 500, fontSize: 18, letterSpacing: '.16em', color: '#231f20', whiteSpace: 'nowrap', textDecoration: 'none' } },
-            img('assets/icons/logomark.svg', { height: 26, width: 'auto', display: 'block', flex: 'none' }), 'printoka'),
+          h('a', { 'data-go': 'home', href: '/', 'aria-label': 'Printoka home', style: { display: 'flex', alignItems: 'center', whiteSpace: 'nowrap', textDecoration: 'none' } },
+            h('img', { src: A('assets/icons/logo.png'), alt: 'Printoka', width: 125, height: 38, style: { height: 38, width: 'auto', display: 'block', flex: 'none' } })),
           // Products mega button
           h('span', { 'data-go': '_mega', style: { display: 'flex', alignItems: 'center', gap: 6, background: TEAL, color: '#fff', fontWeight: 600, fontSize: 13.5, borderRadius: 3, padding: '9px 15px', whiteSpace: 'nowrap', cursor: 'pointer' } },
             v.tProducts, img('assets/icons/dropdown.svg', { height: 7, width: 'auto', display: 'block', filter: 'brightness(0) invert(1)' })),
@@ -86,7 +86,7 @@
     if (a.hidden) return null;
     return h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '14px 20px 0' } },
       h('div', { style: { display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px 20px', padding: '12px 16px', borderRadius: 2, color: '#fff', fontSize: 14, backgroundImage: 'linear-gradient(90deg,#FF9A2E,#F02B29)', boxShadow: '0 1px 3px rgba(33,33,33,.12)' } },
-        img('assets/icons/logomark.svg', { height: 34, width: 'auto', display: 'block', filter: 'brightness(0) invert(1)' }),
+        img('assets/icons/cropped-favicon-192x192.png', { height: 34, width: 34, display: 'block', borderRadius: 8, background: '#fff' }),
         h('div', { style: { flex: '1 1 auto', minWidth: 0, lineHeight: 1.35 } }, a.text || 'Members save up to 15% on every order — sign in to see your price. Free delivery on orders over RM 300.'),
         h('a', { 'data-go': a.link || 'membership', style: { display: 'flex', alignItems: 'center', gap: 6, color: '#fff', fontWeight: 500, textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'pointer' } },
           a.cta || 'Find out more', img('assets/icons/arrow-right.svg', { height: 13, width: 'auto', display: 'block', filter: 'brightness(0) invert(1)' }))));
@@ -108,62 +108,55 @@
       h('span', { style: { fontSize: 13, color: MUT } }, v.specNote));
   }
 
+  // Footer — identical in structure, links and company details to the original printoka.com footer.
+  // Internal links are real hrefs + data-go (routed in-app); external links open in a new tab.
+  var FOOT = {
+    printoka: [['About Us', 'about', '/about-us'], ['Customized Printing Solutions', 'solutions', '/customized-printing-solutions'], ['Become Our Printers', 'partners', '/partners'], ['Printoka Membership Plans', 'membership', '/membership'], ['Terms & Conditions', 'terms', '/terms']],
+    whatWeDo: [['Online Printing Malaysia', 'seo:online-printing-malaysia', '/online-printing-malaysia'], ['Stickers Printing Malaysia', 'open:60', '/digital-stickers-and-labels-printing'], ['Business Card Printing Malaysia', 'open:1', '/business-cards-printing'], ['Packaging Printing Malaysia', 'seo:packaging-printing-in-malaysia', '/packaging-printing-in-malaysia'], ['Brochure and Flyer Printing Malaysia', 'seo:brochure-and-flyer-printing-malaysia', '/brochure-and-flyer-printing-malaysia']],
+    support: [['General FAQs', 'support', '/support'], ['Blog', 'learn', '/learn'], ['Guides for Closing Artwork', 'guides', '/support#guides-for-closing-artwork'], ['Templates Download', 'downloads', '/downloads']],
+    countries: [['flag-my.jpg', 'Malaysia', '/'], ['flag-sg.jpg', 'Singapore', 'https://printokasingapore.com/'], ['flag-bn.jpg', 'Brunei', 'https://printokabrunei.com/'], ['flag-au.jpg', 'Australia', '/au/'], ['flag-nz.jpg', 'New Zealand', '/nz/']],
+    social: [['facebook.svg', 'Facebook', 'https://www.facebook.com/Printoka-Malaysia-414898672398006/', '#3b5998'], ['instagram-line.svg', 'Instagram', 'https://www.instagram.com/printoka_group', '#e1306c'], ['linkedin-fill.svg', 'LinkedIn', 'https://www.linkedin.com/company/51652879/', '#0e76a8']],
+  };
+  var WHATSAPP = 'https://wa.me/60149690799';
+
   function footer(v) {
-    var social = ['FB', 'IG', 'in', 'YT'];
-    var flags = [['flag-my.jpg', 'Malaysia'], ['flag-sg.jpg', 'Singapore'], ['flag-bn.jpg', 'Brunei'], ['flag-au.jpg', 'Australia'], ['flag-nz.jpg', 'New Zealand']];
-    return h('div', null,
-      h('section', { style: { marginTop: 56, background: TEAL, color: '#fff' } },
-        h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '30px 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(230px,1fr))', gap: 26, alignItems: 'start' } },
-          h('div', { style: { display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', textAlign: 'center' } },
-            h('div', { style: { fontSize: 17, fontWeight: 600 } }, 'Follow us'),
-            h('div', { style: { display: 'flex', gap: 10 } }, social.map(function (s, i) {
-              return h('a', { key: i, href: '#', onClick: function (e) { e.preventDefault(); }, style: { height: 34, width: 34, borderRadius: '50%', background: 'rgba(255,255,255,.16)', color: '#fff', display: 'grid', placeItems: 'center', fontSize: 12, fontWeight: 600, textDecoration: 'none' } }, s);
-            }))),
-          h('div', { style: { display: 'flex', flexDirection: 'column', gap: 12, textAlign: 'center' } },
-            h('div', { style: { fontSize: 17, fontWeight: 600 } }, 'Subscribe for latest promotion and updates'),
-            h('div', { style: { display: 'flex', background: '#fff', borderRadius: 2, overflow: 'hidden' } },
-              h('span', { style: { flex: 1, padding: '11px 13px', fontSize: 13, color: MUT, minWidth: 0, textAlign: 'left' } }, 'Your email address'),
-              h('span', { style: { padding: '11px 20px', fontSize: 13.5, fontWeight: 600, color: TEAL, whiteSpace: 'nowrap', borderLeft: '1px solid ' + HAIR } }, 'Subscribe'))),
-          h('div', { style: { display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', textAlign: 'center' } },
-            h('div', { style: { fontSize: 17, fontWeight: 600, whiteSpace: 'nowrap' } }, 'Be a Printoka printer'),
-            h('a', { 'data-go': 'vendor', href: '#', onClick: function (e) { e.preventDefault(); }, style: { background: '#fff', color: TEAL, fontWeight: 600, fontSize: 13.5, borderRadius: 2, padding: '11px 22px', textDecoration: 'none', whiteSpace: 'nowrap', cursor: 'pointer' } }, 'Join our network')))),
-      h('footer', { style: { borderTop: '1px solid #e9ecef', background: '#fff' } },
-        h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '40px 20px 30px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(190px,1fr))', gap: 30 } },
-          v.footerCols.map(function (col, ci) {
-            return h('div', { key: ci, style: { display: 'flex', flexDirection: 'column', gap: 9 } },
-              h('div', { style: { fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: INK } }, col.title),
-              col.items.map(function (it, ii) {
-                var label = Array.isArray(it) ? it[0] : it, go = Array.isArray(it) ? it[1] : null;
-                return h('a', { key: ii, 'data-go': go || undefined, href: '#', onClick: function (e) { e.preventDefault(); }, style: { fontSize: 12.5, color: MUT, textDecoration: 'none', cursor: go ? 'pointer' : 'default' } }, label);
-              }));
-          }),
-          h('div', { style: { display: 'flex', flexDirection: 'column', gap: 12 } },
-            h('div', { style: { display: 'flex', alignItems: 'center', gap: 9, fontWeight: 500, fontSize: 17, letterSpacing: '.16em' } },
-              img('assets/icons/logomark.svg', { height: 24, width: 'auto', display: 'block', flex: 'none' }), 'printoka'),
-            h('div', { style: { fontSize: 11, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: INK } }, 'Contact us'),
-            h('div', { style: { display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' } }, flags.map(function (fl, i) {
-              return h('img', { key: i, src: A('assets/icons/' + fl[0]), alt: fl[1], style: { height: 16, width: 24, objectFit: 'cover', display: 'block' } });
-            })),
-            h('a', { href: 'mailto:hello@printoka.com', style: { fontSize: 14, fontWeight: 500, color: TEAL, textDecoration: 'none' } }, 'hello@printoka.com'),
-            h('div', { style: { display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, fontWeight: 500, color: INK } },
-              img('assets/icons/whatsapp.png', { height: 20, width: 20, display: 'block' }), '+60 3-1234 5678'),
-            h('p', { style: { margin: 0, fontSize: 12, color: MUT, lineHeight: 1.7 } },
-              h('b', { style: { color: INK } }, 'Working Hours'), h('br'), 'Monday to Friday: 8.30am to 6.00pm', h('br'), 'Weekend and Public Holidays: Closed'))),
-        h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '20px 20px 34px', borderTop: '1px solid ' + HAIR, display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 16, alignItems: 'center' } },
-          h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } },
-            h('span', { style: { fontSize: 12, color: MUT, lineHeight: 1.7 } }, 'All rights reserved © 2013–2022 Printoka.com | This website is managed and operated by Yushan Corporation Sdn Bhd (561674-X) | Registered address: Lot 1565, Piasau Industrial Estate, 98000 Miri, Sarawak, Malaysia'),
-            h('div', { style: { display: 'flex', gap: 16, flexWrap: 'wrap' } },
-              ['Privacy & PDPA Policy', 'Terms & Conditions', 'SST disclosure (MY)', 'GST disclosure (SG)'].map(function (t, i) {
-                return h('a', { key: i, href: '#', onClick: function (e) { e.preventDefault(); }, style: { fontSize: 12, color: MUT, textDecoration: 'none' } }, t);
-              }))),
-          h('div', { style: { display: 'flex', gap: 7, flexWrap: 'wrap', justifyContent: 'flex-end' } },
-            v.payments.map(function (p, i) {
-              return h('span', { key: i, style: { font: '600 10.5px Montserrat,sans-serif', border: '1px solid ' + HAIR, background: '#fff', borderRadius: 3, padding: '5px 9px', color: MUT, whiteSpace: 'nowrap' } }, p);
-            })))));
+    var ext = { target: '_blank', rel: 'noopener noreferrer' };
+    var colTitle = function (t) { return h('div', { style: { fontSize: 11, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: '#4a4a4a', marginBottom: 14 } }, t); };
+    var link = function (l, i) { return h('a', { key: i, href: l[2] || (l[1] && l[1].indexOf('open:') === 0 ? undefined : '#'), 'data-go': l[1], style: { display: 'block', fontSize: 15, color: INK, textDecoration: 'none', padding: '6px 0', cursor: 'pointer' } }, l[0]); };
+    var col = function (title, items) { return h('div', null, colTitle(title), items.map(link)); };
+    return h('footer', { style: { marginTop: 56, borderTop: '16px solid ' + TEAL, background: '#fff' } },
+      h('div', { style: { maxWidth: 1240, margin: '0 auto', padding: '44px 20px 0', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: '28px 40px', alignItems: 'start' } },
+        col('Printoka', FOOT.printoka),
+        col('Support', FOOT.support),
+        h('div', null,
+          colTitle('Country'),
+          h('div', { style: { display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 26 } }, FOOT.countries.map(function (c, i) {
+            var external = /^https?:/.test(c[2]);
+            return h('a', Object.assign({ key: i, href: c[2], title: c[1], 'aria-label': 'Printoka ' + c[1] }, external ? ext : {}), h('img', { src: A('assets/icons/' + c[0]), alt: c[1], style: { height: 22, width: 34, objectFit: 'cover', display: 'block' } }));
+          })),
+          colTitle('Follow us'),
+          h('div', { style: { display: 'flex', gap: 12 } }, FOOT.social.map(function (s2, i) {
+            return h('a', Object.assign({ key: i, href: s2[2], 'aria-label': s2[1], style: { height: 42, width: 42, borderRadius: '50%', background: s2[3], display: 'grid', placeItems: 'center' } }, ext),
+              h('img', { src: A('assets/icons/' + s2[0]), alt: '', style: { height: 20, width: 20, display: 'block', filter: 'brightness(0) invert(1)' } }));
+          }))),
+        h('div', null,
+          h('img', { src: A('assets/icons/logo.png'), alt: 'Printoka', width: 158, height: 48, style: { height: 48, width: 'auto', display: 'block', marginBottom: 30 } }),
+          h('div', { style: { fontSize: 19, fontWeight: 500, color: INK, marginBottom: 8 } }, 'Can’t find what you need?'),
+          h('div', { style: { fontSize: 14, color: MUT, marginBottom: 18 } }, 'Chat with us using Whatsapp'),
+          h('a', Object.assign({ href: WHATSAPP, style: { display: 'inline-flex', alignItems: 'center', gap: 8, background: TEAL, color: '#fff', fontSize: 15, fontWeight: 500, padding: '11px 26px', borderRadius: 3, textDecoration: 'none' } }, ext),
+            h('img', { src: A('assets/icons/whatsapp.svg'), alt: '', style: { height: 16, width: 16, display: 'block', filter: 'brightness(0) invert(1)' } }), 'Contact us'))),
+      h('div', { style: { maxWidth: 1240, margin: '0 auto', padding: '24px 20px 0', display: 'flex', gap: 30, flexWrap: 'wrap', alignItems: 'flex-end' } },
+        h('div', { style: { flex: '0 1 300px', paddingBottom: 30 } }, col('What we Do', FOOT.whatWeDo)),
+        h('div', { className: 'pk-hide-sm', style: { flex: '1 1 560px', display: 'flex', justifyContent: 'center' } },
+          h('img', { src: A('assets/icons/footer-1.png'), alt: '', loading: 'lazy', style: { display: 'block', maxWidth: 580, width: '100%', height: 'auto' } }))),
+      h('div', { style: { background: '#f7f7f7', padding: '16px 20px', textAlign: 'center', fontSize: 13.5, color: '#555', lineHeight: 1.7 } },
+        'All rights reserved © 2013-2022 Printoka.com | This website is managed and operated by Yushan Corporation Sdn Bhd (561674-X) | ', h('br'),
+        'Registered address: Lot 1565, Piasau Industrial Estate, 98000 Miri, Sarawak, Malaysia'));
   }
 
+  // floating "Chat" tab (as on the original) — opens a WhatsApp chat with Printoka
   function chat() {
-    return h('a', { href: '#', onClick: function (e) { e.preventDefault(); }, style: { position: 'fixed', right: 0, bottom: 0, zIndex: 70, display: 'flex', alignItems: 'center', gap: 8, background: '#fff', color: TEAL, border: '1px solid ' + HAIR, borderBottom: 'none', borderRadius: '6px 6px 0 0', padding: '8px 20px', boxShadow: '0 -2px 14px rgba(33,33,33,.10)', fontSize: 14, fontWeight: 600, textDecoration: 'none' } },
+    return h('a', { href: WHATSAPP, target: '_blank', rel: 'noopener noreferrer', 'aria-label': 'Chat with Printoka on WhatsApp', style: { position: 'fixed', right: 0, bottom: 0, zIndex: 70, display: 'flex', alignItems: 'center', gap: 8, background: '#fff', color: TEAL, border: '1px solid ' + HAIR, borderBottom: 'none', borderRadius: '6px 6px 0 0', padding: '8px 20px', boxShadow: '0 -2px 14px rgba(33,33,33,.10)', fontSize: 14, fontWeight: 600, textDecoration: 'none' } },
       img('assets/icons/phone.svg', { height: 15, width: 'auto', display: 'block' }), 'Chat');
   }
 
