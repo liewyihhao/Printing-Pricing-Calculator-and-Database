@@ -116,7 +116,13 @@ function migrate() {
   add('hub@printoka.com', 'Hub Staff (Klang Valley)', 'hub', 'hub_staff', { hub: 'HUB-KL' });
   add('hub-miri@printoka.com', 'Hub Staff (Miri)', 'hub', 'hub_staff', { hub: 'HUB-MIRI' });
   add('hub-manager@printoka.com', 'Hub Manager', 'hub', 'hub_manager', { hub: null });
-  add('internal@printoka.com', 'Printoka Internal Production (Miri)', 'vendor', 'vendor', { internal: true });
+  add('internal@printoka.com', 'Printoka Internal Production (Miri)', 'vendor', 'printer_manager', { internal: true });
+  add('scheduler-manager@printoka.com', 'Scheduler Manager', 'production', 'scheduler_manager');
+  add('production-staff@printoka.com', 'Production Staff (Miri floor)', 'production', 'production_staff');
+  // printer company accounts are the printer's MANAGER login; staff logins hang off the company (vendorId)
+  store.customers().filter(c => c.type === 'vendor' && c.role === 'vendor').forEach(c => { c.role = 'printer_manager'; });
+  const lf = store.customers().find(c => c.email === 'vendor@printoka.com');
+  if (lf) add('vendor-staff@printoka.com', 'LargeFormat Co — Print Staff', 'vendor', 'printer_staff', { vendorId: lf.id });
   (db.jobs || []).forEach(normalizeJob);
   store.save();
 }
@@ -201,7 +207,7 @@ function transition(jid, role, actor, action, payload) {
 
 // ---- interactive progress forms ------------------------------------------------
 const STEP_GROUPS = {
-  inhouse: { keys: ['setup', 'printing', 'finishing', 'qc'], roles: ['scheduler_staff', 'scheduler_manager'], status: ['printing'] },
+  inhouse: { keys: ['setup', 'printing', 'finishing', 'qc'], roles: ['production_staff', 'production_manager'], status: ['printing'] },
   hub: { keys: ['checked', 'qc', 'relabelled'], roles: ['hub', 'hub_manager'], status: ['at_hub'] },
   logistics: { keys: ['picked', 'packed', 'labelled'], roles: ['logistics_staff', 'logistics_manager'], status: ['logistics'] },
 };
@@ -235,7 +241,7 @@ function sendInternal(jid, role, actor, body) {
   makeLabel(j);
   const r = transition(jid, role, actor, 'assign_inhouse', { machine: body.machine });
   if (r.error) { j.destination = prev.destination; j.instructions = prev.instructions; makeLabel(j); store.save(); return r; }
-  store.notify({ type: 'role', role: 'scheduler' }, { kind: 'order_sent', title: 'Order sent to internal production', body: j.id + ' · ' + j.product + ' on ' + body.machine + ' → deliver to ' + j.destination.name + '.', jobId: j.id });
+  store.notify({ type: 'role', role: 'production' }, { kind: 'order_sent', title: 'New job on the production floor', body: j.id + ' · ' + j.product + ' on ' + body.machine + ' → deliver to ' + j.destination.name + '.', jobId: j.id });
   return { job: store.job(jid) };
 }
 
@@ -251,7 +257,7 @@ function award(jid, role, actor, body) {
   const quoted = !!(v && v.submittedAt);
   if (!quoted) {
     // Direct award: only the production manager / director, and only with the explicit confirmation
-    if (['scheduler_manager', 'production_director'].indexOf(role) < 0) return { error: 'Only the production manager can award a job without a submitted quote.' };
+    if (['scheduler_manager', 'production_manager', 'production_director'].indexOf(role) < 0) return { error: 'Only a scheduler / production manager can award a job without a submitted quote.' };
     if (body.confirmNoQuote !== true) return { error: 'Tick “This printer didn’t submit a quote yet. Please make sure it is internal production.” to confirm.' };
     if (!v) { v = { vendorId: vendor.id, vendorName: vendor.name, price: null, leadDays: null, note: '', submittedAt: null }; j.outsource.vendors.push(v); }
     if (body.price != null && body.price !== '') v.price = Number(body.price) || 0;
@@ -297,7 +303,8 @@ function dailySeries(events, days) {
 }
 const DEPT_ACTIONS = {
   prepress: ['approve', 'reject_major', 'flag_minor', 'escalate', 'resubmit'],
-  production: ['assign_inhouse', 'assign_outsource', 'finish', 'award_po', 'award_direct', 'request_quotes', 'progress_inhouse', 'vendor_ship', 'quote_priced'],
+  scheduler: ['assign_inhouse', 'assign_outsource', 'award_po', 'award_direct', 'request_quotes', 'quote_priced'],
+  production: ['progress_inhouse', 'finish'],
   logistics: ['dispatch', 'deliver', 'progress_logistics', 'vendor_ship'],
   hub: ['receive_hub', 'forward', 'progress_hub'],
 };
@@ -313,7 +320,8 @@ function kpi(dept, days) {
       const t0 = enteredAt(e.jobId, ['prepress'], e.ts); if (t0) { const m = mins(t0, e.ts); r.times.push(m); r.slaN++; if (m <= (j.urgent ? 10 : 30)) r.sla++; }
       if (e.action === 'reject_major') r.rejects++;
     }
-    if (dept === 'production' && (e.action === 'assign_inhouse' || e.action === 'assign_outsource')) {
+    if (dept === 'production' && e.action === 'finish') { const t0 = enteredAt(e.jobId, ['printing'], e.ts); if (t0) r.times.push(mins(t0, e.ts)); }
+    if (dept === 'scheduler' && (e.action === 'assign_inhouse' || e.action === 'assign_outsource')) {
       const t0 = enteredAt(e.jobId, ['scheduling'], e.ts); if (t0) r.times.push(mins(t0, e.ts));
     }
     if (dept === 'logistics' && e.action === 'dispatch') { const t0 = enteredAt(e.jobId, ['logistics'], e.ts); if (t0) r.times.push(mins(t0, e.ts)); }
@@ -325,7 +333,7 @@ function kpi(dept, days) {
   const flat = k => all.reduce((s, r) => s.concat(r[k]), []);
   const sum = k => all.reduce((s, r) => s + r[k], 0);
   const jobs = store.jobs();
-  const queueNow = { prepress: ['prepress', 'prepress_issue', 'escalated'], production: ['scheduling', 'printing', 'outsourcing'], logistics: ['logistics', 'dispatched'], hub: ['at_hub'] }[dept] || [];
+  const queueNow = { prepress: ['prepress', 'prepress_issue', 'escalated'], scheduler: ['scheduling', 'outsourcing'], production: ['printing'], logistics: ['logistics', 'dispatched'], hub: ['at_hub'] }[dept] || [];
   const overdue = jobs.filter(j => queueNow.indexOf(j.status) >= 0 && j.deadline && Date.parse(j.deadline) < Date.now()).length;
   return { dept, days, actions: ev.length, avgMins: avg(flat('times')), slaPct: pct(sum('sla'), sum('slaN')), rejectPct: pct(sum('rejects'), sum('slaN')), onTimePct: pct(sum('onTime'), sum('onTimeN')),
     inQueue: jobs.filter(j => queueNow.indexOf(j.status) >= 0).length, overdue, staff, series: dailySeries(ev, Math.min(days, 30)) };

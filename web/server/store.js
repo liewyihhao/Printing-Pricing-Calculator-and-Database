@@ -144,6 +144,8 @@ function userCoversRole(user, role) {
   if (user.type === 'admin') return true;
   const r = user.role;
   if (role === 'scheduler') return r === 'scheduler' || r === 'scheduler_manager' || r === 'production_manager';
+  if (role === 'production') return r === 'production_staff' || r === 'production_manager';
+  if (role === 'hub') return r === 'hub_staff' || r === 'hub_manager';
   if (role === 'prepress') return r === 'prepress' || r === 'prepress_manager' || r === 'production_manager';
   if (role === 'logistics') return r === 'logistics' || r === 'logistics_manager' || r === 'production_manager';
   return false;
@@ -428,7 +430,8 @@ function loginCustomer(body) {
 }
 function sessionCustomer(token) {
   const s = token && sessions()[token]; if (!s) return null;
-  return publicCustomer(customers().find(c => c.id === s.userId));
+  const c = customers().find(x => x.id === s.userId);
+  return c && !c.disabled ? publicCustomer(c) : null;
 }
 function logout(token) { if (token && sessions()[token]) { delete sessions()[token]; save(); } return { ok: true }; }
 function ordersForUser(userId) { return orders().filter(o => o.userId === userId); }
@@ -713,4 +716,39 @@ function updateCustomInvoice(cid, patch, actor) {
   save(); return { invoice: inv };
 }
 
-module.exports = { hashPassword, checkCoupon, load, save, reset, jobs, job, users, audit, applyTransition, logEvent, now, id, catalogue, setOverride, createJob, orders, order, createOrder, validateOrderPayment, orderView, registerCustomer, loginCustomer, sessionCustomer, logout, ordersForUser, publicCustomer, customers, findCustomer, getAddresses, addAddress, deleteAddress, setDefaultAddress, getCredit, creditEntry, vendorAccounts, requestVendorQuotes, submitVendorQuote, awardVendorPO, vendorRequests, quotes, quote, quotesForUser, createQuote, priceQuote, rejectQuote, acceptQuote, createManualQuote, setQuoteRemark, customInvoices, customInvoice, customInvoicesForUser, createCustomInvoice, updateCustomInvoice, notifications, notify, notificationsFor, markNotificationRead, viewQuote, createWalkinQuote, recordQuoteDecision, createCustomerByStaff, updateProfile, changePassword, settings, updateSettings, emailTemplates, emailOutbox, emailStats, setEmailActive, sendEmail };
+// ---- staff accounts (admin: WordPress Users → Add New / Edit) ----
+const STAFF_ROLES = {
+  outlet: ['outlet_staff', 'outlet_manager'],
+  production: ['prepress', 'prepress_manager', 'production_staff', 'production_manager', 'scheduler', 'scheduler_manager', 'logistics', 'logistics_manager'],
+  vendor: ['printer_staff', 'printer_manager'],
+  hub: ['hub_staff', 'hub_manager'],
+  admin: ['admin'],
+};
+function createStaffAccount(b, actor) {
+  const email = String(b.email || '').trim().toLowerCase();
+  if (!email || !/.+@.+\..+/.test(email)) return { error: 'Enter a valid email.' };
+  if (customers().some(c => c.email === email)) return { error: 'An account with that email already exists.' };
+  const type = b.type, role = b.role;
+  if (!STAFF_ROLES[type] || STAFF_ROLES[type].indexOf(role) < 0) return { error: 'Pick a valid account type and role.' };
+  if (type === 'vendor' && role === 'printer_staff' && !b.vendorId) return { error: 'Printer staff must belong to a printer company.' };
+  const temp = b.password && String(b.password).length >= 6 ? String(b.password) : crypto.randomBytes(5).toString('hex');
+  const { salt, hash } = hashPassword(temp);
+  const c = { id: 'S-' + crypto.randomBytes(3).toString('hex').toUpperCase(), email, passHash: hash, salt, name: b.name || email.split('@')[0], type, role,
+    outlet: type === 'outlet' ? (b.outlet || null) : null, hub: type === 'hub' ? (b.hub || null) : null, vendorId: type === 'vendor' && role === 'printer_staff' ? b.vendorId : null,
+    phone: b.phone || '', tier: 'Standard', spend12mo: 0, creditBalance: 0, addresses: [], creditLedger: [], createdAt: now(), createdBy: actor };
+  customers().push(c);
+  logEvent({ actor, role: 'admin', action: 'user_create', jobId: null, from: null, to: role, note: 'Staff account ' + email + ' (' + type + ' · ' + role + ')' });
+  sendEmail('new-account', { to: email, name: c.name, subject: 'Your Printoka staff account', body: 'Hi ' + c.name + ',\n\nAn account has been created for you (' + role.replace(/_/g, ' ') + ').\nEmail: ' + email + '\nTemporary password: ' + temp + '\n\nPlease sign in and change your password.' });
+  save(); return { staff: publicCustomer(c), tempPassword: temp };
+}
+function updateStaffAccount(id, b, actor) {
+  const c = customers().find(x => x.id === id && x.type !== 'customer'); if (!c) return { error: 'Staff account not found.' };
+  const before = c.role + (c.disabled ? ' (disabled)' : '');
+  if (b.role) { if ((STAFF_ROLES[c.type] || []).indexOf(b.role) < 0) return { error: 'That role does not fit a ' + c.type + ' account.' }; c.role = b.role; }
+  ['name', 'phone', 'outlet', 'hub', 'vendorId'].forEach(k => { if (b[k] !== undefined) c[k] = b[k]; });
+  if (b.disabled !== undefined) { c.disabled = !!b.disabled; if (c.disabled) { const ss = sessions(); Object.keys(ss).forEach(t => { if (ss[t].userId === c.id) delete ss[t]; }); } }
+  if (b.resetPassword) { const temp = crypto.randomBytes(5).toString('hex'); const hp = hashPassword(temp); c.salt = hp.salt; c.passHash = hp.hash; logEvent({ actor, role: 'admin', action: 'user_password_reset', jobId: null, from: null, to: null, note: c.email }); save(); return { staff: publicCustomer(c), tempPassword: temp }; }
+  logEvent({ actor, role: 'admin', action: 'user_update', jobId: null, from: before, to: c.role + (c.disabled ? ' (disabled)' : ''), note: c.email });
+  save(); return { staff: publicCustomer(c) };
+}
+module.exports = { STAFF_ROLES, createStaffAccount, updateStaffAccount, hashPassword, checkCoupon, load, save, reset, jobs, job, users, audit, applyTransition, logEvent, now, id, catalogue, setOverride, createJob, orders, order, createOrder, validateOrderPayment, orderView, registerCustomer, loginCustomer, sessionCustomer, logout, ordersForUser, publicCustomer, customers, findCustomer, getAddresses, addAddress, deleteAddress, setDefaultAddress, getCredit, creditEntry, vendorAccounts, requestVendorQuotes, submitVendorQuote, awardVendorPO, vendorRequests, quotes, quote, quotesForUser, createQuote, priceQuote, rejectQuote, acceptQuote, createManualQuote, setQuoteRemark, customInvoices, customInvoice, customInvoicesForUser, createCustomInvoice, updateCustomInvoice, notifications, notify, notificationsFor, markNotificationRead, viewQuote, createWalkinQuote, recordQuoteDecision, createCustomerByStaff, updateProfile, changePassword, settings, updateSettings, emailTemplates, emailOutbox, emailStats, setEmailActive, sendEmail };

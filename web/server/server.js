@@ -109,14 +109,14 @@ async function api(req, res, pathname, query) {
   if (seg[0] === 'ops' && seg[1] === 'outlets') return send(res, 200, { outlets: ops.config().outlets.filter(o => o.pickup !== false).map(o => ({ id: o.id, name: o.name, address: o.address })) });
   if (seg[0] === 'ops' && seg[1] === 'config') {
     if (req.method === 'POST') {
-      if (['production_director', 'scheduler_manager', 'hub_manager', 'logistics_manager'].indexOf(role) < 0) return send(res, 403, { error: 'managers only' });
+      if (['production_director', 'scheduler_manager', 'production_manager', 'hub_manager', 'logistics_manager'].indexOf(role) < 0) return send(res, 403, { error: 'managers only' });
       return send(res, 200, { config: ops.saveConfig(await readBody(req), actor) });
     }
     return send(res, 200, { config: ops.config() });
   }
   if (seg[0] === 'ops' && seg[1] === 'kpi') return send(res, 200, { kpi: ops.kpi(query.dept, query.days) });
   if (seg[0] === 'ops' && seg[1] === 'sales') {
-    if (['production_director', 'scheduler_manager'].indexOf(role) < 0) return send(res, 403, { error: 'managers only' });
+    if (['production_director', 'scheduler_manager', 'production_manager'].indexOf(role) < 0) return send(res, 403, { error: 'managers only' });
     return send(res, 200, { sales: ops.sales(query.days) });
   }
   if (seg[0] === 'ops' && seg[1] === 'hub-performance') return send(res, 200, { performance: ops.hubPerformance(query.hub || (me0.type === 'hub' ? me0.hub : null), query.days) });
@@ -134,7 +134,16 @@ async function api(req, res, pathname, query) {
     return send(res, r.error ? 400 : 200, r);
   }
   if (seg[0] === 'auth' && seg[1] === 'login' && req.method === 'POST') {
-    const r = store.loginCustomer(await readBody(req));
+    const lb = await readBody(req);
+    // login portals: each sign-in page only admits its own kind of account
+    const PORTAL = { member: ['customer'], printer: ['vendor'], hub: ['hub'], outlet: ['outlet'], production: ['production'], admin: ['admin'] };
+    const who = store.customers().find(c => c.email === String(lb.email || '').trim().toLowerCase());
+    if (lb.portal && PORTAL[lb.portal] && who && PORTAL[lb.portal].indexOf(who.type) < 0) {
+      const home = Object.keys(PORTAL).find(k => PORTAL[k].indexOf(who.type) >= 0) || 'member';
+      return send(res, 403, { error: 'This sign-in page is for ' + ({ member: 'customers', printer: 'printers', hub: 'hub staff', outlet: 'outlet staff', production: 'production staff', admin: 'administrators' })[lb.portal] + '. Please use the ' + ({ member: 'customer', printer: 'Printer', hub: 'Hub', outlet: 'Outlet', production: 'Production', admin: 'Admin' })[home] + ' login.', portal: home });
+    }
+    if (who && who.disabled) return send(res, 403, { error: 'This account has been disabled. Please contact your administrator.' });
+    const r = store.loginCustomer(lb);
     return send(res, r.error ? 401 : 200, r);
   }
   if (seg[0] === 'auth' && seg[1] === 'logout' && req.method === 'POST') { store.logout(token); return send(res, 200, { ok: true }); }
@@ -190,8 +199,11 @@ async function api(req, res, pathname, query) {
     const me = store.sessionCustomer(token);
     if (!me || me.type !== 'admin') return send(res, 401, { error: 'admin sign-in required' });
     if (seg[1] === 'customers') return send(res, 200, { customers: store.customers().filter(c => c.type === 'customer').map(store.publicCustomer) });
-    if (seg[1] === 'staff') return send(res, 200, { staff: store.customers().filter(c => c.type !== 'customer').map(store.publicCustomer) });
-    if (seg[1] === 'roles') return send(res, 200, { roles: D.ROLES });
+    if (seg[1] === 'staff' && !seg[2] && req.method === 'GET') return send(res, 200, { staff: store.customers().filter(c => c.type !== 'customer').map(store.publicCustomer) });
+    if (seg[1] === 'roles') return send(res, 200, { roles: D.ROLES, staffRoles: store.STAFF_ROLES });
+    // WordPress Users → Add New / Edit role / disable / reset password
+    if (seg[1] === 'staff' && !seg[2] && req.method === 'POST') { const r = store.createStaffAccount(await readBody(req), me.name || me.email); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'staff' && seg[2] && req.method === 'POST') { const r = store.updateStaffAccount(seg[2], await readBody(req), me.name || me.email); return send(res, r.error ? 400 : 200, r); }
     if (seg[1] === 'emails' && !seg[2]) {
       if (req.method === 'GET') return send(res, 200, { templates: store.emailTemplates().map(t => Object.assign({}, t, store.emailStats(t.id))), outbox: store.emailOutbox(60) });
     }
@@ -308,30 +320,32 @@ async function api(req, res, pathname, query) {
   }
 
   // ---- outsource / vendor quotation flow ----
-  if (seg[0] === 'vendors' && !seg[1]) return send(res, 200, { vendors: store.vendorAccounts().map(v => ({ id: v.id, name: v.name })) });
+  if (seg[0] === 'vendors' && !seg[1]) return send(res, 200, { vendors: store.vendorAccounts().filter(v => !v.vendorId).map(v => ({ id: v.id, name: v.name, internal: !!v.internal })) });
   if (seg[0] === 'vendor' && seg[1] === 'requests') {
     const me = store.sessionCustomer(token); if (!me || me.type !== 'vendor') return send(res, 401, { error: 'vendor sign-in required' });
-    return send(res, 200, { jobs: store.vendorRequests(me.id) });
+    return send(res, 200, { jobs: store.vendorRequests(me.vendorId || me.id), company: me.vendorId || me.id, canQuote: me.role !== 'printer_staff' });
   }
   if (seg[0] === 'jobs' && seg[2] === 'request-quotes' && req.method === 'POST') {
-    if (['production_director', 'scheduler_manager', 'scheduler_staff'].indexOf(role) < 0) return send(res, 403, { error: 'production staff only' });
+    if (['production_director', 'scheduler_manager', 'scheduler_staff', 'production_manager'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });
     const b = await readBody(req); const r = store.requestVendorQuotes(seg[1], b.vendorIds, actor);
     return send(res, r.error ? 400 : 200, r);
   }
   if (seg[0] === 'jobs' && seg[2] === 'quote' && req.method === 'POST') {
     const me = store.sessionCustomer(token); if (!me || me.type !== 'vendor') return send(res, 401, { error: 'vendor sign-in required' });
-    const b = await readBody(req); const r = store.submitVendorQuote(seg[1], me.id, b);
+    if (me.role === 'printer_staff') return send(res, 403, { error: 'Only your printer manager can submit prices.' });
+    const b = await readBody(req); const r = store.submitVendorQuote(seg[1], me.vendorId || me.id, b);
     return send(res, r.error ? 400 : 200, r);
   }
   if (seg[0] === 'jobs' && seg[2] === 'award' && req.method === 'POST') {
-    if (['production_director', 'scheduler_manager', 'scheduler_staff'].indexOf(role) < 0) return send(res, 403, { error: 'production staff only' });
+    if (['production_director', 'scheduler_manager', 'scheduler_staff', 'production_manager'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });
     const r = ops.award(seg[1], role, actor, await readBody(req));
     return r.error ? send(res, 400, r) : send(res, 200, { ok: true, job: jobView(r.job, role) });
   }
   // POST /api/vendor/jobs/:id/ship { courier, tracking } — the awarded printer ships with the Printoka label
   if (seg[0] === 'vendor' && seg[1] === 'jobs' && seg[3] === 'ship' && req.method === 'POST') {
     const vme = store.sessionCustomer(token); if (!vme || vme.type !== 'vendor') return send(res, 401, { error: 'vendor sign-in required' });
-    const j0 = store.job(seg[2]); if (!j0 || !j0.outsource || j0.outsource.awardedTo !== vme.id) return send(res, 403, { error: 'this job is not awarded to you' });
+    const co = vme.vendorId || vme.id;
+    const j0 = store.job(seg[2]); if (!j0 || !j0.outsource || j0.outsource.awardedTo !== co) return send(res, 403, { error: 'this job is not awarded to your company' });
     const b = await readBody(req); const r = ops.transition(seg[2], 'printer', vme.name, 'vendor_ship', { courier: b.courier, tracking: b.tracking });
     return r.error ? send(res, 400, r) : send(res, 200, { ok: true, job: store.job(seg[2]) });
   }

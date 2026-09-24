@@ -28,8 +28,10 @@ const ROLES = {
   // production departments
   prepress_staff: { label: 'Prepress Staff', dept: 'prepress', tier: 'staff' },
   prepress_manager: { label: 'Prepress Manager', dept: 'prepress', tier: 'manager' },
-  scheduler_staff: { label: 'Production Staff', dept: 'scheduler', tier: 'staff' },
-  scheduler_manager: { label: 'Production Manager', dept: 'scheduler', tier: 'manager' },
+  scheduler_staff: { label: 'Scheduler Staff', dept: 'scheduler', tier: 'staff' },
+  scheduler_manager: { label: 'Scheduler Manager', dept: 'scheduler', tier: 'manager' },
+  production_staff: { label: 'Production Staff', dept: 'production', tier: 'staff' },
+  production_manager: { label: 'Production Manager', dept: 'production', tier: 'manager' },
   logistics_staff: { label: 'Logistics Staff', dept: 'logistics', tier: 'staff' },
   logistics_manager: { label: 'Logistics Manager', dept: 'logistics', tier: 'manager' },
   production_director: { label: 'Production Director', dept: 'all', tier: 'director' },
@@ -48,8 +50,8 @@ const STATUS = {
   prepress_issue: { label: 'Prepress — issue / fixing', queue: 'prepress' },
   escalated: { label: 'Escalated to manager', queue: 'prepress' },
   rejected: { label: 'Artwork rejected — awaiting new file', queue: 'outlet' },
-  scheduling: { label: 'Production — queue & allocate', queue: 'scheduler' },
-  printing: { label: 'Printing (in-house)', queue: 'scheduler' },
+  scheduling: { label: 'Scheduler — queue & allocate', queue: 'scheduler' },
+  printing: { label: 'In production (in-house floor)', queue: 'production' },
   outsourcing: { label: 'Outsourced — printer producing', queue: 'scheduler' },
   logistics: { label: 'Logistics — pack & dispatch', queue: 'logistics' },
   dispatched: { label: 'In transit', queue: 'logistics' },
@@ -60,7 +62,9 @@ const STATUS = {
 
 const OUTLET = ['cs_walkin', 'print_consultant', 'store_manager'];
 const PREPRESS = ['prepress_staff', 'prepress_manager'];
-const PRODUCTION = ['scheduler_staff', 'scheduler_manager'];
+const SCHEDULER = ['scheduler_staff', 'scheduler_manager', 'production_manager'];
+const FLOOR = ['production_staff', 'production_manager'];
+const PRODUCTION = SCHEDULER;
 const LOGISTICS = ['logistics_staff', 'logistics_manager'];
 const HUB = ['hub', 'hub_manager'];
 
@@ -123,7 +127,7 @@ const TRANSITIONS = {
       gates: ['payment'], requires: ['printer'], note: 'Award to printer by best quote/time/logistics (Scheduler §3.5).' },
   ],
   printing: [
-    { action: 'finish', to: 'logistics', roles: PRODUCTION, gates: ['productionDone'],
+    { action: 'finish', to: 'logistics', roles: FLOOR, gates: ['productionDone'],
       note: 'Set-up → Printing → Finishing → QC done — hand to logistics.' },
   ],
   outsourcing: [
@@ -194,13 +198,13 @@ function priorityCompare(a, b) {
 // Staff account role (login) → state-machine role. Decided on the SERVER from the session,
 // never from what the browser claims.
 const ACCOUNT_ROLE = {
-  admin: 'production_director', production_manager: 'production_director',
+  admin: 'production_director', production_manager: 'production_manager', production_staff: 'production_staff',
   prepress: 'prepress_staff', prepress_manager: 'prepress_manager',
   scheduler: 'scheduler_staff', scheduler_manager: 'scheduler_manager',
   logistics: 'logistics_staff', logistics_manager: 'logistics_manager',
   outlet_staff: 'cs_walkin', outlet_manager: 'store_manager',
   hub: 'hub', hub_staff: 'hub', hub_manager: 'hub_manager',
-  vendor: 'printer',
+  vendor: 'printer', printer_manager: 'printer', printer_staff: 'printer',
 };
 function opsRoleFor(account) {
   if (!account) return null;
