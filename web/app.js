@@ -3621,17 +3621,13 @@ class Component extends DCLogic {
     const sectionHeader = (sec) => h('div', { key: 'h_' + sec, style: { display: 'flex', alignItems: 'center', gap: 10, margin: '22px 0 4px' } },
       h('span', { style: { width: 4, height: 18, background: TEAL, borderRadius: 2, flex: 'none' } }),
       h('span', { style: { fontSize: 15, fontWeight: 700, letterSpacing: '.04em', textTransform: 'uppercase', color: INK } }, sec));
-    return h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '10px 20px 0' } },
+    return h('div', null,
+      this.cfgBanner(prod, NAME),
+      h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '14px 20px 0' } },
       h('div', { style: { fontSize: 12.5, color: FAINT, marginBottom: 14 } },
         h('span', { 'data-go': 'home', style: { color: TEAL } }, 'Home'), ' › ', h('span', { 'data-go': prod ? ('catopen:' + this.catCategoryOf(prod.id)) : 'category', style: { color: TEAL } }, prod ? this.catCategoryLabel(this.catCategoryOf(prod.id)) : 'Products'), ' › ', NAME),
       h('div', { className: 'pk-cfg-grid', style: { display: 'grid', gridTemplateColumns: 'minmax(0,1fr) 352px', gap: 28, alignItems: 'start' } },
         h('div', null,
-          h('div', { style: { display: 'flex', gap: 20, flexWrap: 'wrap', marginBottom: 26 } },
-            h('div', { style: { flex: '0 0 300px', maxWidth: 340, filter: 'drop-shadow(0 12px 24px rgba(33,33,33,.12))' } }, this.art(prod ? prod.name : 'card')),
-            h('div', { style: { flex: '1 1 300px', minWidth: 0 } },
-              h('h1', { style: { margin: '0 0 10px', fontSize: 28, fontWeight: 600, letterSpacing: '-.02em' } }, NAME + ' Printing'),
-              h('p', { style: { margin: '0 0 12px', fontSize: 14, color: MUT, lineHeight: 1.7 } }, (() => { try { const s = this.productSeo(prod, NAME); if (s && s.paras && s.paras[0]) return s.paras[0]; } catch (e) {} return 'Configure your job and see the exact price before you order.'; })()),
-              h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap' } }, this.chip('Price to the cent', 'ok'), this.chip('Ready in 3 working days', 'teal')))),
           h('div', { style: { display: 'flex', flexDirection: 'column', gap: 4, border: '1px solid ' + HAIR, borderRadius: 14, padding: 20 } },
             h('div', { style: { fontSize: 18, fontWeight: 600, letterSpacing: '-.01em', color: INK, borderBottom: '2px solid ' + TEAL, paddingBottom: 8, marginBottom: 4, display: 'inline-block' } }, 'Craft your specification'),
             groups.map(g => h('div', { key: g.sec, style: { display: 'flex', flexDirection: 'column' } }, sectionHeader(g.sec), g.nodes)))),
@@ -3687,7 +3683,36 @@ class Component extends DCLogic {
             h('div', { key: 'b', style: { fontSize: 12, color: MUT, lineHeight: 1.6, marginBottom: 10 } }, 'Custom sizes, special finishes or large volumes we don’t price online are quoted on request.'),
             this.btn('Request a custom quote', 'ghost', 'contact', { justifyContent: 'center', width: '100%' }),
           ]))),
-      this.productDetails(prod, NAME));
+      this.productDetails(prod, NAME)));
+  }
+  // product banner over the configurator: the product's original photo, "Print Your {name}
+  // Online Now!", three benefits. Background = one of the three logo gradients, picked at random
+  // once per product visit (kept stable while the customer configures).
+  cfgBanner(prod, NAME) {
+    const id = prod ? prod.id : 0;
+    this._bannerGrad = this._bannerGrad || {};
+    if (this._bannerGrad[id] == null) this._bannerGrad[id] = Math.floor(Math.random() * HOME_GRADIENTS.length);
+    const bg = HOME_GRADIENTS[this._bannerGrad[id]].replace('90deg', '115deg');
+    const PKI = window.PK_IMAGES, file = PKI && prod && PKI.products[prod.id];
+    const img = file
+      ? h('img', { className: 'pk-cfgb-img', src: window.__asset(PKI.base + file), alt: NAME + ' printed by Printoka', fetchpriority: 'high',
+          style: { height: 190, width: 'auto', maxWidth: '100%', display: 'block', borderRadius: /\.jpe?g$/i.test(file) ? 12 : 0, filter: 'drop-shadow(0 18px 30px rgba(0,0,0,.28))' } })
+      : h('div', { className: 'pk-cfgb-img', style: { width: 250, borderRadius: 12, overflow: 'hidden', filter: 'drop-shadow(0 18px 30px rgba(0,0,0,.28))' } }, this.art(prod ? prod.name : 'card'));
+    const benefits = [['Schedule your delivery', 'Door-to-door, nationwide'], ['Satisfaction guaranteed', 'Quality you can rely on'], ['Exclusive member pricing', 'Save 5–15% as a member']];
+    return h('section', { 'aria-label': NAME + ' printing', style: { background: bg, color: '#fff', overflow: 'hidden', textShadow: '0 1px 2px rgba(0,0,0,.12)' } },
+      h('div', { style: { maxWidth: 1180, margin: '0 auto', padding: '30px 20px', display: 'flex', flexWrap: 'wrap', gap: 28, alignItems: 'center', minHeight: 216 } },
+        h('div', { style: { flex: '0 0 auto', maxWidth: '100%' } }, img),
+        h('div', { style: { flex: '1 1 300px', minWidth: 0 } },
+          h('h1', { style: { margin: 0, display: 'flex', flexDirection: 'column', lineHeight: 1.08, fontWeight: 400 } },
+            h('span', { className: 'pk-cfgb-sm', style: { fontSize: 26 } }, 'Print Your'),
+            h('span', { className: 'pk-cfgb-lg', style: { fontSize: 40, fontWeight: 700, letterSpacing: '-.01em' } }, NAME),
+            h('span', { className: 'pk-cfgb-md', style: { fontSize: 30, fontWeight: 500 } }, 'Online Now!')),
+          h('p', { style: { margin: '12px 0 0', fontSize: 20, fontWeight: 300 } }, 'configure, upload and print')),
+        h('div', { className: 'pk-hide-sm', style: { flex: '0 1 300px', display: 'flex', flexDirection: 'column', gap: 14 } },
+          benefits.map(b => h('div', { key: b[0] },
+            h('div', { style: { fontWeight: 700, fontSize: 15 } }, b[0]),
+            h('div', { style: { fontSize: 13, marginTop: 2, lineHeight: 1.5, display: 'flex', alignItems: 'center', gap: 8 } },
+              h('span', { 'aria-hidden': 'true', style: { width: 5, height: 5, borderRadius: '50%', background: '#fff', flex: 'none' } }), b[1]))))));
   }
 
   // full-width product-detail / SEO section (below the configurator): intro copy for
