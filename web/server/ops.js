@@ -209,9 +209,47 @@ function outletOfJob(j) {
   const o = j.orderId && store.order(j.orderId);
   return (o && o.outlet) || j.outlet || (j.finalDestination && j.finalDestination.type === 'outlet' && j.finalDestination.id) || (o && o.fulfillment && o.fulfillment.method === 'pickup' && o.fulfillment.outlet) || null;
 }
+// Pending Approval: prepress amended the artwork → a warm, clear email asks the customer to approve it
+// (the issues found, which ones prepress fixed, the amended file, and a reply to go ahead)
+function requestArtworkApproval(j, payload, actor) {
+  const issues = (Array.isArray(payload.issues) ? payload.issues : []).map(x => ({ text: String(x.text || '').slice(0, 200), fixed: !!x.fixed })).filter(x => x.text);
+  const file = payload.fileId ? (j.proofs || []).find(f => f.id === payload.fileId) : null;
+  const note = String(payload.note || '').trim().slice(0, 1000);
+  const o = j.orderId && store.order(j.orderId), c = (o && o.customer) || {};
+  const req = { issues, folding: !!payload.folding, note, file: file ? { id: file.id, name: file.name } : null, by: actor, at: now(), emailedTo: null, emailedAt: null };
+  if (c.email) {
+    const st = (store.settings().store) || {};
+    const fixed = issues.filter(x => x.fixed), open = issues.filter(x => !x.fixed);
+    const who = String(actor || '').replace(/\s*\(.*\)\s*$/, '') || 'Our prepress team';
+    const lines = ['Hi ' + (c.name || 'there') + ',', '',
+      'Thank you so much for choosing Printoka! Before your order goes to print, our prepress team gave your artwork a careful check, and we’d love a quick thumbs-up from you.', '',
+      'Order: ' + (o.id || j.orderId), 'Item: ' + j.product + ' × ' + (j.qty || 0).toLocaleString() + ' (' + j.id + ')', ''];
+    if (issues.length) {
+      lines.push('Here’s what we noticed:');
+      fixed.forEach(x => lines.push('  • ' + x.text + ' (we’ve fixed this for you)'));
+      open.forEach(x => lines.push('  • ' + x.text));
+      lines.push('');
+    }
+    if (file) lines.push('We’ve attached the updated file (' + file.name + ') so you can see exactly how it will print.', '');
+    if (req.folding) lines.push('Could you also take a moment to check that the folding looks right to you?', '');
+    if (open.length) lines.push('The points we haven’t changed may affect how the final print looks. If you’re happy with them as they are, we’ll gladly go ahead.', '');
+    if (note) lines.push('A note from our team: ' + note, '');
+    lines.push('If everything looks good, simply reply to this email and we’ll send it to print straight away.', '',
+      'Would you rather make a change yourself? That’s perfectly fine. Just reply with your updated artwork and we’ll check it again for you right away.', '',
+      'If you have any questions at all, we’re always happy to help:',
+      '  ' + who + ', Printoka Prepress', '  ' + [st.supportPhone, st.supportEmail].filter(Boolean).join(' · '), '',
+      'Warm regards,', 'The Printoka Team');
+    const e = store.sendEmail('artwork-approval', { to: c.email, name: c.name, jobId: j.id, replyTo: st.supportEmail || null,
+      subject: 'A quick check on your artwork for order ' + (o.id || j.orderId),
+      body: lines.join('\n'), attachments: file ? [{ id: file.id, name: file.name, jobId: j.id }] : [] });
+    if (e) { req.emailedTo = c.email; req.emailedAt = e.ts; }
+  }
+  j.approvalRequest = req;
+}
 function afterTransition(j, from, to, action, actor, payload) {
   payload = payload || {};
   normalizeJob(j);
+  if (action === 'flag_minor') requestArtworkApproval(j, payload, actor);
   j.statusAt[to] = now();
   if (to === 'printing') j.route = 'inhouse';
   if (to === 'outsourcing') j.route = 'outsource';

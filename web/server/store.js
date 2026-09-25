@@ -179,6 +179,7 @@ const EMAIL_TEMPLATES = [
   { id: 'activate-account', name: 'Activate account', trigger: 'Account created by outlet staff or admin', type: 'Single Email', delay: 'Single Email', to: 'customer' },
   { id: 'reset-password', name: 'Reset password', trigger: 'Password reset requested', type: 'Single Email', delay: 'Single Email', to: 'customer' },
   { id: 'wallet-transaction', name: 'Wallet transaction', trigger: 'Wallet credit/debit', type: 'Single Email', delay: 'Single Email', to: 'customer' },
+  { id: 'artwork-approval', name: 'Artwork approval request', trigger: 'Prepress amended the artwork (Pending Approval)', type: 'Single Email', delay: 'Single Email', to: 'customer' },
   { id: 'order-confirmation', name: 'Order confirmation', trigger: 'Order placed', type: 'Purchase Email', delay: 'Immediately after order', to: 'customer' },
   { id: 'order-feedback', name: 'New order feedback received', trigger: 'Customer submits feedback', type: 'Single Email', delay: 'Single Email', to: 'admin' },
   { id: 'printer-draft', name: 'Printer uploaded draft', trigger: 'Vendor uploads a draft', type: 'Single Email', delay: 'Single Email', to: 'customer' },
@@ -206,6 +207,7 @@ function sendEmail(templateId, opts) {
   const e = {
     id: 'E-' + crypto.randomBytes(4).toString('hex').toUpperCase(), ts: now(), templateId, template: t.name,
     to: opts.to || '—', toName: opts.name || '', subject: opts.subject || t.name, body: opts.body || '',
+    replyTo: opts.replyTo || null, attachments: opts.attachments || [], jobId: opts.jobId || null,
     opened: false, clicked: false,
   };
   emails().unshift(e);

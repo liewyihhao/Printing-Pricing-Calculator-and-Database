@@ -326,13 +326,18 @@
               h('input', { type: 'checkbox', checked: !!ticked[x], onChange: () => setTicks({ [x]: !ticked[x] }), style: { width: 18, height: 18 } }), x)),
             h('div', null, Btn(done ? 'All approved' : 'Approve all', () => { const o = {}; g[1].forEach(x => { o[x] = true; }); setTicks(o); this.setState({ pfOpen: null }); }, 'primary', done))) : null); };
       return this.acC(st === 'prepress_issue' ? 'Pending Approval' : 'Preflight', [
-        st === 'prepress_issue' ? box('Amended: ' + (j.reason || '') + '. Waiting for the customer to approve the amended file.') : null,
+        st === 'prepress_issue' ? (() => { const ar = j.approvalRequest;
+          if (!ar) return box('Amended: ' + (j.reason || '') + '. Waiting for the customer to approve the amended file.');
+          return h('div', { key: 'ar', style: { display: 'flex', flexDirection: 'column', gap: 10 } },
+            box(ar.emailedTo ? 'Approval email sent to ' + ar.emailedTo + ' on ' + when(ar.emailedAt) + '. Waiting for the customer’s reply.' : 'No email on file. Contact the customer directly for their approval.', ar.emailedTo ? 'ok' : 'bad'),
+            ar.issues.length ? h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13.5 } }, ar.issues.map((x, i) => h('div', { key: i, style: { display: 'flex', gap: 8, alignItems: 'center' } }, this.pillDot(x.fixed ? 'Fixed' : 'Found', x.fixed ? 'ok' : 'warn'), x.text))) : null,
+            this.acDL([ar.folding ? ['Folding', 'Customer asked to check'] : null, ar.file ? ['Amended file', link('📄 ' + ar.file.name, () => this.jDownload('/api/jobs/' + id + '/files/' + ar.file.id, ar.file.name))] : null, ar.note ? ['Note', ar.note] : null, ['Amended by', ar.by + ' · ' + when(ar.at)]])); })() : null,
         st !== 'prepress_issue' ? h('div', { key: 'secs', style: { display: 'flex', flexDirection: 'column', gap: 10 } }, CL.map(sectionRow)) : null,
         blocked(approve),
         h('div', { key: 'b', style: { display: 'flex', flexDirection: 'column', gap: 8 } },
           approve && st === 'prepress_issue' ? Btn('Proceed', () => this.pModal('Customer approved', [['approval', 'How did the customer approve it?', 'e.g. Approved by WhatsApp, 25 Sep 10:30']], v => act('approve', { approval: v.approval }, 'Passed to the scheduler.')), 'primary', !approve.enabled) : null,
           approve && st !== 'prepress_issue' ? Btn('Proceed', () => act('approve', {}, 'Passed to the scheduler.'), 'primary', !approve.enabled || !allTicked) : null,
-          acts.flag_minor && st !== 'prepress_issue' ? Btn('Amended', () => this.pModal('Amended', [['reason', 'What did you amend?', 'e.g. Extended the bleed from 2 mm to 3 mm']], v => act('flag_minor', v, 'Pending approval.'))) : null,
+          acts.flag_minor && st !== 'prepress_issue' ? Btn('Amended', () => this.pAmendedModal(j, order)) : null,
           acts.reject_major ? Btn('Request', () => this.pRejectModal(j), 'danger') : null)]);
     }
     // Step 3 — scheduler (§3.5): confirm approval + payment, then in-house (machine + slot) or outsource
@@ -461,6 +466,41 @@
   P.pModal = function (title, fields, submit, submitLabel) {
     this.setState({ acForm: {}, acModal: { title, body: () => fields.map(f => FG(f[1], ta(this.acF(f[0]), v => this.acSetF(f[0], v), 3), 1, f[2] || null))
       .concat([h('div', { key: 'b' }, Btn(submitLabel || 'Confirm', () => { const v = {}; fields.forEach(f => { v[f[0]] = this.acF(f[0]); }); submit(v); }, 'primary', fields.some(f => !String(this.acF(f[0]) || '').trim())))]) } });
+  };
+  // Amended → Pending Approval: pick what was found (and what prepress fixed); the customer gets a friendly approval email
+  const ARTWORK_ISSUES = [
+    'Ink coverage is over 240% (CMYK), so dark areas may print heavier than expected',
+    'Some colour tones are below 10%, so they may look very faint or not show in print',
+    'Some images are low resolution, so they may look blurry when printed',
+    'The file uses RGB colours, which need converting to CMYK for print',
+    'The artwork has no bleed, so a thin white edge may show after cutting',
+    'Some text or elements sit too close to the trim edge',
+    'Some fonts are not outlined or embedded',
+    'The artwork size does not match the order size',
+  ];
+  P.pAmendedModal = function (j, order) {
+    const email = order && order.customer && order.customer.email;
+    this.setState({ acForm: { am: {} }, acModal: { title: 'Amended — ask the customer to approve', wide: true, body: () => {
+      const am = this.acF('am') || {}; const setAm = (k, v) => this.acSetF('am', Object.assign({}, am, { [k]: v }));
+      const picked = ARTWORK_ISSUES.filter(x => am[x]);
+      const send = fileId => this.jPost('/api/jobs/' + j.id + '/transition', { action: 'flag_minor', payload: {
+        reason: picked.map(x => x + (am[x] === 'fixed' ? ' (fixed)' : '')).join('; ') || this.acF('amNote') || 'Artwork amended',
+        issues: picked.map(x => ({ text: x, fixed: am[x] === 'fixed' })), folding: !!this.acF('amFold'), note: this.acF('amNote') || '', fileId: fileId || undefined } },
+        email ? 'Pending approval — email sent to ' + email + '.' : 'Pending approval.', () => this.setState({ acModal: null, acForm: {} }));
+      const go = () => this.acF('amFileData')
+        ? this.aFetchJ('/api/jobs/' + j.id + '/proof', { name: this.acF('amFileName'), data: this.acF('amFileData') }).then(f => { if (this.acDone(f)) send(f.file.id); })
+        : send(null);
+      return [
+        h('b', { key: 'h' }, 'What did you find?'),
+        h('div', { key: 'l', style: { display: 'flex', flexDirection: 'column', gap: 8 } }, ARTWORK_ISSUES.map(x => h('div', { key: x, style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', fontSize: 13.5 } },
+          h('label', { style: { display: 'flex', gap: 10, alignItems: 'center', flex: '1 1 300px', cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!am[x], onChange: e => setAm(x, e.target.checked ? 'found' : false), style: { width: 17, height: 17 } }), x),
+          am[x] ? h('label', { style: { display: 'flex', gap: 6, alignItems: 'center', fontSize: 12.5, color: MUT, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: am[x] === 'fixed', onChange: e => setAm(x, e.target.checked ? 'fixed' : 'found') }), 'We fixed it') : null))),
+        h('label', { key: 'fo', style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 13.5, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!this.acF('amFold'), onChange: e => this.acSetF('amFold', e.target.checked), style: { width: 17, height: 17 } }), 'Ask the customer to check the folding'),
+        FG('Amended file', this.jPickFile('amFile'), 0, 'Attached to the email so the customer can see the fixed file.'),
+        FG('Note to the customer', ta(this.acF('amNote'), v => this.acSetF('amNote', v), 2)),
+        box(email ? 'A friendly approval email goes to ' + email + '. The customer replies to approve, or sends a new file.' : 'This order has no customer email. Please contact the customer directly.', email ? 'ok' : 'bad'),
+        h('div', { key: 'b' }, Btn(email ? 'Send for approval' : 'Mark pending approval', go, 'primary', !picked.length && !this.acF('amNote')))];
+    } } });
   };
   P.pRejectModal = function (j) {
     // major issue: prepress contacts the customer for a new file → Pending Customer Amendment
