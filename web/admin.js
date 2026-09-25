@@ -181,6 +181,30 @@
     const setN = (k, v) => this.setState({ auNew: Object.assign({}, N, { [k]: v }, k === 'type' ? { role: (SR[v] || [])[0] } : {}) });
     const create = () => this.aFetch('/api/admin/staff', N).then(d => { if (this.aMsg(d, d.message)) { this.setState({ auNew: null, auOpen: false }); this.loadAdmin(); } });
     const upd = (s, body, msg) => this.aFetch('/api/admin/staff/' + s.id, body).then(d => { if (this.aMsg(d, msg || 'Saved.')) this.loadAdmin(); });
+    // printer company: the products it prints and the finishing it can do (original "Printing Categories");
+    // the scheduler only sees printers that can make a job's product and every finishing it needs
+    const FIN = ((this.aGet('roles', '/api/admin/roles') || {}).finishes) || [];
+    const clean = n => String(n || '').replace(/\s*\(=.*?\)/g, '').replace(/\s+—.*$/, '').replace(/\s+-\s+(Litho|Digital|Offset|Large Format).*$/i, '').trim();
+    const PRODUCTS = Array.from(new Set((this.pkProducts() || []).map(p => clean(this.catName ? this.catName(p.id) : p.name)).filter(Boolean))).sort();
+    const capText = s => { const c = s.capabilities || {}; const p = c.products || [], f = c.finishes || [];
+      return (p.indexOf('*') >= 0 ? 'All products' : p.length ? p.length + ' product' + (p.length === 1 ? '' : 's') : 'No products set') + ' · ' + (f.indexOf('*') >= 0 ? 'all finishing' : f.length ? f.join(', ') : 'no finishing'); };
+    const capFor = companies.find(s => s.id === this.state.auCap);
+    const capEditor = () => {
+      const s = capFor, c = this.state.auCapDraft || { products: (s.capabilities || {}).products || [], finishes: (s.capabilities || {}).finishes || [] };
+      const set = (k, v) => this.setState({ auCapDraft: Object.assign({}, c, { [k]: v }) });
+      const toggle = (k, x) => set(k, c[k].indexOf(x) >= 0 ? c[k].filter(y => y !== x) : c[k].filter(y => y !== '*').concat([x]));
+      const allP = c.products.indexOf('*') >= 0, allF = c.finishes.indexOf('*') >= 0;
+      const chk = (on, label, fn) => h('label', { key: label, style: { display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: on, onChange: fn }), label);
+      return box([h('b', { key: 't' }, 'Products & finishing — ' + s.name),
+        para('The Scheduler can only ask this printer for quotes on jobs it can make: the product, and every finishing the job needs.'),
+        h('b', { key: 'ph', style: { fontSize: 13 } }, 'Products'),
+        chk(allP, 'All products', () => set('products', allP ? [] : ['*'])),
+        !allP ? (PRODUCTS.length ? h('div', { key: 'pl', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 6 } }, PRODUCTS.map(p => chk(c.products.indexOf(p) >= 0, p, () => toggle('products', p)))) : para('Loading products…')) : null,
+        h('b', { key: 'fh', style: { fontSize: 13 } }, 'Finishing'),
+        chk(allF, 'All finishing', () => set('finishes', allF ? [] : ['*'])),
+        !allF ? h('div', { key: 'fl', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 6 } }, FIN.map(f => chk(c.finishes.indexOf(f) >= 0, f, () => toggle('finishes', f)))) : null,
+        h('div', { key: 'b', style: { display: 'flex', gap: 8 } }, B('Save', () => this.aFetch('/api/admin/staff/' + s.id, { capabilities: c }).then(d => { if (this.aMsg(d, 'Saved — ' + s.name + ' will be offered matching jobs only.')) { this.setState({ auCap: null, auCapDraft: null }); this.loadAdmin(); } }), 'primary'), B('Cancel', () => this.setState({ auCap: null, auCapDraft: null }), 'ghost'))]);
+    };
     return [
       para('Every staff login and its role — Admin, Outlet (staff / manager), Production (Prepress, Scheduler, Production, Logistics — staff / manager), Printer (staff / manager) and Hub (staff / manager). Each role signs in on its own login page and only sees its own screens.'),
       h('div', { key: 'f', style: { display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center' } }, ['all'].concat(Object.keys(TYPES)).map(k => h('span', { key: k, onClick: () => this.setState({ auType: k }), style: { fontSize: 12.5, fontWeight: 600, padding: '6px 12px', borderRadius: 999, cursor: 'pointer', border: '1px solid ' + (t === k ? INK : HAIR), background: t === k ? INK : '#fff', color: t === k ? '#fff' : MUT } }, (k === 'all' ? 'All' : TYPES[k]) + ' (' + (k === 'all' ? staff.length : staff.filter(s => s.type === k).length) + ')')),
@@ -194,12 +218,14 @@
           N.type === 'vendor' && N.role === 'printer_staff' ? F('Printer company', h('select', { value: N.vendorId || '', onChange: e => setN('vendorId', e.target.value), style: inp }, [h('option', { key: '', value: '' }, 'Choose…')].concat(companies.map(o => h('option', { key: o.id, value: o.id }, o.name))))) : null,
           F('Password (optional)', h('input', { type: 'text', value: N.password || '', onChange: e => setN('password', e.target.value), placeholder: 'leave blank to generate', style: inp }))], 200),
         h('div', { key: 'b' }, B('Create account', create, 'primary', !N.email))]) : null,
+      capFor ? capEditor() : null,
       this.table(['Name', 'Email', 'Type', 'Role', 'Scope', 'Status', 'Actions'],
         list.map(s => [h('span', { style: { fontWeight: 600 } }, s.name), s.email, this.chip(TYPES[s.type] || s.type, 'teal'),
           (SR[s.type] || []).length > 1 ? h('select', { value: s.role, onChange: e => upd(s, { role: e.target.value }, 'Role changed.'), style: Object.assign({}, inp, { padding: '5px 7px', fontSize: 12.5 }) }, SR[s.type].map(r => h('option', { key: r, value: r }, ROLE_LABEL[r] || r))) : (ROLE_LABEL[s.role] || s.role),
-          s.outlet || (s.hub ? s.hub.replace('HUB-', 'Hub ') : '') || (s.vendorId ? ((staff.find(x => x.id === s.vendorId) || {}).name || '') : '') || '—',
+          s.type === 'vendor' && !s.vendorId ? h('span', { style: { fontSize: 12.5, color: MUT } }, capText(s)) : s.outlet || (s.hub ? s.hub.replace('HUB-', 'Hub ') : '') || (s.vendorId ? ((staff.find(x => x.id === s.vendorId) || {}).name || '') : '') || '—',
           this.chip(s.disabled ? 'Disabled' : 'Active', s.disabled ? 'bad' : 'ok'),
-          h('span', { style: { display: 'flex', gap: 10 } },
+          h('span', { style: { display: 'flex', gap: 10, flexWrap: 'wrap' } },
+            s.type === 'vendor' && !s.vendorId ? h('span', { onClick: () => { this.setState({ auCap: s.id, auCapDraft: null }); if (typeof window !== 'undefined') window.scrollTo(0, 0); }, style: { color: TEAL, fontWeight: 600, cursor: 'pointer', fontSize: 12.5 } }, 'Products & finishing') : null,
             h('span', { onClick: () => upd(s, { disabled: !s.disabled }, s.disabled ? 'Account enabled.' : 'Account disabled — signed out everywhere.'), style: { color: s.disabled ? TEAL : '#c71917', fontWeight: 600, cursor: 'pointer', fontSize: 12.5 } }, s.disabled ? 'Enable' : 'Disable'),
             h('span', { onClick: () => this.aFetch('/api/admin/staff/' + s.id, { resetPassword: true }).then(d => this.aMsg(d, d.message)), style: { color: TEAL, fontWeight: 600, cursor: 'pointer', fontSize: 12.5 } }, 'Reset password'))]),
         ['16%', null, '100px', '170px', '130px', '90px', '170px']),

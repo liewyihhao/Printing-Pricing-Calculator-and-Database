@@ -132,6 +132,8 @@ function migrate() {
   store.customers().filter(c => c.type === 'vendor' && c.role === 'vendor').forEach(c => { c.role = 'printer_manager'; });
   const lf = store.customers().find(c => c.email === 'vendor@printoka.com');
   if (lf) add('vendor-staff@printoka.com', 'LargeFormat Co — Print Staff', 'vendor', 'printer_staff', { vendorId: lf.id });
+  // printers registered before capabilities existed keep taking every job until Admin narrows them down
+  store.customers().filter(c => c.type === 'vendor' && !c.vendorId && !c.capabilities).forEach(c => { c.capabilities = { products: ['*'], finishes: ['*'] }; });
   // plain product names everywhere ("Flyer (= Loose Sheet Litho)" → "Flyer")
   (db.orders || []).forEach(o => (o.items || []).forEach(it => { it.product = store.productName(it.product); }));
   (db.jobs || []).forEach(j => { j.product = store.productName(j.product); if (j.label && j.label.product) j.label.product = store.productName(j.label.product); });

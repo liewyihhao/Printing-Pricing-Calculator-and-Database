@@ -793,6 +793,7 @@ function createStaffAccount(b, actor) {
   const c = { id: 'S-' + crypto.randomBytes(3).toString('hex').toUpperCase(), email, passHash: hash, salt, name: b.name || email.split('@')[0], type, role,
     outlet: type === 'outlet' ? (b.outlet || null) : null, hub: type === 'hub' ? (b.hub || null) : null, vendorId: type === 'vendor' && role === 'printer_staff' ? b.vendorId : null,
     phone: b.phone || '', tier: 'Standard', spend12mo: 0, creditBalance: 0, addresses: [], creditLedger: [], createdAt: now(), createdBy: actor, adminCreated: true };
+  if (type === 'vendor' && role !== 'printer_staff') c.capabilities = b.capabilities || { products: [], finishes: [] }; // Admin picks what this printer makes
   customers().push(c);
   logEvent({ actor, role: 'admin', action: 'user_create', jobId: null, from: null, to: role, note: 'Staff account ' + email + ' (' + type + ' · ' + role + ')' });
   sendActivation(c);
@@ -803,6 +804,7 @@ function updateStaffAccount(id, b, actor) {
   const before = c.role + (c.disabled ? ' (disabled)' : '');
   if (b.role) { if ((STAFF_ROLES[c.type] || []).indexOf(b.role) < 0) return { error: 'That role does not fit a ' + c.type + ' account.' }; c.role = b.role; }
   ['name', 'phone', 'outlet', 'hub', 'vendorId'].forEach(k => { if (b[k] !== undefined) c[k] = b[k]; });
+  if (b.capabilities && c.type === 'vendor' && !c.vendorId) c.capabilities = b.capabilities; // products + finishing this printer can do
   if (b.disabled !== undefined) { c.disabled = !!b.disabled; if (c.disabled) { const ss = sessions(); Object.keys(ss).forEach(t => { if (ss[t].userId === c.id) delete ss[t]; }); } }
   if (b.resetPassword) { requestPasswordReset(c.email); logEvent({ actor, role: 'admin', action: 'user_password_reset', jobId: null, from: null, to: null, note: c.email }); save(); return { staff: publicCustomer(c), message: 'Password reset email sent to ' + c.email + '.' }; }
   logEvent({ actor, role: 'admin', action: 'user_update', jobId: null, from: before, to: c.role + (c.disabled ? ' (disabled)' : ''), note: c.email });

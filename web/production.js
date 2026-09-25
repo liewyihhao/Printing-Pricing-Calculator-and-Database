@@ -472,7 +472,9 @@
   };
   // outsourcing (§3.5 rules: cost, production time, logistics — never preference or pressure)
   P.pOutsourceCard = function (j, pr) {
-    const o = j.outsource || {}; const id = j.id; const vendors = (this.acGet('vendors', '/api/vendors') || {}).vendors || [];
+    const o = j.outsource || {}; const id = j.id;
+    // only printers registered for this product and its finishing (Admin → Users & roles → printer company)
+    const vj = this.acGet('vendors_' + id, '/api/vendors?job=' + encodeURIComponent(id)) || {}; const vendors = vj.vendors || [], hidden = vj.hidden || [], need = vj.need || { finishes: [] };
     const quotes = pr.quotes || [];
     const canAward = !o.awardedTo && ['scheduling', 'to_outsource'].indexOf(j.status) >= 0;
     const toInhouse = (j.actions || []).find(a => a.action === 'choose_inhouse' && a.permitted);
@@ -481,6 +483,8 @@
       q.awarded ? this.pillDot('Awarded', 'ok') : canAward && q.submittedAt ? Btn('Award', () => this.pAwardModal(j, q)) : ''].map((c, i) => h('td', { key: i, style: { padding: '9px 8px', borderTop: '1px solid ' + LINE, fontSize: 13 } }, c))));
     return this.acC(o.awardedTo ? 'Outsourced' : 'Outsource', [
       !o.awardedTo ? note('Choose the printer by cost, production time and delivery to the outlet or production only.') : null,
+      canAward && !quotes.length ? this.acDL([['Needs', (need.product || j.product) + (need.finishes.length ? ' · ' + need.finishes.join(', ') : '')], hidden.length ? ['Not shown', hidden.map(x => x.name + ' (' + x.why + ')').join(', ')] : null]) : null,
+      canAward && !quotes.length && vj.vendors && !vendors.length ? box('No registered printer can make this job. Ask Admin to add the product and finishing to a printer (Users & roles).', 'bad') : null,
       quotes.length ? h('div', { key: 't', style: { overflowX: 'auto' } }, h('table', { style: { width: '100%', borderCollapse: 'collapse' } }, h('thead', null, h('tr', null, ['Printer', 'Quote', 'Time', 'Document', ''].map(c => h('th', { key: c, style: { textAlign: 'left', padding: '6px 8px', fontSize: 12 } }, c)))), h('tbody', null, rows))) : null,
       canAward && !quotes.length ? [h('div', { key: 'v', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 8 } }, vendors.map(v => { const picked = this.acF('vids') || []; return h('label', { key: v.id, style: { display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: picked.indexOf(v.id) >= 0, onChange: () => this.acSetF('vids', picked.indexOf(v.id) >= 0 ? picked.filter(x => x !== v.id) : picked.concat([v.id])) }), v.name); })),
         h('div', { key: 'rb' }, Btn('Request quotes', () => this.jPost('/api/jobs/' + id + '/request-quotes', { vendorIds: this.acF('vids') || [] }, 'Quote requests sent.', () => this.setState({ acForm: {} })), 'primary', !(this.acF('vids') || []).length))] : null,
@@ -545,7 +549,7 @@
         : send(null), 'primary', !this.acF('reason')))] } });
   };
   P.pAwardModal = function (j, q) {
-    const pickup = j.finalDestination && j.finalDestination.type === 'outlet'; const vendors = (this.acGet('vendors', '/api/vendors') || {}).vendors || [];
+    const pickup = j.finalDestination && j.finalDestination.type === 'outlet'; const vendors = (this.acGet('vendors_' + j.id, '/api/vendors?job=' + encodeURIComponent(j.id)) || {}).vendors || [];
     this.setState({ acForm: {}, acModal: { title: q ? 'Award to ' + q.vendorName : 'Award without a quote', body: () => [
       q ? this.acDL([['Quote', 'RM ' + Number(q.amount).toFixed(2)], ['Production time', q.leadDays ? q.leadDays + ' days' : '—']]) : FG('Printer', h('select', { value: this.acF('vid'), onChange: e => this.acSetF('vid', e.target.value), style: inp }, [h('option', { key: '', value: '' }, 'Choose a printer…')].concat(vendors.map(v => h('option', { key: v.id, value: v.id }, v.name)))), 1),
       FG('The printer delivers to', h('select', { value: this.acF('dest') || 'production', onChange: e => this.acSetF('dest', e.target.value), style: inp }, [h('option', { key: 'p', value: 'production' }, 'Production — logistics receives, repacks and delivers')].concat(pickup ? [h('option', { key: 'o', value: 'outlet' }, 'Straight to ' + j.finalDestination.name)] : [])), 1),

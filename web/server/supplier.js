@@ -58,6 +58,45 @@ function saveBlob(dir, b, prefix) {
   fs.mkdirSync(dir, { recursive: true }); fs.writeFileSync(path.join(dir, id + '-' + name), buf);
   return { id, name, stored: id + '-' + name, size: buf.length, at: now() };
 }
+// ---------------------------------------------------------------- what each printer can make (original "Printing Categories")
+// Admin registers per printer company the products it prints and the finishing it can do. A job is offered only to
+// printers that make its product AND can do every finishing the job's spec asks for (e.g. hot stamping).
+const FINISHES = [
+  ['Hot Stamping', /hot\s*stamp|\bfoil/i], ['Embossing', /emboss|deboss/i], ['Spot UV', /spot\s*uv/i], ['Lamination', /laminat|\blam\b/i],
+  ['Die-cut', /die[\s-]*cut/i], ['Round Corner', /round(ed)?\s*corner/i], ['Numbering', /numbering/i], ['Perforation', /perforat/i],
+  ['Folding', /\bfold/i], ['Binding', /binding|saddle|perfect\s*bind|wire[\s-]*o/i],
+];
+const FINISH_NAMES = FINISHES.map(f => f[0]);
+const NOT_WANTED = /^(none|no\b|nil|without|n\/a|-|not required)/i;
+// the finishing a job needs, read from its spec ("Label: Value · Label: Value"); "Lamination: None" does not count
+function requiredFinishes(spec) {
+  const need = {};
+  String(spec || '').split(/\s*·\s*|\n/).forEach(part => {
+    const i = part.indexOf(':'), label = i >= 0 ? part.slice(0, i) : '', val = (i >= 0 ? part.slice(i + 1) : part).trim();
+    if (!val || NOT_WANTED.test(val)) return;
+    FINISHES.forEach(f => { if (f[1].test(label) || f[1].test(val)) need[f[0]] = true; });
+  });
+  return FINISH_NAMES.filter(n => need[n]);
+}
+const normName = s => store.productName(String(s || '')).toLowerCase().replace(/s$/, '').trim();
+function printerCan(v, j) {
+  const cap = v.capabilities || { products: [], finishes: [] };
+  const products = cap.products || [], finishes = cap.finishes || [];
+  const makes = products.indexOf('*') >= 0 || products.some(p => normName(p) === normName(j.product));
+  const missing = requiredFinishes(j.spec).filter(f => finishes.indexOf('*') < 0 && finishes.indexOf(f) < 0);
+  return { ok: makes && !missing.length, why: !makes ? 'Does not print ' + j.product : missing.length ? 'No ' + missing.join(', ') : '' };
+}
+// printer companies for a job: who can take it, and who is left out (and why)
+function vendorsForJob(j) {
+  const all = store.vendorAccounts().filter(v => !v.vendorId && !v.disabled);
+  const out = { need: { product: j.product, finishes: requiredFinishes(j.spec) }, vendors: [], hidden: [] };
+  all.forEach(v => { const r = printerCan(v, j); (r.ok ? out.vendors : out.hidden).push({ id: v.id, name: v.name, internal: !!v.internal, why: r.why }); });
+  return out;
+}
+function cleanCapabilities(b) {
+  const arr = x => (Array.isArray(x) ? x : []).map(s => String(s).slice(0, 80)).filter(Boolean);
+  return { products: arr(b && b.products), finishes: arr(b && b.finishes).filter(f => f === '*' || FINISH_NAMES.indexOf(f) >= 0) };
+}
 function jobFiles(j) { const out = []; const o = j.outsource || {};
   (o.vendors || []).forEach(v => { if (v.document) out.push(Object.assign({ kind: 'quote', vendorId: v.vendorId }, v.document)); });
   (o.draftHistory || []).concat(o.draft && o.draft.file ? [o.draft.file] : []).forEach(f => out.push(Object.assign({ kind: 'draft', vendorId: o.awardedTo }, f)));
@@ -325,5 +364,5 @@ function readCustomQuoteDoc(qid, vendorId, me) {
   return { file: p.document, data: fs.readFileSync(f), type: MIME[(p.document.name.split('.').pop() || '').toLowerCase()] || 'application/octet-stream' };
 }
 
-module.exports = { STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, shipToHub, deliveryDetails, markPaid, saveProof, savePaymentProofOnJob, deliverTo, documentData, readJobFile,
+module.exports = { FINISH_NAMES, requiredFinishes, printerCan, vendorsForJob, cleanCapabilities, STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, shipToHub, deliveryDetails, markPaid, saveProof, savePaymentProofOnJob, deliverTo, documentData, readJobFile,
   requestPrinterQuotes, vendorCustomQuotes, vendorCustomQuote, submitCustomQuote, readCustomQuoteDoc };

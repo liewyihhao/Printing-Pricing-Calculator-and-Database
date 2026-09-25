@@ -288,10 +288,10 @@ async function api(req, res, pathname, query) {
     if (!me || me.type !== 'admin') return send(res, 401, { error: 'admin sign-in required' });
     if (seg[1] === 'customers' && !seg[2] && req.method === 'GET') return send(res, 200, { customers: store.customers().filter(c => c.type === 'customer').map(store.publicCustomer) });
     if (seg[1] === 'staff' && !seg[2] && req.method === 'GET') return send(res, 200, { staff: store.customers().filter(c => c.type !== 'customer').map(store.publicCustomer) });
-    if (seg[1] === 'roles') return send(res, 200, { roles: D.ROLES, staffRoles: store.STAFF_ROLES });
+    if (seg[1] === 'roles') return send(res, 200, { roles: D.ROLES, staffRoles: store.STAFF_ROLES, finishes: supplier.FINISH_NAMES });
     // WordPress Users → Add New / Edit role / disable / reset password
-    if (seg[1] === 'staff' && !seg[2] && req.method === 'POST') { const r = store.createStaffAccount(await readBody(req), me.name || me.email); return send(res, r.error ? 400 : 200, r); }
-    if (seg[1] === 'staff' && seg[2] && req.method === 'POST') { const r = store.updateStaffAccount(seg[2], await readBody(req), me.name || me.email); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'staff' && !seg[2] && req.method === 'POST') { const sb = await readBody(req); if (sb.capabilities) sb.capabilities = supplier.cleanCapabilities(sb.capabilities); const r = store.createStaffAccount(sb, me.name || me.email); return send(res, r.error ? 400 : 200, r); }
+    if (seg[1] === 'staff' && seg[2] && req.method === 'POST') { const sb = await readBody(req); if (sb.capabilities) sb.capabilities = supplier.cleanCapabilities(sb.capabilities); const r = store.updateStaffAccount(seg[2], sb, me.name || me.email); return send(res, r.error ? 400 : 200, r); }
     if (seg[1] === 'emails' && !seg[2]) {
       if (req.method === 'GET') return send(res, 200, { templates: store.emailTemplates().map(t => Object.assign({}, t, store.emailStats(t.id))), outbox: store.emailOutbox(60) });
     }
@@ -516,14 +516,18 @@ async function api(req, res, pathname, query) {
   }
 
   // ---- outsource / vendor quotation flow ----
-  if (seg[0] === 'vendors' && !seg[1]) return send(res, 200, { vendors: store.vendorAccounts().filter(v => !v.vendorId).map(v => ({ id: v.id, name: v.name, internal: !!v.internal })) });
+  // printer companies; ?job=ID → only the printers that make this product and can do its finishing (+ who is left out)
+  if (seg[0] === 'vendors' && !seg[1]) { const vj = query.job && store.job(query.job); if (vj) return send(res, 200, supplier.vendorsForJob(vj)); return send(res, 200, { vendors: store.vendorAccounts().filter(v => !v.vendorId).map(v => ({ id: v.id, name: v.name, internal: !!v.internal })) }); }
   if (seg[0] === 'vendor' && seg[1] === 'requests') {
     const me = store.sessionCustomer(token); if (!me || me.type !== 'vendor') return send(res, 401, { error: 'vendor sign-in required' });
     return send(res, 200, { jobs: store.vendorRequests(me.vendorId || me.id).map(j => Object.assign(supplier.vendorJob(j, me), { printing: supplier.listRow(j, me) })), company: me.vendorId || me.id, canQuote: me.role !== 'printer_staff' });
   }
   if (seg[0] === 'jobs' && seg[2] === 'request-quotes' && req.method === 'POST') {
     if (['production_director', 'scheduler_manager', 'scheduler_staff'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });
-    const b = await readBody(req); const r = store.requestVendorQuotes(seg[1], b.vendorIds, actor);
+    const b = await readBody(req); const qj = store.job(seg[1]);
+    // only printers registered for this product and its finishing may be asked
+    if (qj) { const bad = (b.vendorIds || []).map(id => store.findCustomer(id)).filter(v => !v || !supplier.printerCan(v, qj).ok); if (bad.length) return send(res, 400, { error: (bad[0] ? bad[0].name + ': ' + supplier.printerCan(bad[0], qj).why : 'Unknown printer') + '. Pick a printer registered for this job.' }); }
+    const r = store.requestVendorQuotes(seg[1], b.vendorIds, actor);
     return send(res, r.error ? 400 : 200, r);
   }
   if (seg[0] === 'jobs' && seg[2] === 'quote' && req.method === 'POST') {
@@ -552,7 +556,9 @@ async function api(req, res, pathname, query) {
   }
   if (seg[0] === 'jobs' && seg[2] === 'award' && req.method === 'POST') {
     if (['production_director', 'scheduler_manager', 'scheduler_staff'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });
-    const r = ops.award(seg[1], role, actor, await readBody(req));
+    const ab = await readBody(req); const aj = store.job(seg[1]), av = store.findCustomer(ab.vendorId);
+    if (aj && av && av.type === 'vendor' && !supplier.printerCan(av, aj).ok) return send(res, 400, { error: av.name + ': ' + supplier.printerCan(av, aj).why + '. Pick a printer registered for this job.' });
+    const r = ops.award(seg[1], role, actor, ab);
     return r.error ? send(res, 400, r) : send(res, 200, { ok: true, job: jobView(r.job, role) });
   }
   // POST /api/vendor/jobs/:id/ship { courier, tracking } — the awarded printer ships with the Printoka label
