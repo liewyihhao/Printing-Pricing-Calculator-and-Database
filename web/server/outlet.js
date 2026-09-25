@@ -174,10 +174,14 @@ function onPaid(o) { if (!o || !o.fromQuote) return; const q = store.quote(o.fro
 
 // ---------------------------------------------------------------- orders
 const PAID = o => o.payment && o.payment.status === 'validated';
+// an outlet sees: its own quote / counter orders, website orders collected there, and any order whose parcel is
+// addressed to it (logistics chose "Send to: Outlet", or a printer ships straight to it) — the chain from the
+// customer's web order runs through production and logistics and ends as "Incoming" at the receiving outlet
+const headedTo = (o, oid) => (o.jobIds || []).some(jid => { const j = store.job(jid); return j && [j.finalDestination, j.destination].some(d => d && d.type === 'outlet' && d.id === oid); });
 function outletOrders(me) {
   const oid = outletOf(me);
   const fromQuotes = {}; store.quotes().forEach(q => { if (q.orderId && (me.type === 'admin' || q.outlet === oid)) fromQuotes[q.orderId] = q; });
-  return store.orders().filter(o => fromQuotes[o.id] || (o.outlet && o.outlet === oid) || (o.fulfillment && o.fulfillment.method === 'pickup' && o.fulfillment.outlet === oid) || (me.type === 'admin' && (o.outlet || fromQuotes[o.id])))
+  return store.orders().filter(o => fromQuotes[o.id] || (o.outlet && o.outlet === oid) || (o.fulfillment && o.fulfillment.method === 'pickup' && o.fulfillment.outlet === oid) || (oid && headedTo(o, oid)) || (me.type === 'admin' && (o.outlet || fromQuotes[o.id])))
     .map(o => { if (fromQuotes[o.id] && !o.fromQuote) { o.fromQuote = fromQuotes[o.id].id; o.outlet = fromQuotes[o.id].outlet; o.issuedBy = fromQuotes[o.id].issuedBy || null; } return o; });
 }
 // the order status the outlet sees (WooCommerce-style label), from the live jobs

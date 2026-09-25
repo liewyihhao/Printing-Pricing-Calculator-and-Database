@@ -4784,8 +4784,25 @@ class Component extends DCLogic {
       lookup,
       o === false ? h('div', { style: { color: '#c0392b', fontSize: 13 } }, 'No order found with that number.') : null);
     const jobs = o.jobs || [];
-    const cur = jobs.length ? Math.min.apply(null, jobs.map(j => this.trackStage(j.status))) : 0;
     const paid = o.payment && o.payment.status === 'validated';
+    // where it ends up: an outlet (the customer collects there) or the customer's own address — follows logistics' Send to
+    const dest = (jobs.find(j => j.finalDestination) || {}).finalDestination || null;
+    const atOutlet = !!(dest && dest.type === 'outlet');
+    if (atOutlet) STAGES.splice(3, 2, 'On the way to the outlet', 'Ready to collect', 'Collected');
+    const OUTLET_STAGE = { dispatched: 3, ready_collect: 4, completed: 5 };
+    const stageOf = s => !atOutlet ? this.trackStage(s) : OUTLET_STAGE[s] != null ? OUTLET_STAGE[s] : Math.min(this.trackStage(s), 2);
+    const cur = jobs.length ? Math.min.apply(null, jobs.map(j => stageOf(j.status))) : 0;
+    // the customer's own words for each job (the internal department statuses stay inside Printoka)
+    const custLabel = j => {
+      const s = j.status, toOutlet = (j.finalDestination || {}).type === 'outlet';
+      if (s === 'intake') return 'Order received';
+      if (s === 'rejected') return 'Action needed: artwork';
+      if (['prepress', 'prepress_issue', 'escalated'].indexOf(s) >= 0) return 'Artwork check';
+      if (s === 'dispatched') return toOutlet ? 'On the way to the outlet' : 'Shipped';
+      if (s === 'ready_collect') return 'Ready to collect';
+      if (s === 'completed') return toOutlet ? 'Collected' : 'Delivered';
+      return 'In production';
+    };
     return h('div', { style: { maxWidth: 1000, margin: '0 auto', padding: '10px 20px 0' } },
       this.head('Order ' + o.id, (o.customer && o.customer.name ? o.customer.name + ' · ' : '') + jobs.length + ' job(s) · ' + (o.channel || 'online') + ' · ' + (paid ? 'paid' : 'payment pending'),
         [this.btn('Invoice', 'ghost', 'doc:invoice:' + o.id), this.btn('Order slip', 'ghost', 'doc:slip:' + o.id), this.btn('Contact support', 'teal', 'crm')]),
@@ -4798,6 +4815,7 @@ class Component extends DCLogic {
               h('span', { style: { height: 14, width: 14, borderRadius: '50%', flex: 'none', background: i > cur ? '#eaeaea' : (i === cur ? AMBER : TEAL) } }),
               i < STAGES.length - 1 && h('span', { style: { flex: 1, height: 2, background: i < cur ? TEAL : '#eaeaea' } })),
             h('div', { style: { fontSize: 12.5, fontWeight: i === cur ? 600 : 500, color: i > cur ? FAINT : INK } }, s)))),
+        dest ? h('div', { style: { marginTop: 16, fontSize: 13, color: INK, lineHeight: 1.6 } }, h('b', null, atOutlet ? 'Collect at: ' : 'Delivering to: '), (dest.name || '') + (dest.address ? ', ' + dest.address : '')) : null,
         !paid ? h('div', { style: { marginTop: 16, background: '#fff5e2', color: '#a1660a', borderRadius: 8, padding: '11px 13px', fontSize: 12.5, lineHeight: 1.6 } }, 'Payment is pending — production starts once payment is confirmed. Paid by bank transfer? Our team validates it shortly.') : null,
         // shipped to the customer: they confirm it arrived (completes the delivery)
         this.userType() === 'customer' && o.userId === (this.state.user || {}).id && jobs.some(j => j.status === 'dispatched' && (j.destination || {}).type === 'customer')
@@ -4812,7 +4830,7 @@ class Component extends DCLogic {
             h('div', { style: { display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' } },
               h('span', { style: { font: '600 12px ui-monospace,Menlo,monospace', color: TEAL } }, j.id),
               h('span', { style: { fontSize: 14.5, fontWeight: 600 } }, j.product),
-              h('span', { style: { marginLeft: 'auto' } }, this.chip(j.statusLabel || j.status, j.status === 'completed' ? 'ok' : (j.status === 'rejected' || j.status === 'prepress_issue' ? 'bad' : 'teal')))),
+              h('span', { style: { marginLeft: 'auto' } }, this.chip(custLabel(j), j.status === 'completed' ? 'ok' : (j.status === 'rejected' ? 'bad' : 'teal')))),
             h('div', { style: { fontSize: 12.5, color: MUT, lineHeight: 1.6 } }, j.spec || '—'),
             h('div', { style: { fontSize: 12, color: FAINT } }, 'Qty ' + (j.qty || 0).toLocaleString() + ' · ' + this.money(j.price || 0) + ' · artwork: ' + ((j.artwork && j.artwork.file) || '—'))))),
         jobs.length === 0 ? h('div', { style: { color: FAINT, fontSize: 13 } }, 'No jobs on this order.') : null));
