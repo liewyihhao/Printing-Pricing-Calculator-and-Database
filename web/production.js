@@ -44,6 +44,11 @@
   const STEP = { intake: 1, prepress: 2, prepress_issue: 2, escalated: 2, rejected: 2, scheduling: 3, printing: 4, outsourcing: 4, printed: 5, inbound: 5, logistics: 5, dispatched: 5, at_hub: 5, ready_collect: 5, completed: 5, cancelled: 5 };
   const STEPS = ['Order entered', 'Prepress', 'Scheduler', 'Printing', 'Logistics'];
   const overdue = j => j.deadline && Date.parse(j.deadline) < Date.now() && ['completed', 'cancelled', 'ready_collect'].indexOf(j.status) < 0;
+  // how many days the job has sat at its current step without moving forward (from the order date for a new order):
+  // a small numbered circle — grey 0–1, amber 2, red 3+
+  const idleDays = j => { const since = (j.statusAt && j.statusAt[j.status]) || j.updatedAt || j.createdAt; return since ? Math.max(0, Math.floor((Date.now() - Date.parse(since)) / 864e5)) : 0; };
+  const daysBadge = j => { const n = idleDays(j), c = n >= 3 ? ['#fdecec', '#c71917'] : n === 2 ? ['#fff4e0', '#b86e00'] : ['#f1f2f3', '#5f6368'];
+    return h('span', { title: n + (n === 1 ? ' day' : ' days') + ' at this step', 'aria-label': n + (n === 1 ? ' day' : ' days') + ' at this step', style: { display: 'inline-grid', placeItems: 'center', minWidth: 26, height: 26, padding: '0 6px', borderRadius: 13, background: c[0], color: c[1], fontSize: 12.5, fontWeight: 700 } }, n); };
   const tone = j => j.status === 'completed' ? 'ok' : (j.status === 'rejected' || j.status === 'escalated' || overdue(j)) ? 'bad' : 'teal';
 
   // ---------------------------------------------------------------- page shell (same as the outlet account)
@@ -66,9 +71,9 @@
     const list = jobs.slice().sort((a, b) => { const da = a.deadline ? Date.parse(a.deadline) : Infinity, db = b.deadline ? Date.parse(b.deadline) : Infinity; if (da !== db) return da - db; return (Date.parse(a.paymentValidatedAt || 0) || Infinity) - (Date.parse(b.paymentValidatedAt || 0) || Infinity); });
     // "Handled by": who took the job in the department it is in now
     const handler = j => { const dq = j.queue || ({ intake: 'prepress', prepress: 'prepress', prepress_issue: 'prepress', escalated: 'prepress', rejected: 'prepress', scheduling: 'scheduler', printing: 'scheduler', outsourcing: 'scheduler' })[j.status] || 'logistics'; return (j.owner || {})[dq] || '—'; };
-    return this.acList({ key, title, action: extra, cols: ['Date', 'Job', 'Product', 'Customer', 'Due', 'Handled by', 'Status'],
+    return this.acList({ key, title, action: extra, cols: ['Date', 'Job', 'Product', 'Customer', 'Days', 'Handled by', 'Status'],
       rows: list.map(j => ({ date: j.createdAt, status: j.statusLabel || j.status, search: [j.id, j.orderId, j.customer, j.product, handler(j)],
-        cells: [h('span', { style: { whiteSpace: 'nowrap' } }, dmy(j.createdAt)), link('#' + j.id, () => openJob(this, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), j.customer, h('span', { style: { color: overdue(j) ? '#c71917' : MUT, fontWeight: overdue(j) ? 700 : 400, whiteSpace: 'nowrap' } }, j.deadline ? dmy(j.deadline) + (overdue(j) ? ' · overdue' : '') : '—'), handler(j), this.pillDot(j.statusLabel || j.status, tone(j))] })) });
+        cells: [h('span', { style: { whiteSpace: 'nowrap' } }, dmy(j.createdAt)), link('#' + j.id, () => openJob(this, j)), j.product, j.customer, daysBadge(j), handler(j), this.pillDot(j.statusLabel || j.status, tone(j))] })) });
   };
   P.pTiles = function (items) { return this.acCard(this.acQuick(items)); };
   const jobsIn = (c, statuses) => c.opsJobs().filter(j => statuses.indexOf(j.status) >= 0);
@@ -143,11 +148,11 @@
   };
   P.pJobsOutsourced = function () {
     return this.pStateList('jo', 'Jobs Outsourced', this.opsJobs().filter(j => j.outsource && j.outsource.awardedTo).map(j => ({ date: j.createdAt, due: j.deadline, state: outState(j), search: [j.id, j.product, j.customer, j.outsource.po],
-      cells: [link('#' + j.id, () => openJob(this, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), ((j.outsource.vendors || []).find(v => v.vendorId === j.outsource.awardedTo) || {}).vendorName || '—', h('span', { style: { whiteSpace: 'nowrap' } }, j.deadline ? dmy(j.deadline) : '—')] })), ['Job', 'Product', 'Printer', 'Due']);
+      cells: [link('#' + j.id, () => openJob(this, j)), j.product, ((j.outsource.vendors || []).find(v => v.vendorId === j.outsource.awardedTo) || {}).vendorName || '—', daysBadge(j)] })), ['Job', 'Product', 'Printer', 'Days']);
   };
   P.pJobsInhouse = function () {
     return this.pStateList('ji', 'Jobs Inhouse', this.opsJobs().filter(j => j.route === 'inhouse' && ['scheduling'].indexOf(j.status) < 0).map(j => ({ date: j.createdAt, due: j.deadline, state: inState(j), search: [j.id, j.product, j.customer, j.machine],
-      cells: [link('#' + j.id, () => openJob(this, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), (j.machine || '—') + (j.slot ? ' · ' + when(j.slot) : ''), h('span', { style: { whiteSpace: 'nowrap' } }, j.deadline ? dmy(j.deadline) : '—')] })), ['Job', 'Product', 'Machine · slot', 'Due']);
+      cells: [link('#' + j.id, () => openJob(this, j)), j.product, (j.machine || '—') + (j.slot ? ' · ' + when(j.slot) : ''), daysBadge(j)] })), ['Job', 'Product', 'Machine · slot', 'Days']);
   };
   P.s_scheduler = function () { return this.pShell('scheduler', DEPT_TABS.scheduler(this), tab => this.pScheduler(tab, t => this.setState({ sTab: t }))); };
   P.pScheduler = function (tab, go) {
@@ -182,7 +187,7 @@
     : ['Completed', 'neutral', true];
   const shipState = logState;
   const logRows = (c, list, st) => list.map(j => ({ date: j.createdAt, due: j.deadline, state: st(j), search: [j.id, j.product, j.customer],
-    cells: [link('#' + j.id, () => openJob(c, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), j.customer, (j.finalDestination || {}).name || '—'] }));
+    cells: [link('#' + j.id, () => openJob(c, j)), j.product, j.customer, (j.finalDestination || {}).name || '—'] }));
   const wasShipped = j => !!(j.dispatchDelivery || (j.statusAt && j.statusAt.logistics && ['dispatched', 'ready_collect', 'completed'].indexOf(j.status) >= 0));
   P.s_logistics = function () { return this.pShell('logistics', DEPT_TABS.logistics(this), tab => this.pLogistics(tab, t => this.setState({ sTab: t }))); };
   P.pLogistics = function (tab, go) {
@@ -330,7 +335,7 @@
           if (!ar) return box('Amended: ' + (j.reason || '') + '. Waiting for the customer to approve the amended file.');
           return h('div', { key: 'ar', style: { display: 'flex', flexDirection: 'column', gap: 10 } },
             box(ar.emailedTo ? 'Approval email sent to ' + ar.emailedTo + ' on ' + when(ar.emailedAt) + '. Waiting for the customer’s reply.' : 'No email on file. Contact the customer directly for their approval.', ar.emailedTo ? 'ok' : 'bad'),
-            ar.issues.length ? h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6, fontSize: 13.5 } }, ar.issues.map((x, i) => h('div', { key: i, style: { display: 'flex', gap: 8, alignItems: 'center' } }, this.pillDot(x.fixed ? 'Fixed' : 'Found', x.fixed ? 'ok' : 'warn'), x.text))) : null,
+            ar.issues.length ? h('ul', { style: { margin: 0, paddingLeft: 20, display: 'flex', flexDirection: 'column', gap: 4, fontSize: 13.5 } }, ar.issues.map((x, i) => h('li', { key: i }, x.text))) : null,
             this.acDL([ar.folding ? ['Folding', 'Customer asked to check'] : null, ar.file ? ['Amended file', link('📄 ' + ar.file.name, () => this.jDownload('/api/jobs/' + id + '/files/' + ar.file.id, ar.file.name))] : null, ar.note ? ['Note', ar.note] : null, ['Amended by', ar.by + ' · ' + when(ar.at)]])); })() : null,
         st !== 'prepress_issue' ? h('div', { key: 'secs', style: { display: 'flex', flexDirection: 'column', gap: 10 } }, CL.map(sectionRow)) : null,
         blocked(approve),
@@ -484,17 +489,16 @@
       const am = this.acF('am') || {}; const setAm = (k, v) => this.acSetF('am', Object.assign({}, am, { [k]: v }));
       const picked = ARTWORK_ISSUES.filter(x => am[x]);
       const send = fileId => this.jPost('/api/jobs/' + j.id + '/transition', { action: 'flag_minor', payload: {
-        reason: picked.map(x => x + (am[x] === 'fixed' ? ' (fixed)' : '')).join('; ') || this.acF('amNote') || 'Artwork amended',
-        issues: picked.map(x => ({ text: x, fixed: am[x] === 'fixed' })), folding: !!this.acF('amFold'), note: this.acF('amNote') || '', fileId: fileId || undefined } },
+        reason: picked.join('; ') || this.acF('amNote') || 'Artwork amended',
+        issues: picked.map(x => ({ text: x })), folding: !!this.acF('amFold'), note: this.acF('amNote') || '', fileId: fileId || undefined } },
         email ? 'Pending approval — email sent to ' + email + '.' : 'Pending approval.', () => this.setState({ acModal: null, acForm: {} }));
       const go = () => this.acF('amFileData')
         ? this.aFetchJ('/api/jobs/' + j.id + '/proof', { name: this.acF('amFileName'), data: this.acF('amFileData') }).then(f => { if (this.acDone(f)) send(f.file.id); })
         : send(null);
       return [
         h('b', { key: 'h' }, 'What did you find?'),
-        h('div', { key: 'l', style: { display: 'flex', flexDirection: 'column', gap: 8 } }, ARTWORK_ISSUES.map(x => h('div', { key: x, style: { display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', fontSize: 13.5 } },
-          h('label', { style: { display: 'flex', gap: 10, alignItems: 'center', flex: '1 1 300px', cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!am[x], onChange: e => setAm(x, e.target.checked ? 'found' : false), style: { width: 17, height: 17 } }), x),
-          am[x] ? h('label', { style: { display: 'flex', gap: 6, alignItems: 'center', fontSize: 12.5, color: MUT, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: am[x] === 'fixed', onChange: e => setAm(x, e.target.checked ? 'fixed' : 'found') }), 'We fixed it') : null))),
+        h('div', { key: 'l', style: { display: 'flex', flexDirection: 'column', gap: 8 } }, ARTWORK_ISSUES.map(x =>
+          h('label', { key: x, style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 13.5, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!am[x], onChange: e => setAm(x, e.target.checked), style: { width: 17, height: 17 } }), x))),
         h('label', { key: 'fo', style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 13.5, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!this.acF('amFold'), onChange: e => this.acSetF('amFold', e.target.checked), style: { width: 17, height: 17 } }), 'Ask the customer to check the folding'),
         FG('Amended file', this.jPickFile('amFile'), 0, 'Attached to the email so the customer can see the fixed file.'),
         FG('Note to the customer', ta(this.acF('amNote'), v => this.acSetF('amNote', v), 2)),
