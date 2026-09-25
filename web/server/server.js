@@ -96,7 +96,10 @@ async function api(req, res, pathname, query) {
     if (['scheduler_staff', 'scheduler_manager', 'production_director'].indexOf(role) >= 0 && j.outsource) { let seen = false; (j.outsource.vendors || []).forEach(v => { if (v.submittedAt && !v.seenAt) { v.seenAt = store.now(); seen = true; } }); if (seen) store.save(); }
     ops.claim(j, role, actor); // the first staff member of the job's department to open it takes that part
     const o = j.orderId ? store.order(j.orderId) : null;
-    return send(res, 200, { job: jobView(j, role), handlers: ops.handlers(j), printing: supplier.view(j, me0), audit: store.audit({ jobId: seg[1] }), order: o && me0.type !== 'hub' ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items, files: (o.files || []).filter(f => f.kind === 'artwork') } : null });
+    // prepress "New Order" check: the order, its payment and the customer's account
+    const acct = o && o.userId ? store.findCustomer(o.userId) : null;
+    return send(res, 200, { job: jobView(j, role), handlers: ops.handlers(j), printing: supplier.view(j, me0), audit: store.audit({ jobId: seg[1] }), order: o && me0.type !== 'hub' ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items, files: (o.files || []).filter(f => f.kind === 'artwork'),
+      fromQuote: o.fromQuote || null, outlet: o.outlet || null, channel: o.channel || 'online', account: acct ? { name: acct.name, email: acct.email, phone: acct.phone || '', tier: acct.tier || 'Standard', since: acct.createdAt || null, disabled: !!acct.disabled } : null } : null });
   }
   // ---- printers & hubs (original printoka-3rd-party-supplier flow) ----
   if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'proof'].indexOf(seg[2]) >= 0) {

@@ -43,12 +43,13 @@ const ROLES = {
 
 // ---- job statuses: each belongs to one department queue ----------------------
 const STATUS = {
-  intake: { label: 'Order received — awaiting payment confirmation', queue: 'outlet', step: 1 },
-  prepress: { label: 'Prepress — file check', queue: 'prepress', step: 2 },
-  prepress_issue: { label: 'Prepress — minor issue, awaiting approval', queue: 'prepress', step: 2 },
-  escalated: { label: 'Prepress — escalated to manager', queue: 'prepress', step: 2 },
-  rejected: { label: 'Rejected — returned to outlet', queue: 'outlet', step: 2 },
-  scheduling: { label: 'Scheduler — in queue', queue: 'scheduler', step: 3 },
+  // prepress statuses (user, 2026-09-25): New Order → Preflight → (Pending Customer Approval | Pending Customer Amendment) → scheduler New Order
+  intake: { label: 'New Order', queue: 'prepress', step: 2 },
+  prepress: { label: 'Preflight', queue: 'prepress', step: 2 },
+  prepress_issue: { label: 'Pending Customer Approval', queue: 'prepress', step: 2 },
+  escalated: { label: 'Escalated to Manager', queue: 'prepress', step: 2 },
+  rejected: { label: 'Pending Customer Amendment', queue: 'prepress', step: 2 },
+  scheduling: { label: 'New Order', queue: 'scheduler', step: 3 },
   printing: { label: 'Printing — in-house', queue: 'scheduler', step: 4 },
   outsourcing: { label: 'Printing — outsourced', queue: 'scheduler', step: 4 },
   // logistics statuses (user, 2026-09-25): Pending Receiving → Pending Pickup → Shipped → Completed
@@ -105,28 +106,29 @@ const GATES = {
 // from -> [{ action, to, roles, gates, requires, note }]. The Production Director may perform any
 // transition (final authority, §1.4). Staff never approve escalations — managers do.
 const TRANSITIONS = {
+  // New Order: prepress checks the order details, the payment and the customer, then marks it processed → Preflight
   intake: [
-    { action: 'acknowledge', to: 'prepress', roles: OUTLET, gates: ['payment'], note: 'Payment confirmed — released to prepress.' },
+    { action: 'process', to: 'prepress', roles: PREPRESS, gates: ['payment'], note: 'Order processed — details, payment and customer checked. To preflight.' },
   ],
   // Step 2 — Prepress (§2.4–2.7)
   prepress: [
     { action: 'approve', to: 'scheduling', roles: PREPRESS, gates: ['artworkPresent', 'artworkMatch'], note: 'PASS — released to the scheduler.' },
-    { action: 'flag_minor', to: 'prepress_issue', roles: PREPRESS, requires: ['reason'], note: 'MINOR ISSUE — fixing internally; approval needed before release.' },
-    { action: 'reject_major', to: 'rejected', roles: PREPRESS, requires: ['reason', 'proof', 'suggestion'], note: 'MAJOR ISSUE — rejected and returned to the outlet with proof and a suggested correction.' },
+    { action: 'flag_minor', to: 'prepress_issue', roles: PREPRESS, requires: ['reason'], note: 'MINOR ISSUE — prepress amended the file and asked the customer to approve it.' },
+    { action: 'reject_major', to: 'rejected', roles: PREPRESS, requires: ['reason'], note: 'MAJOR ISSUE — prepress contacted the customer for a new file.' },
     { action: 'escalate', to: 'escalated', roles: ['prepress_staff'], requires: ['reason'], note: 'CRITICAL — escalated to the prepress manager.' },
   ],
   prepress_issue: [
-    { action: 'approve', to: 'scheduling', roles: PREPRESS, gates: ['artworkPresent', 'artworkMatch'], requires: ['approval'], note: 'Fix approved — released to the scheduler.' },
-    { action: 'reject_major', to: 'rejected', roles: PREPRESS, requires: ['reason', 'proof', 'suggestion'] },
+    { action: 'approve', to: 'scheduling', roles: PREPRESS, gates: ['artworkPresent', 'artworkMatch'], requires: ['approval'], note: 'Customer approved the amended file — released to the scheduler.' },
+    { action: 'reject_major', to: 'rejected', roles: PREPRESS, requires: ['reason'] },
     { action: 'escalate', to: 'escalated', roles: ['prepress_staff'], requires: ['reason'] },
   ],
   escalated: [
     { action: 'approve', to: 'scheduling', roles: ['prepress_manager'], gates: ['artworkPresent', 'artworkMatch'], note: 'Manager approved — released to the scheduler.' },
     { action: 'flag_minor', to: 'prepress_issue', roles: ['prepress_manager'], requires: ['reason'], note: 'Manager: fix internally and seek approval.' },
-    { action: 'reject_major', to: 'rejected', roles: ['prepress_manager'], requires: ['reason', 'proof', 'suggestion'] },
+    { action: 'reject_major', to: 'rejected', roles: ['prepress_manager'], requires: ['reason'] },
   ],
   rejected: [
-    { action: 'resubmit', to: 'prepress', roles: OUTLET.concat(PREPRESS), requires: ['file'], note: 'Corrected file received — back to prepress for a fresh check.' },
+    { action: 'resubmit', to: 'prepress', roles: OUTLET.concat(PREPRESS), requires: ['file'], note: 'Customer resubmitted the file — back to preflight.' },
   ],
   // Step 3 — Scheduler (§3.5 SOP: confirm prepress approval + payment, assign machine/printer, queue with a time slot)
   scheduling: [

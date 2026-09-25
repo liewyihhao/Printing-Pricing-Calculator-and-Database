@@ -387,7 +387,7 @@ function dailySeries(events, days) {
   return out;
 }
 // ---- daily reporting (§1.6): morning (start of day) and end-of-day, manager → director ----------
-const QUEUE = { prepress: ['prepress', 'prepress_issue', 'escalated'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
+const QUEUE = { prepress: ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
 const LEAVES = { prepress: ['approve', 'reject_major'], scheduler: ['finish', 'vendor_ship', 'vendor_ship_outlet'], logistics: ['dispatch'] };
 const startOfDay = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
 function reportFigures(dept) {
@@ -424,7 +424,7 @@ function listReports(role, days) {
 }
 
 const DEPT_ACTIONS = {
-  prepress: ['approve', 'reject_major', 'flag_minor', 'escalate', 'resubmit'],
+  prepress: ['process', 'approve', 'reject_major', 'flag_minor', 'escalate', 'resubmit'],
   scheduler: ['assign_inhouse', 'assign_outsource', 'award_po', 'award_direct', 'request_quotes', 'quote_priced', 'finish', 'draft_approve', 'draft_reject', 'deliver'],
   logistics: ['receive', 'dispatch', 'progress_logistics', 'progress_receiving', 'dispatch_details'],
   hub: ['receive_hub', 'forward', 'progress_hub'],

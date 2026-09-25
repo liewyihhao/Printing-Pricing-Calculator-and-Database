@@ -291,16 +291,16 @@ function createOrder(body) {
   const GATEWAY = { card_test: 'Stripe', stripe: 'Stripe', ipay88: 'iPay88', fpx: 'iPay88 · FPX', tng: "Touch 'n Go eWallet", bank_transfer: 'Manual bank-in', credit_term: 'Credit terms' };
   const paid = method !== 'bank_transfer' && method !== 'credit_term';
   const jobIds = [];
-  // Web/online orders skip the outlet: once paid they go STRAIGHT to prepress (no acknowledge step).
-  // Unpaid (bank transfer) waits at intake until payment is validated, then is bumped to prepress.
+  // Every order (website, or converted from an outlet quote) lands in prepress as a New Order: prepress checks the
+  // order details, the payment and the customer, then marks it processed → Preflight (user, 2026-09-25).
   items.forEach(it => {
     const jid = 'J-' + num + '-' + it.lineNo;
     const j = {
       id: jid, orderId: oid, channel: 'online', customer: cust.name || 'Online customer',
-      product: it.product, spec: it.spec, qty: it.qty, price: it.lineTotal, status: paid ? 'prepress' : 'intake',
+      product: it.product, spec: it.spec, qty: it.qty, price: it.lineTotal, status: 'intake',
       paymentValidated: paid, paymentValidatedAt: paid ? now() : null, creditTerms: method === 'credit_term',
       artwork: { file: (it.artworks && it.artworks[0]) || it.artworkFile || 'pending-upload.pdf', checkStatus: 'pending' }, artworkMatches: true,
-      deadline: body.deadline || null, createdAt: now(), acknowledgedAt: paid ? now() : null, owner: {},
+      deadline: body.deadline || null, createdAt: now(), owner: {},
     };
     db.jobs.push(j); jobIds.push(jid);
   });
@@ -336,7 +336,7 @@ function createOrder(body) {
 function validateOrderPayment(oid, actor) {
   const o = order(oid); if (!o) return { error: 'order not found' };
   o.payment.status = 'validated'; o.payment.paidAt = now(); o.status = 'paid';
-  (o.jobIds || []).forEach(jid => { const j = job(jid); if (j) { j.paymentValidated = true; j.paymentValidatedAt = now(); if (j.channel === 'online' && j.status === 'intake') { j.status = 'prepress'; j.acknowledgedAt = now(); } } });
+  (o.jobIds || []).forEach(jid => { const j = job(jid); if (j) { j.paymentValidated = true; j.paymentValidatedAt = now(); } }); // stays a New Order until prepress processes it
   // payment cleared → the web order can now move into prepress; notify prepress
   notify({ type: 'role', role: 'prepress' }, { kind: 'order_placed', title: 'Payment’s in — an order is ready for you', body: 'We’ve confirmed payment for ' + (o.customer && o.customer.name || 'a customer') + ', so order ' + oid + ' is all set for its artwork check.', cta: 'Open the order →', orderId: oid });
   logEvent({ actor: actor || 'admin', role: 'store_manager', action: 'validate_payment', jobId: null, from: 'pending_payment', to: 'paid', note: oid + ' payment validated' });

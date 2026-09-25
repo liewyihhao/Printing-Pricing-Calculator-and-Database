@@ -40,7 +40,7 @@
   const inDept = (c, d) => isDirector(c) || deptOf(c) === d;
 
   // queues (guidebook §1.8 steps)
-  const Q = { prepress: ['prepress', 'prepress_issue', 'escalated'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
+  const Q = { prepress: ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
   const STEP = { intake: 1, prepress: 2, prepress_issue: 2, escalated: 2, rejected: 2, scheduling: 3, printing: 4, outsourcing: 4, printed: 5, inbound: 5, logistics: 5, dispatched: 5, at_hub: 5, ready_collect: 5, completed: 5, cancelled: 5 };
   const STEPS = ['Order entered', 'Prepress', 'Scheduler', 'Printing', 'Logistics'];
   const overdue = j => j.deadline && Date.parse(j.deadline) < Date.now() && ['completed', 'cancelled', 'ready_collect'].indexOf(j.status) < 0;
@@ -65,7 +65,7 @@
   P.pTable = function (key, title, jobs, extra) {
     const list = jobs.slice().sort((a, b) => { const da = a.deadline ? Date.parse(a.deadline) : Infinity, db = b.deadline ? Date.parse(b.deadline) : Infinity; if (da !== db) return da - db; return (Date.parse(a.paymentValidatedAt || 0) || Infinity) - (Date.parse(b.paymentValidatedAt || 0) || Infinity); });
     // "Handled by": who took the job in the department it is in now
-    const handler = j => { const dq = j.queue || ({ prepress: 'prepress', prepress_issue: 'prepress', escalated: 'prepress', scheduling: 'scheduler', printing: 'scheduler', outsourcing: 'scheduler' })[j.status] || 'logistics'; return (j.owner || {})[dq] || '—'; };
+    const handler = j => { const dq = j.queue || ({ intake: 'prepress', prepress: 'prepress', prepress_issue: 'prepress', escalated: 'prepress', rejected: 'prepress', scheduling: 'scheduler', printing: 'scheduler', outsourcing: 'scheduler' })[j.status] || 'logistics'; return (j.owner || {})[dq] || '—'; };
     return this.acList({ key, title, action: extra, cols: ['Date', 'Job', 'Product', 'Customer', 'Due', 'Handled by', 'Status'],
       rows: list.map(j => ({ date: j.createdAt, status: j.statusLabel || j.status, search: [j.id, j.orderId, j.customer, j.product, handler(j)],
         cells: [h('span', { style: { whiteSpace: 'nowrap' } }, dmy(j.createdAt)), link('#' + j.id, () => openJob(this, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), j.customer, h('span', { style: { color: overdue(j) ? '#c71917' : MUT, fontWeight: overdue(j) ? 700 : 400, whiteSpace: 'nowrap' } }, j.deadline ? dmy(j.deadline) + (overdue(j) ? ' · overdue' : '') : '—'), handler(j), this.pillDot(j.statusLabel || j.status, tone(j))] })) });
@@ -77,21 +77,22 @@
   // each department's tabs; the Production Director sees the same dashboards inside the director account
   const DEPT_TABS = {
     prepress: c => ['Dashboard', 'Files', 'KPI'].concat(isManager(c) ? ['Daily report'] : []),
-    scheduler: c => ['Dashboard', 'Quote request', 'Quote Pending from Printer', 'Jobs Outsourced', 'Jobs Inhouse'].concat(isManager(c) ? ['KPI', 'Daily report'] : []),
+    scheduler: c => ['Dashboard', 'New Order', 'Quote request', 'Quote Pending from Printer', 'Jobs Outsourced', 'Jobs Inhouse'].concat(isManager(c) ? ['KPI', 'Daily report'] : []),
     logistics: c => ['Dashboard', 'Incoming Jobs', 'Completed Jobs', 'Shipped'].concat(isManager(c) ? ['KPI', 'Daily report'] : []),
   };
   P.s_prepress = function () { return this.pShell('prepress', DEPT_TABS.prepress(this), tab => this.pPrepress(tab, (t, extra) => this.setState(Object.assign({ sTab: t }, extra)))); };
   P.pPrepress = function (tab, go) {
-    if (tab === 'Files') return this.pTable('pf', 'Files', jobsIn(this, ['prepress', 'prepress_issue', 'escalated', 'rejected']));
+    if (tab === 'Files') return this.pTable('pf', 'Files', jobsIn(this, Q.prepress));
     if (tab === 'KPI') return this.pKpi('prepress');
     if (tab === 'Daily report') return this.pDaily('prepress');
-    const q = jobsIn(this, Q.prepress);
+    // indicators (user, 2026-09-25): New Orders → Preflight → Pending Customer Approval (minor) / Pending Customer Amendment (major)
+    const esc = jobsIn(this, ['escalated']).length;
     return [this.pTiles([
-      { label: 'Files to check', value: jobsIn(this, ['prepress']).length, icon: 'check', color: 'teal', onClick: () => go('Files', { pf_s: 'Prepress — file check' }) },
-      { label: 'Minor issues', value: jobsIn(this, ['prepress_issue']).length, icon: 'edit-3', color: 'orange', onClick: () => go('Files', { pf_s: 'Prepress — minor issue, awaiting approval' }) },
-      { label: 'Escalated to manager', value: jobsIn(this, ['escalated']).length, icon: 'layers', color: 'red', onClick: () => go('Files', { pf_s: 'Prepress — escalated to manager' }) },
-      { label: 'Rejected to outlet', value: jobsIn(this, ['rejected']).length, icon: 'file', color: 'red', onClick: () => go('Files', { pf_s: 'Rejected — returned to outlet' }) }])]
-      .concat(this.pTable('pd', 'Your queue', q));
+      { label: 'New Orders', value: jobsIn(this, ['intake']).length, icon: 'file', color: 'red', onClick: () => go('Files', { pf_s: 'New Order' }) },
+      { label: 'Preflight', value: jobsIn(this, ['prepress']).length + esc, icon: 'check', color: 'teal', onClick: () => go('Files', { pf_s: 'Preflight' }) },
+      { label: 'Pending Customer Approval', value: jobsIn(this, ['prepress_issue']).length, icon: 'edit-3', color: 'orange', onClick: () => go('Files', { pf_s: 'Pending Customer Approval' }) },
+      { label: 'Pending Customer Amendment', value: jobsIn(this, ['rejected']).length, icon: 'layers', color: 'orange', onClick: () => go('Files', { pf_s: 'Pending Customer Amendment' }) }])]
+      .concat(this.pTable('pd', 'Tasks', jobsIn(this, Q.prepress)));
   };
 
   // ================================================================== SCHEDULER
@@ -148,6 +149,8 @@
   };
   P.s_scheduler = function () { return this.pShell('scheduler', DEPT_TABS.scheduler(this), tab => this.pScheduler(tab, t => this.setState({ sTab: t }))); };
   P.pScheduler = function (tab, go) {
+    // New Order: passed preflight — review it, then request printer quotes or process it in-house
+    if (tab === 'New Order') return this.pTable('sn', 'New Order', jobsIn(this, ['scheduling']));
     if (tab === 'Quote request') return this.pQuoteRequests();
     if (tab === 'Quote Pending from Printer') return this.pPrinterPending();
     if (tab === 'Jobs Outsourced') return this.pJobsOutsourced();
@@ -158,11 +161,12 @@
     const open = arr => arr.filter(s => !s[2]).length;
     const pending = jobs.filter(j => j.outsource && (j.outsource.vendors || []).length && j.outsource.requestedAt).map(j => pqState(j.outsource.vendors, !!j.outsource.awardedTo)).concat(qs.filter(q => q.printerQuotes && q.printerQuotes.printers.length).map(q => pqState(q.printerQuotes.printers, false)));
     return [this.pTiles([
+      { label: 'New Order', value: jobsIn(this, ['scheduling']).length, icon: 'file', color: 'red', onClick: () => go('New Order') },
       { label: 'Quote request', value: open(qs.map(qrState)), icon: 'edit-3', color: 'teal', onClick: () => go('Quote request') },
       { label: 'Quote Pending from Printer', value: open(pending), icon: 'file', color: 'orange', onClick: () => go('Quote Pending from Printer') },
       { label: 'Jobs Outsourced', value: open(jobs.filter(j => j.outsource && j.outsource.awardedTo).map(outState)), icon: 'truck', color: 'teal', onClick: () => go('Jobs Outsourced') },
       { label: 'Jobs Inhouse', value: open(jobs.filter(j => j.route === 'inhouse' && j.status !== 'scheduling').map(inState)), icon: 'printer', color: 'teal', onClick: () => go('Jobs Inhouse') }])]
-      .concat(this.pTable('sd', 'New jobs', jobsIn(this, ['scheduling'])))
+      .concat(this.pTable('sd', 'New Order', jobsIn(this, ['scheduling'])))
       .concat(this.pTable('sdl', 'Confirm delivery', jobs.filter(j => j.status === 'dispatched' && (j.destination || {}).type === 'customer')));
   };
 
@@ -239,7 +243,7 @@
     const main = [];
     // logistics pages (1 Received · 2 Print label · 3 Shipping): the step on the left, order details on the right
     const logPage = ['inbound', 'printed', 'logistics'].indexOf(j.status) >= 0 && inDept(this, 'logistics') && deptOf(this) !== 'scheduler';
-    const card = this.pStepCard(j, pr, acts); if (card) main.push(card);
+    const card = this.pStepCard(j, pr, acts, d.order); if (card) main.push(card);
     if (j.outsource && inDept(this, 'scheduler') && !logPage) main.push(this.pOutsourceCard(j, pr));
     const orderCard = this.acC('Order details', [h('b', { key: 'p' }, j.product), this.acSpec((pr.job && pr.job.spec) || j.spec),
       this.acDL([['Quantity', (j.qty || 0).toLocaleString()], ['Customer', j.customer], ['Due', j.deadline ? when(j.deadline) + (overdue(j) ? ' — overdue' : '') : '—'], ['Deliver to', j.finalDestination ? (j.finalDestination.name || j.finalDestination.type) + (j.finalDestination.address ? ', ' + j.finalDestination.address : '') : '—'], j.instructions ? ['Instructions', j.instructions] : null, j.machine ? ['Machine', j.machine + (j.slot ? ' · ' + when(j.slot) : '')] : null]),
@@ -257,41 +261,55 @@
     const st = STEP[j.status] || 1;
     const typeTab = tabs.indexOf('Reports') >= 0 ? (st <= 2 ? 'Prepress' : st <= 4 ? 'Scheduler' : 'Logistics')
       : tabs.indexOf('Files') >= 0 ? 'Files'
-      : tabs.indexOf('Jobs Inhouse') >= 0 ? (j.route === 'inhouse' ? 'Jobs Inhouse' : j.route === 'outsource' ? 'Jobs Outsourced' : 'Dashboard')
+      : tabs.indexOf('Jobs Inhouse') >= 0 ? (j.status === 'scheduling' ? 'New Order' : j.route === 'inhouse' ? 'Jobs Inhouse' : j.route === 'outsource' ? 'Jobs Outsourced' : 'Dashboard')
       : tabs.indexOf('Incoming Jobs') >= 0 ? (j.status === 'dispatched' || j.status === 'completed' || j.status === 'ready_collect' ? 'Shipped' : j.route === 'inhouse' ? 'Completed Jobs' : 'Incoming Jobs') : tabs[1];
     return this.acSingle({ home: tabs[0], type: typeTab, title: '#' + id, statusNode: this.pillDot(j.statusLabel || j.status, tone(j)) }, main, aside);
   };
   // the one card for the step the job is at — only the department that owns the step can act
-  P.pStepCard = function (j, pr, acts) {
+  P.pStepCard = function (j, pr, acts, order) {
     const id = j.id, st = j.status, role = this.userRole();
     const act = (action, payload, ok) => this.jPost('/api/jobs/' + id + '/transition', { action, payload: payload || {} }, ok, () => this.setState({ acModal: null, acForm: {} }));
     const blocked = a => a && a.blockedBy && a.blockedBy.length ? box(a.blockedBy.join(' '), 'bad') : null;
-    // Step 2 — prepress file check (§2.4 order: basic → technical → content; §2.5 result)
+    // Step 2 — prepress (user, 2026-09-25): New Order → Preflight → Pending Customer Approval / Pending Customer Amendment
     if (Q.prepress.indexOf(st) >= 0) {
-      if (!inDept(this, 'prepress')) return this.acC('Prepress', note('The prepress team is checking this file.'));
+      if (!inDept(this, 'prepress')) return this.acC('Prepress', note(st === 'intake' ? 'New order — waiting for prepress to process it.' : 'The prepress team is checking this file.'));
+      // New Order: check the order, the payment and the customer, then mark it processed
+      if (st === 'intake') {
+        const o = order || {}, pay = o.payment || {}, ac = o.account, c = o.customer || {};
+        const paid = pay.status === 'validated' || j.creditTerms;
+        return this.acC('New order', [
+          this.acDL([['Order', o.id || j.orderId], ['From', o.fromQuote ? 'Outlet quotation ' + o.fromQuote + (o.outlet ? ' · ' + String(o.outlet).replace(/-/g, ' ') : '') : (o.channel === 'outlet' ? 'Outlet' : 'Website order')],
+            ['Placed', o.createdAt ? when(o.createdAt) : '—'], ['Total', o.total != null ? this.rm(o.total) : '—']]),
+          h('b', { key: 'ph' }, 'Payment'),
+          this.acDL([['Method', pay.gateway || pay.method || '—'], ['Status', this.pillDot(paid ? (j.creditTerms && pay.status !== 'validated' ? 'Credit Terms' : 'Paid') : 'Not Paid', paid ? 'ok' : 'bad')], pay.reference ? ['Reference', pay.reference] : null]),
+          h('b', { key: 'ch' }, 'Customer'),
+          this.acDL([['Name', c.name || j.customer], ['Email', c.email || '—'], ['Phone', c.phone || '—'], ['Account', ac ? (ac.disabled ? 'Disabled account' : ac.tier + ' member' + (ac.since ? ' since ' + dmy(ac.since) : '')) : 'Guest (no account)']]),
+          !paid ? box('Payment has not been received yet. The order can be processed once it is paid.', 'bad') : null,
+          acts.process ? h('div', { key: 'b' }, Btn('Mark order processed', () => act('process', {}, 'Order processed — now in preflight.'), 'primary', !acts.process.enabled)) : null]);
+      }
       if (st === 'escalated' && !acts.approve) return this.acC('Escalated', [box('Escalated to the prepress manager: ' + (j.reason || '') + '. Waiting for the manager’s decision.')]);
+      // Pending Customer Amendment (major issue): prepress asked the customer for a new file
+      if (st === 'rejected') return this.acC('Pending customer amendment', [box('Issue: ' + (j.reason || '—') + (j.suggestion ? ' · Suggested correction: ' + j.suggestion : ''), 'bad'),
+        (j.proofs || []).length ? link('📄 Screenshot: ' + j.proofs[j.proofs.length - 1].name, () => this.jDownload('/api/jobs/' + id + '/files/' + j.proofs[j.proofs.length - 1].id, j.proofs[j.proofs.length - 1].name)) : null,
+        acts.resubmit ? h('div', { key: 'b' }, Btn('New file received — back to preflight', () => this.pModal('New file received', [['file', 'File name', 'e.g. bizcard-v2.pdf']], v => act('resubmit', v, 'Back in preflight.')), 'primary')) : null]);
       const CL = [['Basic verification', ['Product type matches the file', 'Quantity is correct', 'Size matches the specs']],
         ['Technical check', ['Resolution at least 300 dpi', 'Colour mode is CMYK', 'Bleed at least 3 mm', 'Safe margin respected', 'Fonts outlined / embedded', 'No white lines', 'No RGB colour', 'No complex or risky die-cutting', 'No Pantone colour', 'No elements outside the safe zone', 'No similar colours under 10%', 'No toning / colour under 10%']],
         ['Content check', ['No missing fonts', 'No alignment issues', 'No cropping errors']]];
       const ticked = this.acF('fc') || {}; const allTicked = CL.every(g => g[1].every(x => ticked[x]));
       const tick = x => this.acSetF('fc', Object.assign({}, ticked, { [x]: !ticked[x] }));
       const approve = acts.approve;
-      return this.acC(st === 'prepress_issue' ? 'Minor issue — fix and get approval' : 'File check', [
-        st === 'prepress_issue' ? box('Minor issue: ' + (j.reason || '') + '. Fix the file, send it to the customer (through the outlet) and release it once they approve.') : note('Check the file in this order. Tick each point, then choose the result.'),
+      return this.acC(st === 'prepress_issue' ? 'Pending customer approval' : 'Preflight', [
+        st === 'prepress_issue' ? box('Amended: ' + (j.reason || '') + '. Waiting for the customer to approve the amended file.') : note('Check the artwork against every point, then choose the result.'),
         st !== 'prepress_issue' ? CL.map(g => h('div', { key: g[0], style: { display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 13 } }, g[0]),
           g[1].map(x => h('label', { key: x, style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 13, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!ticked[x], onChange: () => tick(x), style: { width: 17, height: 17 } }), x)))) : null,
         blocked(approve),
         h('div', { key: 'b', style: { display: 'flex', flexDirection: 'column', gap: 8 } },
-          approve && st === 'prepress_issue' ? Btn('Customer approved the fix — release to scheduler', () => this.pModal('Release to scheduler', [['approval', 'How did the customer approve the fix?', 'e.g. Approved by WhatsApp to the KL outlet, 25 Sep 10:30']], v => act('approve', { approval: v.approval }, 'Released to the scheduler.')), 'primary', !approve.enabled) : null,
-          approve && st !== 'prepress_issue' ? Btn('Pass — release to scheduler', () => act('approve', {}, 'Passed — released to the scheduler.'), 'primary', !approve.enabled || !allTicked) : null,
-          approve && st !== 'prepress_issue' && !allTicked ? note('Tick every check to pass the file.') : null,
-          acts.flag_minor ? Btn('Minor issue — fix internally and get approval', () => this.pModal('Minor issue', [['reason', 'What needs fixing?', 'e.g. Bleed is 2 mm — extending it to 3 mm']], v => act('flag_minor', v, 'Marked as a minor issue.'))) : null,
-          acts.reject_major ? Btn('Major issue — reject and return to outlet', () => this.pRejectModal(j), 'danger') : null,
-          acts.escalate ? Btn('Critical — escalate to prepress manager', () => this.pModal('Escalate to manager', [['reason', 'Why is it critical?', '']], v => act('escalate', v, 'Escalated to the prepress manager.'))) : null)]);
+          approve && st === 'prepress_issue' ? Btn('Customer approved — pass to scheduler', () => this.pModal('Customer approved', [['approval', 'How did the customer approve it?', 'e.g. Approved by WhatsApp, 25 Sep 10:30']], v => act('approve', { approval: v.approval }, 'Passed to the scheduler.')), 'primary', !approve.enabled) : null,
+          approve && st !== 'prepress_issue' ? Btn('Approve — pass to scheduler', () => act('approve', {}, 'Approved — passed to the scheduler.'), 'primary', !approve.enabled || !allTicked) : null,
+          approve && st !== 'prepress_issue' && !allTicked ? note('Tick every check to approve the artwork.') : null,
+          acts.flag_minor && st !== 'prepress_issue' ? Btn('Minor issue — amended, pending customer approval', () => this.pModal('Minor issue', [['reason', 'What did you amend?', 'e.g. Extended the bleed from 2 mm to 3 mm']], v => act('flag_minor', v, 'Pending customer approval.'))) : null,
+          acts.reject_major ? Btn(st === 'prepress_issue' ? 'Customer wants a new file — pending amendment' : 'Major issue — ask the customer for a new file', () => this.pRejectModal(j), 'danger') : null)]);
     }
-    if (st === 'rejected') return this.acC('Rejected — returned to outlet', [box('Issue: ' + (j.reason || '—') + (j.suggestion ? ' · Suggested correction: ' + j.suggestion : ''), 'bad'),
-      (j.proofs || []).length ? link('📄 Proof: ' + j.proofs[j.proofs.length - 1].name, () => this.jDownload('/api/jobs/' + id + '/files/' + j.proofs[j.proofs.length - 1].id, j.proofs[j.proofs.length - 1].name)) : null,
-      acts.resubmit ? Btn('Corrected file received — check again', () => this.pModal('Corrected file received', [['file', 'File name', 'e.g. bizcard-v2.pdf']], v => act('resubmit', v, 'Back in the prepress queue.')), 'primary') : null]);
     // Step 3 — scheduler (§3.5): confirm approval + payment, then in-house (machine + slot) or outsource
     if (st === 'scheduling') {
       if (!inDept(this, 'scheduler')) return this.acC('Scheduler', note('Waiting for the scheduler to queue this job.'));
@@ -420,13 +438,15 @@
       .concat([h('div', { key: 'b' }, Btn(submitLabel || 'Confirm', () => { const v = {}; fields.forEach(f => { v[f[0]] = this.acF(f[0]); }); submit(v); }, 'primary', fields.some(f => !String(this.acF(f[0]) || '').trim())))]) } });
   };
   P.pRejectModal = function (j) {
-    this.setState({ acForm: {}, acModal: { title: 'Reject and return to outlet', body: () => [
-      note('Never use vague reasons like “file problem”. State the issue, attach a screenshot and suggest the correction.'),
+    // major issue: prepress contacts the customer for a new file → Pending Customer Amendment
+    const send = proofId => this.jPost('/api/jobs/' + j.id + '/transition', { action: 'reject_major', payload: { reason: this.acF('reason'), proof: proofId || undefined, suggestion: this.acF('suggestion') || undefined } }, 'Pending customer amendment.', () => this.setState({ acModal: null, acForm: {} }));
+    this.setState({ acForm: {}, acModal: { title: 'Major issue — ask for a new file', body: () => [
       FG('Issue', ta(this.acF('reason'), v => this.acSetF('reason', v), 3), 1, 'e.g. Text runs into the 3 mm bleed on the right edge'),
-      FG('Screenshot', this.jPickFile('proof'), 1),
-      FG('Suggested correction', ta(this.acF('suggestion'), v => this.acSetF('suggestion', v), 3), 1, 'e.g. Move the text 5 mm inwards and resend the PDF'),
-      h('div', { key: 'b' }, Btn('Reject and return to outlet', () => this.aFetchJ('/api/jobs/' + j.id + '/proof', { name: this.acF('proofName'), data: this.acF('proofData') }).then(f => {
-        if (!this.acDone(f)) return; this.jPost('/api/jobs/' + j.id + '/transition', { action: 'reject_major', payload: { reason: this.acF('reason'), proof: f.file.id, suggestion: this.acF('suggestion') } }, 'Rejected and returned to the outlet.', () => this.setState({ acModal: null, acForm: {} })); }), 'primary', !this.acF('reason') || !this.acF('suggestion') || !this.acF('proofData')))] } });
+      FG('Screenshot', this.jPickFile('proof')),
+      FG('Suggested correction', ta(this.acF('suggestion'), v => this.acSetF('suggestion', v), 3)),
+      h('div', { key: 'b' }, Btn('Customer contacted — pending amendment', () => this.acF('proofData')
+        ? this.aFetchJ('/api/jobs/' + j.id + '/proof', { name: this.acF('proofName'), data: this.acF('proofData') }).then(f => { if (this.acDone(f)) send(f.file.id); })
+        : send(null), 'primary', !this.acF('reason')))] } });
   };
   P.pAwardModal = function (j, q) {
     const pickup = j.finalDestination && j.finalDestination.type === 'outlet'; const vendors = (this.acGet('vendors', '/api/vendors') || {}).vendors || [];
