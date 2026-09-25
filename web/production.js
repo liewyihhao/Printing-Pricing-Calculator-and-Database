@@ -229,11 +229,13 @@
     const j = d.job, pr = d.printing || {}, id = j.id;
     const acts = {}; (j.actions || []).forEach(a => { if (a.permitted) acts[a.action] = a; });
     const main = [];
-    const card = this.pStepCard(j, pr, acts); if (card) main.push(card);
+    // an incoming job reads top to bottom: the order, then who delivered it and the Received button
+    const card = this.pStepCard(j, pr, acts), cardLast = j.status === 'inbound' && inDept(this, 'logistics'); if (card && !cardLast) main.push(card);
     if (j.outsource && inDept(this, 'scheduler')) main.push(this.pOutsourceCard(j, pr));
     main.push(this.acC('Order details', [h('b', { key: 'p' }, j.product), this.acSpec((pr.job && pr.job.spec) || j.spec),
       this.acDL([['Quantity', (j.qty || 0).toLocaleString()], ['Customer', j.customer], ['Due', j.deadline ? when(j.deadline) + (overdue(j) ? ' — overdue' : '') : '—'], ['Deliver to', j.finalDestination ? (j.finalDestination.name || j.finalDestination.type) + (j.finalDestination.address ? ', ' + j.finalDestination.address : '') : '—'], j.instructions ? ['Instructions', j.instructions] : null, j.machine ? ['Machine', j.machine + (j.slot ? ' · ' + when(j.slot) : '')] : null]),
       (pr.job && pr.job.artworks || []).length ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12, display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 12.5 } }, 'Artwork'), pr.job.artworks.map((a, i) => a.id ? h('span', { key: i }, link('📄 ' + a.name, () => this.openOrderFile(a.orderId, a))) : h('span', { key: i, style: { color: MUT } }, '📄 ' + a.name))) : null]));
+    if (card && cardLast) main.push(card);
     // documents open as PDFs on the page (not for prepress — they only check files)
     const docs = deptOf(this) === 'prepress' ? [] : (pr.documents || []);
     // who took the job in each part (the first person in each department to open it)
@@ -308,14 +310,14 @@
     const cl = (group, keys) => { const prog = (j.progress && j.progress[group]) || {}; const can = inDept(this, 'logistics');
       return keys.map(k => { const v = prog[k[0]]; return h('label', { key: k[0], style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 13, cursor: can ? 'pointer' : 'default' } },
         h('input', { type: 'checkbox', checked: !!v, disabled: !can, onChange: e => this.opsStep(id, group, k[0], e.target.checked), style: { width: 17, height: 17 } }), h('span', { style: { flex: 1 } }, k[1]), v ? h('span', { style: { fontSize: 12, color: FAINT } }, v.by) : null); }); };
-    // Incoming Jobs (printer) — verify, then receive (this marks the scheduler's outsourced job done)
+    // Incoming Jobs (printer) — the incoming order and one button: Received (marks the scheduler's outsourced job done)
     if (st === 'inbound') {
       if (!inDept(this, 'logistics')) return this.acC('Logistics', note('The printer has shipped it — waiting for logistics to receive it.'));
-      const RC = [['matched', 'The job matches the order'], ['quantity', 'Quantity is correct'], ['quality', 'Finishing quality is good'], ['unlabelled', 'Printer labels removed']];
-      const pd = pr.printerDelivery;
-      return this.acC('Receive from printer', [
-        pd ? this.acDL([['Printer', ((j.outsource && (j.outsource.vendors || []).find(v => v.vendorId === j.outsource.awardedTo)) || {}).vendorName], ['Delivery company', pd.company], ['Tracking number', (pd.tracking || []).join(', ')], pd.document ? ['Delivery order', link(pd.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + pd.document.id, pd.document.name))] : null]) : null,
-        note('When the parcel arrives, check it and tick each point, then press Received.'), cl('receiving', RC), blocked(acts.receive),
+      const pd = pr.printerDelivery || {};
+      return this.acC('Incoming job', [
+        this.acDL([['From',((j.outsource && (j.outsource.vendors || []).find(v => v.vendorId === j.outsource.awardedTo)) || {}).vendorName || 'Printer'],
+          ['Delivery company', pd.company || '—'], ['Tracking number', (pd.tracking || []).join(', ') || '—'],
+          pd.document ? ['Delivery order', link(pd.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + pd.document.id, pd.document.name))] : null]),
         acts.receive ? h('div', { key: 'b' }, Btn('Received', () => act('receive', {}, 'Received.'), 'primary', !acts.receive.enabled)) : null]);
     }
     // Completed Jobs (in-house) — receive from production (this marks the scheduler's in-house job done)
@@ -348,7 +350,6 @@
     const a = acts.dispatch;
     const PC = [['verified', 'Checked — order vs item, quantity and quality'], ['packed', 'Packed — protected from damage'], ['labelled', 'Shipping label stuck on every parcel']];
     return this.acC('Pack & ship', [
-      note('Pack the order, print the shipping label, then enter the courier and tracking number and press Ship.'),
       cl ? cl('logistics', PC) : null,
       packing ? this.pSendTo(j) : null,
       h('div', { key: 'lb' }, Btn('View Shipping Label (PDF)', () => this.openJobDoc(j.id, 'shipping-label'))),

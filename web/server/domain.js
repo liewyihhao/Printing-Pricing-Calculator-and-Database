@@ -147,7 +147,7 @@ const TRANSITIONS = {
   ],
   // Step 5 — Logistics (§4.4 receiving · §4.5 packing, delivery)
   inbound: [
-    { action: 'receive', to: 'logistics', roles: LOGISTICS, gates: ['receivingDone'], note: 'Outsourced job received and verified — to packing.' },
+    { action: 'receive', to: 'logistics', roles: LOGISTICS, note: 'Outsourced job received from the printer — to packing.' },
   ],
   logistics: [
     { action: 'dispatch', to: 'dispatched', roles: LOGISTICS, gates: ['packingDone'], requires: ['courier'], note: 'Assigned to the courier and dispatched.' },
