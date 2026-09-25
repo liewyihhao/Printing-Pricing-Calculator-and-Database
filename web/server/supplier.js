@@ -65,7 +65,16 @@ function jobFiles(j) { const out = []; const o = j.outsource || {};
   if (j.hubDelivery && j.hubDelivery.document) out.push(Object.assign({ kind: 'delivery-order' }, j.hubDelivery.document));
   if (j.dispatchDelivery && j.dispatchDelivery.document) out.push(Object.assign({ kind: 'dispatch-order' }, j.dispatchDelivery.document));
   (j.proofs || []).forEach(f => out.push(Object.assign({ kind: 'proof' }, f)));
+  if (j.paymentProof) out.push(Object.assign({ kind: 'payment-proof' }, j.paymentProof));
   return out; }
+// payment proof kept on the job itself when there is no web order behind it (counter / legacy jobs)
+function savePaymentProofOnJob(jid, me, b) {
+  const j = store.job(jid); if (!j) return { error: 'Job not found.' };
+  const f = saveBlob(path.join(ROOT, jid), b, 'P'); if (f.error) return f;
+  f.by = me.name; j.paymentProof = f; j.paymentValidated = true; j.paymentValidatedAt = now(); j.paymentValidatedBy = me.name;
+  store.logEvent({ actor: me.name, role: me.role || me.type, action: 'payment_proof', jobId: jid, from: null, to: null, note: 'Payment proof ' + f.name + ' — payment validated' });
+  store.save(); return { file: { id: f.id, name: f.name } };
+}
 // prepress rejection proof (§2.7: attach a visual proof — screenshot)
 function saveProof(jid, me, b) {
   const j = store.job(jid); if (!j) return { error: 'Job not found.' };
@@ -316,5 +325,5 @@ function readCustomQuoteDoc(qid, vendorId, me) {
   return { file: p.document, data: fs.readFileSync(f), type: MIME[(p.document.name.split('.').pop() || '').toLowerCase()] || 'application/octet-stream' };
 }
 
-module.exports = { STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, shipToHub, deliveryDetails, markPaid, saveProof, deliverTo, documentData, readJobFile,
+module.exports = { STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, shipToHub, deliveryDetails, markPaid, saveProof, savePaymentProofOnJob, deliverTo, documentData, readJobFile,
   requestPrinterQuotes, vendorCustomQuotes, vendorCustomQuote, submitCustomQuote, readCustomQuoteDoc };

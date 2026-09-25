@@ -276,20 +276,29 @@
       // New Order: check the order, the payment and the customer, then mark it processed
       if (st === 'intake') {
         const o = order || {}, pay = o.payment || {}, ac = o.account, c = o.customer || {};
-        const paid = pay.status === 'validated' || j.creditTerms;
+        const paid = pay.status === 'validated' || j.paymentValidated || j.creditTerms;
+        const jp = j.paymentProof; // proof uploaded on a job that has no web order behind it
+        // Upload payment proof: prepress attaches the proof and the payment is validated with it
+        const uploadProof = () => this.setState({ acForm: {}, acModal: { title: 'Upload payment proof', body: () => [
+          FG('Payment proof', this.jPickFile('pp'), 1, 'Bank-in slip, transfer receipt or screenshot (PDF or image).'),
+          FG('Reference', h('input', { value: this.acF('ppRef'), onChange: e => this.acSetF('ppRef', e.target.value), placeholder: 'optional, e.g. bank transaction ID', style: inp })),
+          h('div', { key: 'b' }, Btn('Upload and validate payment', () => this.jPost('/api/jobs/' + id + '/payment-proof', { name: this.acF('ppName'), data: this.acF('ppData'), reference: this.acF('ppRef') || undefined }, 'Payment proof uploaded — payment validated.', () => this.setState({ acModal: null, acForm: {} })), 'primary', !this.acF('ppData')))] } });
         return this.acC('New order', [
           this.acDL([['Order', o.id || j.orderId], ['From', o.fromQuote ? 'Outlet quotation ' + o.fromQuote + (o.outlet ? ' · ' + String(o.outlet).replace(/-/g, ' ') : '') : (o.channel === 'outlet' ? 'Outlet' : 'Website order')],
             ['Placed', o.createdAt ? when(o.createdAt) : '—'], ['Total', o.total != null ? this.rm(o.total) : '—']]),
           h('b', { key: 'ph' }, 'Payment'),
           // prepress checks the payment and validates it (bank transfer: against the bank-in slip / the bank account)
           this.acDL([['Method', pay.gateway || pay.method || '—'], ['Status', this.pillDot(paid ? (j.creditTerms && pay.status !== 'validated' ? 'Credit Terms' : 'Paid') : 'Not Paid', paid ? 'ok' : 'bad')], pay.reference ? ['Reference', pay.reference] : null,
-            pay.proof ? ['Bank-in slip', pay.proofFileId ? link('📄 ' + pay.proof, () => this.openOrderFile(o.id, { id: pay.proofFileId, name: pay.proof })) : pay.proof] : null,
-            pay.validatedBy ? ['Validated by', pay.validatedBy + (pay.validatedAt ? ' · ' + when(pay.validatedAt) : '')] : null]),
-          !paid && o.id ? h('div', { key: 'vp' }, Btn('Payment received — validate', () => this.jPost('/api/orders/' + o.id + '/pay', {}, 'Payment validated.'))) : null,
+            pay.proof ? ['Payment proof', pay.proofFileId ? link('📄 ' + pay.proof, () => this.openOrderFile(o.id, { id: pay.proofFileId, name: pay.proof })) : pay.proof] : null,
+            jp ? ['Payment proof', link('📄 ' + jp.name, () => this.jDownload('/api/jobs/' + id + '/files/' + jp.id, jp.name))] : null,
+            (pay.validatedBy || j.paymentValidatedBy) ? ['Validated by', (pay.validatedBy || j.paymentValidatedBy) + ((pay.validatedAt || j.paymentValidatedAt) ? ' · ' + when(pay.validatedAt || j.paymentValidatedAt) : '')] : null]),
           h('b', { key: 'ch' }, 'Customer'),
           this.acDL([['Name', c.name || j.customer], ['Email', c.email || '—'], ['Phone', c.phone || '—'], ['Account', ac ? (ac.disabled ? 'Disabled account' : ac.tier + ' member' + (ac.since ? ' since ' + dmy(ac.since) : '')) : 'Guest (no account)']]),
-          !paid ? box('Check the payment. Validate it once the money is received — the order can then be processed.', 'bad') : null,
-          acts.process ? h('div', { key: 'b' }, Btn('Mark order processed', () => act('process', {}, 'Order processed — now in preflight.'), 'primary', !acts.process.enabled)) : null]);
+          !paid ? box('Check the payment, then upload the payment proof. The order can be processed once the payment is validated.', 'bad') : null,
+          h('div', { key: 'b', style: { display: 'flex', gap: 8, flexWrap: 'wrap' } },
+            !paid ? Btn('Upload payment proof', uploadProof) : null,
+            !paid && pay.proofFileId && o.id ? Btn('Validate the customer’s proof', () => this.jPost('/api/orders/' + o.id + '/pay', {}, 'Payment validated.')) : null,
+            acts.process ? Btn('Process Order', () => act('process', {}, 'Order processed — now in preflight.'), 'primary', !acts.process.enabled) : null)]);
       }
       if (st === 'escalated' && !acts.approve) return this.acC('Escalated', [box('Escalated to the prepress manager: ' + (j.reason || '') + '. Waiting for the manager’s decision.')]);
       // Pending Customer Amendment (major issue): prepress asked the customer for a new file

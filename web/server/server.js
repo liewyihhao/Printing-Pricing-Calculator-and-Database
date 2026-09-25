@@ -102,7 +102,7 @@ async function api(req, res, pathname, query) {
       fromQuote: o.fromQuote || null, outlet: o.outlet || null, channel: o.channel || 'online', account: acct ? { name: acct.name, email: acct.email, phone: acct.phone || '', tier: acct.tier || 'Standard', since: acct.createdAt || null, disabled: !!acct.disabled } : null } : null });
   }
   // ---- printers & hubs (original printoka-3rd-party-supplier flow) ----
-  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'proof'].indexOf(seg[2]) >= 0) {
+  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'proof', 'payment-proof'].indexOf(seg[2]) >= 0) {
     const j0 = store.job(seg[1]); if (!j0) return send(res, 404, { error: 'not found' });
     if (!supplier.canSee(j0, me0)) return send(res, 403, { error: 'Access denied: You are not authorized to view this.' });
     const out = r => send(res, r && r.error ? (r.code || 400) : 200, r);
@@ -113,6 +113,18 @@ async function api(req, res, pathname, query) {
     const b = await readBody(req);
     if (me0.type !== 'vendor' && me0.type !== 'hub') {
       if (seg[2] === 'proof') return ['prepress_staff', 'prepress_manager', 'production_director'].indexOf(role) >= 0 ? out(supplier.saveProof(seg[1], me0, b)) : send(res, 403, { error: 'prepress only' });
+      // New Order: prepress uploads the payment proof → the payment is validated (on the order, or on the job when it has none)
+      if (seg[2] === 'payment-proof') {
+        if (['prepress_staff', 'prepress_manager', 'production_director'].indexOf(role) < 0) return send(res, 403, { error: 'prepress only' });
+        if (!/\.(pdf|png|jpe?g|webp|heic)$/i.test(String(b.name || ''))) return send(res, 400, { error: 'The payment proof must be a PDF or an image.' });
+        const po = j0.orderId && store.order(j0.orderId);
+        if (!po) return out(supplier.savePaymentProofOnJob(seg[1], me0, b));
+        const f = files.saveFile(po.id, { kind: 'proof', name: b.name, data: b.data }, me0); if (f.error) return out(f);
+        if (!po.payment || po.payment.status !== 'validated') { const r = store.validateOrderPayment(po.id, me0.name); if (r.error) return out(r); }
+        po.payment.validatedBy = me0.name; po.payment.validatedAt = store.now(); if (b.reference) po.payment.reference = String(b.reference).slice(0, 80);
+        outlet.onPaid(po); ops.syncOrder(po.id); store.save();
+        return out({ ok: true, file: f.file });
+      }
     }
     if (seg[2] === 'vendor-quote') return me0.type === 'vendor' ? out(supplier.submitQuote(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
     if (seg[2] === 'ship-to-hub') return me0.type === 'vendor' ? out(supplier.shipToHub(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
