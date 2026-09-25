@@ -49,9 +49,9 @@ const STATUS = {
   prepress_issue: { label: 'Pending Approval', queue: 'prepress', step: 2 },
   escalated: { label: 'Escalated to Manager', queue: 'prepress', step: 2 },
   // approved, but held in prepress until every artwork on the same order is approved (then all go to the scheduler together)
-  artwork_ready: { label: 'Artwork Approved', queue: 'prepress', step: 2 },
+  artwork_ready: { label: 'Awaiting Other Items', queue: 'prepress', step: 2 },
   rejected: { label: 'Pending Amendment', queue: 'prepress', step: 2 },
-  scheduling: { label: 'New Order', queue: 'scheduler', step: 3 },
+  scheduling: { label: 'Artwork Approved', queue: 'scheduler', step: 3 },
   printing: { label: 'Printing — in-house', queue: 'scheduler', step: 4 },
   outsourcing: { label: 'Printing — outsourced', queue: 'scheduler', step: 4 },
   // logistics statuses (user, 2026-09-25): Pending Receiving → Pending Pickup → Shipped → Completed

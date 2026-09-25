@@ -75,7 +75,7 @@
       rows: list.map(j => ({ date: j.createdAt, status: j.statusLabel || j.status, search: [j.id, j.orderId, j.customer, j.product, handler(j)],
         cells: [h('span', { style: { whiteSpace: 'nowrap' } }, dmy(j.createdAt)), link('#' + j.id, () => openJob(this, j)), j.product, j.customer, daysBadge(j), handler(j), this.pillDot(j.statusLabel || j.status, tone(j))] })) });
   };
-  P.pTiles = function (items) { return this.acCard(this.acQuick(items)); };
+  P.pTiles = function (items, title) { return this.acCard(title ? [h('p', { key: 't', style: { fontWeight: 700, fontSize: 15, margin: 0, padding: '16px 20px', borderBottom: '1px solid ' + HAIR } }, title), h('div', { key: 'q' }, this.acQuick(items))] : this.acQuick(items)); };
   const jobsIn = (c, statuses) => c.opsJobs().filter(j => statuses.indexOf(j.status) >= 0);
 
   // ================================================================== PREPRESS
@@ -84,7 +84,7 @@
   // each department's tabs; the Production Director sees the same dashboards inside the director account
   const DEPT_TABS = {
     prepress: c => ['Dashboard', 'New Orders', 'Preflight', 'Pending Approval', 'Pending Amendment'].concat(isManager(c) ? ['KPI', 'Daily report'] : []),
-    scheduler: c => ['Dashboard', 'New Order', 'Quote request', 'Quote Pending from Printer', 'Jobs Outsourced', 'Jobs Inhouse'].concat(isManager(c) ? ['KPI', 'Daily report'] : []),
+    scheduler: c => ['Dashboard', 'Artwork Approved', 'Outsourced', 'In House', 'Quote Requests', 'Quote Pending Response from Printer'].concat(isManager(c) ? ['KPI', 'Daily report'] : []),
     logistics: c => ['Dashboard', 'Incoming Jobs', 'Completed Jobs', 'Shipped'].concat(isManager(c) ? ['KPI', 'Daily report'] : []),
   };
   P.s_prepress = function () { return this.pShell('prepress', DEPT_TABS.prepress(this), tab => this.pPrepress(tab, (t, extra) => this.setState(Object.assign({ sTab: t }, extra)))); };
@@ -135,7 +135,7 @@
   };
   P.pQuoteRequests = function () {
     const qs = (this.acGet('p_quotes', '/api/quotes') || {}).quotes; if (!qs) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
-    return this.pStateList('qr', 'Quote request', qs.map(q => ({ date: q.createdAt, state: qrState(q), search: [q.id, q.customer && q.customer.name, q.requirement && q.requirement.product, q.outlet],
+    return this.pStateList('qr', 'Quote Requests', qs.map(q => ({ date: q.createdAt, state: qrState(q), search: [q.id, q.customer && q.customer.name, q.requirement && q.requirement.product, q.outlet],
       cells: [link(q.id, () => this.acOpen({ kind: 'quote', id: q.id })), quoteFrom(q) + (q.issuedBy ? ' · ' + q.issuedBy.name : ''), (q.requirement && q.requirement.product) || '—', (q.customer && q.customer.name) || '—', (q.handler && q.handler.name) || '—', q.price != null ? this.rm(q.price) : '—'] })), ['Quote', 'From', 'Product', 'Customer', 'Handled by', { label: 'Price', right: true }]);
   };
   P.pPrinterPending = function () {
@@ -144,36 +144,38 @@
       cells: [link('#' + j.id, () => openJob(this, j)), 'Job', j.product, (j.outsource.vendors || []).map(v => v.vendorName + (v.submittedAt ? ' — RM ' + Number(v.price).toFixed(2) : '')).join(', ')] }))
       .concat(qs.filter(q => q.printerQuotes && q.printerQuotes.printers.length).map(q => ({ date: q.printerQuotes.requestedAt, state: pqState(q.printerQuotes.printers, false), search: [q.id, q.requirement && q.requirement.product],
         cells: [link(q.id, () => this.acOpen({ kind: 'quote', id: q.id })), 'Custom quote', (q.requirement && q.requirement.product) || '—', q.printerQuotes.printers.map(p => p.vendorName + (p.submittedAt ? ' — RM ' + Number(p.amount).toFixed(2) : '')).join(', ')] })));
-    return this.pStateList('pq', 'Quote Pending from Printer', rows, ['Ref', 'For', 'Product', 'Printers']);
+    return this.pStateList('pq', 'Quote Pending Response from Printer', rows, ['Ref', 'For', 'Product', 'Printers']);
   };
   P.pJobsOutsourced = function () {
-    return this.pStateList('jo', 'Jobs Outsourced', this.opsJobs().filter(j => j.outsource && j.outsource.awardedTo).map(j => ({ date: j.createdAt, due: j.deadline, state: outState(j), search: [j.id, j.product, j.customer, j.outsource.po],
+    return this.pStateList('jo', 'Outsourced', this.opsJobs().filter(j => j.outsource && j.outsource.awardedTo).map(j => ({ date: j.createdAt, due: j.deadline, state: outState(j), search: [j.id, j.product, j.customer, j.outsource.po],
       cells: [link('#' + j.id, () => openJob(this, j)), j.product, ((j.outsource.vendors || []).find(v => v.vendorId === j.outsource.awardedTo) || {}).vendorName || '—', daysBadge(j)] })), ['Job', 'Product', 'Printer', 'Days']);
   };
   P.pJobsInhouse = function () {
-    return this.pStateList('ji', 'Jobs Inhouse', this.opsJobs().filter(j => j.route === 'inhouse' && ['scheduling'].indexOf(j.status) < 0).map(j => ({ date: j.createdAt, due: j.deadline, state: inState(j), search: [j.id, j.product, j.customer, j.machine],
+    return this.pStateList('ji', 'In House', this.opsJobs().filter(j => j.route === 'inhouse' && ['scheduling'].indexOf(j.status) < 0).map(j => ({ date: j.createdAt, due: j.deadline, state: inState(j), search: [j.id, j.product, j.customer, j.machine],
       cells: [link('#' + j.id, () => openJob(this, j)), j.product, (j.machine || '—') + (j.slot ? ' · ' + when(j.slot) : ''), daysBadge(j)] })), ['Job', 'Product', 'Machine · slot', 'Days']);
   };
   P.s_scheduler = function () { return this.pShell('scheduler', DEPT_TABS.scheduler(this), tab => this.pScheduler(tab, t => this.setState({ sTab: t }))); };
   P.pScheduler = function (tab, go) {
     // New Order: passed preflight — review it, then request printer quotes or process it in-house
-    if (tab === 'New Order') return this.pTable('sn', 'New Order', jobsIn(this, ['scheduling']));
-    if (tab === 'Quote request') return this.pQuoteRequests();
-    if (tab === 'Quote Pending from Printer') return this.pPrinterPending();
-    if (tab === 'Jobs Outsourced') return this.pJobsOutsourced();
-    if (tab === 'Jobs Inhouse') return this.pJobsInhouse();
+    if (tab === 'Artwork Approved') return this.pTable('sn', 'Artwork Approved', jobsIn(this, ['scheduling']));
+    if (tab === 'Quote Requests') return this.pQuoteRequests();
+    if (tab === 'Quote Pending Response from Printer') return this.pPrinterPending();
+    if (tab === 'Outsourced') return this.pJobsOutsourced();
+    if (tab === 'In House') return this.pJobsInhouse();
     if (tab === 'KPI') return this.pKpi('scheduler');
     if (tab === 'Daily report') return this.pDaily('scheduler');
     const qs = ((this.acGet('p_quotes', '/api/quotes') || {}).quotes) || [], jobs = this.opsJobs();
     const open = arr => arr.filter(s => !s[2]).length;
     const pending = jobs.filter(j => j.outsource && (j.outsource.vendors || []).length && j.outsource.requestedAt).map(j => pqState(j.outsource.vendors, !!j.outsource.awardedTo)).concat(qs.filter(q => q.printerQuotes && q.printerQuotes.printers.length).map(q => pqState(q.printerQuotes.printers, false)));
+    // two rows (user, 2026-09-26): the orders — then Quotations
     return [this.pTiles([
-      { label: 'New Order', value: jobsIn(this, ['scheduling']).length, icon: 'file', color: 'red', onClick: () => go('New Order') },
-      { label: 'Quote request', value: open(qs.map(qrState)), icon: 'edit-3', color: 'teal', onClick: () => go('Quote request') },
-      { label: 'Quote Pending from Printer', value: open(pending), icon: 'file', color: 'orange', onClick: () => go('Quote Pending from Printer') },
-      { label: 'Jobs Outsourced', value: open(jobs.filter(j => j.outsource && j.outsource.awardedTo).map(outState)), icon: 'truck', color: 'teal', onClick: () => go('Jobs Outsourced') },
-      { label: 'Jobs Inhouse', value: open(jobs.filter(j => j.route === 'inhouse' && j.status !== 'scheduling').map(inState)), icon: 'printer', color: 'teal', onClick: () => go('Jobs Inhouse') }])]
-      .concat(this.pTable('sd', 'New Order', jobsIn(this, ['scheduling'])))
+      { label: 'Artwork Approved', value: jobsIn(this, ['scheduling']).length, icon: 'file', color: 'red', onClick: () => go('Artwork Approved') },
+      { label: 'Outsourced', value: open(jobs.filter(j => j.outsource && j.outsource.awardedTo).map(outState)), icon: 'truck', color: 'teal', onClick: () => go('Outsourced') },
+      { label: 'In House', value: open(jobs.filter(j => j.route === 'inhouse' && j.status !== 'scheduling').map(inState)), icon: 'printer', color: 'teal', onClick: () => go('In House') }]),
+      this.pTiles([
+      { label: 'Quote Requests', value: open(qs.map(qrState)), icon: 'edit-3', color: 'teal', onClick: () => go('Quote Requests') },
+      { label: 'Quote Pending Response from Printer', value: open(pending), icon: 'file', color: 'orange', onClick: () => go('Quote Pending Response from Printer') }], 'Quotations')]
+      .concat(this.pTable('sd', 'Artwork Approved', jobsIn(this, ['scheduling'])))
       .concat(this.pTable('sdl', 'Confirm delivery', jobs.filter(j => j.status === 'dispatched' && (j.destination || {}).type === 'customer')));
   };
 
@@ -268,7 +270,7 @@
     const st = STEP[j.status] || 1;
     const typeTab = tabs.indexOf('Reports') >= 0 ? (st <= 2 ? 'Prepress' : st <= 4 ? 'Scheduler' : 'Logistics')
       : tabs.indexOf('Preflight') >= 0 ? (Object.keys(PREPRESS_TABS).find(k => PREPRESS_TABS[k].indexOf(j.status) >= 0) || 'Dashboard')
-      : tabs.indexOf('Jobs Inhouse') >= 0 ? (j.status === 'scheduling' ? 'New Order' : j.route === 'inhouse' ? 'Jobs Inhouse' : j.route === 'outsource' ? 'Jobs Outsourced' : 'Dashboard')
+      : tabs.indexOf('In House') >= 0 ? (j.status === 'scheduling' ? 'Artwork Approved' : j.route === 'inhouse' ? 'In House' : j.route === 'outsource' ? 'Outsourced' : 'Dashboard')
       : tabs.indexOf('Incoming Jobs') >= 0 ? (j.status === 'dispatched' || j.status === 'completed' || j.status === 'ready_collect' ? 'Shipped' : j.route === 'inhouse' ? 'Completed Jobs' : 'Incoming Jobs') : tabs[1];
     return this.acSingle({ home: tabs[0], type: typeTab, title: '#' + id, statusNode: this.pillDot(j.statusLabel || j.status, tone(j)) }, main, aside);
   };
@@ -310,8 +312,8 @@
       // approved, held until every other artwork on the order is approved — then the whole order goes to the scheduler
       if (st === 'artwork_ready') {
         const waiting = (siblings || []).filter(x => ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected'].indexOf(x.status) >= 0);
-        return this.acC('Artwork approved', [
-          box('This artwork is approved. The order goes to the Scheduler once every item on it is approved.', 'ok'),
+        return this.acC('Awaiting other items', [
+          box('This artwork is approved. The order goes to the Scheduler once every other item on it is approved too.', 'ok'),
           (siblings || []).length ? h('div', { key: 'sib', style: { display: 'flex', flexDirection: 'column', gap: 8 } }, h('b', { style: { fontSize: 13.5 } }, 'Items on this order'),
             siblings.map(x => h('div', { key: x.id, style: { display: 'flex', alignItems: 'center', gap: 10, fontSize: 13.5 } },
               link('#' + x.id, () => this.acOpen({ kind: 'job', id: x.id })), h('span', { style: { flex: 1 } }, x.product), this.pillDot(x.statusLabel, waiting.some(w => w.id === x.id) ? 'warn' : 'ok')))) : null]);
@@ -634,6 +636,6 @@
       this.acC('Customer', this.acDL([['Name', q.customer && q.customer.name], ['Email', q.customer && q.customer.email], ['Phone', q.customer && q.customer.phone]])),
       this.acC('Log', this.acStatusList(log)),
     ];
-    return this.acSingle({ home: tabs[0], type: 'Quote request', title: q.id, statusNode: this.pillDot(qrState(q)[0], qrState(q)[1]) }, main, aside);
+    return this.acSingle({ home: tabs[0], type: 'Quote Requests', title: q.id, statusNode: this.pillDot(qrState(q)[0], qrState(q)[1]) }, main, aside);
   };
 })();
