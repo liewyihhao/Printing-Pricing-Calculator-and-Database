@@ -431,9 +431,15 @@
     if (perf.error) return head.concat([h('div', { key: 'e', style: { color: '#c0392b' } }, perf.error)]);
     const keys = perf.months.map(m => m.key), labels = {}; perf.months.forEach(m => { labels[m.key] = m.label; });
     const METRICS = (IND_METRICS[perf.dept] || []).map(d => [d[0], perf.metrics[d[1]] || {}, d[2], d[3], d[4]]);
+    // click a key metric to see its chart right below — one chart at a time, no scrolling
+    const sel = Math.min(Number(this.state.indSel) || 0, Math.max(0, METRICS.length - 1)), cur = METRICS[sel];
     return head.concat([
       this.acCard([h('div', { key: 'h', style: { padding: 20 } }, h('p', { style: { fontWeight: 700, margin: 0 } }, 'Key metrics' + (perf.staff ? ' — ' + perf.staff : '')), h('div', { style: { fontSize: 22, marginTop: 4 } }, labels[keys[keys.length - months]] + ' - ' + labels[keys[keys.length - 1]])),
-        h('div', { key: 'g', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', borderTop: '1px solid ' + HAIR, overflow: 'hidden' } }, METRICS.map(mm => { const A = this.accent(mm[4]); return h('div', { key: mm[0], style: { background: '#fff', padding: 20, position: 'relative', boxShadow: '1px 0 0 ' + HAIR + ', 0 1px 0 ' + HAIR } }, this.acMetricHead(mm[0], this.acMetric(mm[1], keys, months, mm[2]), mm[2]), h('span', { style: { position: 'absolute', right: 20, bottom: 20, height: 44, width: 44, borderRadius: '50%', background: A[1], display: 'grid', placeItems: 'center' } }, this.dashIcon(mm[3], A[0], 20))); }))]),
-    ].concat(METRICS.map(mm => this.acCard(h('div', { style: { padding: 20 } }, this.acMetricHead(mm[0], this.acMetric(mm[1], keys, months, mm[2]), mm[2]), h('div', { style: { marginTop: 20 } }, this.acChart(Object.fromEntries(Object.entries(mm[1]).map(e => [e[0], e[1] == null ? 0 : e[1]])), keys, labels, months)))))));
+        h('div', { key: 'g', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', borderTop: '1px solid ' + HAIR, overflow: 'hidden' } }, METRICS.map((mm, i) => { const A = this.accent(mm[4]), on = i === sel;
+          return h('div', { key: mm[0], role: 'button', 'aria-pressed': on, onClick: () => this.setState({ indSel: i }), style: { background: on ? '#fafafa' : '#fff', padding: 20, position: 'relative', cursor: 'pointer', boxShadow: '1px 0 0 ' + HAIR + ', 0 1px 0 ' + HAIR + (on ? ', inset 0 -3px 0 ' + TEAL : '') } },
+            this.acMetricHead(mm[0], this.acMetric(mm[1], keys, months, mm[2]), mm[2]), h('span', { style: { position: 'absolute', right: 20, bottom: 20, height: 44, width: 44, borderRadius: '50%', background: A[1], display: 'grid', placeItems: 'center' } }, this.dashIcon(mm[3], A[0], 20))); })),
+        cur ? h('div', { key: 'c', style: { padding: 20, borderTop: '1px solid ' + HAIR } }, h('p', { style: { fontWeight: 700, margin: '0 0 12px' } }, cur[0]),
+          this.acChart(Object.fromEntries(Object.entries(cur[1]).map(e => [e[0], e[1] == null ? 0 : e[1]])), keys, labels, months)) : null]),
+    ]);
   };
 })();
