@@ -51,7 +51,7 @@ const STATUS = {
   scheduling: { label: 'Scheduler — in queue', queue: 'scheduler', step: 3 },
   printing: { label: 'Printing — in-house', queue: 'scheduler', step: 4 },
   outsourcing: { label: 'Printing — outsourced', queue: 'scheduler', step: 4 },
-  printed: { label: 'Printed — waiting for logistics to receive', queue: 'logistics', step: 5 },
+  printed: { label: 'Printed — shipping label to print', queue: 'logistics', step: 5 },
   inbound: { label: 'Printer shipped — waiting for logistics to receive', queue: 'logistics', step: 5 },
   logistics: { label: 'Received by logistics — packing', queue: 'logistics', step: 5 },
   dispatched: { label: 'Shipped', queue: 'logistics', step: 5 },
@@ -72,8 +72,8 @@ const HUB = ['hub', 'hub_manager'];
 const CHECKLISTS = {
   // Receiving SOP §4.4
   receiving: [['matched', 'Outsourced order matches the physical item'], ['quantity', 'Quantity checked'], ['quality', 'Finishing quality checked'], ['unlabelled', 'Printer labels removed for relabelling']],
-  // Packing / Repacking SOP §4.5
-  logistics: [['verified', 'Verified — order vs item, quantity, finishing quality'], ['packed', 'Packed — right materials, no damage risk, items grouped'], ['labelled', 'Labelled — label printed from the dashboard (customer, order ID, destination, parcel count)']],
+  // Packing (user, 2026-09-25): one step — the shipping label is printed, then the shipping page opens
+  logistics: [['labelled', 'Shipping label printed']],
   hub: [['checked', 'Parcel checked against the order'], ['qc', 'Quality check passed'], ['relabelled', 'Relabelled / repacked']],
 };
 const checklistGate = (group, what) => job => {
@@ -91,7 +91,7 @@ const GATES = {
   artworkPresent: job => job.artwork && job.artwork.file && !/^pending-upload/.test(job.artwork.file)
     ? null : 'No artwork file attached to this job yet.',
   receivingDone: checklistGate('receiving', 'receiving checklist'),
-  packingDone: checklistGate('logistics', 'packing checklist'),
+  packingDone: job => ((job.progress && job.progress.logistics) || {}).labelled ? null : 'Print the shipping label first.',
   logisticsDone: checklistGate('logistics', 'packing checklist'),
   hubDone: checklistGate('hub', 'hub progress form'),
   destCustomer: job => destType(job) === 'customer' ? null : 'This parcel is going to a ' + destType(job) + ', not the customer.',

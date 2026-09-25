@@ -38,6 +38,7 @@ function jobView(j, role) {
     statusLabel: (D.STATUS[j.status] || {}).label,
     queue: (D.STATUS[j.status] || {}).queue,
     actions: role ? D.availableActions(j, role) : [],
+    requestedBy: ops.requestedBy(j),
   });
 }
 

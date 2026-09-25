@@ -196,6 +196,14 @@ function handlers(j) {
     { part: 'Delivery', who: dl ? (dl.action === 'customer_received' ? 'Customer — ' + dl.actor : dl.action === 'receive_outlet' ? 'Outlet — ' + dl.actor : 'Scheduler — ' + dl.actor) : null, at: dl ? dl.ts : null },
   ];
 }
+// who asked for this delivery: outlet staff (walk-in / counter order) or the customer on the website
+function requestedBy(j) {
+  const o = j.orderId && store.order(j.orderId);
+  const out = (o && o.outlet) || j.outlet || (j.channel === 'outlet' && j.fulfillmentOutlet) || null;
+  if (out) { const ol = outletById(out); return { type: 'outlet', outlet: ol ? ol.name : String(out) }; }
+  if (j.channel === 'outlet' || (o && o.channel === 'outlet')) return { type: 'outlet', outlet: null };
+  return { type: 'customer' };
+}
 // the outlet a job belongs to (its quote/counter outlet, or the pickup outlet)
 function outletOfJob(j) {
   const o = j.orderId && store.order(j.orderId);
@@ -264,7 +272,8 @@ function transition(jid, role, actor, action, payload) {
 // SOP checklists: logistics receiving (§4.4) and packing (§4.5); hub (legacy)
 const STEP_GROUPS = {
   receiving: { keys: D.CHECKLISTS.receiving.map(c => c[0]), roles: ['logistics_staff', 'logistics_manager'], status: ['inbound'] },
-  logistics: { keys: D.CHECKLISTS.logistics.map(c => c[0]), roles: ['logistics_staff', 'logistics_manager'], status: ['logistics'] },
+  // in-house jobs start at the print-label page (no Received page), so the label step is open at 'printed' too
+  logistics: { keys: D.CHECKLISTS.logistics.map(c => c[0]), roles: ['logistics_staff', 'logistics_manager'], status: ['logistics', 'printed'] },
   hub: { keys: D.CHECKLISTS.hub.map(c => c[0]), roles: ['hub', 'hub_manager'], status: ['at_hub'] },
 };
 function setStep(jid, group, key, done, role, actor, note) {
@@ -304,7 +313,7 @@ function sendInternal(jid, role, actor, body) {
 function sendTo(jid, role, actor, body) {
   const j = store.job(jid); if (!j) return { error: 'Job not found' };
   if (['logistics_staff', 'logistics_manager', 'production_director'].indexOf(role) < 0) return { error: 'Only logistics chooses where the parcel goes.' };
-  if (j.status !== 'logistics') return { error: 'Receive the job first; the destination can be changed until it is shipped.' };
+  if (j.status !== 'logistics' && j.status !== 'printed') return { error: 'Receive the job first; the destination can be changed until it is shipped.' };
   normalizeJob(j);
   const type = body.type === 'outlet' ? 'outlet' : 'customer';
   if (type === 'outlet' && !outletById(body.outletId)) return { error: 'Pick the outlet.' };
@@ -570,5 +579,5 @@ function individual(me, staffId) {
   return { performance: r, staff: individualStaff(me) };
 }
 
-module.exports = { sendTo, individual, individualStaff, config, saveConfig, migrate, normalizeJob, makeLabel, syncOrder, onOrderCreated, afterTransition, transition, setStep, sendInternal, award, kpi, sales, hubPerformance, actions, hubById, outletById, STEP_GROUPS, PROGRESS_LABEL,
+module.exports = { requestedBy, sendTo,individual, individualStaff, config, saveConfig, migrate, normalizeJob, makeLabel, syncOrder, onOrderCreated, afterTransition, transition, setStep, sendInternal, award, kpi, sales, hubPerformance, actions, hubById, outletById, STEP_GROUPS, PROGRESS_LABEL,
   reportFigures, submitReport, listReports, outletOfJob, destOf, claim, handlers };

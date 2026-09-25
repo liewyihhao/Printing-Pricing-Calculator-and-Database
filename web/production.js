@@ -167,7 +167,9 @@
 
   // ================================================================== LOGISTICS
   // Incoming Jobs (from printers) · Completed Jobs (from in-house) · Shipped
-  const logState = j => ['inbound', 'printed'].indexOf(j.status) >= 0 ? ['Waiting to receive', 'warn', false] : j.status === 'logistics' ? ['Received — pack and ship', 'teal', false] : ['Done — shipped', 'ok', true];
+  const logState = j => j.status === 'inbound' ? ['Waiting to receive', 'warn', false]
+    : (j.status === 'printed' || j.status === 'logistics') ? (((j.progress || {}).logistics || {}).labelled && j.status === 'logistics' ? ['Label printed — enter tracking and ship', 'teal', false] : ['Print the shipping label', 'warn', false])
+    : ['Done — shipped', 'ok', true];
   const shipState = j => j.status === 'dispatched' ? ['Shipped — waiting for delivery', 'teal', false] : ['Done — ' + (j.status === 'completed' ? 'delivered' : 'received by the outlet'), 'ok', true];
   const logRows = (c, list, st) => list.map(j => ({ date: j.createdAt, due: j.deadline, state: st(j), search: [j.id, j.product, j.customer],
     cells: [link(j.id, () => openJob(c, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), j.customer, (j.finalDestination || {}).name || '—'] }));
@@ -229,18 +231,23 @@
     const j = d.job, pr = d.printing || {}, id = j.id;
     const acts = {}; (j.actions || []).forEach(a => { if (a.permitted) acts[a.action] = a; });
     const main = [];
-    // an incoming job reads top to bottom: the order, then who delivered it and the Received button
-    const card = this.pStepCard(j, pr, acts), cardLast = j.status === 'inbound' && inDept(this, 'logistics'); if (card && !cardLast) main.push(card);
-    if (j.outsource && inDept(this, 'scheduler')) main.push(this.pOutsourceCard(j, pr));
-    main.push(this.acC('Order details', [h('b', { key: 'p' }, j.product), this.acSpec((pr.job && pr.job.spec) || j.spec),
+    // logistics pages (1 Received · 2 Print label · 3 Shipping): the step on the left, order details on the right
+    const logPage = ['inbound', 'printed', 'logistics'].indexOf(j.status) >= 0 && inDept(this, 'logistics') && deptOf(this) !== 'scheduler';
+    const card = this.pStepCard(j, pr, acts); if (card) main.push(card);
+    if (j.outsource && inDept(this, 'scheduler') && !logPage) main.push(this.pOutsourceCard(j, pr));
+    const orderCard = this.acC('Order details', [h('b', { key: 'p' }, j.product), this.acSpec((pr.job && pr.job.spec) || j.spec),
       this.acDL([['Quantity', (j.qty || 0).toLocaleString()], ['Customer', j.customer], ['Due', j.deadline ? when(j.deadline) + (overdue(j) ? ' — overdue' : '') : '—'], ['Deliver to', j.finalDestination ? (j.finalDestination.name || j.finalDestination.type) + (j.finalDestination.address ? ', ' + j.finalDestination.address : '') : '—'], j.instructions ? ['Instructions', j.instructions] : null, j.machine ? ['Machine', j.machine + (j.slot ? ' · ' + when(j.slot) : '')] : null]),
-      (pr.job && pr.job.artworks || []).length ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12, display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 12.5 } }, 'Artwork'), pr.job.artworks.map((a, i) => a.id ? h('span', { key: i }, link('📄 ' + a.name, () => this.openOrderFile(a.orderId, a))) : h('span', { key: i, style: { color: MUT } }, '📄 ' + a.name))) : null]));
-    if (card && cardLast) main.push(card);
-    // documents open as PDFs on the page (not for prepress — they only check files)
-    const docs = deptOf(this) === 'prepress' ? [] : (pr.documents || []);
+      (pr.job && pr.job.artworks || []).length ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12, display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 12.5 } }, 'Artwork'), pr.job.artworks.map((a, i) => a.id ? h('span', { key: i }, link('📄 ' + a.name, () => this.openOrderFile(a.orderId, a))) : h('span', { key: i, style: { color: MUT } }, '📄 ' + a.name))) : null]);
+    if (!logPage) main.push(orderCard);
+    // documents open as PDFs on the page (not for prepress — they only check files).
+    // On the logistics pages the purchase order shows only on the receiving page; after that only the shipping label.
+    let docs = deptOf(this) === 'prepress' ? [] : (pr.documents || []);
+    if (logPage) docs = docs.filter(x => j.status === 'inbound' ? x.id === 'purchase-order' : x.id === 'shipping-label');
     // who took the job in each part (the first person in each department to open it)
     const hb = (d.handlers || []).map(x => [x.part, x.who ? h('span', null, x.who, x.at ? h('span', { style: { display: 'block', fontSize: 12, color: FAINT } }, when(x.at)) : null) : h('span', { style: { color: FAINT } }, 'Not yet')]);
-    const aside = [hb.length ? this.acC('Handled by', this.acDL(hb)) : null, docs.length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, docs.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null];
+    const docCard = docs.length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, docs.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null;
+    const hbCard = hb.length ? this.acC('Handled by', this.acDL(hb)) : null;
+    const aside = logPage ? [orderCard, docCard, hbCard] : [hbCard, docCard];
     const st = STEP[j.status] || 1;
     const typeTab = tabs.indexOf('Reports') >= 0 ? (st <= 2 ? 'Prepress' : st <= 4 ? 'Scheduler' : 'Logistics')
       : tabs.indexOf('Files') >= 0 ? 'Files'
@@ -306,10 +313,7 @@
             h('div', { key: 'b' }, Btn('Send to logistics', () => act('finish', { qc: true }, 'Sent to logistics.'), 'primary', !this.acF('qc')))] } }), 'primary') : null)]);
     }
     if (st === 'outsourcing') return inDept(this, 'scheduler') ? null : this.acC('Printing', note('Outsourced to a printer.'));
-    // Step 5 — logistics (§4.4 receiving, §4.5 packing + delivery)
-    const cl = (group, keys) => { const prog = (j.progress && j.progress[group]) || {}; const can = inDept(this, 'logistics');
-      return keys.map(k => { const v = prog[k[0]]; return h('label', { key: k[0], style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 13, cursor: can ? 'pointer' : 'default' } },
-        h('input', { type: 'checkbox', checked: !!v, disabled: !can, onChange: e => this.opsStep(id, group, k[0], e.target.checked), style: { width: 17, height: 17 } }), h('span', { style: { flex: 1 } }, k[1]), v ? h('span', { style: { fontSize: 12, color: FAINT } }, v.by) : null); }); };
+    // Step 5 — logistics: 1 Received (printer jobs only) · 2 Print shipping label · 3 Shipping
     // Incoming Jobs (printer) — the incoming order and one button: Received (marks the scheduler's outsourced job done)
     if (st === 'inbound') {
       if (!inDept(this, 'logistics')) return this.acC('Logistics', note('The printer has shipped it — waiting for logistics to receive it.'));
@@ -320,15 +324,12 @@
           pd.document ? ['Delivery order', link(pd.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + pd.document.id, pd.document.name))] : null]),
         acts.receive ? h('div', { key: 'b' }, Btn('Received', () => act('receive', {}, 'Received.'), 'primary', !acts.receive.enabled)) : null]);
     }
-    // Completed Jobs (in-house) — receive from production (this marks the scheduler's in-house job done)
-    if (st === 'printed') {
-      if (!inDept(this, 'logistics')) return this.acC('Logistics', note('Printed — waiting for logistics to receive it.'));
-      return this.acC('Receive from production', [note('Collect the printed job from production, then press Received.'),
-        acts.receive ? h('div', { key: 'b' }, Btn('Received', () => act('receive', {}, 'Received.'), 'primary')) : null]);
-    }
-    if (st === 'logistics') {
-      if (!inDept(this, 'logistics')) return this.acC('Logistics', note('Received by logistics — being packed.'));
-      return this.pDispatchCard(j, pr, acts, cl);
+    // Completed Jobs (in-house) start here, at the print-label page — no Received page
+    // Page 2 — print the shipping label; Page 3 — shipping (tracking number)
+    if (st === 'printed' || st === 'logistics') {
+      if (!inDept(this, 'logistics')) return this.acC('Logistics', note(st === 'printed' ? 'Printed — waiting for logistics.' : 'With logistics — being packed and shipped.'));
+      const labelled = !!((j.progress || {}).logistics || {}).labelled;
+      return st === 'logistics' && labelled ? this.pShipCard(j, pr, acts) : this.pLabelCard(j, acts);
     }
     // Shipped — complete when the customer or outlet receives it, or the scheduler confirms delivery
     if (st === 'dispatched') {
@@ -342,23 +343,37 @@
     if (st === 'completed') return this.acC('Completed', box('Delivered / collected.', 'ok'));
     return null;
   };
-  // Delivery SOP (§4.5): courier from HQ's list, dispatch (time recorded), then confirmation
-  P.pDispatchCard = function (j, pr, acts, cl) {
-    const cfg = this.state.opsConfig || { couriers: [] }; const dd = pr.dispatchDelivery || {}; const packing = j.status === 'logistics';
+  const destLine = d => ((d || {}).name || '—') + ((d || {}).address ? ', ' + d.address : '');
+  // Page 2 — print the shipping label, addressed as requested (outlet staff's request, or the website customer's own)
+  P.pLabelCard = function (j, acts) {
+    const rq = j.requestedBy || {};
+    const done = () => { this.acDrop('job_'); this.opsLoad(); this.setState({ acForm: {} }); };
+    // in-house jobs have no Received page: Printed receives it from production and opens shipping in one go
+    const printed = () => this.aFetchJ('/api/jobs/' + j.id + '/step', { group: 'logistics', key: 'labelled', done: true }).then(r => {
+      if (r.error) return this.acDone(r);
+      if (j.status !== 'printed') return this.acDone(r, 'Label printed.') && done();
+      return this.jPost('/api/jobs/' + j.id + '/transition', { action: 'receive', payload: {} }, 'Label printed.', done);
+    });
+    return this.acC('Print shipping label', [
+      this.acDL([['Requested by', rq.type === 'outlet' ? 'Outlet staff' + (rq.outlet ? ' — ' + rq.outlet : '') : 'Customer (website order)'], ['Deliver to', destLine(j.destination)], ['Parcels', j.parcels || 1]]),
+      this.pSendTo(j),
+      h('div', { key: 'b', style: { display: 'flex', gap: 8, flexWrap: 'wrap' } },
+        Btn('Print Shipping Label (PDF)', () => this.openJobDoc(j.id, 'shipping-label')),
+        Btn('Printed', printed, 'primary', j.status === 'printed' && !acts.receive))]);
+  };
+  // Page 3 — shipping: courier, tracking number, delivery order → Ship
+  P.pShipCard = function (j, pr, acts) {
+    const cfg = this.state.opsConfig || { couriers: [] }; const dd = pr.dispatchDelivery || {};
     const F = (k, def) => this.acF(k) !== '' ? this.acF(k) : def;
     const tracking = F('dTracking', (dd.tracking || []).join('\n')), courier = F('dCourier', dd.company || cfg.couriers[0] || '');
     const a = acts.dispatch;
-    const PC = [['verified', 'Checked — order vs item, quantity and quality'], ['packed', 'Packed — protected from damage'], ['labelled', 'Shipping label stuck on every parcel']];
-    return this.acC('Pack & ship', [
-      cl ? cl('logistics', PC) : null,
-      packing ? this.pSendTo(j) : null,
-      h('div', { key: 'lb' }, Btn('View Shipping Label (PDF)', () => this.openJobDoc(j.id, 'shipping-label'))),
-      this.acDL([['Deliver to', ((j.destination || {}).name || '—') + ((j.destination || {}).address ? ', ' + j.destination.address : '')], ['Parcels', j.parcels || 1]]),
-      FG('Courier', h('select', { value: courier, onChange: e => this.acSetF('dCourier', e.target.value), style: inp }, cfg.couriers.map(c => h('option', { key: c }, c))), 1, 'Only the delivery companies selected by HQ.'),
+    return this.acC('Shipping', [
+      this.acDL([['Deliver to', destLine(j.destination)], ['Parcels', j.parcels || 1]]),
+      FG('Courier', h('select', { value: courier, onChange: e => this.acSetF('dCourier', e.target.value), style: inp }, cfg.couriers.map(c => h('option', { key: c }, c))), 1),
       FG('Tracking number', ta(tracking, v => this.acSetF('dTracking', v), 3), 1, 'One per line if there is more than one parcel.'),
       FG('Delivery order', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, dd.document ? link('📄 ' + dd.document.name, () => this.jDownload('/api/jobs/' + j.id + '/files/' + dd.document.id, dd.document.name)) : null, this.jPickFile('dDoc'))),
-      packing && a && a.blockedBy && a.blockedBy.length ? box(a.blockedBy.join(' '), 'bad') : null,
-      h('div', { key: 'b' }, Btn(packing ? 'Ship' : 'Save changes', () => this.jPost('/api/jobs/' + j.id + '/delivery', { tracking, company: courier, documentData: this.acF('dDocData') || undefined, documentName: this.acF('dDocName') || undefined }, packing ? 'Dispatched.' : 'Delivery details saved.', () => this.setState({ acForm: {} })), 'primary', !tracking.trim() || (packing && (!a || !a.enabled))))]);
+      a && a.blockedBy && a.blockedBy.length ? box(a.blockedBy.join(' '), 'bad') : null,
+      h('div', { key: 'b' }, Btn('Ship', () => this.jPost('/api/jobs/' + j.id + '/delivery', { tracking, company: courier, documentData: this.acF('dDocData') || undefined, documentName: this.acF('dDocName') || undefined }, 'Shipped.', () => this.setState({ acForm: {} })), 'primary', !tracking.trim() || !a || !a.enabled))]);
   };
   // Send to: the customer directly, or an outlet (the shipping label follows the choice)
   P.pSendTo = function (j) {
