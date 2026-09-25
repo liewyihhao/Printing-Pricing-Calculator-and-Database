@@ -167,11 +167,11 @@
     const qs = ((this.acGet('p_quotes', '/api/quotes') || {}).quotes) || [], jobs = this.opsJobs();
     const open = arr => arr.filter(s => !s[2]).length;
     const pending = jobs.filter(j => j.outsource && (j.outsource.vendors || []).length && j.outsource.requestedAt).map(j => pqState(j.outsource.vendors, !!j.outsource.awardedTo)).concat(qs.filter(q => q.printerQuotes && q.printerQuotes.printers.length).map(q => pqState(q.printerQuotes.printers, false)));
-    // two rows (user, 2026-09-26): the orders — then Quotations
+    // two rows (user, 2026-09-26): Orders, then Quotations
     return [this.pTiles([
       { label: 'Artwork Approved', value: jobsIn(this, ['scheduling']).length, icon: 'file', color: 'red', onClick: () => go('Artwork Approved') },
       { label: 'Outsourced', value: open(jobs.filter(j => j.outsource && j.outsource.awardedTo).map(outState)), icon: 'truck', color: 'teal', onClick: () => go('Outsourced') },
-      { label: 'In House', value: open(jobs.filter(j => j.route === 'inhouse' && j.status !== 'scheduling').map(inState)), icon: 'printer', color: 'teal', onClick: () => go('In House') }]),
+      { label: 'In House', value: open(jobs.filter(j => j.route === 'inhouse' && j.status !== 'scheduling').map(inState)), icon: 'printer', color: 'teal', onClick: () => go('In House') }], 'Orders'),
       this.pTiles([
       { label: 'Quote Requests', value: open(qs.map(qrState)), icon: 'edit-3', color: 'teal', onClick: () => go('Quote Requests') },
       { label: 'Quote Pending Response from Printer', value: open(pending), icon: 'file', color: 'orange', onClick: () => go('Quote Pending Response from Printer') }], 'Quotations')]
