@@ -94,9 +94,6 @@ const GATES = {
   packingDone: checklistGate('logistics', 'packing checklist'),
   logisticsDone: checklistGate('logistics', 'packing checklist'),
   hubDone: checklistGate('hub', 'hub progress form'),
-  // original supplier flow: the printer prints only after HQ approves its draft
-  draftApproved: job => (!job.outsource || !job.outsource.awardedTo || (job.outsource.draft && job.outsource.draft.approvedAt))
-    ? null : 'Please wait for admin approve the draft before start printing.',
   destCustomer: job => destType(job) === 'customer' ? null : 'This parcel is going to a ' + destType(job) + ', not the customer.',
   destOutlet: job => destType(job) === 'outlet' ? null : 'This parcel is not addressed to an outlet.',
   destProduction: job => destType(job) === 'production' ? null : 'This parcel is not addressed to production.',
@@ -144,8 +141,9 @@ const TRANSITIONS = {
     { action: 'receive', to: 'logistics', roles: LOGISTICS, note: 'Received from in-house production.' },
   ],
   outsourcing: [
-    { action: 'vendor_ship', to: 'inbound', roles: SCHEDULER.concat(['printer'], LOGISTICS), gates: ['draftApproved', 'destProduction'], requires: ['courier'], note: 'Printer shipped the job to production for receiving.' },
-    { action: 'vendor_ship_outlet', to: 'dispatched', roles: SCHEDULER.concat(['printer'], LOGISTICS), gates: ['draftApproved', 'destOutlet'], requires: ['courier'], note: 'Printer shipped the job straight to the outlet.' },
+    // the printer finishes the job, ships it and enters the delivery details (no draft step)
+    { action: 'vendor_ship', to: 'inbound', roles: SCHEDULER.concat(['printer'], LOGISTICS), gates: ['destProduction'], requires: ['courier'], note: 'Printer shipped the job to production — delivery details entered.' },
+    { action: 'vendor_ship_outlet', to: 'dispatched', roles: SCHEDULER.concat(['printer'], LOGISTICS), gates: ['destOutlet'], requires: ['courier'], note: 'Printer shipped the job straight to the outlet — delivery details entered.' },
   ],
   // Step 5 — Logistics (§4.4 receiving · §4.5 packing, delivery)
   inbound: [

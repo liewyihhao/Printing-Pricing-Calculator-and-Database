@@ -205,8 +205,7 @@
     const go = (tab, key, val) => this.setState({ sTab: tab, [key]: val });
     return [this.acCard(this.acQuick([
       { label: 'Quote requests', value: n(p => /^quote/.test(p.statusId) && !p.submitted), icon: 'edit-3', color: 'teal', onClick: () => go('Printing Jobs', 'vj_s', 'Quote requested') },
-      { label: 'Upload draft', value: n(p => p.statusId === 'printer-assigned'), icon: 'upload', color: 'red', onClick: () => go('Printing Jobs', 'vj_s', 'Printer assigned') },
-      { label: 'Ready to print & ship', value: n(p => p.statusId === 'draft-approved'), icon: 'truck', color: 'orange', onClick: () => go('Printing Jobs', 'vj_s', 'Draft approved') },
+      { label: 'Purchase orders to deliver', value: n(p => p.statusId === 'printer-assigned'), icon: 'truck', color: 'orange', onClick: () => go('Printing Jobs', 'vj_s', 'Purchase order issued') },
       { label: 'Custom quotes', value: cqs.filter(q => q.status === 'Pending quote').length, icon: 'file', color: 'teal', onClick: () => go('Custom Quotes', 'vc_s', 'Pending quote') }]))];
   };
   P.vJobs = function () {
@@ -233,31 +232,22 @@
         h('div', { key: 'b' }, Btn('Submit quote', () => this.jPost('/api/jobs/' + id + '/vendor-quote', { amount: amt, leadDays: lead, documentData: this.acF('qDocData') || undefined, documentName: this.acF('qDocName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !amt))]
         : [mq.submittedAt ? this.acDL([['Quote amount (RM)', Number(mq.amount).toFixed(2)], ['Quote document', mq.document ? fileLink(mq.document) : '—']]) : null, muted(staff ? 'Your printer manager submits the price for this job.' : 'Quoting is closed for this job.')]));
     }
-    if (['printer-assigned', 'draft-pending-approval'].indexOf(s.id) >= 0) {
-      const dr = p.draft || {};
-      main.push(this.acC('Upload Draft', [
-        dr.rejectedAt ? alertBox('The administrator asked for changes: ' + dr.rejectReason, 'bad') : null,
-        alertBox(dr.file && !dr.rejectedAt ? 'Please wait for admin approve the draft before start printing.' : 'Please upload draft for approval before start printing.'),
-        dr.file ? fileLink(dr.file) : null,
-        this.jPickFile('draft'),
-        h('div', { key: 'b' }, Btn('Save Changes', () => this.jPost('/api/jobs/' + id + '/draft', { data: this.acF('draftData'), name: this.acF('draftName') }, null, () => this.setState({ acForm: {} })), 'primary', !this.acF('draftData')))]));
+    // purchase order issued → print the job, ship it, then enter the delivery details (logistics sees "Incoming Jobs")
+    if (['printer-assigned', 'shipped-to-hub'].indexOf(s.id) >= 0) {
+      const pd = p.printerDelivery || {};
+      const F = (k, def) => this.acF(k) !== '' ? this.acF(k) : def;
+      const tracking = F('pTracking', (pd.tracking || []).join('\n')), company = F('pCompany', pd.company || '');
+      const to = (j.destination && j.destination.type === 'outlet') ? 'the outlet' : 'Printoka production';
+      main.push(this.acC('Delivery Details', p.canShip ? [
+        s.id === 'printer-assigned' ? muted('When the job is completed, ship it to ' + to + ' and enter the delivery details below. Printoka logistics will receive it.') : alertBox('Delivery details sent. Printoka will confirm when it receives the job.', 'ok'),
+        FG('Delivery Order / Tracking Number', h('textarea', { rows: 4, value: tracking, onChange: e => this.acSetF('pTracking', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1, 'Enter at least 1 tracking number. Enter a new line for additional tracking numbers.'),
+        FG('Delivery Company', h('input', { value: company, onChange: e => this.acSetF('pCompany', e.target.value), placeholder: 'e.g. J&T Express, GDEX, own van', style: inp }), 1),
+        FG('Delivery Order', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, pd.document ? fileLink(pd.document) : null, this.jPickFile('pDo'))),
+        h('div', { key: 'b' }, Btn('Save Changes', () => this.jPost('/api/jobs/' + id + '/ship-to-hub', { tracking, company, documentData: this.acF('pDoData') || undefined, documentName: this.acF('pDoName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !tracking.trim() || !company.trim()))]
+        : [this.acDL([['Tracking number', (pd.tracking || []).join(', ') || '—'], ['Delivery company', pd.company || '—'], ['Delivery order', pd.document ? fileLink(pd.document) : '—']])]));
       main.push(quoteCard());
     }
-    if (s.id === 'draft-approved') {
-      const cfg = this.state.opsConfig || { couriers: [] };
-      const st = this.acF('jStatus') || 'draft-approved';
-      main.push(this.acC('Job Status', [
-        alertBox('The administrator has approved the draft. You may proceed with printing.', 'ok'),
-        muted('After shipping the items to ' + (j.destination && j.destination.type === 'outlet' ? 'the outlet' : 'production') + ', update the status below, then click save changes.'),
-        h('select', { key: 's', value: st, onChange: e => this.acSetF('jStatus', e.target.value), style: inp }, [['draft-approved', 'Draft approved'], ['shipped-to-hub', 'Shipped to ' + ((j.destination && j.destination.name) || 'production')]].map(o => h('option', { key: o[0], value: o[0] }, o[1]))),
-        st === 'shipped-to-hub' ? h('div', { key: 'c', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 10 } },
-          FG('Courier', h('input', { list: 'pk-couriers', value: this.acF('jCourier'), onChange: e => this.acSetF('jCourier', e.target.value), placeholder: 'e.g. J&T Express, own van', style: inp }), 0),
-          FG('Tracking number', h('input', { value: this.acF('jTracking'), onChange: e => this.acSetF('jTracking', e.target.value), style: inp })),
-          h('datalist', { id: 'pk-couriers' }, (cfg.couriers || []).map(c => h('option', { key: c, value: c })))) : null,
-        h('div', { key: 'b' }, Btn('Save Changes', () => st !== 'shipped-to-hub' ? this.setState({ acMsg: { bad: true, text: 'No changes required.' } }) : this.jPost('/api/jobs/' + id + '/ship-to-hub', { status: st, courier: this.acF('jCourier'), tracking: this.acF('jTracking') }, null, () => this.setState({ acForm: {} })), 'primary'))]));
-      main.push(quoteCard());
-    }
-    if (['shipped-to-hub', 'shipped', 'paid'].indexOf(s.id) >= 0) main.push(quoteCard());
+    if (['shipped', 'paid'].indexOf(s.id) >= 0) main.push(quoteCard(), this.acC('Payment', p.paidAt ? alertBox('Paid by Printoka.', 'ok') : muted('Printoka received the job. The scheduler will make the payment.')));
     if (s.id === 'not-awarded') main.push(this.acC('Quote', [muted('This job was awarded to another printer. Thank you for quoting.'), mq.submittedAt ? this.acDL([['Your quote (RM)', Number(mq.amount).toFixed(2)]]) : null]));
     const J = p.job || {};
     main.push(this.acC('Job details', [
@@ -266,8 +256,7 @@
       (J.artworks || []).length ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12, display: 'flex', flexDirection: 'column', gap: 8 } }, h('b', { style: { fontSize: 12.5 } }, 'Artworks'),
         h('ol', { style: { margin: 0, paddingLeft: 18 } }, J.artworks.map((a, i) => h('li', { key: i, style: { marginBottom: 4 } }, a.id && p.awardedToMe ? link(a.name, () => this.openOrderFile(a.orderId, a)) : h('span', { style: { color: MUT } }, a.name))))) : null]));
     const aside = [
-      this.acC('Activities', this.acStatusList(p.activities || [])),
-      (p.documents || []).length ? this.acC('Job documents', h('ol', { style: { margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 8 } }, p.documents.map(x => h('li', { key: x.id }, link(x.label, () => this.openJobDoc(id, x.id)))))) : null,
+      (p.documents || []).length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, p.documents.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null,
       p.deliverTo ? this.acC('Deliver to', [h('b', { key: 'n' }, p.deliverTo.name), h('p', { key: 'a', style: { margin: 0, color: MUT, whiteSpace: 'pre-wrap' } }, p.deliverTo.address), p.deliverTo.phone ? [h('b', { key: 'pt' }, 'Phone'), h('p', { key: 'pv', style: { margin: 0, color: MUT } }, p.deliverTo.phone)] : null]) : null,
     ];
     return this.acSingle({ home: 'Dashboard', type: 'Printing Jobs', title: id, statusNode: jobPill(s) }, main, aside);
@@ -294,7 +283,7 @@
         h('div', { key: 'c' }, Btn('Submit quote', () => this.jPost('/api/vendor/custom-quotes/' + q.id, { weight: this.acF('cWeight'), amount: this.acF('cAmount'), documentData: this.acF('cDocData') || undefined, documentName: this.acF('cDocName') || undefined }, null, () => this.setState({ acModal: null, acForm: {} })), 'primary'))] } }), 'primary', !this.acF('cWeight') || !this.acF('cAmount')))]
       : [muted('Your printer manager submits the price for this quote.')]));
     main.push(this.acC('Job details', [this.acDL([['Quantity', q.quantity || '—']]), h('b', { key: 's' }, 'Specification'), h('div', { key: 'v', style: { whiteSpace: 'pre-wrap', lineHeight: 1.7 } }, q.specification || '—')]));
-    const aside = [this.acC('Activities', this.acStatusList(q.activities || [])), q.hub ? this.acC('Hub detail', [h('b', { key: 'n' }, q.hub.name), h('p', { key: 'a', style: { margin: 0, color: MUT, whiteSpace: 'pre-wrap' } }, q.hub.address)]) : null];
+    const aside = [q.hub ? this.acC('Hub detail', [h('b', { key: 'n' }, q.hub.name), h('p', { key: 'a', style: { margin: 0, color: MUT, whiteSpace: 'pre-wrap' } }, q.hub.address)]) : null];
     return this.acSingle({ home: 'Dashboard', type: 'Custom Quotes', title: q.id, status: q.status }, main, aside);
   };
 

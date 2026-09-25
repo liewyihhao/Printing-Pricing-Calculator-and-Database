@@ -98,7 +98,7 @@ async function api(req, res, pathname, query) {
     return send(res, 200, { job: jobView(j, role), handlers: ops.handlers(j), printing: supplier.view(j, me0), audit: store.audit({ jobId: seg[1] }), order: o && me0.type !== 'hub' ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items, files: (o.files || []).filter(f => f.kind === 'artwork') } : null });
   }
   // ---- printers & hubs (original printoka-3rd-party-supplier flow) ----
-  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'draft', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'proof'].indexOf(seg[2]) >= 0) {
+  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'proof'].indexOf(seg[2]) >= 0) {
     const j0 = store.job(seg[1]); if (!j0) return send(res, 404, { error: 'not found' });
     if (!supplier.canSee(j0, me0)) return send(res, 403, { error: 'Access denied: You are not authorized to view this.' });
     const out = r => send(res, r && r.error ? (r.code || 400) : 200, r);
@@ -111,14 +111,9 @@ async function api(req, res, pathname, query) {
       if (seg[2] === 'proof') return ['prepress_staff', 'prepress_manager', 'production_director'].indexOf(role) >= 0 ? out(supplier.saveProof(seg[1], me0, b)) : send(res, 403, { error: 'prepress only' });
     }
     if (seg[2] === 'vendor-quote') return me0.type === 'vendor' ? out(supplier.submitQuote(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
-    if (seg[2] === 'draft') {
-      if (me0.type === 'vendor') return out(supplier.uploadDraft(seg[1], me0, b));
-      if (APPROVERS.indexOf(role) < 0) return send(res, 403, { error: 'Only the scheduler or the production director can approve a printer draft.' });
-      return out(supplier.decideDraft(seg[1], b.decision, b.reason, actor, role));
-    }
     if (seg[2] === 'ship-to-hub') return me0.type === 'vendor' ? out(supplier.shipToHub(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
     if (seg[2] === 'delivery') return me0.type === 'vendor' ? send(res, 403, { error: 'not available to printers' }) : out(supplier.deliveryDetails(seg[1], me0, role, b));
-    if (seg[2] === 'vendor-paid') return ['scheduler_manager', 'production_director'].indexOf(role) >= 0 ? out(supplier.markPaid(seg[1], actor, role, b)) : send(res, 403, { error: 'managers only' });
+    if (seg[2] === 'vendor-paid') return APPROVERS.indexOf(role) >= 0 ? out(supplier.markPaid(seg[1], actor, role, b)) : send(res, 403, { error: 'Only the scheduler pays printers.' });
   }
   // POST /api/jobs/:id/transition  { action, payload }
   if (seg[0] === 'jobs' && seg[2] === 'transition' && req.method === 'POST') {
@@ -411,6 +406,9 @@ async function api(req, res, pathname, query) {
     const c = Object.assign({}, q);
     ['printerQuotes', 'printerActivity', 'priceBasis', 'handler', 'outletOpenedAt', 'outletOpenedBy', 'followUpDueAt', 'remarks', 'lastFollowUpAt', 'lastFollowUpBy', 'followups', 'issuedBy', 'requestedByStaff'].forEach(k => { delete c[k]; });
     c.history = (q.history || []).filter(x => ['issued', 'reviewed', 'accepted', 'rejected'].indexOf(x.action) >= 0).map(x => ({ ts: x.ts, action: x.action, price: x.price }));
+    // who handles it: walk-in → the outlet staff and the scheduler; website → the scheduler only (never the printer)
+    const sched = q.handler ? q.handler.name : ((q.history || []).find(x => x.action === 'issued') || {}).actor || null;
+    c.handledBy = { outletStaff: q.outlet ? ((q.issuedBy && q.issuedBy.name) || q.requestedByStaff || null) : null, scheduler: sched };
     return c;
   };
   if (seg[0] === 'quotes' && seg[2] === 'view' && req.method === 'POST') {

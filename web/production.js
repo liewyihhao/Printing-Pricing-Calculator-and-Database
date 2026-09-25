@@ -298,7 +298,10 @@
     if (st === 'inbound') {
       if (!inDept(this, 'logistics')) return this.acC('Logistics', note('The printer has shipped it — waiting for logistics to receive it.'));
       const RC = [['matched', 'The job matches the order'], ['quantity', 'Quantity is correct'], ['quality', 'Finishing quality is good'], ['unlabelled', 'Printer labels removed']];
-      return this.acC('Receive from printer', [note('When the parcel arrives, check it and tick each point, then press Received.'), cl('receiving', RC), blocked(acts.receive),
+      const pd = pr.printerDelivery;
+      return this.acC('Receive from printer', [
+        pd ? this.acDL([['Printer', ((j.outsource && (j.outsource.vendors || []).find(v => v.vendorId === j.outsource.awardedTo)) || {}).vendorName], ['Delivery company', pd.company], ['Tracking number', (pd.tracking || []).join(', ')], pd.document ? ['Delivery order', link(pd.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + pd.document.id, pd.document.name))] : null]) : null,
+        note('When the parcel arrives, check it and tick each point, then press Received.'), cl('receiving', RC), blocked(acts.receive),
         acts.receive ? h('div', { key: 'b' }, Btn('Received', () => act('receive', {}, 'Received.'), 'primary', !acts.receive.enabled)) : null]);
     }
     // Completed Jobs (in-house) — receive from production (this marks the scheduler's in-house job done)
@@ -356,12 +359,10 @@
         h('div', { key: 'rb' }, Btn('Request quotes', () => this.jPost('/api/jobs/' + id + '/request-quotes', { vendorIds: this.acF('vids') || [] }, 'Quote requests sent.', () => this.setState({ acForm: {} })), 'primary', !(this.acF('vids') || []).length))] : null,
       canAward && /scheduler_manager/.test(this.userRole()) || (canAward && isDirector(this)) ? h('div', { key: 'dir' }, Btn('Award without a quote…', () => this.pAwardModal(j, null))) : null,
       pr.po ? this.acDL([['Purchase order', pr.po], ['Printer delivers to', (j.destination || {}).name]]) : null,
-      pr.draft && pr.draft.file ? h('div', { key: 'dr', style: { display: 'flex', flexDirection: 'column', gap: 8 } },
-        pr.draft.approvedAt ? box('Draft approved by ' + pr.draft.approvedBy + '. The printer may print.', 'ok') : pr.draft.rejectedAt ? box('Draft rejected: ' + pr.draft.rejectReason + '. Waiting for a new draft.', 'bad') : box('The printer uploaded a draft. Check it and approve it before they print.'),
-        link('📄 ' + pr.draft.file.name, () => this.jDownload('/api/jobs/' + id + '/files/' + pr.draft.file.id, pr.draft.file.name)),
-        pr.canApproveDraft ? Row(Btn('Approve draft', () => this.jPost('/api/jobs/' + id + '/draft', { decision: 'approve' }, 'Draft approved.'), 'primary'), Btn('Reject draft', () => this.pModal('Reject draft', [['reason', 'What should the printer change?', '']], v => this.jPost('/api/jobs/' + id + '/draft', { decision: 'reject', reason: v.reason }, 'Draft rejected.', () => this.setState({ acModal: null }))))) : null) : null,
-      o.awardedTo && !o.draft && j.status === 'outsourcing' ? note('Waiting for the printer to upload a draft.') : null,
-      (isDirector(this) || /scheduler_manager/.test(this.userRole())) && pr.awarded && pr.status && ['shipped-to-hub', 'shipped'].indexOf(pr.status.id) >= 0 ? Btn('Printer paid', () => this.pModal('Printer paid', [['reference', 'Payment reference', 'e.g. IBG-7781']], v => this.jPost('/api/jobs/' + id + '/vendor-paid', v, 'Printer marked paid.', () => this.setState({ acModal: null })))) : null,
+      pr.printerDelivery ? this.acDL([['Printer shipped', when(pr.printerDelivery.at)], ['Delivery company', pr.printerDelivery.company], ['Tracking number', (pr.printerDelivery.tracking || []).join(', ')], pr.printerDelivery.document ? ['Delivery order', link(pr.printerDelivery.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + pr.printerDelivery.document.id, pr.printerDelivery.document.name))] : null]) : null,
+      o.awardedTo && j.status === 'outsourcing' ? note('Purchase order sent. Waiting for the printer to finish the job and enter the delivery details.') : null,
+      // the scheduler pays the printer once Printoka has received the job
+      inDept(this, 'scheduler') && pr.awarded && !pr.paidAt && pr.status && pr.status.id === 'shipped' ? Btn('Mark printer paid', () => this.pModal('Mark printer paid', [['reference', 'Payment reference', 'e.g. IBG-7781']], v => this.jPost('/api/jobs/' + id + '/vendor-paid', v, 'Printer marked paid.', () => this.setState({ acModal: null }))), 'primary') : null,
       pr.paidAt ? box('Printer paid.', 'ok') : null]);
   };
 

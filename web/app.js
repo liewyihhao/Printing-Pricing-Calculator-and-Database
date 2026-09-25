@@ -4682,11 +4682,14 @@ class Component extends DCLogic {
         h('span', { onClick: () => { this.quoteView(q.id); this.openDoc(q.id, 'quote'); }, style: { color: '#E52220', fontWeight: 600, cursor: 'pointer' } }, q.id),
         this.pillDot({ requested: 'Being priced', issued: 'Ready for you', reviewed: 'Awaiting you', accepted: 'Accepted', amendment: 'Updating', declined: 'Closed' }[q.status] || q.status, q.status === 'accepted' ? 'ok' : q.status === 'issued' ? 'warn' : 'teal'),
         (q.requirement && q.requirement.product) || 'Custom job',
+        // who is handling it: walk-in → outlet staff + scheduler; website → scheduler
+        h('div', { style: { fontSize: 12.5, lineHeight: 1.6 } }, q.handledBy && q.handledBy.outletStaff ? h('div', null, h('span', { style: { color: FAINT } }, 'Outlet: '), q.handledBy.outletStaff) : null,
+          h('div', null, h('span', { style: { color: FAINT } }, 'Scheduler: '), (q.handledBy && q.handledBy.scheduler) || (['requested', 'amendment'].indexOf(q.status) >= 0 ? 'Being assigned' : '—'))),
         q.price != null ? this.rm(q.price) : '—',
         (q.status === 'issued' || q.status === 'reviewed') ? h('span', { onClick: () => this.quoteAccept(q.id), style: { color: '#E52220', fontWeight: 600, cursor: 'pointer', fontSize: 13 } }, 'Accept & pay') : (q.orderId ? h('span', { 'data-go': 'trackorder:' + q.orderId, style: { color: '#E52220', fontWeight: 600, cursor: 'pointer', fontSize: 13 } }, 'Track') : ''),
       ]);
       content = [stitle('My Quotations'),
-        this.dataCard([{ label: 'Date' }, { label: 'Quote' }, { label: 'Status' }, { label: 'Product' }, { label: 'Amount', right: true }, { label: '', right: true }], rows, { empty: 'No quotations yet — request one from the Contact page.', minWidth: 760 })];
+        this.dataCard([{ label: 'Date' }, { label: 'Quote' }, { label: 'Status' }, { label: 'Product' }, { label: 'Handled by' }, { label: 'Amount', right: true }, { label: '', right: true }], rows, { empty: 'No quotations yet — request one from the Contact page.', minWidth: 880 })];
     } else if (tab === 'Artwork') {
       const arts = []; orders.forEach(o => (o.items || []).forEach(it => (it.artworks || []).forEach(a => arts.push({ name: a, order: o.id }))));
       content = [stitle('Artwork Gallery'),
