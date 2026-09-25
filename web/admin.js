@@ -179,7 +179,7 @@
     const list = staff.filter(s => t === 'all' || s.type === t);
     const N = this.state.auNew || { type: 'production', role: 'prepress' };
     const setN = (k, v) => this.setState({ auNew: Object.assign({}, N, { [k]: v }, k === 'type' ? { role: (SR[v] || [])[0] } : {}) });
-    const create = () => this.aFetch('/api/admin/staff', N).then(d => { if (this.aMsg(d, 'Account created for ' + (d.staff && d.staff.email) + '. Temporary password: ' + d.tempPassword + ' (also emailed).')) { this.setState({ auNew: null, auOpen: false }); this.loadAdmin(); } });
+    const create = () => this.aFetch('/api/admin/staff', N).then(d => { if (this.aMsg(d, d.message)) { this.setState({ auNew: null, auOpen: false }); this.loadAdmin(); } });
     const upd = (s, body, msg) => this.aFetch('/api/admin/staff/' + s.id, body).then(d => { if (this.aMsg(d, msg || 'Saved.')) this.loadAdmin(); });
     return [
       para('Every staff login and its role — Admin, Outlet (staff / manager), Production (Prepress, Scheduler, Production, Logistics — staff / manager), Printer (staff / manager) and Hub (staff / manager). Each role signs in on its own login page and only sees its own screens.'),
@@ -201,7 +201,7 @@
           this.chip(s.disabled ? 'Disabled' : 'Active', s.disabled ? 'bad' : 'ok'),
           h('span', { style: { display: 'flex', gap: 10 } },
             h('span', { onClick: () => upd(s, { disabled: !s.disabled }, s.disabled ? 'Account enabled.' : 'Account disabled — signed out everywhere.'), style: { color: s.disabled ? TEAL : '#c71917', fontWeight: 600, cursor: 'pointer', fontSize: 12.5 } }, s.disabled ? 'Enable' : 'Disable'),
-            h('span', { onClick: () => this.aFetch('/api/admin/staff/' + s.id, { resetPassword: true }).then(d => this.aMsg(d, 'New temporary password for ' + s.email + ': ' + d.tempPassword)), style: { color: TEAL, fontWeight: 600, cursor: 'pointer', fontSize: 12.5 } }, 'Reset password'))]),
+            h('span', { onClick: () => this.aFetch('/api/admin/staff/' + s.id, { resetPassword: true }).then(d => this.aMsg(d, d.message)), style: { color: TEAL, fontWeight: 600, cursor: 'pointer', fontSize: 12.5 } }, 'Reset password'))]),
         ['16%', null, '100px', '170px', '130px', '90px', '170px']),
     ];
   };

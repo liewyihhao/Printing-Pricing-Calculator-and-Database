@@ -53,7 +53,7 @@ async function api(req, res, pathname, query) {
     if (!me0) return send(res, 401, { error: 'staff sign-in required' });
     role = D.opsRoleFor(me0);
     if (!role) return send(res, 403, { error: 'your account has no operations role' });
-    if (me0.type === 'vendor' && seg[0] !== 'jobs') return send(res, 403, { error: 'not available to printers' });
+    if (me0.type === 'vendor' && seg[0] !== 'jobs' && !(seg[0] === 'ops' && seg[1] === 'individual')) return send(res, 403, { error: 'not available to printers' });
     actor = me0.name || me0.email;
   }
 
@@ -144,6 +144,8 @@ async function api(req, res, pathname, query) {
     return send(res, 200, { config: ops.config(), checklists: D.CHECKLISTS, errorTypes: D.ERROR_TYPES });
   }
   if (seg[0] === 'ops' && seg[1] === 'kpi') return send(res, 200, { kpi: ops.kpi(query.dept, query.days) });
+  // individual performance report (per staff member; managers / the director / printer managers may pick staff)
+  if (seg[0] === 'ops' && seg[1] === 'individual') { const r = ops.individual(me0, query.staff || null); return send(res, r.error && !r.staff ? 403 : 200, r); }
   // daily reporting (guidebook §1.6): the department manager submits; the production director reads all
   if (seg[0] === 'ops' && seg[1] === 'daily-report') {
     const dept = String(query.dept || (req.method === 'POST' ? '' : D.deptOf(role)) || '');
@@ -173,6 +175,14 @@ async function api(req, res, pathname, query) {
     const r = store.registerCustomer(await readBody(req));
     return send(res, r.error ? 400 : 200, r);
   }
+  // account activation / password reset (original form-reset-password.php + lx_reset_password_content)
+  if (seg[0] === 'auth' && seg[1] === 'reset-password') {
+    if (req.method === 'POST') { const b = await readBody(req); const r = store.resetPassword(b.login, b.key, b.password_1, b.password_2); return send(res, r.error ? 400 : 200, r); }
+    const r = store.resetCheck(query.login, query.key); if (r.error) return send(res, 400, { error: r.error });
+    return send(res, 200, r.activate ? { title: 'Activate Your Account', subtitle: 'Set your password below to finalize your registration.', button: 'Activate your account', activate: true }
+      : { title: 'Reset Password', subtitle: 'Enter a new password below.', button: 'Save', activate: false });
+  }
+  if (seg[0] === 'auth' && seg[1] === 'lost-password' && req.method === 'POST') { const b = await readBody(req); return send(res, 200, store.requestPasswordReset(b.email)); }
   if (seg[0] === 'auth' && seg[1] === 'login' && req.method === 'POST') {
     const lb = await readBody(req);
     // login portals: each sign-in page only admits its own kind of account

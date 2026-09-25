@@ -366,6 +366,10 @@ class Component extends DCLogic {
     // but intercept a plain left-click so it routes in-app instead of a full page reload.
     if (el.tagName === 'A' && el.getAttribute('href') && (e.button == null || e.button === 0) && !e.metaKey && !e.ctrlKey && !e.shiftKey && !e.altKey) e.preventDefault();
     if (v === '_noop') return;   // visual button inside a real external link (e.g. WhatsApp)
+    // header account popover (original #user popover: the account nav + logout)
+    if (v === '_usermenu') return this.setState(s => ({ userMenu: !s.userMenu }));
+    if (v === '_logout') { this.setState({ userMenu: false }); return this.logout(); }
+    if (v.indexOf('acct:') === 0) { const t = v.slice(5); this.setState({ userMenu: false, cTab: t }); return this.go(this.userType() === 'customer' ? 'dash' : this.homeFor()); }
     if (v === '_mega') return this.setState(s => ({ megaOpen: !s.megaOpen }));
     if (v === '_dismiss') return this.setState({ banner: false });
     if (v === '_locale') { const L = ['EN', 'ZH', 'MS']; return this.setState(s => ({ locale: L[(L.indexOf(s.locale || 'EN') + 1) % 3] })); }
@@ -799,7 +803,7 @@ class Component extends DCLogic {
     if (this.state.route === 'learn') this.blogLoad();
     if (this.state.route === 'production') this.loadVendors();
     if (this.state.route === 'vendor') this.loadVendorRequests();
-    if (this.state.route === 'admin') this.loadAdmin();
+    // admin data loads once /api/auth/me confirms an admin (the initial route is only a placeholder)
     this.resolveUrl();
     this.loadCart();
     this.loadSettings();
@@ -1673,6 +1677,10 @@ class Component extends DCLogic {
     const NAMED = { cart: 'cart', checkout: 'checkout', auth: 'auth', search: 'search', learn: 'learn', 'learning-hub': 'learn', membership: 'membership', contact: 'contact', about: 'about', 'about-us': 'about', support: 'support', downloads: 'downloads', partners: 'partners', terms: 'terms', track: 'track', artwork: 'artwork', 'customized-printing-solutions': 'solutions' };
     // packaging: library landing at /packaging, configurator/quote/die-lines as their own sub-URLs
     if (segs[0] === 'packaging') return this.setState({ route: 'packaging', pkTab: segs[1] || 'library' });
+    if (segs[0] === 'account' && (segs[1] === 'reset-password' || segs[1] === 'lost-password')) {
+      const qs = new URLSearchParams(window.location.search);
+      return this.setState({ route: 'auth', authTab: segs[1] === 'reset-password' ? 'reset' : 'lost', resetKey: qs.get('key') || '', resetLogin: qs.get('login') || '', authErr: null });
+    }
     if (segs[0] === 'account') { const pm = String(segs[1] || '').match(/^(printer|hub|outlet|production|admin)-login$/); return this.setState({ route: 'auth', authTab: segs[1] === 'register' ? 'register' : 'login', authRole: pm ? pm[1] : 'member', authErr: null, authErrPortal: null }); }
     if (segs.length === 1 && NAMED[segs[0]]) return this.setState({ route: NAMED[segs[0]] });
     // category listing: /products or /products/<catId>
@@ -2002,7 +2010,13 @@ class Component extends DCLogic {
     };
     // never let an unknown/non-string tone crash a whole screen — fall back to neutral
     const T = MAP[tone] || MAP.neutral;
-    return h('span', { style: { background: T[0], color: T[1], fontSize: 11.5, fontWeight: 600, borderRadius: 5, padding: '3px 9px', whiteSpace: 'nowrap' } }, text);
+    return h('span', { style: { background: T[0], color: T[1], fontSize: 11.5, fontWeight: 600, borderRadius: 5, padding: '3px 9px', whiteSpace: 'nowrap' } }, this.sentence(text));
+  }
+  // status labels in sentence case everywhere: "pending payment" / "pending_payment" → "Pending payment"
+  sentence(text) {
+    if (typeof text !== 'string') return text;
+    const t = text.replace(/_/g, ' ').trim();
+    return t ? t.charAt(0).toUpperCase() + t.slice(1) : t;
   }
 
   card(children, extra) {
@@ -2222,7 +2236,7 @@ class Component extends DCLogic {
   pillDot(text, tone) {
     const T = ({ ok: '#3d8b40', warn: '#d99100', bad: '#c71917', teal: '#12B3A6', neutral: '#8a9199' })[tone] || '#8a9199';
     return h('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 7, background: '#f6f7f8', borderRadius: 999, padding: '5px 12px', fontSize: 12.5, fontWeight: 600, color: INK, whiteSpace: 'nowrap' } },
-      h('span', { style: { height: 7, width: 7, borderRadius: '50%', background: T } }), text);
+      h('span', { style: { height: 7, width: 7, borderRadius: '50%', background: T } }), this.sentence(text));
   }
   // shared production/vendor "Dashboard" tab: stat cards + throughput chart + notifications
   opsStatGrid(cards) {
@@ -2272,6 +2286,11 @@ class Component extends DCLogic {
       signedIn: !!this.state.user,
       userName: this.state.user ? this.state.user.name : '',
       tierLabel: this.tier().toUpperCase(),
+      userMenu: !!s.userMenu,
+      isCustomer: this.userType() === 'customer',
+      // original header: "Welcome, {first name}" + the member tier's medal icon
+      firstName: this.state.user ? String(this.state.user.firstName || this.state.user.name || '').trim().split(/\s+/)[0] : '',
+      medalIcon: ['bronze', 'silver', 'gold', 'platinum'].indexOf(String(this.tier()).toLowerCase()) >= 0 ? 'assets/home/' + String(this.tier()).toLowerCase() + '.png' : '',
       countryLabel: this.cc(),
       isMY: this.cc() === 'MY',
       isSG: this.cc() === 'SG',
@@ -2683,7 +2702,7 @@ class Component extends DCLogic {
           h('div', { key: 'pw' }, lbl('Password'), h('div', { style: { position: 'relative' } },
             h('input', { type: this.state.lgShow ? 'text' : 'password', value: this.state.lgPass || '', onChange: e => this.setField('lgPass', e.target.value), style: inp }),
             h('span', { onClick: () => this.setField('lgShow', !this.state.lgShow), style: { position: 'absolute', right: 12, top: 12, cursor: 'pointer', color: FAINT, fontSize: 14 } }, this.state.lgShow ? '🙈' : '👁'))),
-          h('div', { key: 'fp', style: { fontSize: 13 } }, h('span', { 'data-go': 'contact', style: { color: '#2f6fd0', cursor: 'pointer' } }, 'Forgot your password?')),
+          h('div', { key: 'fp', style: { fontSize: 13 } }, h('span', { onClick: () => { this.pushUrl('/account/lost-password/'); this.setState({ authTab: 'lost', authErr: null, lostDone: false }); }, style: { color: '#2f6fd0', cursor: 'pointer' } }, 'Forgot your password?')),
           h('label', { key: 'rm', style: { display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, color: MUT, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!this.state.lgRemember, onChange: e => this.setField('lgRemember', e.target.checked) }), 'Remember me?'),
           h('span', { key: 'b', 'data-go': 'dologin', style: { display: 'block', textAlign: 'center', background: PT.accent, color: '#fff', fontWeight: 600, fontSize: 15, padding: '13px', borderRadius: 8, cursor: 'pointer' } }, this.state.authBusy ? 'Signing in…' : 'Login'),
           this.state.authErrPortal && this.state.authErrPortal !== role ? h('div', { key: 'gp', style: { textAlign: 'center', fontSize: 13 } }, h('span', { onClick: () => this.openPortal(this.state.authErrPortal), style: { color: '#2f6fd0', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' } }, 'Go to the ' + this.authPortal(this.state.authErrPortal).title + ' page →')) : null,
@@ -2771,7 +2790,7 @@ class Component extends DCLogic {
   s_invoices() {
     const tab = this.state.invTab || 'invoices';
     const u = this.state.user;
-    const nav = [['Overview', null, 'dash'], ['My Orders', null, 'dash'], ['My Quotes', null, 'dash'], ['Artwork gallery', null, 'artwork'], ['Membership & rewards', null, 'membership'], ['Credit balance', null, 'dash'], ['Invoices & slips', null, 'invoices'], ['Address book', null, 'dash'], ['Notifications', null, 'dash']];
+    const nav = [['Overview', null, 'dash'], ['My Orders', null, 'dash'], ['My Quotes', null, 'dash'], ['Artwork gallery', null, 'artwork'], ['Membership & rewards', null, 'membership'], ['Credit balance', null, 'dash'], ['Invoices & slips', null, 'invoices'], ['Address book', null, 'dash']];
     const orders = this.state.userOrders || [];
     const cinvs = this.state.custInvoices || [];
     // real invoices: one per storefront order + every custom invoice prepared for this customer
@@ -5238,7 +5257,6 @@ class Component extends DCLogic {
       ['Pricing & margin', null, 'pricing'], ['Membership', null, 'membership'], ['TeraWallet · Credit', null, 'wallet'],
       ['Payments', null, 'gateways'], ['Tax & invoicing', null, 'tax'], ['Couriers & vendors', null, 'couriers'], ['Outlets', null, 'outlets'],
       ['Follow-up emails', null, 'followup'], ['Scheduled emails', null, 'scheduled'], ['Mailing lists', null, 'mailing'],
-      ['Notifications', null, 'notify'],
       ['Printoka settings', null, 'settings'], ['Theme settings', null, 'theme'], ['Store settings', null, 'storeset'], ['Audit log', null, 'audit'],
     ];
     const navItems = nav.map(n => [n[0], n[1], n[2] === '__group' ? '__group' : 'set:atab:' + n[2]]);

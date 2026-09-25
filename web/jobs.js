@@ -189,9 +189,10 @@
   P.s_vendor = function () {
     const u = this.state.user || {}; const v = this.state.acView;
     const tab = V_TABS.indexOf(this.state.sTab) >= 0 ? this.state.sTab : 'Dashboard';
-    const shell = { tabs: V_TABS, active: tab, icon: 'printer', accent: 'linear-gradient(180deg,#2fa4c5,#02cd9c)', sub: u.role === 'printer_staff' ? 'Printer staff' : 'Printer manager', menu: [['Dashboard', () => this.setState({ acView: null, sTab: 'Dashboard' })]] };
+    const shell = { tabs: V_TABS, active: tab, icon: 'printer', accent: 'linear-gradient(180deg,#2fa4c5,#02cd9c)', sub: u.role === 'printer_staff' ? 'Printer staff' : 'Printer manager', menu: [['Dashboard', () => this.setState({ acView: null, sTab: 'Dashboard' })], ['Individual report', () => this.acOpen({ kind: 'individual' })]] };
     let content;
     if (v && v.kind === 'job') { const d = this.acGet('vjob_' + v.id, '/api/jobs/' + encodeURIComponent(v.id)); const s = d && d.printing && d.printing.status; if (s) shell.progress = { text: s.label + ' - Step ' + s.step + ' of ' + s.of, width: Math.round(s.step / s.of * 100) }; content = this.vJob(d); }
+    else if (v && v.kind === 'individual') content = this.opsIndividual(() => this.setState({ acView: null }));
     else if (v && v.kind === 'cq') content = this.vCustomQuote(this.acGet('vcq_' + v.id, '/api/vendor/custom-quotes/' + encodeURIComponent(v.id)));
     else if (tab === 'Printing Jobs') content = this.vJobs();
     else if (tab === 'Custom Quotes') content = this.vCustomQuotes();

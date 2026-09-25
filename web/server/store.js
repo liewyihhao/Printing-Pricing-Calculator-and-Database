@@ -176,6 +176,8 @@ function markNotificationRead(user, nid) {
 // each event appends a rendered email + tracks Sent/Opens/Clicks stats.
 const EMAIL_TEMPLATES = [
   { id: 'new-account', name: 'New Account - reset password', trigger: 'Customer account created', type: 'Single Email', delay: 'Single Email', to: 'customer' },
+  { id: 'activate-account', name: 'Activate account', trigger: 'Account created by outlet staff or admin', type: 'Single Email', delay: 'Single Email', to: 'customer' },
+  { id: 'reset-password', name: 'Reset password', trigger: 'Password reset requested', type: 'Single Email', delay: 'Single Email', to: 'customer' },
   { id: 'wallet-transaction', name: 'Wallet transaction', trigger: 'Wallet credit/debit', type: 'Single Email', delay: 'Single Email', to: 'customer' },
   { id: 'order-confirmation', name: 'Order confirmation', trigger: 'Order placed', type: 'Purchase Email', delay: 'Immediately after order', to: 'customer' },
   { id: 'order-feedback', name: 'New order feedback received', trigger: 'Customer submits feedback', type: 'Single Email', delay: 'Single Email', to: 'admin' },
@@ -237,13 +239,19 @@ function applyTransition(jid, role, actor, action, payload) {
   return { job: j, from, to: t.to };
 }
 
+// plain product name for orders, jobs and documents: "Flyer (= Loose Sheet Litho)" → "Flyer",
+// "Booklet — Litho (Offset)" → "Booklet" (the catalogue's printing-method suffixes are internal)
+function productName(n) {
+  const s = String(n || '').replace(/\s*\(=[^)]*\)/g, '').replace(/\s+[—–]\s+.*$/, '').replace(/\s+-\s+(Litho|Digital|Offset|Large Format).*$/i, '').trim();
+  return s || String(n || '').trim();
+}
 // ---- create an order/job at intake (outlet walk-in or online) ----
 function createJob(body) {
   const db = load();
   const jid = 'J-' + (10000 + Math.floor(Math.random() * 89999)) + '-1';
   const j = {
     id: jid, orderId: 'O-' + jid.slice(2, 7), channel: body.channel || 'outlet',
-    customer: body.customer || 'Walk-in customer', product: body.product || 'Business Card',
+    customer: body.customer || 'Walk-in customer', product: productName(body.product || 'Business Card'),
     spec: body.spec || '', qty: Number(body.qty) || 100, price: Number(body.price) || 0,
     status: 'intake', paymentValidated: !!body.paymentValidated, paymentValidatedAt: body.paymentValidated ? now() : null,
     creditTerms: !!body.creditTerms, artwork: { file: body.artworkFile || 'artwork.pdf', checkStatus: 'pending' },
@@ -266,7 +274,7 @@ function createOrder(body) {
   const oid = 'PO-' + yr + '-' + num;
   const cust = body.customer || {};
   const items = (body.items || []).map((it, i) => ({
-    lineNo: i + 1, productId: it.productId, product: it.product || it.name, spec: it.spec || '',
+    lineNo: i + 1, productId: it.productId, product: productName(it.product || it.name), spec: it.spec || '',
     qty: Number(it.qty) || 1, unitPrice: Number(it.unitPrice) || 0, lineTotal: Number(it.lineTotal) || 0,
     artworks: it.artworks || (it.artworkFile ? [it.artworkFile] : []),
   }));
@@ -420,7 +428,8 @@ function registerCustomer(body) {
   customers().push(c);
   const cpNew = c.coupons[0], cp = c.coupons[1];
   logEvent({ actor: email, role: 'customer', action: 'register', jobId: null, from: null, to: null, note: 'New customer account ' + c.id + ' · promo ' + cpNew.code + ', ' + cp.code });
-  sendEmail('new-account', { to: c.email, name: c.name, subject: 'Welcome to Printoka — here are your RM30 and 15% discount codes', body: 'Hi ' + c.name + ',\n\nYour Printoka account is ready. As a welcome, here are your discount codes:\n\n' + cpNew.code + '\nRM30 off your order of RM ' + cpNew.minSpend + ' or more. One-time use, on all products.\n\n' + cp.code + '\n15% off every order of RM ' + cp.minSpend + ' or more. No expiry, use it as many times as you like, on all products.\n\nOne code per order. Enter it in your cart.\n\nHappy printing,\nThe Printoka team' });
+  // accounts created by outlet staff / admin skip the new-account email — they get "Activate your account" instead
+  if (!body.adminCreated) sendEmail('new-account', { to: c.email, name: c.name, subject: 'Welcome to Printoka — here are your RM30 and 15% discount codes', body: 'Hi ' + c.name + ',\n\nYour Printoka account is ready. As a welcome, here are your discount codes:\n\n' + cpNew.code + '\nRM30 off your order of RM ' + cpNew.minSpend + ' or more. One-time use, on all products.\n\n' + cp.code + '\n15% off every order of RM ' + cp.minSpend + ' or more. No expiry, use it as many times as you like, on all products.\n\nOne code per order. Enter it in your cart.\n\nHappy printing,\nThe Printoka team' });
   save();
   return { customer: publicCustomer(c), token: newSession(c.id) };
 }
@@ -618,11 +627,10 @@ function createWalkinQuote(body, staff) {
   const email = String(c.email || '').trim().toLowerCase();
   if (email) cust = customers().find(x => x.email === email && x.type === 'customer');
   if (!cust) {
-    tempPassword = 'pk' + crypto.randomBytes(3).toString('hex');
-    const reg = registerCustomer({ email: email || ('walkin+' + crypto.randomBytes(3).toString('hex') + '@printoka.my'), password: tempPassword, name: c.name || 'Walk-in customer', phone: c.phone || '', company: c.company || '' });
+    const reg = registerCustomer({ email: email || ('walkin+' + crypto.randomBytes(3).toString('hex') + '@printoka.my'), password: crypto.randomBytes(24).toString('hex'), name: c.name || 'Walk-in customer', phone: c.phone || '', company: c.company || '', adminCreated: true });
     if (reg.error) return { error: reg.error };
     cust = findCustomer(reg.customer.id); createdAccount = true;
-    if (cust) { cust.createdByOutlet = staff && staff.outlet; cust.walkinCreated = true; }
+    if (cust) { cust.adminCreated = true; cust.createdByOutlet = staff && staff.outlet; cust.createdByStaffId = staff && staff.id; cust.walkinCreated = true; if (email) sendActivation(cust); }
   }
   const qid = 'QT-' + (1000 + Math.floor(Math.random() * 8999));
   const q = {
@@ -639,22 +647,57 @@ function createWalkinQuote(body, staff) {
   save();
   return { quote: q, customer: publicCustomer(cust), createdAccount, tempPassword };
 }
-// outlet/admin creates a customer account on the customer's behalf ("Create new user")
+// ---- account activation / password reset (original: get_password_reset_key → /account/reset-password/?key=…&login=…)
+const SITE = process.env.PUBLIC_URL || 'https://printoka.com';
+const sha = s => crypto.createHash('sha256').update(String(s)).digest('hex');
+function issueResetKey(c) {
+  const key = crypto.randomBytes(15).toString('base64').replace(/[^A-Za-z0-9]/g, '').slice(0, 20);
+  c.resetKeyHash = sha(key); c.resetKeyExp = new Date(Date.now() + 24 * 3600e3).toISOString(); // valid for a day, like WordPress
+  return SITE + '/account/reset-password/?key=' + encodeURIComponent(key) + '&login=' + encodeURIComponent(c.email);
+}
+// original notify_user(): the "Activate account" email with the reset-password link (no password is ever shown or sent)
+function sendActivation(c) {
+  const url = issueResetKey(c);
+  sendEmail('activate-account', { to: c.email, name: c.name, subject: 'Activate your Printoka account', body: 'Hi ' + c.name + ',\n\nAn account has been created for you at Printoka.\nSet your password to activate it:\n' + url + '\n\nThe link is valid for 24 hours.' });
+  return url;
+}
+function resetCheck(login, key) {
+  const c = customers().find(x => x.email === String(login || '').trim().toLowerCase());
+  if (!c || !c.resetKeyHash || c.resetKeyHash !== sha(key) || Date.parse(c.resetKeyExp) < Date.now()) return { error: 'This link is invalid or has expired. Please request a new one.' };
+  return { customer: c, activate: !!c.adminCreated && !c.activatedAt };
+}
+function resetPassword(login, key, p1, p2) {
+  const r = resetCheck(login, key); if (r.error) return r;
+  if (!p1 || String(p1).length < 6) return { error: 'Password must be at least 6 characters.' };
+  if (p1 !== p2) return { error: 'Passwords do not match.' };
+  const c = r.customer, hp = hashPassword(String(p1)); c.salt = hp.salt; c.passHash = hp.hash;
+  c.resetKeyHash = null; c.resetKeyExp = null; if (c.adminCreated && !c.activatedAt) c.activatedAt = now();
+  logEvent({ actor: c.email, role: c.type, action: r.activate ? 'account_activated' : 'password_reset', jobId: null, from: null, to: null, note: c.email });
+  save(); return { ok: true, activated: r.activate };
+}
+// "Lost your password?": emails a reset link (same page, "Reset Password" wording)
+function requestPasswordReset(email) {
+  const c = customers().find(x => x.email === String(email || '').trim().toLowerCase());
+  if (c && !c.disabled) { const url = issueResetKey(c); sendEmail('reset-password', { to: c.email, name: c.name, subject: 'Reset your Printoka password', body: 'Hi ' + c.name + ',\n\nSomeone asked to reset the password for your Printoka account.\nSet a new password here:\n' + url + '\n\nIf this wasn’t you, you can ignore this email.' }); save(); }
+  return { ok: true };
+}
+// outlet/admin creates a customer account on the customer's behalf ("Create new user") — original
+// outlet_create_user(): record who created it, skip the new-account email, send "Activate your account"
 function createCustomerByStaff(body, staff) {
   const email = String(body.email || '').trim().toLowerCase();
   if (!email) return { error: 'An email address is required to create the account.' };
   if (customers().find(c => c.email === email)) return { error: 'An account with that email already exists.' };
-  const tempPassword = 'pk' + crypto.randomBytes(3).toString('hex');
   const name = [body.firstName, body.lastName].filter(Boolean).join(' ') || body.name || email.split('@')[0];
-  const reg = registerCustomer({ email, password: tempPassword, name, phone: body.phone || '', company: body.company || '' });
+  const reg = registerCustomer({ email, password: crypto.randomBytes(24).toString('hex'), name, phone: body.phone || '', company: body.company || '', adminCreated: true });
   if (reg.error) return reg;
   const c = findCustomer(reg.customer.id);
   if (c) {
-    c.createdByOutlet = (staff && staff.outlet) || null; c.createdByStaffId = (staff && staff.id) || null; c.walkinCreated = true; c.promoOptIn = !!body.promo;
+    c.adminCreated = true; c.createdByOutlet = (staff && staff.outlet) || null; c.createdByStaffId = (staff && staff.id) || null; c.walkinCreated = true; c.promoOptIn = !!body.promo;
     if (body.address || body.city || body.country) c.addresses = [{ id: 'A-' + crypto.randomBytes(3).toString('hex').toUpperCase(), label: 'Home', name, phone: body.phone || '', line1: body.address || '', line2: '', city: body.city || '', postcode: body.postcode || '', state: body.state || '', country: body.country || 'MY', isDefault: true }];
+    sendActivation(c);
     save();
   }
-  return { customer: publicCustomer(c), tempPassword, createdAccount: true };
+  return { customer: publicCustomer(c), createdAccount: true, message: 'User "' + name + '" created successfully.' };
 }
 // outlet records the customer's decision (proceed / not_proceed / amend) and pushes it to the Scheduler
 function recordQuoteDecision(qid, decision, remark, staff) {
@@ -735,15 +778,15 @@ function createStaffAccount(b, actor) {
   const type = b.type, role = b.role;
   if (!STAFF_ROLES[type] || STAFF_ROLES[type].indexOf(role) < 0) return { error: 'Pick a valid account type and role.' };
   if (type === 'vendor' && role === 'printer_staff' && !b.vendorId) return { error: 'Printer staff must belong to a printer company.' };
-  const temp = b.password && String(b.password).length >= 6 ? String(b.password) : crypto.randomBytes(5).toString('hex');
-  const { salt, hash } = hashPassword(temp);
+  // like WordPress admin "Add New User": no password is set or shown — the user activates by email
+  const { salt, hash } = hashPassword(crypto.randomBytes(24).toString('hex'));
   const c = { id: 'S-' + crypto.randomBytes(3).toString('hex').toUpperCase(), email, passHash: hash, salt, name: b.name || email.split('@')[0], type, role,
     outlet: type === 'outlet' ? (b.outlet || null) : null, hub: type === 'hub' ? (b.hub || null) : null, vendorId: type === 'vendor' && role === 'printer_staff' ? b.vendorId : null,
-    phone: b.phone || '', tier: 'Standard', spend12mo: 0, creditBalance: 0, addresses: [], creditLedger: [], createdAt: now(), createdBy: actor };
+    phone: b.phone || '', tier: 'Standard', spend12mo: 0, creditBalance: 0, addresses: [], creditLedger: [], createdAt: now(), createdBy: actor, adminCreated: true };
   customers().push(c);
   logEvent({ actor, role: 'admin', action: 'user_create', jobId: null, from: null, to: role, note: 'Staff account ' + email + ' (' + type + ' · ' + role + ')' });
-  sendEmail('new-account', { to: email, name: c.name, subject: 'Your Printoka staff account', body: 'Hi ' + c.name + ',\n\nAn account has been created for you (' + role.replace(/_/g, ' ') + ').\nEmail: ' + email + '\nTemporary password: ' + temp + '\n\nPlease sign in and change your password.' });
-  save(); return { staff: publicCustomer(c), tempPassword: temp };
+  sendActivation(c);
+  save(); return { staff: publicCustomer(c), message: 'Account created. An email was sent to ' + email + ' to set their password.' };
 }
 function updateStaffAccount(id, b, actor) {
   const c = customers().find(x => x.id === id && x.type !== 'customer'); if (!c) return { error: 'Staff account not found.' };
@@ -751,8 +794,9 @@ function updateStaffAccount(id, b, actor) {
   if (b.role) { if ((STAFF_ROLES[c.type] || []).indexOf(b.role) < 0) return { error: 'That role does not fit a ' + c.type + ' account.' }; c.role = b.role; }
   ['name', 'phone', 'outlet', 'hub', 'vendorId'].forEach(k => { if (b[k] !== undefined) c[k] = b[k]; });
   if (b.disabled !== undefined) { c.disabled = !!b.disabled; if (c.disabled) { const ss = sessions(); Object.keys(ss).forEach(t => { if (ss[t].userId === c.id) delete ss[t]; }); } }
-  if (b.resetPassword) { const temp = crypto.randomBytes(5).toString('hex'); const hp = hashPassword(temp); c.salt = hp.salt; c.passHash = hp.hash; logEvent({ actor, role: 'admin', action: 'user_password_reset', jobId: null, from: null, to: null, note: c.email }); save(); return { staff: publicCustomer(c), tempPassword: temp }; }
+  if (b.resetPassword) { requestPasswordReset(c.email); logEvent({ actor, role: 'admin', action: 'user_password_reset', jobId: null, from: null, to: null, note: c.email }); save(); return { staff: publicCustomer(c), message: 'Password reset email sent to ' + c.email + '.' }; }
   logEvent({ actor, role: 'admin', action: 'user_update', jobId: null, from: before, to: c.role + (c.disabled ? ' (disabled)' : ''), note: c.email });
   save(); return { staff: publicCustomer(c) };
 }
-module.exports = { newSession, STAFF_ROLES, createStaffAccount, updateStaffAccount, hashPassword, checkCoupon, load, save, reset, jobs, job, users, audit, applyTransition, logEvent, now, id, catalogue, setOverride, createJob, orders, order, createOrder, validateOrderPayment, orderView, registerCustomer, loginCustomer, sessionCustomer, logout, ordersForUser, publicCustomer, customers, findCustomer, getAddresses, addAddress, deleteAddress, setDefaultAddress, getCredit, creditEntry, vendorAccounts, requestVendorQuotes, submitVendorQuote, awardVendorPO, vendorRequests, quotes, quote, quotesForUser, createQuote, priceQuote, rejectQuote, acceptQuote, createManualQuote, setQuoteRemark, customInvoices, customInvoice, customInvoicesForUser, createCustomInvoice, updateCustomInvoice, notifications, notify, notificationsFor, markNotificationRead, viewQuote, createWalkinQuote, recordQuoteDecision, createCustomerByStaff, updateProfile, changePassword, settings, updateSettings, emailTemplates, emailOutbox, emailStats, setEmailActive, sendEmail };
+module.exports = {
+  productName, newSession, resetCheck, resetPassword, requestPasswordReset, STAFF_ROLES, createStaffAccount, updateStaffAccount, hashPassword, checkCoupon, load, save, reset, jobs, job, users, audit, applyTransition, logEvent, now, id, catalogue, setOverride, createJob, orders, order, createOrder, validateOrderPayment, orderView, registerCustomer, loginCustomer, sessionCustomer, logout, ordersForUser, publicCustomer, customers, findCustomer, getAddresses, addAddress, deleteAddress, setDefaultAddress, getCredit, creditEntry, vendorAccounts, requestVendorQuotes, submitVendorQuote, awardVendorPO, vendorRequests, quotes, quote, quotesForUser, createQuote, priceQuote, rejectQuote, acceptQuote, createManualQuote, setQuoteRemark, customInvoices, customInvoice, customInvoicesForUser, createCustomInvoice, updateCustomInvoice, notifications, notify, notificationsFor, markNotificationRead, viewQuote, createWalkinQuote, recordQuoteDecision, createCustomerByStaff, updateProfile, changePassword, settings, updateSettings, emailTemplates, emailOutbox, emailStats, setEmailActive, sendEmail };

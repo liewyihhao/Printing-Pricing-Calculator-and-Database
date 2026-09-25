@@ -47,9 +47,16 @@
               v.localeLabel, img('assets/icons/dropdown.svg', { height: 6, width: 'auto', display: 'block', opacity: .55 })),
             h('span', { style: { width: 1, height: 16, background: HAIR } }),
             v.signedIn
-              ? h('span', { 'data-go': 'dash', style: { display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer' } },
-                  h('span', { style: { height: 26, width: 26, borderRadius: '50%', background: '#f3f4f6', color: TEAL, display: 'grid', placeItems: 'center', fontSize: 11, fontWeight: 600 } }, (v.userName || '?').slice(0, 2).toUpperCase()),
-                  h('span', { style: { fontSize: 10.5, fontWeight: 600, letterSpacing: '.06em', background: 'linear-gradient(90deg,#FF9A2E,#E52220)', color: '#fff', borderRadius: 3, padding: '2px 6px' } }, v.tierLabel))
+              // original header__user: "Welcome, {first name}" + tier medal; opens the account popover (with Logout)
+              ? h('span', { style: { position: 'relative', display: 'flex' } },
+                  h('span', { 'data-go': '_usermenu', role: 'button', 'aria-expanded': v.userMenu ? 'true' : 'false', title: v.tierLabel ? v.tierLabel.charAt(0) + v.tierLabel.slice(1).toLowerCase() + ' member' : undefined, style: { display: 'flex', alignItems: 'center', cursor: 'pointer', background: '#fafafa', padding: '6px 12px', fontSize: 13.5, color: '#231f20' } },
+                    'Welcome, ' + (v.firstName || 'there'),
+                    v.medalIcon ? img(v.medalIcon, { height: '1.7rem', width: 'auto', display: 'inline-block', marginLeft: 8, marginTop: -2 }) : null),
+                  v.userMenu ? h('span', { 'data-go': '_usermenu', style: { position: 'fixed', inset: 0, zIndex: 80 } }) : null,
+                  v.userMenu ? h('div', { role: 'menu', style: { position: 'absolute', top: '100%', right: 0, marginTop: 6, zIndex: 81, background: '#fff', border: '1px solid ' + HAIR, borderRadius: 10, boxShadow: '0 12px 30px rgba(0,0,0,.12)', padding: '8px 0', minWidth: 210, whiteSpace: 'nowrap' } },
+                    (v.isCustomer ? [['Dashboard', 'Dashboard'], ['Orders', 'Orders'], ['Quotations', 'Quotations'], ['Invoices', 'Invoices'], ['Transactions', 'Transactions'], ['Sales Missions', 'Sales Missions'], ['Artwork Gallery', 'Artwork'], ['Coupons', 'Coupons'], ['Account Details', 'Account']] : [['Dashboard', 'Dashboard']])
+                      .map(m => h('div', { key: m[1], role: 'menuitem', 'data-go': 'acct:' + m[1], style: { padding: '9px 18px', fontSize: 13.5, fontWeight: 500, color: '#231f20', cursor: 'pointer' } }, m[0]))
+                      .concat([h('div', { key: 'sep', style: { borderTop: '1px solid ' + HAIR, margin: '6px 0' } }), h('div', { key: 'lo', role: 'menuitem', 'data-go': '_logout', style: { padding: '9px 18px', fontSize: 13.5, fontWeight: 600, color: TEAL, cursor: 'pointer' } }, 'Logout')])) : null)
               : h('span', { 'data-go': 'auth', style: { display: 'flex', alignItems: 'center', gap: 7, cursor: 'pointer', fontSize: 13.5, color: '#231f20' } },
                   img('assets/icons/user.svg', { height: 18, width: 'auto', display: 'block' }), 'Login/ Signup'),
             h('span', { 'data-go': 'cart', style: { position: 'relative', display: 'flex', cursor: 'pointer' } },

@@ -132,6 +132,9 @@ function migrate() {
   store.customers().filter(c => c.type === 'vendor' && c.role === 'vendor').forEach(c => { c.role = 'printer_manager'; });
   const lf = store.customers().find(c => c.email === 'vendor@printoka.com');
   if (lf) add('vendor-staff@printoka.com', 'LargeFormat Co — Print Staff', 'vendor', 'printer_staff', { vendorId: lf.id });
+  // plain product names everywhere ("Flyer (= Loose Sheet Litho)" → "Flyer")
+  (db.orders || []).forEach(o => (o.items || []).forEach(it => { it.product = store.productName(it.product); }));
+  (db.jobs || []).forEach(j => { j.product = store.productName(j.product); if (j.label && j.label.product) j.label.product = store.productName(j.label.product); });
   (db.jobs || []).forEach(j => { normalizeJob(j); const lp = j.progress && j.progress.logistics; if (lp && lp.picked && !lp.verified) lp.verified = lp.picked;
     // hubs are no longer in the production flow: jobs still in production go to production / their own destination
     if ((j.destination || {}).type === 'hub' && ['scheduling', 'printing', 'printed', 'logistics'].indexOf(j.status) >= 0) { j.destination = Object.assign({}, j.finalDestination); makeLabel(j); }
@@ -504,5 +507,50 @@ function actions(dept, opts) {
     .slice(-400).reverse().map(e => { const j = store.job(e.jobId) || {}; return Object.assign({}, e, { customer: j.customer, product: j.product, orderId: j.orderId }); });
 }
 
-module.exports = { config, saveConfig, migrate, normalizeJob, makeLabel, syncOrder, onOrderCreated, afterTransition, transition, setStep, sendInternal, award, kpi, sales, hubPerformance, actions, hubById, outletById, STEP_GROUPS, PROGRESS_LABEL,
+// ---- individual performance report (same idea as the outlet's original individual-performance report):
+// monthly figures per staff member, computed from the actions they recorded
+const M24 = () => { const out = []; const d = new Date(); d.setDate(1); d.setHours(0, 0, 0, 0); for (let i = 23; i >= 0; i--) { const m = new Date(d.getFullYear(), d.getMonth() - i, 1); out.push({ key: m.getFullYear() + '-' + String(m.getMonth() + 1).padStart(2, '0'), label: m.toLocaleString('en', { month: 'short' }) + ' ' + m.getFullYear() }); } return out; };
+const ymOf = ts => { const d = new Date(ts); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'); };
+const DEPT_OF_ACCOUNT = { prepress: 'prepress', prepress_manager: 'prepress', scheduler: 'scheduler', scheduler_manager: 'scheduler', production_staff: 'scheduler', logistics: 'logistics', logistics_manager: 'logistics' };
+function individualStaff(me) {
+  const all = store.customers();
+  if (me.type === 'vendor') { const co = me.vendorId || me.id; return me.role === 'printer_staff' ? [] : all.filter(c => c.type === 'vendor' && (c.id === co || c.vendorId === co)).map(c => ({ id: c.id, name: c.name, dept: 'printer' })); }
+  const director = me.type === 'admin' || me.role === 'production_director' || me.role === 'production_manager';
+  const myDept = DEPT_OF_ACCOUNT[me.role];
+  if (!director && !/_manager$/.test(me.role)) return [];
+  return all.filter(c => c.type === 'production' && DEPT_OF_ACCOUNT[c.role] && (director || DEPT_OF_ACCOUNT[c.role] === myDept)).map(c => ({ id: c.id, name: c.name, dept: DEPT_OF_ACCOUNT[c.role] }));
+}
+function individual(me, staffId) {
+  let who = me;
+  if (staffId && staffId !== me.id) { if (!individualStaff(me).some(s => s.id === staffId)) return { error: 'You can only view the staff you manage.' }; who = store.findCustomer(staffId); }
+  const dept = who.type === 'vendor' ? 'printer' : DEPT_OF_ACCOUNT[who.role];
+  if (!dept) return { error: 'The Production Director has no individual report — pick a staff member.', staff: individualStaff(me) };
+  const M = M24(), blank = () => { const o = {}; M.forEach(m => { o[m.key] = 0; }); return o; };
+  const name = who.name, ev = store.audit().filter(e => e.actor === name && e.ts);
+  const jobs = {}; store.jobs().forEach(j => { jobs[j.id] = j; });
+  const count = acts => { const s = blank(); ev.filter(e => acts.indexOf(e.action) >= 0).forEach(e => { const k = ymOf(e.ts); if (s[k] != null) s[k]++; }); return s; };
+  const pctBy = (list, good) => { const n = blank(), g = blank(), out = {}; list.forEach(e => { const k = ymOf(e.ts); if (n[k] == null) return; n[k]++; if (good(e)) g[k]++; }); M.forEach(m => { out[m.key] = n[m.key] ? Math.round(g[m.key] / n[m.key] * 100) : null; }); return out; };
+  const beforeDeadline = e => { const j = jobs[e.jobId]; return !j || !j.deadline || Date.parse(e.ts) <= Date.parse(j.deadline); };
+  const r = { staff: name, dept, months: M, metrics: {} };
+  if (dept === 'prepress') {
+    const checks = ev.filter(e => ['approve', 'flag_minor', 'reject_major', 'escalate'].indexOf(e.action) >= 0 && e.from === 'prepress');
+    const ck = blank(); checks.forEach(e => { const k = ymOf(e.ts); if (ck[k] != null) ck[k]++; });
+    r.metrics = { filesChecked: ck, passed: count(['approve']), rejections: count(['reject_major']),
+      withinSla: pctBy(checks, e => { const t0 = enteredAt(e.jobId, ['prepress'], e.ts); return t0 && mins(t0, e.ts) <= ((jobs[e.jobId] || {}).urgent ? 10 : 30); }) };
+  } else if (dept === 'scheduler') {
+    r.metrics = { jobsScheduled: count(['assign_inhouse', 'assign_outsource']), quotesReplied: count(['quote_issued']), printerQuotesAsked: count(['request_quotes', 'request_printer_quote']),
+      onTime: pctBy(ev.filter(e => ['finish'].indexOf(e.action) >= 0), beforeDeadline) };
+  } else if (dept === 'logistics') {
+    r.metrics = { received: count(['receive']), shipped: count(['dispatch']), onTimeDelivery: pctBy(ev.filter(e => e.action === 'dispatch'), beforeDeadline) };
+  } else {
+    const co = who.vendorId || who.id; const won = blank(), paid = blank();
+    store.jobs().forEach(j => { const o = j.outsource; if (!o || o.awardedTo !== co) return; const v = (o.vendors || []).find(x => x.vendorId === co) || {};
+      if (o.awardedAt && won[ymOf(o.awardedAt)] != null) won[ymOf(o.awardedAt)]++;
+      if (o.paidAt && paid[ymOf(o.paidAt)] != null) paid[ymOf(o.paidAt)] = Math.round((paid[ymOf(o.paidAt)] + (Number(v.price) || 0)) * 100) / 100; });
+    r.metrics = { quotesSubmitted: count(['submit_quote']), purchaseOrders: won, delivered: count(['printer_delivery']), onTimeDelivery: pctBy(ev.filter(e => e.action === 'printer_delivery'), beforeDeadline), amountPaid: paid };
+  }
+  return { performance: r, staff: individualStaff(me) };
+}
+
+module.exports = { individual, individualStaff, config, saveConfig, migrate, normalizeJob, makeLabel, syncOrder, onOrderCreated, afterTransition, transition, setStep, sendInternal, award, kpi, sales, hubPerformance, actions, hubById, outletById, STEP_GROUPS, PROGRESS_LABEL,
   reportFigures, submitReport, listReports, outletOfJob, destOf, claim, handlers };

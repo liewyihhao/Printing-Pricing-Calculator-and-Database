@@ -164,6 +164,37 @@
   P.acSetF = function (k, v) { this.setState(st => ({ acForm: Object.assign({}, st.acForm, { [k]: v }) })); };
   P.acReadFile = function (file) { return new Promise(res => { if (!file) return res(null); const r = new FileReader(); r.onload = () => res({ name: file.name, data: r.result }); r.readAsDataURL(file); }); };
 
+  // notifications are not used for any user (dashboards show state directly, like the original site)
+  P.notifPanel = function () { return null; };
+  P.loadNotifications = function () {};
+
+  // ================================================================== ACTIVATE / RESET PASSWORD (original form-reset-password.php)
+  // An account created by outlet staff or admin gets an "Activate your account" email; the link opens this
+  // page as "Activate Your Account". A "Forgot your password?" link opens the same page as "Reset Password".
+  const origAuth = P.s_auth;
+  P.s_auth = function () {
+    const tab = this.state.authTab;
+    if (tab !== 'reset' && tab !== 'lost') return origAuth.call(this);
+    const wrap = kids => h('div', { style: { background: '#fafafa', padding: '48px 16px 64px' } }, h('div', { style: { maxWidth: 520, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 16 } }, kids));
+    const title = (t, s) => [h('h4', { key: 't', style: { fontSize: 22, fontWeight: 600, margin: 0 } }, t), h('p', { key: 's', style: { fontSize: 14, color: MUT, margin: 0 } }, s)];
+    const err = this.state.authErr ? h('div', { key: 'e', style: { fontSize: 13, color: '#c0392b' } }, this.state.authErr) : null;
+    if (tab === 'lost') {
+      if (this.state.lostDone) return wrap(title('Check your email', 'If an account exists for that email, we sent a link to reset your password.'));
+      return wrap(title('Lost your password?', 'Enter your email address. You will receive a link to create a new password.').concat([
+        FG('Email', h('input', { type: 'email', value: this.state.lostEmail || '', onChange: e => this.setState({ lostEmail: e.target.value }), style: inp })), err,
+        h('div', { key: 'b' }, Btn('Reset password', () => this.aFetchJ('/api/auth/lost-password', { email: this.state.lostEmail }).then(() => this.setState({ lostDone: true })), 'primary', !this.state.lostEmail))]));
+    }
+    const key = this.state.resetKey, login = this.state.resetLogin;
+    const info = this.acGet('reset_' + key, '/api/auth/reset-password?key=' + encodeURIComponent(key || '') + '&login=' + encodeURIComponent(login || ''));
+    if (!info) return wrap([h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')]);
+    if (info.error) return wrap(title('Link expired', info.error).concat([h('div', { key: 'b' }, Btn('Request a new link', () => { this.pushUrl('/account/lost-password/'); this.setState({ authTab: 'lost', lostDone: false }); }, 'primary'))]));
+    if (this.state.resetDone) return wrap(title(info.activate ? 'Your account is active' : 'Password saved', 'You can now sign in with your new password.').concat([h('div', { key: 'b' }, Btn('Sign in', () => { this.pushUrl('/account/'); this.setState({ authTab: 'login', resetDone: false, lgEmail: login }); }, 'primary'))]));
+    const pw = (k, label) => { const show = this.state['show_' + k]; return FG(label, h('div', { style: { position: 'relative' } }, h('input', { type: show ? 'text' : 'password', placeholder: label, value: this.state[k] || '', onChange: e => this.setState({ [k]: e.target.value }), style: Object.assign({}, inp, { paddingRight: 44 }) }),
+      h('span', { onClick: () => this.setState({ ['show_' + k]: !show }), role: 'button', 'aria-label': show ? 'Hide password' : 'Show password', style: { position: 'absolute', right: 12, top: 9, cursor: 'pointer', fontSize: 12.5, color: MUT } }, show ? 'Hide' : 'Show'))); };
+    return wrap(title(info.title, info.subtitle).concat([pw('rp1', 'New Password'), pw('rp2', 'Re-enter new password'), err,
+      h('div', { key: 'b' }, Btn(info.button, () => this.aFetchJ('/api/auth/reset-password', { key, login, password_1: this.state.rp1, password_2: this.state.rp2 }).then(d => { if (d.error) return this.setState({ authErr: d.error }); this.setState({ resetDone: true, authErr: null, rp1: '', rp2: '' }); }), 'primary', !this.state.rp1 || !this.state.rp2))]));
+  };
+
   // ================================================================== OUTLET (original account/outlet/*)
   const OUT_TABS = ['Dashboard', 'Sales performance', 'Orders', 'Custom quotes'];
   P.s_outlet = function () {
@@ -211,7 +242,7 @@
         FG('Town / City', h('input', { value: f('city'), onChange: e => set('city', e.target.value), style: inp })), FG('Postcode', h('input', { value: f('postcode'), onChange: e => set('postcode', e.target.value), style: inp })),
         FG('State', h('input', { value: f('state'), onChange: e => set('state', e.target.value), style: inp })), FG('Country', h('select', { value: f('country') || 'MY', onChange: e => set('country', e.target.value), style: inp }, [['MY', 'Malaysia'], ['SG', 'Singapore'], ['BN', 'Brunei']].map(c => h('option', { key: c[0], value: c[0] }, c[1]))))),
       h('label', { key: 'p', style: { display: 'flex', gap: 8, fontSize: 13, color: MUT } }, h('input', { type: 'checkbox', checked: !!f('promo'), onChange: e => set('promo', e.target.checked) }), 'Receive exclusive offers and promotions from Printoka.'),
-      h('div', { key: 'b' }, Btn('Create user', () => this.aFetchJ('/api/customers', Object.assign({ country: 'MY' }, this.state.acForm)).then(d => { if (this.acDone(d, 'Account created for ' + (d.customer && d.customer.email) + '. Temporary password: ' + d.tempPassword + ' (also emailed).')) this.setState({ acModal: null, acForm: {} }); }), 'primary', !f('email') || !f('firstName'))),
+      h('div', { key: 'b' }, Btn('Create user', () => this.aFetchJ('/api/customers', Object.assign({ country: 'MY' }, this.state.acForm)).then(d => { if (this.acDone(d, d.message || 'User created successfully.')) this.setState({ acModal: null, acForm: {} }); }), 'primary', !f('email') || !f('firstName'))),
     ];
     this.setState({ acModal: { title: 'Create new user', body, wide: true }, acForm: {} });
   };
@@ -360,6 +391,33 @@
     return head.concat([
       this.acCard([h('div', { key: 'h', style: { padding: 20 } }, h('p', { style: { fontWeight: 700, margin: 0 } }, 'Key metrics' + (perf.staff ? ' — ' + perf.staff : '')), h('div', { style: { fontSize: 22, marginTop: 4 } }, labels[keys[keys.length - months]] + ' - ' + labels[keys[keys.length - 1]])),
         h('div', { key: 'g', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 1, background: HAIR, borderTop: '1px solid ' + HAIR } }, METRICS.map(mm => { const A = this.accent(mm[4]); return h('div', { key: mm[0], style: { background: '#fff', padding: 20, position: 'relative' } }, this.acMetricHead(mm[0], this.acMetric(mm[1], keys, months, mm[2]), mm[2]), h('span', { style: { position: 'absolute', right: 20, bottom: 20, height: 44, width: 44, borderRadius: '50%', background: A[1], display: 'grid', placeItems: 'center' } }, this.dashIcon(mm[3], A[0], 20))); }))]),
+    ].concat(METRICS.map(mm => this.acCard(h('div', { style: { padding: 20 } }, this.acMetricHead(mm[0], this.acMetric(mm[1], keys, months, mm[2]), mm[2]), h('div', { style: { marginTop: 20 } }, this.acChart(Object.fromEntries(Object.entries(mm[1]).map(e => [e[0], e[1] == null ? 0 : e[1]])), keys, labels, months)))))));
+  };
+
+  // ---- the same individual performance report for production staff and printers (KPI per staff member)
+  const IND_METRICS = {
+    prepress: [['Files checked', 'filesChecked', 'number', 'file', 'red'], ['Files passed', 'passed', 'number', 'check', 'teal'], ['Files rejected', 'rejections', 'number', 'edit-3', 'orange'], ['Checked within time', 'withinSla', 'percent', 'clock', 'teal']],
+    scheduler: [['Jobs scheduled', 'jobsScheduled', 'number', 'printer', 'red'], ['Quotes replied', 'quotesReplied', 'number', 'edit-3', 'teal'], ['Printer quotes requested', 'printerQuotesAsked', 'number', 'file', 'orange'], ['Jobs finished on time', 'onTime', 'percent', 'clock', 'teal']],
+    logistics: [['Jobs received', 'received', 'number', 'box', 'red'], ['Jobs shipped', 'shipped', 'number', 'layers', 'orange'], ['Shipped on time', 'onTimeDelivery', 'percent', 'clock', 'teal']],
+    printer: [['Quotes submitted', 'quotesSubmitted', 'number', 'edit-3', 'red'], ['Purchase orders received', 'purchaseOrders', 'number', 'file', 'orange'], ['Jobs delivered', 'delivered', 'number', 'box', 'teal'], ['Delivered on time', 'onTimeDelivery', 'percent', 'clock', 'teal'], ['Amount paid', 'amountPaid', 'currency', 'dollar-sign', 'teal']],
+  };
+  P.opsIndividual = function (back) {
+    const sid = this.state.indStaff || '';
+    const pd = this.acGet('ops_ind_' + sid, '/api/ops/individual' + (sid ? '?staff=' + encodeURIComponent(sid) : ''));
+    const staff = (pd && pd.staff) || [];
+    const perf = pd && (pd.error ? { error: pd.error } : pd.performance);
+    const months = Number(this.state.indRange || 6);
+    const head = [h('h1', { key: 't', style: { fontSize: 34, fontWeight: 600, margin: '6px 0 0' } }, 'Individual performance report'),
+      h('div', { key: 'f', style: { display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap' } },
+        staff.length ? h('select', { value: sid, onChange: e => this.setField('indStaff', e.target.value), style: pillInp }, [h('option', { key: '', value: '' }, 'Me')].concat(staff.map(s => h('option', { key: s.id, value: s.id }, s.name)))) : null,
+        this.acRange('indRange'), back ? h('span', { onClick: back, style: { marginLeft: 'auto', fontWeight: 700, color: TEAL, cursor: 'pointer', fontSize: 13.5 } }, 'Back to dashboard ›') : null)];
+    if (!perf) return head.concat([h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')]);
+    if (perf.error) return head.concat([h('div', { key: 'e', style: { color: '#c0392b' } }, perf.error)]);
+    const keys = perf.months.map(m => m.key), labels = {}; perf.months.forEach(m => { labels[m.key] = m.label; });
+    const METRICS = (IND_METRICS[perf.dept] || []).map(d => [d[0], perf.metrics[d[1]] || {}, d[2], d[3], d[4]]);
+    return head.concat([
+      this.acCard([h('div', { key: 'h', style: { padding: 20 } }, h('p', { style: { fontWeight: 700, margin: 0 } }, 'Key metrics' + (perf.staff ? ' — ' + perf.staff : '')), h('div', { style: { fontSize: 22, marginTop: 4 } }, labels[keys[keys.length - months]] + ' - ' + labels[keys[keys.length - 1]])),
+        h('div', { key: 'g', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', borderTop: '1px solid ' + HAIR, overflow: 'hidden' } }, METRICS.map(mm => { const A = this.accent(mm[4]); return h('div', { key: mm[0], style: { background: '#fff', padding: 20, position: 'relative', boxShadow: '1px 0 0 ' + HAIR + ', 0 1px 0 ' + HAIR } }, this.acMetricHead(mm[0], this.acMetric(mm[1], keys, months, mm[2]), mm[2]), h('span', { style: { position: 'absolute', right: 20, bottom: 20, height: 44, width: 44, borderRadius: '50%', background: A[1], display: 'grid', placeItems: 'center' } }, this.dashIcon(mm[3], A[0], 20))); }))]),
     ].concat(METRICS.map(mm => this.acCard(h('div', { style: { padding: 20 } }, this.acMetricHead(mm[0], this.acMetric(mm[1], keys, months, mm[2]), mm[2]), h('div', { style: { marginTop: 20 } }, this.acChart(Object.fromEntries(Object.entries(mm[1]).map(e => [e[0], e[1] == null ? 0 : e[1]])), keys, labels, months)))))));
   };
 })();

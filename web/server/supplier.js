@@ -100,7 +100,7 @@ function activities(j, me) {
   store.audit({ jobId: j.id }).forEach(e => {
     const vendorSafe = ['submit_quote', 'award_po', 'award_direct', 'draft_upload', 'draft_approve', 'draft_reject', 'vendor_ship', 'receive_hub', 'forward', 'hub_delivery', 'vendor_paid', 'request_quotes'];
     if (me.type === 'vendor' && vendorSafe.indexOf(e.action) < 0 && !(e.to && ['dispatched', 'at_hub'].indexOf(e.to) >= 0)) return;
-    if (me.type === 'vendor' && e.action === 'submit_quote' && e.actor !== coOf(me)) return;
+    if (me.type === 'vendor' && e.action === 'submit_quote' && (e.vendorId || e.actor) !== coOf(me)) return;
     const acc = store.findCustomer(e.actor) || store.customers().find(c => c.name === e.actor && c.type === 'vendor');
     const by = (acc && acc.name) || e.actor;
     const own = me.type === 'vendor' && !!acc && (acc.id === coOf(me) || acc.vendorId === coOf(me));
@@ -181,7 +181,7 @@ function submitQuote(jid, me, b) {
   if (b.documentData) { const f = saveBlob(path.join(ROOT, jid), { data: b.documentData, name: b.documentName || 'quote.pdf' }, 'Q'); if (f.error) return f; v.document = f; }
   const n = j.outsource.vendors.filter(x => x.submittedAt).length;
   j.outsource.status = n === j.outsource.vendors.length ? 'quotes_received' : 'partly_received';
-  store.logEvent({ actor: co, role: 'printer', action: 'submit_quote', jobId: jid, from: null, to: null, note: 'Quote RM ' + amount.toFixed(2) + (v.leadDays ? ' · ' + v.leadDays + ' days' : '') });
+  store.logEvent({ actor: me.name, vendorId: co, role: 'printer', action: 'submit_quote', jobId: jid, from: null, to: null, note: 'Quote RM ' + amount.toFixed(2) + (v.leadDays ? ' · ' + v.leadDays + ' days' : '') });
   if (j.outsource.status === 'quotes_received') store.notify({ type: 'role', role: 'scheduler' }, { kind: 'quotes_received', title: 'All printer quotes are in for ' + jid, body: j.product + ' · ' + n + ' quote(s) — compare and award.', jobId: jid });
   store.save(); return { ok: true, message: 'Quote update successfully!' };
 }
@@ -274,6 +274,7 @@ function requestPrinterQuotes(qid, b, actor) {
     store.notify({ type: 'customer', id }, { kind: 'printer_custom_quote', title: 'New custom quote request', body: ((q.requirement && q.requirement.product) || 'Custom job') + ' — submit your weight and price.', quoteId: qid });
     if (v.email) store.sendEmail('request-quote-printer', { to: v.email, name: v.name, subject: 'Custom quote request — ' + ((q.requirement && q.requirement.product) || qid), body: 'Hi ' + v.name + ',\n\nPrintoka would like your price for a custom job. Sign in to your printer account → Custom Quotes to submit it.' }); });
   q.printerActivity = q.printerActivity || []; q.printerActivity.push({ ts: now(), actor, action: 'Quote requested', note: ids.length + ' printer(s)' });
+  store.logEvent({ actor, role: 'scheduler_staff', action: 'request_printer_quote', jobId: null, quoteId: qid, from: null, to: null, note: qid + ' · ' + ids.length + ' printer(s)' });
   q.history = q.history || []; q.history.push({ ts: now(), actor, action: 'Asked printer for a quote', note: ids.map(id => (store.findCustomer(id) || {}).name).filter(Boolean).join(', ') });
   store.save(); return { quote: q };
 }

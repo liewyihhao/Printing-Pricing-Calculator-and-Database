@@ -51,11 +51,12 @@
   P.pShell = function (route, tabs, content) {
     const v = this.state.acView; const S = SHELL[route];
     const tab = tabs.indexOf(this.state.sTab) >= 0 ? this.state.sTab : tabs[0];
-    const shell = { tabs, active: tab, icon: S[1], accent: 'linear-gradient(180deg,#1f3b73,#2e6bd9)', sub: S[0], menu: [['Dashboard', () => this.setState({ acView: null, sTab: tabs[0] })]] };
+    const shell = { tabs, active: tab, icon: S[1], accent: 'linear-gradient(180deg,#1f3b73,#2e6bd9)', sub: S[0], menu: [['Dashboard', () => this.setState({ acView: null, sTab: tabs[0] })], ['Individual report', () => this.acOpen({ kind: 'individual' })]] };
     if (isDirector(this)) shell.menu = shell.menu.concat([['Prepress', () => this.go('prepress')], ['Scheduler', () => this.go('scheduler')], ['Logistics', () => this.go('logistics')], ['Director dashboard', () => this.go('production')]].filter(m => m[0] !== S[0]));
     let body;
     if (v && v.kind === 'job') { const d = this.acGet('job_' + v.id, '/api/jobs/' + encodeURIComponent(v.id)); const st = d && d.job ? STEP[d.job.status] || 1 : 0; if (st) shell.progress = { text: STEPS[st - 1] + ' - Step ' + st + ' of 5', width: st * 20 }; body = this.pJob(d, tabs); }
     else if (v && v.kind === 'quote') body = this.pQuote(v.id, tabs);
+    else if (v && v.kind === 'individual') body = this.opsIndividual(() => this.setState({ acView: null }));
     else body = content(tab);
     return this.acPage(shell, body);
   };
