@@ -474,16 +474,14 @@
   P.pOutsourceCard = function (j, pr) {
     const o = j.outsource || {}; const id = j.id;
     // only printers registered for this product and its finishing (Admin → Users & roles → printer company)
-    const vj = this.acGet('vendors_' + id, '/api/vendors?job=' + encodeURIComponent(id)) || {}; const vendors = vj.vendors || [], hidden = vj.hidden || [], need = vj.need || { finishes: [] };
+    const vj = this.acGet('vendors_' + id, '/api/vendors?job=' + encodeURIComponent(id)) || {}; const vendors = vj.vendors || [];
     const quotes = pr.quotes || [];
     const canAward = !o.awardedTo && ['scheduling', 'to_outsource'].indexOf(j.status) >= 0;
-    const toInhouse = (j.actions || []).find(a => a.action === 'choose_inhouse' && a.permitted);
     const rows = quotes.map(q => h('tr', { key: q.vendorId }, [q.vendorName, q.amount != null ? 'RM ' + Number(q.amount).toFixed(2) : 'no quote yet', q.leadDays ? q.leadDays + ' days' : '—',
       q.document ? link(q.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + q.document.id, q.document.name)) : '—',
       q.awarded ? this.pillDot('Awarded', 'ok') : canAward && q.submittedAt ? Btn('Award', () => this.pAwardModal(j, q)) : ''].map((c, i) => h('td', { key: i, style: { padding: '9px 8px', borderTop: '1px solid ' + LINE, fontSize: 13 } }, c))));
     return this.acC(o.awardedTo ? 'Outsourced' : 'Outsource', [
-      !o.awardedTo ? note('Choose the printer by cost, production time and delivery to the outlet or production only.') : null,
-      canAward && !quotes.length ? this.acDL([['Needs', (need.product || j.product) + (need.finishes.length ? ' · ' + need.finishes.join(', ') : '')], hidden.length ? ['Not shown', hidden.map(x => x.name + ' (' + x.why + ')').join(', ')] : null]) : null,
+      !o.awardedTo ? note(quotes.length ? 'Choose the printer by cost, production time and delivery to the outlet or production only.' : 'Select the printers to request for quotation.') : null,
       canAward && !quotes.length && vj.vendors && !vendors.length ? box('No registered printer can make this job. Ask Admin to add the product and finishing to a printer (Users & roles).', 'bad') : null,
       quotes.length ? h('div', { key: 't', style: { overflowX: 'auto' } }, h('table', { style: { width: '100%', borderCollapse: 'collapse' } }, h('thead', null, h('tr', null, ['Printer', 'Quote', 'Time', 'Document', ''].map(c => h('th', { key: c, style: { textAlign: 'left', padding: '6px 8px', fontSize: 12 } }, c)))), h('tbody', null, rows))) : null,
       canAward && !quotes.length ? [h('div', { key: 'v', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 8 } }, vendors.map(v => { const picked = this.acF('vids') || []; return h('label', { key: v.id, style: { display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: picked.indexOf(v.id) >= 0, onChange: () => this.acSetF('vids', picked.indexOf(v.id) >= 0 ? picked.filter(x => x !== v.id) : picked.concat([v.id])) }), v.name); })),
@@ -494,8 +492,7 @@
       o.awardedTo && j.status === 'outsourcing' ? note('Purchase order sent. Waiting for the printer to finish the job and enter the delivery details.') : null,
       // the scheduler pays the printer once Printoka has received the job
       inDept(this, 'scheduler') && pr.awarded && !pr.paidAt && pr.status && pr.status.id === 'shipped' ? Btn('Mark printer paid', () => this.pModal('Mark printer paid', [['reference', 'Payment reference', 'e.g. IBG-7781']], v => this.jPost('/api/jobs/' + id + '/vendor-paid', v, 'Printer marked paid.', () => this.setState({ acModal: null }))), 'primary') : null,
-      pr.paidAt ? box('Printer paid.', 'ok') : null,
-      toInhouse && !o.awardedTo ? h('div', { key: 'ih' }, Btn('Print in house instead', () => this.jPost('/api/jobs/' + id + '/transition', { action: 'choose_inhouse', payload: {} }, 'Moved to In House.'))) : null]);
+      pr.paidAt ? box('Printer paid.', 'ok') : null]);
   };
 
   // ---------------------------------------------------------------- pop-ups (one question each, one button)
