@@ -21,7 +21,7 @@ const seoProduct = require('./seo-product');
 
 const PORT = process.env.PORT || 4611;
 const WEB_ROOT = path.join(__dirname, '..'); // web/
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.woff2': 'font/woff2', '.map': 'application/json', '.pdf': 'application/pdf', '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon' };
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.woff2': 'font/woff2', '.ttf': 'font/ttf', '.map': 'application/json', '.pdf': 'application/pdf', '.webp': 'image/webp', '.gif': 'image/gif', '.ico': 'image/x-icon' };
 
 function send(res, code, body, type) {
   res.writeHead(code, { 'Content-Type': type || 'application/json; charset=utf-8', 'Cache-Control': 'no-cache' });

@@ -52,6 +52,14 @@
   const RM = n => 'RM' + Number(n || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   const dmy = ts => { const d = ts ? new Date(ts) : new Date(); return String(d.getDate()).padStart(2, '0') + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + d.getFullYear(); };
   const PT = 0.3528; // mm per point
+  // Printoka brand font (Montserrat, same as the templates and the site) embedded in every PDF;
+  // falls back to Helvetica only if the font files can't be loaded
+  const FONT_FILES = [['Montserrat_400Regular.ttf', 'normal'], ['Montserrat_600SemiBold.ttf', 'bold']];
+  let fontsP = null;
+  const toB64 = buf => { const u = new Uint8Array(buf); let s = ''; for (let i = 0; i < u.length; i += 0x8000) s += String.fromCharCode.apply(null, u.subarray(i, i + 0x8000)); return btoa(s); };
+  const loadFonts = () => fontsP || (fontsP = Promise.all(FONT_FILES.map(f => fetch('/assets/fonts/' + f[0]).then(r => { if (!r.ok) throw new Error('font'); return r.arrayBuffer(); }).then(b => [f[0], f[1], toB64(b)])))
+    .catch(() => { fontsP = null; return null; }));
+  const applyFonts = (doc, fonts) => { if (!fonts) return 'helvetica'; fonts.forEach(f => { doc.addFileToVFS(f[0], f[2]); doc.addFont(f[0], 'Montserrat', f[1]); }); return 'Montserrat'; };
   const addrLines = a => { if (!a) return []; if (typeof a === 'string') return a.split(/\n|,\s*(?=\d{5})/).map(s => s.trim()).filter(Boolean);
     return [a.name, a.company, a.phone, a.line1, a.line2, [a.postcode, a.city].filter(Boolean).join(', '), a.state, ({ MY: 'Malaysia', SG: 'Singapore', BN: 'Brunei' })[a.country] || a.country].filter(Boolean); };
   const orderNo = o => String(o.id || '').replace(/^PO-/, '');
@@ -65,6 +73,7 @@
     await loadLibs();
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ unit: 'mm', format: 'a4', compress: true });
+    const FONT = applyFonts(doc, await loadFonts());
     const no = orderNo(o);
     const cust = o.customer || {};
     const pickup = o.fulfillment && o.fulfillment.method === 'pickup';
@@ -91,11 +100,11 @@
 
     const FS = 7, LH = FS * PT * 1.4; // font size + line height like the original (7pt, ratio 1.4)
     const TOP = 107, BOTTOM = 252;
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(FS);
+    doc.setFont(FONT, 'normal'); doc.setFontSize(FS);
     // pre-wrap descriptions to the 102 mm column (minus padding)
     rows.forEach(r => {
-      doc.setFont('helvetica', 'bold'); r.nameLines = doc.splitTextToSize(String(r.name || ''), 96);
-      doc.setFont('helvetica', 'normal'); r.wrapped = r.lines.reduce((a, l) => a.concat(doc.splitTextToSize(String(l), 96)), []);
+      doc.setFont(FONT, 'bold'); r.nameLines = doc.splitTextToSize(String(r.name || ''), 96);
+      doc.setFont(FONT, 'normal'); r.wrapped = r.lines.reduce((a, l) => a.concat(doc.splitTextToSize(String(l), 96)), []);
       r.height = (r.nameLines.length + r.wrapped.length) * LH + 4;
     });
     // paginate
@@ -107,24 +116,24 @@
       if (p) doc.addPage();
       await drawTemplate(doc, kind);
       // header (original coordinates: TCPDF writeHTMLCell top-left → baseline ≈ top + 0.8·size)
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(6); doc.setTextColor(223, 8, 8);
+      doc.setFont(FONT, 'normal'); doc.setFontSize(6); doc.setTextColor(223, 8, 8);
       doc.textWithLink('print@printoka.com', 61.9, 37.2, { url: 'mailto:print@printoka.com' });
       doc.setTextColor(33, 33, 33); doc.setFontSize(8);
-      doc.setFont('helvetica', 'bold'); doc.text(docNo, kind === 'invoice' ? 164.8 : 162.2, 30.3);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.text('Date: ' + dmy(o.createdAt), 196.5, 37.4, { align: 'right' });
+      doc.setFont(FONT, 'bold'); doc.text(docNo, kind === 'invoice' ? 164.8 : 162.2, 30.3);
+      doc.setFont(FONT, 'normal'); doc.setFontSize(7.5); doc.text('Date: ' + dmy(o.createdAt), 196.5, 37.4, { align: 'right' });
       // customer box
       doc.setFontSize(FS);
       doc.text((o.userId || 'Guest') + (cust.name ? '  ·  ' + cust.name : ''), 34.2, 51.0);
       doc.text(pcr, 57.6, 55.4);
-      if (o.payment && o.payment.status === 'validated' && kind === 'invoice') { doc.setFont('helvetica', 'bold'); doc.setTextColor(61, 139, 64); doc.text('PAID', 196.5, 51.0, { align: 'right' }); doc.setTextColor(33, 33, 33); doc.setFont('helvetica', 'normal'); }
+      if (o.payment && o.payment.status === 'validated' && kind === 'invoice') { doc.setFont(FONT, 'bold'); doc.setTextColor(61, 139, 64); doc.text('PAID', 196.5, 51.0, { align: 'right' }); doc.setTextColor(33, 33, 33); doc.setFont(FONT, 'normal'); }
       billing.slice(0, 7).forEach((l, i) => doc.text(doc.splitTextToSize(l, 80)[0], 16.6, 66.9 + i * LH));
       shipping.slice(0, 7).forEach((l, i) => doc.text(doc.splitTextToSize(l, 80)[0], 101.8, 66.9 + i * LH));
       // item rows
       pages[p].forEach(r => {
         let ty = r.y + 3.4;
-        doc.setFont('helvetica', 'normal'); doc.text(String(idx++), 14, ty);
-        doc.setFont('helvetica', 'bold'); r.nameLines.forEach((l, i) => doc.text(l, 24, ty + i * LH));
-        doc.setFont('helvetica', 'normal'); r.wrapped.forEach((l, i) => doc.text(l, 24, ty + (r.nameLines.length + i) * LH));
+        doc.setFont(FONT, 'normal'); doc.text(String(idx++), 14, ty);
+        doc.setFont(FONT, 'bold'); r.nameLines.forEach((l, i) => doc.text(l, 24, ty + i * LH));
+        doc.setFont(FONT, 'normal'); r.wrapped.forEach((l, i) => doc.text(l, 24, ty + (r.nameLines.length + i) * LH));
         doc.text(Number(r.qty).toLocaleString('en-US'), 126, ty);
         doc.text(r.uom != null ? r.uom : 'pcs', 138, ty);
         doc.text(RM(r.unit), 171, ty, { align: 'right' });
@@ -137,7 +146,7 @@
         doc.text(RM(o.shipping || 0), 194.5, Y[0], { align: 'right' });
         doc.text(o.couponDiscount ? '-' + RM(o.couponDiscount) : '-', 194.5, Y[1], { align: 'right' });
         doc.text(o.memberDiscount ? '-' + RM(o.memberDiscount) : '-', 194.5, Y[2], { align: 'right' });
-        doc.setFont('helvetica', 'bold'); doc.setFontSize(8); doc.text(RM(o.total), 194.5, Y[3], { align: 'right' }); doc.setFont('helvetica', 'normal');
+        doc.setFont(FONT, 'bold'); doc.setFontSize(8); doc.text(RM(o.total), 194.5, Y[3], { align: 'right' }); doc.setFont(FONT, 'normal');
       } else { doc.setFontSize(6.5); doc.setTextColor(120, 120, 120); doc.text('Continued on next page', 194.5, 275.4, { align: 'right' }); doc.setTextColor(33, 33, 33); }
       doc.setFontSize(6.5); doc.setTextColor(120, 120, 120);
       doc.text('Page ' + (p + 1) + ' of ' + pages.length, 196, 289, { align: 'right' });
@@ -158,8 +167,9 @@
     await loadLibs();
     const { jsPDF } = window.jspdf; const kind = d.kind, S = PAGE[kind];
     const doc = new jsPDF({ unit: 'mm', format: [S[0], S[1]], orientation: S[0] > S[1] ? 'landscape' : 'portrait', compress: true });
+    const FONT = applyFonts(doc, await loadFonts());
     await drawTemplate(doc, kind);
-    doc.setTextColor(33, 33, 33); doc.setFont('helvetica', 'normal');
+    doc.setTextColor(33, 33, 33); doc.setFont(FONT, 'normal');
     const J = d.job || {};
     if (kind === 'purchase-order') {
       doc.setFontSize(6); doc.setTextColor(223, 8, 8); doc.textWithLink('print@printoka.com', 60.866, 35.4 + 6 * PT, { url: 'mailto:print@printoka.com' }); doc.setTextColor(33, 33, 33);
@@ -167,7 +177,7 @@
       cellText(doc, [String(d.poNumber || '')], 145, 27.5, 7, 1.4);
       cellText(doc, [d.vendor && d.vendor.name].concat(String((d.vendor && d.vendor.address) || '').split(/\n|,\s*(?=\d{5})/)), 15, 53, 7, 1.4, 60);
       const sh = d.shipping || {}; cellText(doc, [sh.name].concat(String(sh.address || '').split(/\n/), [sh.phone]), 100, 53, 7, 1.4, 60);
-      doc.setFont('helvetica', 'bold'); cellText(doc, [J.product], 25, 110, 7, 1.4, 90); doc.setFont('helvetica', 'normal');
+      doc.setFont(FONT, 'bold'); cellText(doc, [J.product], 25, 110, 7, 1.4, 90); doc.setFont(FONT, 'normal');
       cellText(doc, jobLines(J).slice(1), 25, 110 + 7 * PT * 1.4, 7, 1.4, 90);
       const amt = d.amount != null ? Number(d.amount).toFixed(2) : '';
       cellText(doc, ['1'], 126, 110, 7, 1.4); cellText(doc, [amt], 148, 110, 7, 1.4); cellText(doc, [amt], 173, 110, 7, 1.4); cellText(doc, [amt], 173, 272.5, 7, 1.4);
@@ -180,17 +190,17 @@
       cellText(doc, [o.name], 25, 90, 9, 1.4, 105);
       cellText(doc, String(o.address || '').split(/,\s*/).reduce((a, p) => { const last = a[a.length - 1]; if (last && (last + ', ' + p).length < 42) a[a.length - 1] = last + ', ' + p; else a.push(p); return a; }, []), 25, 100, 9, 1.4, 105);
       cellText(doc, [o.phone], 25, 130, 9, 1.4);
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(16); cellText(doc, [o.postcode], 85, 130, 16, 1.4);
+      doc.setFont(FONT, 'bold'); doc.setFontSize(16); cellText(doc, [o.postcode], 85, 130, 16, 1.4);
       doc.setFontSize(12); cellText(doc, [o.orderNumber], 165, 11, 12, 1.4);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(8); cellText(doc, jobLines(J), 140, 30, 8, 1.75, 60);
+      doc.setFont(FONT, 'normal'); doc.setFontSize(8); cellText(doc, jobLines(J), 140, 30, 8, 1.75, 60);
     } else if (kind === 'hub-label') {
       const hb = d.hub || {};
       doc.setFontSize(7.5);
       cellText(doc, [hb.name], 25, 30.5, 7.5, 1.5, 70);
       cellText(doc, String(hb.address || '').split(/\n|,\s*(?=\d{5})/), 25, 40.5, 7.5, 1.5, 70);
       cellText(doc, [hb.phone], 25, 90.5, 7.5, 1.5);
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(10); cellText(doc, [String(d.poNumber || '')], 112, 10, 10, 1.4);
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); cellText(doc, jobLines(J), 100, 30, 7, 1.4, 40);
+      doc.setFont(FONT, 'bold'); doc.setFontSize(10); cellText(doc, [String(d.poNumber || '')], 112, 10, 10, 1.4);
+      doc.setFont(FONT, 'normal'); doc.setFontSize(7); cellText(doc, jobLines(J), 100, 30, 7, 1.4, 40);
     }
     doc.setProperties({ title: ({ 'purchase-order': 'Purchase Order ', 'shipping-label': 'Shipping Label ', 'hub-label': 'Hub Label ' })[kind] + (d.poNumber || d.jobId), author: 'Printoka', creator: 'Printoka' });
     return doc;
