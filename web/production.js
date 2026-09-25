@@ -40,8 +40,8 @@
   const inDept = (c, d) => isDirector(c) || deptOf(c) === d;
 
   // queues (guidebook §1.8 steps)
-  const Q = { prepress: ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
-  const STEP = { intake: 1, prepress: 2, prepress_issue: 2, escalated: 2, rejected: 2, scheduling: 3, printing: 4, outsourcing: 4, printed: 5, inbound: 5, logistics: 5, dispatched: 5, at_hub: 5, ready_collect: 5, completed: 5, cancelled: 5 };
+  const Q = { prepress: ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected', 'artwork_ready'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
+  const STEP = { intake: 1, prepress: 2, prepress_issue: 2, escalated: 2, rejected: 2, artwork_ready: 2, scheduling: 3, printing: 4, outsourcing: 4, printed: 5, inbound: 5, logistics: 5, dispatched: 5, at_hub: 5, ready_collect: 5, completed: 5, cancelled: 5 };
   const STEPS = ['Order entered', 'Prepress', 'Scheduler', 'Printing', 'Logistics'];
   const overdue = j => j.deadline && Date.parse(j.deadline) < Date.now() && ['completed', 'cancelled', 'ready_collect'].indexOf(j.status) < 0;
   // how many days the job has sat at its current step without moving forward (from the order date for a new order):
@@ -70,7 +70,7 @@
   P.pTable = function (key, title, jobs, extra) {
     const list = jobs.slice().sort((a, b) => { const da = a.deadline ? Date.parse(a.deadline) : Infinity, db = b.deadline ? Date.parse(b.deadline) : Infinity; if (da !== db) return da - db; return (Date.parse(a.paymentValidatedAt || 0) || Infinity) - (Date.parse(b.paymentValidatedAt || 0) || Infinity); });
     // "Handled by": who took the job in the department it is in now
-    const handler = j => { const dq = j.queue || ({ intake: 'prepress', prepress: 'prepress', prepress_issue: 'prepress', escalated: 'prepress', rejected: 'prepress', scheduling: 'scheduler', printing: 'scheduler', outsourcing: 'scheduler' })[j.status] || 'logistics'; return (j.owner || {})[dq] || '—'; };
+    const handler = j => { const dq = j.queue || ({ intake: 'prepress', prepress: 'prepress', prepress_issue: 'prepress', escalated: 'prepress', rejected: 'prepress', artwork_ready: 'prepress', scheduling: 'scheduler', printing: 'scheduler', outsourcing: 'scheduler' })[j.status] || 'logistics'; return (j.owner || {})[dq] || '—'; };
     return this.acList({ key, title, action: extra, cols: ['Date', 'Job', 'Product', 'Customer', 'Days', 'Handled by', 'Status'],
       rows: list.map(j => ({ date: j.createdAt, status: j.statusLabel || j.status, search: [j.id, j.orderId, j.customer, j.product, handler(j)],
         cells: [h('span', { style: { whiteSpace: 'nowrap' } }, dmy(j.createdAt)), link('#' + j.id, () => openJob(this, j)), j.product, j.customer, daysBadge(j), handler(j), this.pillDot(j.statusLabel || j.status, tone(j))] })) });
@@ -80,7 +80,7 @@
 
   // ================================================================== PREPRESS
   // prepress tabs and the statuses each one lists
-  const PREPRESS_TABS = { 'New Orders': ['intake'], 'Preflight': ['prepress', 'escalated'], 'Pending Approval': ['prepress_issue'], 'Pending Amendment': ['rejected'] };
+  const PREPRESS_TABS = { 'New Orders': ['intake'], 'Preflight': ['prepress', 'escalated', 'artwork_ready'], 'Pending Approval': ['prepress_issue'], 'Pending Amendment': ['rejected'] };
   // each department's tabs; the Production Director sees the same dashboards inside the director account
   const DEPT_TABS = {
     prepress: c => ['Dashboard', 'New Orders', 'Preflight', 'Pending Approval', 'Pending Amendment'].concat(isManager(c) ? ['KPI', 'Daily report'] : []),
@@ -250,7 +250,7 @@
     const main = [];
     // logistics pages (1 Received · 2 Print label · 3 Shipping): the step on the left, order details on the right
     const logPage = ['inbound', 'printed', 'logistics'].indexOf(j.status) >= 0 && inDept(this, 'logistics') && deptOf(this) !== 'scheduler';
-    const card = this.pStepCard(j, pr, acts, d.order); if (card) main.push(card);
+    const card = this.pStepCard(j, pr, acts, d.order, d.siblings); if (card) main.push(card);
     if (j.outsource && inDept(this, 'scheduler') && !logPage) main.push(this.pOutsourceCard(j, pr));
     const orderCard = this.acC('Order details', [h('b', { key: 'p' }, j.product), this.acSpec((pr.job && pr.job.spec) || j.spec),
       this.acDL([['Quantity', (j.qty || 0).toLocaleString()], ['Customer', j.customer], ['Due', j.deadline ? when(j.deadline) + (overdue(j) ? ' — overdue' : '') : '—'], ['Deliver to', j.finalDestination ? (j.finalDestination.name || j.finalDestination.type) + (j.finalDestination.address ? ', ' + j.finalDestination.address : '') : '—'], j.instructions ? ['Instructions', j.instructions] : null, j.machine ? ['Machine', j.machine + (j.slot ? ' · ' + when(j.slot) : '')] : null]),
@@ -273,7 +273,7 @@
     return this.acSingle({ home: tabs[0], type: typeTab, title: '#' + id, statusNode: this.pillDot(j.statusLabel || j.status, tone(j)) }, main, aside);
   };
   // the one card for the step the job is at — only the department that owns the step can act
-  P.pStepCard = function (j, pr, acts, order) {
+  P.pStepCard = function (j, pr, acts, order, siblings) {
     const id = j.id, st = j.status, role = this.userRole();
     const act = (action, payload, ok) => this.jPost('/api/jobs/' + id + '/transition', { action, payload: payload || {} }, ok, () => this.setState({ acModal: null, acForm: {} }));
     const blocked = a => a && a.blockedBy && a.blockedBy.length ? box(a.blockedBy.join(' '), 'bad') : null;
@@ -306,6 +306,15 @@
             !paid ? Btn('Upload payment proof', uploadProof) : null,
             !paid && pay.proofFileId && o.id ? Btn('Validate the customer’s proof', () => this.jPost('/api/orders/' + o.id + '/pay', {}, 'Payment validated.')) : null,
             acts.process ? Btn('Process Order', () => act('process', {}, 'Order processed — now in preflight.'), 'primary', !acts.process.enabled) : null)]);
+      }
+      // approved, held until every other artwork on the order is approved — then the whole order goes to the scheduler
+      if (st === 'artwork_ready') {
+        const waiting = (siblings || []).filter(x => ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected'].indexOf(x.status) >= 0);
+        return this.acC('Artwork approved', [
+          box('This artwork is approved. The order goes to the Scheduler once every item on it is approved.', 'ok'),
+          (siblings || []).length ? h('div', { key: 'sib', style: { display: 'flex', flexDirection: 'column', gap: 8 } }, h('b', { style: { fontSize: 13.5 } }, 'Items on this order'),
+            siblings.map(x => h('div', { key: x.id, style: { display: 'flex', alignItems: 'center', gap: 10, fontSize: 13.5 } },
+              link('#' + x.id, () => this.acOpen({ kind: 'job', id: x.id })), h('span', { style: { flex: 1 } }, x.product), this.pillDot(x.statusLabel, waiting.some(w => w.id === x.id) ? 'warn' : 'ok')))) : null]);
       }
       if (st === 'escalated' && !acts.approve) return this.acC('Escalated', [box('Escalated to the prepress manager: ' + (j.reason || '') + '. Waiting for the manager’s decision.')]);
       // Pending Customer Amendment (major issue): prepress asked the customer for a new file

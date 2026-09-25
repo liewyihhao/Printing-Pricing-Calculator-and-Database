@@ -140,6 +140,9 @@ function migrate() {
     if ((j.destination || {}).type === 'hub' && ['scheduling', 'printing', 'printed', 'logistics'].indexOf(j.status) >= 0) { j.destination = Object.assign({}, j.finalDestination); makeLabel(j); }
     if ((j.destination || {}).type === 'hub' && j.status === 'outsourcing') { j.destination = destOf('production', null, j); makeLabel(j); }
   });
+  // an order reaches the scheduler only once every artwork on it is approved: hold approved items whose siblings are still in prepress
+  const open = ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected'];
+  (db.jobs || []).forEach(j => { if (j.status === 'scheduling' && j.orderId && (db.jobs || []).some(x => x.orderId === j.orderId && x.id !== j.id && open.indexOf(x.status) >= 0)) { j.status = 'artwork_ready'; j.statusAt = Object.assign(j.statusAt || {}, { artwork_ready: j.statusAt && j.statusAt.scheduling || new Date().toISOString() }); } });
   store.save();
 }
 
@@ -156,7 +159,7 @@ function syncOrder(oid) {
   else if (all(['ready_collect', 'completed'])) p = 'ready_for_collection';
   else if (all(['dispatched', 'at_hub', 'ready_collect', 'completed'])) p = 'shipped';
   else if (any(['scheduling', 'printing', 'outsourcing', 'printed', 'inbound', 'logistics', 'dispatched', 'at_hub', 'ready_collect', 'completed'])) p = 'in_production';
-  else if (any(['prepress', 'prepress_issue', 'escalated'])) p = 'artwork_check';
+  else if (any(['prepress', 'prepress_issue', 'escalated', 'artwork_ready'])) p = 'artwork_check';
   if (o.progress !== p) { o.progress = p; o.progressLabel = PROGRESS_LABEL[p]; o.progressAt = now(); }
   return o;
 }
@@ -243,10 +246,27 @@ function requestArtworkApproval(j, payload, actor) {
   }
   j.approvalRequest = req;
 }
+// An order reaches the scheduler only when prepress has approved EVERY artwork on it (user, 2026-09-25):
+// an approved item waits as "Artwork Approved" while its siblings are still in prepress; the last approval releases them all.
+const PREPRESS_OPEN = ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected'];
+const siblingsOf = j => j.orderId ? store.jobs().filter(x => x.orderId === j.orderId && x.id !== j.id && x.status !== 'cancelled') : [];
+function holdOrRelease(j, actor) {
+  const sibs = siblingsOf(j);
+  if (sibs.some(x => PREPRESS_OPEN.indexOf(x.status) >= 0)) {
+    j.status = 'artwork_ready'; j.statusAt.artwork_ready = now();
+    store.logEvent({ actor, role: 'system', action: 'hold_for_order', jobId: j.id, from: 'scheduling', to: 'artwork_ready', note: 'Artwork approved — waiting for the other items on ' + j.orderId });
+    return;
+  }
+  sibs.filter(x => x.status === 'artwork_ready').forEach(x => {
+    normalizeJob(x); x.status = 'scheduling'; x.statusAt.scheduling = now(); x.updatedAt = now();
+    store.logEvent({ actor, role: 'system', action: 'release_order', jobId: x.id, from: 'artwork_ready', to: 'scheduling', note: 'All artwork on ' + j.orderId + ' approved — to the scheduler' });
+  });
+}
 function afterTransition(j, from, to, action, actor, payload) {
   payload = payload || {};
   normalizeJob(j);
   if (action === 'flag_minor') requestArtworkApproval(j, payload, actor);
+  if (to === 'scheduling') { holdOrRelease(j, actor); if (j.status !== 'scheduling') { syncOrder(j.orderId); store.save(); return; } }
   j.statusAt[to] = now();
   if (to === 'printing') j.route = 'inhouse';
   if (to === 'outsourcing') j.route = 'outsource';
@@ -300,6 +320,7 @@ function transition(jid, role, actor, action, payload) {
   const r = store.applyTransition(jid, role, actor, action, payload || {});
   if (r.error) return r;
   afterTransition(r.job, r.from, r.to, action, actor, payload || {});
+  r.to = r.job.status; // e.g. an approved item held as Artwork Approved until the rest of its order is approved
   return r;
 }
 
@@ -422,7 +443,7 @@ function dailySeries(events, days) {
   return out;
 }
 // ---- daily reporting (§1.6): morning (start of day) and end-of-day, manager → director ----------
-const QUEUE = { prepress: ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
+const QUEUE = { prepress: ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected', 'artwork_ready'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
 const LEAVES = { prepress: ['approve', 'reject_major'], scheduler: ['finish', 'vendor_ship', 'vendor_ship_outlet'], logistics: ['dispatch'] };
 const startOfDay = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
 function reportFigures(dept) {

@@ -48,6 +48,8 @@ const STATUS = {
   prepress: { label: 'Preflight', queue: 'prepress', step: 2 },
   prepress_issue: { label: 'Pending Approval', queue: 'prepress', step: 2 },
   escalated: { label: 'Escalated to Manager', queue: 'prepress', step: 2 },
+  // approved, but held in prepress until every artwork on the same order is approved (then all go to the scheduler together)
+  artwork_ready: { label: 'Artwork Approved', queue: 'prepress', step: 2 },
   rejected: { label: 'Pending Amendment', queue: 'prepress', step: 2 },
   scheduling: { label: 'New Order', queue: 'scheduler', step: 3 },
   printing: { label: 'Printing — in-house', queue: 'scheduler', step: 4 },

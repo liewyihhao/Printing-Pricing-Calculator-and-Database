@@ -98,7 +98,9 @@ async function api(req, res, pathname, query) {
     const o = j.orderId ? store.order(j.orderId) : null;
     // prepress "New Order" check: the order, its payment and the customer's account
     const acct = o && o.userId ? store.findCustomer(o.userId) : null;
-    return send(res, 200, { job: jobView(j, role), handlers: ops.handlers(j), printing: supplier.view(j, me0), audit: store.audit({ jobId: seg[1] }), order: o && me0.type !== 'hub' ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items, files: (o.files || []).filter(f => f.kind === 'artwork'),
+    // the other items on the same order (an order goes to the scheduler only when every artwork is approved)
+    const siblings = j.orderId ? store.jobs().filter(x => x.orderId === j.orderId && x.id !== j.id).map(x => ({ id: x.id, product: x.product, status: x.status, statusLabel: (D.STATUS[x.status] || {}).label || x.status })) : [];
+    return send(res, 200, { job: jobView(j, role), siblings, handlers: ops.handlers(j), printing: supplier.view(j, me0), audit: store.audit({ jobId: seg[1] }), order: o && me0.type !== 'hub' ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items, files: (o.files || []).filter(f => f.kind === 'artwork'),
       fromQuote: o.fromQuote || null, outlet: o.outlet || null, channel: o.channel || 'online', account: acct ? { name: acct.name, email: acct.email, phone: acct.phone || '', tier: acct.tier || 'Standard', since: acct.createdAt || null, disabled: !!acct.disabled } : null } : null });
   }
   // ---- printers & hubs (original printoka-3rd-party-supplier flow) ----

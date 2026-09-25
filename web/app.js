@@ -4768,7 +4768,7 @@ class Component extends DCLogic {
 
   // ===== ORDER TRACKING =====
   trackStage(status) {
-    const map = { intake: 0, prepress: 1, prepress_issue: 1, escalated: 1, rejected: 1, scheduling: 2, printing: 2, outsourcing: 2, printed: 2, inbound: 2, logistics: 2, dispatched: 3, at_hub: 3, ready_collect: 3, completed: 4 };
+    const map = { intake: 0, prepress: 1, prepress_issue: 1, escalated: 1, rejected: 1, artwork_ready: 1, scheduling: 2, printing: 2, outsourcing: 2, printed: 2, inbound: 2, logistics: 2, dispatched: 3, at_hub: 3, ready_collect: 3, completed: 4 };
     return map[status] != null ? map[status] : 0;
   }
   s_track() {
@@ -4797,7 +4797,7 @@ class Component extends DCLogic {
       const s = j.status, toOutlet = (j.finalDestination || {}).type === 'outlet';
       if (s === 'intake') return 'Order received';
       if (s === 'rejected') return 'Action needed: artwork';
-      if (['prepress', 'prepress_issue', 'escalated'].indexOf(s) >= 0) return 'Artwork check';
+      if (['prepress', 'prepress_issue', 'escalated', 'artwork_ready'].indexOf(s) >= 0) return 'Artwork check';
       if (s === 'dispatched') return toOutlet ? 'On the way to the outlet' : 'Shipped';
       if (s === 'ready_collect') return 'Ready to collect';
       if (s === 'completed') return toOutlet ? 'Collected' : 'Delivered';
