@@ -310,20 +310,19 @@
         ['Content check', ['No missing fonts', 'No alignment issues', 'No cropping errors']]];
       const ticked = this.acF('fc') || {}; const allTicked = CL.every(g => g[1].every(x => ticked[x]));
       const approve = acts.approve;
-      // each checklist section opens in a pop-up: tick one by one, or approve the whole section
+      // each checklist section is a drop-down: tick one by one, or approve the whole section
       const setTicks = obj => this.setState(s => ({ acForm: Object.assign({}, s.acForm, { fc: Object.assign({}, (s.acForm || {}).fc, obj) }) }));
-      const openSection = g => this.setState({ acModal: { title: g[0], body: () => {
-        const t = this.acF('fc') || {}, all = g[1].every(x => t[x]);
-        return [h('div', { key: 'l', style: { display: 'flex', flexDirection: 'column', gap: 10 } }, g[1].map(x => h('label', { key: x, style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, cursor: 'pointer' } },
-            h('input', { type: 'checkbox', checked: !!t[x], onChange: () => setTicks({ [x]: !t[x] }), style: { width: 18, height: 18 } }), x))),
-          h('div', { key: 'b', style: { display: 'flex', gap: 8, flexWrap: 'wrap' } },
-            Btn(all ? 'All approved' : 'Approve all', () => { const o = {}; g[1].forEach(x => { o[x] = true; }); setTicks(o); this.setState({ acModal: null }); }, 'primary', all),
-            Btn('Done', () => this.setState({ acModal: null })))];
-      } } });
-      const sectionRow = g => { const n = g[1].filter(x => ticked[x]).length, done = n === g[1].length;
-        return h('div', { key: g[0], onClick: () => openSection(g), style: { display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', border: '1px solid ' + HAIR, borderRadius: 10, cursor: 'pointer', background: '#fff' } },
-          h('b', { style: { fontSize: 14, flex: 1 } }, g[0]), h('span', { style: { fontSize: 13, color: MUT } }, n + ' of ' + g[1].length),
-          this.pillDot(done ? 'Approved' : 'To Check', done ? 'ok' : 'warn'), h('span', { style: { color: FAINT, fontSize: 18 } }, '›')); };
+      const openSec = this.state.pfOpen || null;
+      const sectionRow = g => { const n = g[1].filter(x => ticked[x]).length, done = n === g[1].length, open = openSec === id + '|' + g[0];
+        return h('div', { key: g[0], style: { border: '1px solid ' + HAIR, borderRadius: 10, background: '#fff', overflow: 'hidden' } },
+          h('div', { onClick: () => this.setState({ pfOpen: open ? null : id + '|' + g[0] }), style: { display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', cursor: 'pointer' } },
+            h('b', { style: { fontSize: 14, flex: 1 } }, g[0]), h('span', { style: { fontSize: 13, color: MUT } }, n + ' of ' + g[1].length),
+            this.pillDot(done ? 'Approved' : 'To Check', done ? 'ok' : 'warn'),
+            h('span', { style: { color: FAINT, fontSize: 12, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .15s' } }, '▼')),
+          open ? h('div', { style: { borderTop: '1px solid ' + HAIR, padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: 10 } },
+            g[1].map(x => h('label', { key: x, style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, cursor: 'pointer' } },
+              h('input', { type: 'checkbox', checked: !!ticked[x], onChange: () => setTicks({ [x]: !ticked[x] }), style: { width: 18, height: 18 } }), x)),
+            h('div', null, Btn(done ? 'All approved' : 'Approve all', () => { const o = {}; g[1].forEach(x => { o[x] = true; }); setTicks(o); this.setState({ pfOpen: null }); }, 'primary', done))) : null); };
       return this.acC(st === 'prepress_issue' ? 'Pending customer approval' : 'Preflight', [
         st === 'prepress_issue' ? box('Amended: ' + (j.reason || '') + '. Waiting for the customer to approve the amended file.') : null,
         st !== 'prepress_issue' ? h('div', { key: 'secs', style: { display: 'flex', flexDirection: 'column', gap: 10 } }, CL.map(sectionRow)) : null,
