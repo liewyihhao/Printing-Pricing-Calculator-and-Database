@@ -281,10 +281,14 @@
           this.acDL([['Order', o.id || j.orderId], ['From', o.fromQuote ? 'Outlet quotation ' + o.fromQuote + (o.outlet ? ' · ' + String(o.outlet).replace(/-/g, ' ') : '') : (o.channel === 'outlet' ? 'Outlet' : 'Website order')],
             ['Placed', o.createdAt ? when(o.createdAt) : '—'], ['Total', o.total != null ? this.rm(o.total) : '—']]),
           h('b', { key: 'ph' }, 'Payment'),
-          this.acDL([['Method', pay.gateway || pay.method || '—'], ['Status', this.pillDot(paid ? (j.creditTerms && pay.status !== 'validated' ? 'Credit Terms' : 'Paid') : 'Not Paid', paid ? 'ok' : 'bad')], pay.reference ? ['Reference', pay.reference] : null]),
+          // prepress checks the payment and validates it (bank transfer: against the bank-in slip / the bank account)
+          this.acDL([['Method', pay.gateway || pay.method || '—'], ['Status', this.pillDot(paid ? (j.creditTerms && pay.status !== 'validated' ? 'Credit Terms' : 'Paid') : 'Not Paid', paid ? 'ok' : 'bad')], pay.reference ? ['Reference', pay.reference] : null,
+            pay.proof ? ['Bank-in slip', pay.proofFileId ? link('📄 ' + pay.proof, () => this.openOrderFile(o.id, { id: pay.proofFileId, name: pay.proof })) : pay.proof] : null,
+            pay.validatedBy ? ['Validated by', pay.validatedBy + (pay.validatedAt ? ' · ' + when(pay.validatedAt) : '')] : null]),
+          !paid && o.id ? h('div', { key: 'vp' }, Btn('Payment received — validate', () => this.jPost('/api/orders/' + o.id + '/pay', {}, 'Payment validated.'))) : null,
           h('b', { key: 'ch' }, 'Customer'),
           this.acDL([['Name', c.name || j.customer], ['Email', c.email || '—'], ['Phone', c.phone || '—'], ['Account', ac ? (ac.disabled ? 'Disabled account' : ac.tier + ' member' + (ac.since ? ' since ' + dmy(ac.since) : '')) : 'Guest (no account)']]),
-          !paid ? box('Payment has not been received yet. The order can be processed once it is paid.', 'bad') : null,
+          !paid ? box('Check the payment. Validate it once the money is received — the order can then be processed.', 'bad') : null,
           acts.process ? h('div', { key: 'b' }, Btn('Mark order processed', () => act('process', {}, 'Order processed — now in preflight.'), 'primary', !acts.process.enabled)) : null]);
       }
       if (st === 'escalated' && !acts.approve) return this.acC('Escalated', [box('Escalated to the prepress manager: ' + (j.reason || '') + '. Waiting for the manager’s decision.')]);

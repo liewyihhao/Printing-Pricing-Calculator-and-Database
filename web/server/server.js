@@ -357,7 +357,7 @@ async function api(req, res, pathname, query) {
   if (seg[0] === 'orders' && seg[2] === 'pay' && req.method === 'POST') {
     const payer = staffMe(); if (!payer || payer.type === 'vendor' || payer.type === 'hub') return send(res, 401, { error: 'staff sign-in required' });
     const r = store.validateOrderPayment(seg[1], payer.name || payer.email);
-    if (!r.error) outlet.onPaid(store.order(seg[1]));
+    if (!r.error) { const po = store.order(seg[1]); po.payment.validatedBy = payer.name || payer.email; po.payment.validatedAt = store.now(); outlet.onPaid(po); }
     if (!r.error) { const o = store.order(seg[1]); (o.jobIds || []).forEach(jid => { const jj = store.job(jid); if (jj) { ops.normalizeJob(jj); jj.statusAt = Object.assign(jj.statusAt || {}, { [jj.status]: store.now() }); } }); ops.syncOrder(seg[1]); store.save(); }
     if (r.error) return send(res, 400, r);
     return send(res, 200, { ok: true, order: store.orderView(seg[1]) });
