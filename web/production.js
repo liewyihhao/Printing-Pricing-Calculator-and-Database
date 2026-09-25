@@ -300,12 +300,24 @@
         ['Technical check', ['Resolution at least 300 dpi', 'Colour mode is CMYK', 'Bleed at least 3 mm', 'Safe margin respected', 'Fonts outlined / embedded', 'No white lines', 'No RGB colour', 'No complex or risky die-cutting', 'No Pantone colour', 'No elements outside the safe zone', 'No similar colours under 10%', 'No toning / colour under 10%']],
         ['Content check', ['No missing fonts', 'No alignment issues', 'No cropping errors']]];
       const ticked = this.acF('fc') || {}; const allTicked = CL.every(g => g[1].every(x => ticked[x]));
-      const tick = x => this.acSetF('fc', Object.assign({}, ticked, { [x]: !ticked[x] }));
       const approve = acts.approve;
+      // each checklist section opens in a pop-up: tick one by one, or approve the whole section
+      const setTicks = obj => this.setState(s => ({ acForm: Object.assign({}, s.acForm, { fc: Object.assign({}, (s.acForm || {}).fc, obj) }) }));
+      const openSection = g => this.setState({ acModal: { title: g[0], body: () => {
+        const t = this.acF('fc') || {}, all = g[1].every(x => t[x]);
+        return [h('div', { key: 'l', style: { display: 'flex', flexDirection: 'column', gap: 10 } }, g[1].map(x => h('label', { key: x, style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 14, cursor: 'pointer' } },
+            h('input', { type: 'checkbox', checked: !!t[x], onChange: () => setTicks({ [x]: !t[x] }), style: { width: 18, height: 18 } }), x))),
+          h('div', { key: 'b', style: { display: 'flex', gap: 8, flexWrap: 'wrap' } },
+            Btn(all ? 'All approved' : 'Approve all', () => { const o = {}; g[1].forEach(x => { o[x] = true; }); setTicks(o); this.setState({ acModal: null }); }, 'primary', all),
+            Btn('Done', () => this.setState({ acModal: null })))];
+      } } });
+      const sectionRow = g => { const n = g[1].filter(x => ticked[x]).length, done = n === g[1].length;
+        return h('div', { key: g[0], onClick: () => openSection(g), style: { display: 'flex', alignItems: 'center', gap: 12, padding: '14px 16px', border: '1px solid ' + HAIR, borderRadius: 10, cursor: 'pointer', background: '#fff' } },
+          h('b', { style: { fontSize: 14, flex: 1 } }, g[0]), h('span', { style: { fontSize: 13, color: MUT } }, n + ' of ' + g[1].length),
+          this.pillDot(done ? 'Approved' : 'To Check', done ? 'ok' : 'warn'), h('span', { style: { color: FAINT, fontSize: 18 } }, '›')); };
       return this.acC(st === 'prepress_issue' ? 'Pending customer approval' : 'Preflight', [
-        st === 'prepress_issue' ? box('Amended: ' + (j.reason || '') + '. Waiting for the customer to approve the amended file.') : note('Check the artwork against every point, then choose the result.'),
-        st !== 'prepress_issue' ? CL.map(g => h('div', { key: g[0], style: { display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 13 } }, g[0]),
-          g[1].map(x => h('label', { key: x, style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 13, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!ticked[x], onChange: () => tick(x), style: { width: 17, height: 17 } }), x)))) : null,
+        st === 'prepress_issue' ? box('Amended: ' + (j.reason || '') + '. Waiting for the customer to approve the amended file.') : null,
+        st !== 'prepress_issue' ? h('div', { key: 'secs', style: { display: 'flex', flexDirection: 'column', gap: 10 } }, CL.map(sectionRow)) : null,
         blocked(approve),
         h('div', { key: 'b', style: { display: 'flex', flexDirection: 'column', gap: 8 } },
           approve && st === 'prepress_issue' ? Btn('Customer approved — pass to scheduler', () => this.pModal('Customer approved', [['approval', 'How did the customer approve it?', 'e.g. Approved by WhatsApp, 25 Sep 10:30']], v => act('approve', { approval: v.approval }, 'Passed to the scheduler.')), 'primary', !approve.enabled) : null,

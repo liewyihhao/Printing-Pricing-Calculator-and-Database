@@ -112,18 +112,18 @@ const TRANSITIONS = {
   ],
   // Step 2 — Prepress (§2.4–2.7)
   prepress: [
-    { action: 'approve', to: 'scheduling', roles: PREPRESS, gates: ['artworkPresent', 'artworkMatch'], note: 'PASS — released to the scheduler.' },
+    { action: 'approve', to: 'scheduling', roles: PREPRESS, gates: ['artworkPresent'], note: 'PASS — released to the scheduler.' },
     { action: 'flag_minor', to: 'prepress_issue', roles: PREPRESS, requires: ['reason'], note: 'MINOR ISSUE — prepress amended the file and asked the customer to approve it.' },
     { action: 'reject_major', to: 'rejected', roles: PREPRESS, requires: ['reason'], note: 'MAJOR ISSUE — prepress contacted the customer for a new file.' },
     { action: 'escalate', to: 'escalated', roles: ['prepress_staff'], requires: ['reason'], note: 'CRITICAL — escalated to the prepress manager.' },
   ],
   prepress_issue: [
-    { action: 'approve', to: 'scheduling', roles: PREPRESS, gates: ['artworkPresent', 'artworkMatch'], requires: ['approval'], note: 'Customer approved the amended file — released to the scheduler.' },
+    { action: 'approve', to: 'scheduling', roles: PREPRESS, gates: ['artworkPresent'], requires: ['approval'], note: 'Customer approved the amended file — released to the scheduler.' },
     { action: 'reject_major', to: 'rejected', roles: PREPRESS, requires: ['reason'] },
     { action: 'escalate', to: 'escalated', roles: ['prepress_staff'], requires: ['reason'] },
   ],
   escalated: [
-    { action: 'approve', to: 'scheduling', roles: ['prepress_manager'], gates: ['artworkPresent', 'artworkMatch'], note: 'Manager approved — released to the scheduler.' },
+    { action: 'approve', to: 'scheduling', roles: ['prepress_manager'], gates: ['artworkPresent'], note: 'Manager approved — released to the scheduler.' },
     { action: 'flag_minor', to: 'prepress_issue', roles: ['prepress_manager'], requires: ['reason'], note: 'Manager: fix internally and seek approval.' },
     { action: 'reject_major', to: 'rejected', roles: ['prepress_manager'], requires: ['reason'] },
   ],
