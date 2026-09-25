@@ -73,7 +73,12 @@ function quoteView(q, full) {
 }
 function canQuote(q, me) { return q && me && (me.type === 'admin' || (me.type === 'outlet' && q.outlet && q.outlet === outletOf(me))); }
 function listQuotes(me) { const o = outletOf(me); const l = store.quotes().filter(q => q.outlet && (me.type === 'admin' || q.outlet === o)); const ch = l.map(q => refreshFollowUp(q)).some(Boolean); if (ch) store.save(); return l.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).map(q => quoteView(q)); }
-function getQuote(qid, me) { const q = store.quote(qid); if (!canQuote(q, me)) return { error: 'Access denied: You are not authorized to view this.' }; const v = quoteView(q, true); store.save(); return { quote: v }; }
+function getQuote(qid, me) {
+  const q = store.quote(qid); if (!canQuote(q, me)) return { error: 'Access denied: You are not authorized to view this.' };
+  // the scheduler's "Quote request" is done once the priced quote is opened by the outlet (or the customer)
+  if (me.type === 'outlet' && q.price != null && ['issued', 'reviewed'].indexOf(q.status) >= 0 && !q.outletOpenedAt) { q.outletOpenedAt = now(); q.outletOpenedBy = me.name; }
+  const v = quoteView(q, true); store.save(); return { quote: v };
+}
 const QROOT = path.join(__dirname, '..', '..', 'private-files', 'quotes');
 function saveQuoteArtwork(q, b, me) {
   if (!b.artworkData) return null;
@@ -182,7 +187,7 @@ function orderStatus(o) {
   if (any(['at_hub'])) return ['hub-arrived', 'Arrived at Hub'];
   if (js.some(toHub)) return ['hub-shipped', 'Shipped to Hub'];
   if (all(['dispatched', 'completed', 'ready_collect'])) return ['shipped', 'Shipped'];
-  if (any(['scheduling', 'printing', 'outsourcing', 'inbound', 'logistics', 'dispatched'])) return ['processing', 'Processing'];
+  if (any(['scheduling', 'printing', 'outsourcing', 'printed', 'inbound', 'logistics', 'dispatched'])) return ['processing', 'Processing'];
   return ['payment-received', 'Payment Received'];
 }
 const STAGES = ['draft', 'pending_payment', 'payment_received', 'processing', 'shipped'];

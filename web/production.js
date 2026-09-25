@@ -40,8 +40,8 @@
   const inDept = (c, d) => isDirector(c) || deptOf(c) === d;
 
   // queues (guidebook §1.8 steps)
-  const Q = { prepress: ['prepress', 'prepress_issue', 'escalated'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['inbound', 'logistics', 'dispatched'] };
-  const STEP = { intake: 1, prepress: 2, prepress_issue: 2, escalated: 2, rejected: 2, scheduling: 3, printing: 4, outsourcing: 4, inbound: 5, logistics: 5, dispatched: 5, at_hub: 5, ready_collect: 5, completed: 5, cancelled: 5 };
+  const Q = { prepress: ['prepress', 'prepress_issue', 'escalated'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
+  const STEP = { intake: 1, prepress: 2, prepress_issue: 2, escalated: 2, rejected: 2, scheduling: 3, printing: 4, outsourcing: 4, printed: 5, inbound: 5, logistics: 5, dispatched: 5, at_hub: 5, ready_collect: 5, completed: 5, cancelled: 5 };
   const STEPS = ['Order entered', 'Prepress', 'Scheduler', 'Printing', 'Logistics'];
   const overdue = j => j.deadline && Date.parse(j.deadline) < Date.now() && ['completed', 'cancelled', 'ready_collect'].indexOf(j.status) < 0;
   const tone = j => j.status === 'completed' ? 'ok' : (j.status === 'rejected' || j.status === 'escalated' || overdue(j)) ? 'bad' : 'teal';
@@ -87,40 +87,106 @@
     });
   };
 
-  // ================================================================== SCHEDULER (queue, in-house printing, outsourcing)
+  // ================================================================== SCHEDULER
+  // Quote request · Quote Pending from Printer · Jobs Outsourced · Jobs Inhouse
+  const recent = ts => !ts || Date.now() - Date.parse(ts) < 30 * 864e5;
+  const quoteFrom = q => q.outlet ? 'Outlet — ' + String(q.outlet).replace(/-/g, ' ') : 'Website customer';
+  // a quote request is done once the priced quote is opened by the customer or the outlet
+  const qrState = q => {
+    if (['requested', 'amendment'].indexOf(q.status) >= 0 || q.price == null) return ['To price', 'warn', false];
+    if (q.viewedAt || q.outletOpenedAt || ['reviewed', 'accepted', 'rejected', 'declined'].indexOf(q.status) >= 0) return ['Done — opened by ' + (q.viewedAt || q.status === 'reviewed' ? 'customer' : 'outlet'), 'ok', true];
+    return ['Quoted — waiting to be opened', 'teal', false];
+  };
+  // a printer quote request is done once every printer's quote is in and opened by the scheduler
+  const pqState = (printers, awarded) => {
+    const got = printers.filter(p => p.submittedAt), unseen = got.filter(p => !p.seenAt);
+    if (awarded || (printers.length && got.length === printers.length && !unseen.length)) return ['Done — quotes received', 'ok', true];
+    if (unseen.length) return ['Quote received — open to review', 'bad', false];
+    return ['Waiting for printers (' + got.length + ' of ' + printers.length + ')', 'warn', false];
+  };
+  const receivedByLogistics = j => !!(j.statusAt && (j.statusAt.logistics || j.statusAt.dispatched && j.dispatchDelivery)) || ['logistics'].indexOf(j.status) >= 0;
+  const outState = j => {
+    if (j.status === 'outsourcing') return [j.printing ? j.printing.status : 'Printing — outsourced', 'teal', false];
+    if (j.status === 'inbound') return ['Printer shipped — waiting for logistics', 'warn', false];
+    if (j.status === 'dispatched' && !receivedByLogistics(j)) return ['Printer shipped to the outlet', 'warn', false];
+    return ['Done — received', 'ok', true];
+  };
+  const inState = j => j.status === 'printing' ? ['Printing on ' + (j.machine || 'machine'), 'teal', false] : j.status === 'printed' ? ['Printed — waiting for logistics', 'warn', false] : ['Done — received by logistics', 'ok', true];
+  // a list with a clear state per row; open rows first, done rows (last 30 days) after
+  P.pStateList = function (key, title, rows, cols) {
+    rows = rows.filter(r => !r.state[2] || recent(r.date)).sort((a, b) => (a.state[2] - b.state[2]) || String(a.due || '9').localeCompare(String(b.due || '9')));
+    return this.acList({ key, title, cols: cols.concat(['Status']), rows: rows.map(r => ({ date: r.date, status: r.state[0].replace(/ \(.*\)$/, ''), search: r.search, cells: r.cells.concat([this.pillDot(r.state[0], r.state[1])]) })) });
+  };
+  P.pQuoteRequests = function () {
+    const qs = (this.acGet('p_quotes', '/api/quotes') || {}).quotes; if (!qs) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
+    return this.pStateList('qr', 'Quote request', qs.map(q => ({ date: q.createdAt, state: qrState(q), search: [q.id, q.customer && q.customer.name, q.requirement && q.requirement.product, q.outlet],
+      cells: [link(q.id, () => this.acOpen({ kind: 'quote', id: q.id })), quoteFrom(q), (q.requirement && q.requirement.product) || '—', (q.customer && q.customer.name) || '—', q.price != null ? this.rm(q.price) : '—'] })), ['Quote', 'From', 'Product', 'Customer', { label: 'Price', right: true }]);
+  };
+  P.pPrinterPending = function () {
+    const qs = ((this.acGet('p_quotes', '/api/quotes') || {}).quotes) || [];
+    const rows = this.opsJobs().filter(j => j.outsource && (j.outsource.vendors || []).length && j.outsource.requestedAt).map(j => ({ date: j.outsource.requestedAt, state: pqState(j.outsource.vendors, !!j.outsource.awardedTo), search: [j.id, j.product, j.customer],
+      cells: [link(j.id, () => openJob(this, j)), 'Job', j.product, (j.outsource.vendors || []).map(v => v.vendorName + (v.submittedAt ? ' — RM ' + Number(v.price).toFixed(2) : '')).join(', ')] }))
+      .concat(qs.filter(q => q.printerQuotes && q.printerQuotes.printers.length).map(q => ({ date: q.printerQuotes.requestedAt, state: pqState(q.printerQuotes.printers, false), search: [q.id, q.requirement && q.requirement.product],
+        cells: [link(q.id, () => this.acOpen({ kind: 'quote', id: q.id })), 'Custom quote', (q.requirement && q.requirement.product) || '—', q.printerQuotes.printers.map(p => p.vendorName + (p.submittedAt ? ' — RM ' + Number(p.amount).toFixed(2) : '')).join(', ')] })));
+    return this.pStateList('pq', 'Quote Pending from Printer', rows, ['Ref', 'For', 'Product', 'Printers']);
+  };
+  P.pJobsOutsourced = function () {
+    return this.pStateList('jo', 'Jobs Outsourced', this.opsJobs().filter(j => j.outsource && j.outsource.awardedTo).map(j => ({ date: j.createdAt, due: j.deadline, state: outState(j), search: [j.id, j.product, j.customer, j.outsource.po],
+      cells: [link(j.id, () => openJob(this, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), ((j.outsource.vendors || []).find(v => v.vendorId === j.outsource.awardedTo) || {}).vendorName || '—', j.deadline ? dmy(j.deadline) : '—'] })), ['Job', 'Product', 'Printer', 'Due']);
+  };
+  P.pJobsInhouse = function () {
+    return this.pStateList('ji', 'Jobs Inhouse', this.opsJobs().filter(j => j.route === 'inhouse' && ['scheduling'].indexOf(j.status) < 0).map(j => ({ date: j.createdAt, due: j.deadline, state: inState(j), search: [j.id, j.product, j.customer, j.machine],
+      cells: [link(j.id, () => openJob(this, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), (j.machine || '—') + (j.slot ? ' · ' + when(j.slot) : ''), j.deadline ? dmy(j.deadline) : '—'] })), ['Job', 'Product', 'Machine · slot', 'Due']);
+  };
   P.s_scheduler = function () {
-    const tabs = ['Dashboard', 'Queue', 'Printing', 'Custom quotes', 'KPI'].concat(isManager(this) ? ['Daily report', 'Machines'] : []);
+    const tabs = ['Dashboard', 'Quote request', 'Quote Pending from Printer', 'Jobs Outsourced', 'Jobs Inhouse'].concat(isManager(this) ? ['KPI', 'Daily report'] : []);
     return this.pShell('scheduler', tabs, tab => {
-      if (tab === 'Queue') return this.pTable('sq', 'Queue — highest priority first', jobsIn(this, ['scheduling']));
-      if (tab === 'Printing') return this.pTable('sp', 'Printing', jobsIn(this, ['printing', 'outsourcing']));
-      if (tab === 'Custom quotes') return this.pQuotes();
+      if (tab === 'Quote request') return this.pQuoteRequests();
+      if (tab === 'Quote Pending from Printer') return this.pPrinterPending();
+      if (tab === 'Jobs Outsourced') return this.pJobsOutsourced();
+      if (tab === 'Jobs Inhouse') return this.pJobsInhouse();
       if (tab === 'KPI') return this.pKpi('scheduler');
       if (tab === 'Daily report') return this.pDaily('scheduler');
-      if (tab === 'Machines') return this.pMachines();
-      const drafts = this.opsJobs().filter(j => j.status === 'outsourcing' && j.outsource && j.outsource.draft && j.outsource.draft.file && !j.outsource.draft.approvedAt && !j.outsource.draft.rejectedAt);
+      const qs = ((this.acGet('p_quotes', '/api/quotes') || {}).quotes) || [], jobs = this.opsJobs();
+      const open = arr => arr.filter(s => !s[2]).length;
+      const pending = jobs.filter(j => j.outsource && (j.outsource.vendors || []).length && j.outsource.requestedAt).map(j => pqState(j.outsource.vendors, !!j.outsource.awardedTo)).concat(qs.filter(q => q.printerQuotes && q.printerQuotes.printers.length).map(q => pqState(q.printerQuotes.printers, false)));
       return [this.pTiles([
-        { label: 'To schedule', value: jobsIn(this, ['scheduling']).length, icon: 'layers', color: 'teal', onClick: () => this.setState({ sTab: 'Queue' }) },
-        { label: 'Printing in-house', value: jobsIn(this, ['printing']).length, icon: 'printer', color: 'teal', onClick: () => this.setState({ sTab: 'Printing', sp_s: 'Printing — in-house' }) },
-        { label: 'Outsourced', value: jobsIn(this, ['outsourcing']).length, icon: 'truck', color: 'orange', onClick: () => this.setState({ sTab: 'Printing', sp_s: 'Printing — outsourced' }) },
-        { label: 'Printer drafts to approve', value: drafts.length, icon: 'file', color: 'red', onClick: () => this.setState({ sTab: 'Printing', sp_s: 'Printing — outsourced' }) }])]
-        .concat(this.pTable('sd', 'Queue — highest priority first', jobsIn(this, ['scheduling']))).concat([this.notifPanel()]);
+        { label: 'Quote request', value: open(qs.map(qrState)), icon: 'edit-3', color: 'teal', onClick: () => this.setState({ sTab: 'Quote request' }) },
+        { label: 'Quote Pending from Printer', value: open(pending), icon: 'file', color: 'orange', onClick: () => this.setState({ sTab: 'Quote Pending from Printer' }) },
+        { label: 'Jobs Outsourced', value: open(jobs.filter(j => j.outsource && j.outsource.awardedTo).map(outState)), icon: 'truck', color: 'teal', onClick: () => this.setState({ sTab: 'Jobs Outsourced' }) },
+        { label: 'Jobs Inhouse', value: open(jobs.filter(j => j.route === 'inhouse' && j.status !== 'scheduling').map(inState)), icon: 'printer', color: 'teal', onClick: () => this.setState({ sTab: 'Jobs Inhouse' }) }])]
+        .concat(this.pTable('sd', 'New jobs — print in-house or outsource', jobsIn(this, ['scheduling'])))
+        .concat(this.pTable('sdl', 'Shipped to customers — confirm delivery', jobs.filter(j => j.status === 'dispatched' && (j.destination || {}).type === 'customer')))
+        .concat([this.notifPanel()]);
     });
   };
 
-  // ================================================================== LOGISTICS (receive, pack & label, dispatch, confirm)
+  // ================================================================== LOGISTICS
+  // Incoming Jobs (from printers) · Completed Jobs (from in-house) · Shipped
+  const logState = j => ['inbound', 'printed'].indexOf(j.status) >= 0 ? ['Waiting to receive', 'warn', false] : j.status === 'logistics' ? ['Received — pack and ship', 'teal', false] : ['Done — shipped', 'ok', true];
+  const shipState = j => j.status === 'dispatched' ? ['Shipped — waiting for delivery', 'teal', false] : ['Done — ' + (j.status === 'completed' ? 'delivered' : 'received by the outlet'), 'ok', true];
+  const logRows = (c, list, st) => list.map(j => ({ date: j.createdAt, due: j.deadline, state: st(j), search: [j.id, j.product, j.customer],
+    cells: [link(j.id, () => openJob(c, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), j.customer, (j.finalDestination || {}).name || '—'] }));
+  const wasShipped = j => !!(j.dispatchDelivery || (j.statusAt && j.statusAt.logistics && ['dispatched', 'ready_collect', 'completed'].indexOf(j.status) >= 0));
   P.s_logistics = function () {
-    const tabs = ['Dashboard', 'Receiving', 'Packing', 'In transit', 'KPI'].concat(isManager(this) ? ['Daily report'] : []);
+    const tabs = ['Dashboard', 'Incoming Jobs', 'Completed Jobs', 'Shipped'].concat(isManager(this) ? ['KPI', 'Daily report'] : []);
+    const jobs = this.opsJobs();
+    const incoming = jobs.filter(j => j.route === 'outsource' && (['inbound', 'logistics'].indexOf(j.status) >= 0 || wasShipped(j)));
+    const completed = jobs.filter(j => j.route === 'inhouse' && (['printed', 'logistics'].indexOf(j.status) >= 0 || wasShipped(j)));
+    const shipped = jobs.filter(j => (j.destination || {}).type !== 'hub' && (j.status === 'dispatched' || (wasShipped(j) && ['ready_collect', 'completed'].indexOf(j.status) >= 0)));
+    const cols = ['Job', 'Product', 'Customer', 'Deliver to'];
     return this.pShell('logistics', tabs, tab => {
-      if (tab === 'Receiving') return this.pTable('lr', 'Receiving — outsourced jobs', jobsIn(this, ['inbound']));
-      if (tab === 'Packing') return this.pTable('lp', 'Packing & labelling', jobsIn(this, ['logistics']));
-      if (tab === 'In transit') return this.pTable('lt', 'In transit', jobsIn(this, ['dispatched']).filter(j => (j.destination || {}).type !== 'hub'));
+      if (tab === 'Incoming Jobs') return this.pStateList('li', 'Incoming Jobs — from printers', logRows(this, incoming, logState), cols);
+      if (tab === 'Completed Jobs') return this.pStateList('lc', 'Completed Jobs — from in-house', logRows(this, completed, logState), cols);
+      if (tab === 'Shipped') return this.pStateList('ls', 'Shipped', logRows(this, shipped, shipState), cols);
       if (tab === 'KPI') return this.pKpi('logistics');
       if (tab === 'Daily report') return this.pDaily('logistics');
+      const open = (list, st) => list.filter(j => !st(j)[2]).length;
       return [this.pTiles([
-        { label: 'To receive', value: jobsIn(this, ['inbound']).length, icon: 'box', color: 'orange', onClick: () => this.setState({ sTab: 'Receiving' }) },
-        { label: 'To pack & label', value: jobsIn(this, ['logistics']).length, icon: 'check', color: 'teal', onClick: () => this.setState({ sTab: 'Packing' }) },
-        { label: 'In transit', value: jobsIn(this, ['dispatched']).length, icon: 'truck', color: 'teal', onClick: () => this.setState({ sTab: 'In transit' }) }])]
-        .concat(this.pTable('ld', 'Your queue', jobsIn(this, Q.logistics))).concat([this.notifPanel()]);
+        { label: 'Incoming Jobs', value: open(incoming, logState), icon: 'truck', color: 'orange', onClick: () => this.setState({ sTab: 'Incoming Jobs' }) },
+        { label: 'Completed Jobs', value: open(completed, logState), icon: 'printer', color: 'teal', onClick: () => this.setState({ sTab: 'Completed Jobs' }) },
+        { label: 'Shipped', value: open(shipped, shipState), icon: 'box', color: 'teal', onClick: () => this.setState({ sTab: 'Shipped' }) }])]
+        .concat(this.pStateList('ld', 'To receive and ship', logRows(this, incoming.concat(completed).filter(j => !logState(j)[2]), logState), cols)).concat([this.notifPanel()]);
     });
   };
 
@@ -132,13 +198,13 @@
       if (tab === 'Reports') return this.pReports();
       if (tab === 'Settings') return this.pSettings();
       const all = this.opsJobs();
-      const attention = all.filter(j => j.status === 'escalated' || (overdue(j) && Q.prepress.concat(Q.scheduler, Q.logistics).indexOf(j.status) >= 0) || (j.delays || []).some(d => Date.parse(d.at) >= new Date().setHours(0, 0, 0, 0)));
+      const attention = all.filter(j => j.status === 'escalated' || (overdue(j) && Q.prepress.concat(Q.scheduler, Q.logistics).indexOf(j.status) >= 0));
       return [this.pTiles([
         { label: 'Prepress', value: jobsIn(this, Q.prepress).length, icon: 'check', color: 'teal', onClick: () => this.setState({ sTab: 'Prepress' }) },
         { label: 'Scheduler', value: jobsIn(this, Q.scheduler).length, icon: 'printer', color: 'teal', onClick: () => this.setState({ sTab: 'Scheduler' }) },
         { label: 'Logistics', value: jobsIn(this, Q.logistics).length, icon: 'truck', color: 'orange', onClick: () => this.setState({ sTab: 'Logistics' }) },
         { label: 'Needs attention', value: attention.length, icon: 'layers', color: 'red' }])]
-        .concat(this.pTable('dir_att', 'Needs attention — escalated, overdue or delayed today', attention)).concat([this.notifPanel()]);
+        .concat(this.pTable('dir_att', 'Needs attention — escalated or overdue', attention)).concat([this.notifPanel()]);
     });
   };
 
@@ -147,7 +213,6 @@
     if (!d) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
     if (d.error) return [h('div', { key: 'e', style: { color: '#c0392b' } }, d.error)];
     const j = d.job, pr = d.printing || {}, id = j.id;
-    if (j.status === 'at_hub' || (j.destination || {}).type === 'hub') return this.jobSingle(d, 'production', tabs); // legacy hub parcels
     const acts = {}; (j.actions || []).forEach(a => { if (a.permitted) acts[a.action] = a; });
     const main = [];
     const card = this.pStepCard(j, pr, acts); if (card) main.push(card);
@@ -155,15 +220,12 @@
     main.push(this.acC('Order details', [h('b', { key: 'p' }, j.product), this.acSpec((pr.job && pr.job.spec) || j.spec),
       this.acDL([['Quantity', (j.qty || 0).toLocaleString()], ['Customer', j.customer], ['Due', j.deadline ? when(j.deadline) + (overdue(j) ? ' — overdue' : '') : '—'], ['Deliver to', j.finalDestination ? (j.finalDestination.name || j.finalDestination.type) + (j.finalDestination.address ? ', ' + j.finalDestination.address : '') : '—'], j.instructions ? ['Instructions', j.instructions] : null, j.machine ? ['Machine', j.machine + (j.slot ? ' · ' + when(j.slot) : '')] : null]),
       (pr.job && pr.job.artworks || []).length ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12, display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 12.5 } }, 'Artwork'), pr.job.artworks.map((a, i) => a.id ? h('span', { key: i }, link('📄 ' + a.name, () => this.openOrderFile(a.orderId, a))) : h('span', { key: i, style: { color: MUT } }, '📄 ' + a.name))) : null]));
-    const issues = (j.delays || []).map(x => ({ title: 'Delay — ' + x.dept, text: x.reason + (x.newEta ? ' · new ETA ' + x.newEta : ''), by: x.by, at: x.at })).concat((j.incidents || []).map(x => ({ title: x.type === 'machine_down' ? 'Machine down' : 'Error — ' + x.dept, text: x.note, by: x.by, at: x.at }))).sort((a, b) => String(b.at).localeCompare(String(a.at)));
-    const aside = [
-      this.acC('Activities', this.acStatusList(pr.activities || [])),
-      deptOf(this) === 'prepress' ? null : this.acC('Documents', h('ol', { style: { margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 8 } },
-        (pr.documents || []).map(x => h('li', { key: x.id }, link(x.label, () => this.openJobDoc(id, x.id)))).concat(j.label ? [h('li', { key: 'l' }, link('Parcel label', () => this.printLabel(j.label)))] : []))),
-      issues.length || isManager(this) ? this.acC('Delays & errors', [issues.length ? this.acStatusList(issues) : note('None recorded.'),
-        isManager(this) ? h('div', { key: 'b' }, Btn('Log an error', () => this.pErrorModal(j))) : null]) : null,
-    ];
-    const typeTab = tabs.indexOf('Files') >= 0 ? 'Files' : tabs.indexOf('Queue') >= 0 ? 'Queue' : tabs[1];
+    // documents open as PDFs on the page (not for prepress — they only check files)
+    const docs = deptOf(this) === 'prepress' ? [] : (pr.documents || []);
+    const aside = [docs.length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, docs.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null];
+    const typeTab = tabs.indexOf('Files') >= 0 ? 'Files'
+      : tabs.indexOf('Jobs Inhouse') >= 0 ? (j.route === 'inhouse' ? 'Jobs Inhouse' : j.route === 'outsource' ? 'Jobs Outsourced' : 'Dashboard')
+      : tabs.indexOf('Incoming Jobs') >= 0 ? (j.status === 'dispatched' || j.status === 'completed' || j.status === 'ready_collect' ? 'Shipped' : j.route === 'inhouse' ? 'Completed Jobs' : 'Incoming Jobs') : tabs[1];
     return this.acSingle({ home: tabs[0], type: typeTab, title: '#' + id, statusNode: this.pillDot(j.statusLabel || j.status, tone(j)) }, main, aside);
   };
   // the one card for the step the job is at — only the department that owns the step can act
@@ -171,7 +233,6 @@
     const id = j.id, st = j.status, role = this.userRole();
     const act = (action, payload, ok) => this.jPost('/api/jobs/' + id + '/transition', { action, payload: payload || {} }, ok, () => this.setState({ acModal: null, acForm: {} }));
     const blocked = a => a && a.blockedBy && a.blockedBy.length ? box(a.blockedBy.join(' '), 'bad') : null;
-    const delayBtn = dept => inDept(this, dept) ? Btn('Report a delay', () => this.pDelayModal(j)) : null;
     // Step 2 — prepress file check (§2.4 order: basic → technical → content; §2.5 result)
     if (Q.prepress.indexOf(st) >= 0) {
       if (!inDept(this, 'prepress')) return this.acC('Prepress', note('The prepress team is checking this file.'));
@@ -222,51 +283,59 @@
         h('div', { key: 'b', style: { display: 'flex', flexDirection: 'column', gap: 8 } },
           acts.finish ? Btn('Printing done — send to logistics', () => this.setState({ acForm: {}, acModal: { title: 'Printing done', body: () => [
             h('label', { key: 'q', style: { display: 'flex', gap: 10, fontSize: 13.5, alignItems: 'flex-start', cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!this.acF('qc'), onChange: e => this.acSetF('qc', e.target.checked), style: { marginTop: 3 } }), 'The spec and print quality match the order.'),
-            h('div', { key: 'b' }, Btn('Send to logistics', () => act('finish', { qc: true }, 'Sent to logistics.'), 'primary', !this.acF('qc')))] } }), 'primary') : null,
-          Btn('Machine down — move to another machine', () => this.pMachineModal(j)),
-          delayBtn('scheduler'))]);
+            h('div', { key: 'b' }, Btn('Send to logistics', () => act('finish', { qc: true }, 'Sent to logistics.'), 'primary', !this.acF('qc')))] } }), 'primary') : null)]);
     }
-    if (st === 'outsourcing') return inDept(this, 'scheduler') ? this.acC('Printing — outsourced', [note('The printer uploads a draft; approve it before they print. They then deliver to ' + ((j.destination || {}).type === 'outlet' ? 'the outlet' : 'production (logistics receives it)') + '.'), h('div', { key: 'b' }, delayBtn('scheduler'))]) : this.acC('Printing', note('Outsourced to a printer.'));
+    if (st === 'outsourcing') return inDept(this, 'scheduler') ? null : this.acC('Printing', note('Outsourced to a printer.'));
     // Step 5 — logistics (§4.4 receiving, §4.5 packing + delivery)
     const cl = (group, keys) => { const prog = (j.progress && j.progress[group]) || {}; const can = inDept(this, 'logistics');
       return keys.map(k => { const v = prog[k[0]]; return h('label', { key: k[0], style: { display: 'flex', gap: 10, alignItems: 'center', fontSize: 13, cursor: can ? 'pointer' : 'default' } },
         h('input', { type: 'checkbox', checked: !!v, disabled: !can, onChange: e => this.opsStep(id, group, k[0], e.target.checked), style: { width: 17, height: 17 } }), h('span', { style: { flex: 1 } }, k[1]), v ? h('span', { style: { fontSize: 12, color: FAINT } }, v.by) : null); }); };
+    // Incoming Jobs (printer) — verify, then receive (this marks the scheduler's outsourced job done)
     if (st === 'inbound') {
-      if (!inDept(this, 'logistics')) return this.acC('Logistics', note('On its way from the printer to production.'));
-      const RC = [['matched', 'The outsourced order matches the physical item'], ['quantity', 'Quantity is correct'], ['quality', 'Finishing quality is good'], ['unlabelled', 'Printer labels removed for relabelling']];
-      return this.acC('Receive outsourced job', [note('When the parcel arrives from ' + ((j.outsource && j.outsource.po) ? 'the printer (' + j.outsource.po + ')' : 'the printer') + ', verify it, then move it to packing.'), cl('receiving', RC), blocked(acts.receive),
-        h('div', { key: 'b', style: { display: 'flex', flexDirection: 'column', gap: 8 } }, acts.receive ? Btn('Received — move to packing', () => act('receive', {}, 'Received — ready to pack.'), 'primary', !acts.receive.enabled) : null, delayBtn('logistics'))]);
+      if (!inDept(this, 'logistics')) return this.acC('Logistics', note('The printer has shipped it — waiting for logistics to receive it.'));
+      const RC = [['matched', 'The job matches the order'], ['quantity', 'Quantity is correct'], ['quality', 'Finishing quality is good'], ['unlabelled', 'Printer labels removed']];
+      return this.acC('Receive from printer', [note('When the parcel arrives, check it and tick each point, then press Received.'), cl('receiving', RC), blocked(acts.receive),
+        acts.receive ? h('div', { key: 'b' }, Btn('Received', () => act('receive', {}, 'Received.'), 'primary', !acts.receive.enabled)) : null]);
+    }
+    // Completed Jobs (in-house) — receive from production (this marks the scheduler's in-house job done)
+    if (st === 'printed') {
+      if (!inDept(this, 'logistics')) return this.acC('Logistics', note('Printed — waiting for logistics to receive it.'));
+      return this.acC('Receive from production', [note('Collect the printed job from production, then press Received.'),
+        acts.receive ? h('div', { key: 'b' }, Btn('Received', () => act('receive', {}, 'Received.'), 'primary')) : null]);
     }
     if (st === 'logistics') {
-      if (!inDept(this, 'logistics')) return this.acC('Logistics', note('Being packed for delivery.'));
-      const PC = [['verified', 'Verified — order vs item, quantity and finishing quality'], ['packed', 'Packed — right materials, protected from damage, items grouped'], ['labelled', 'Labelled — label printed from this page (customer, order ID, destination, parcel count)']];
-      return [this.acC('Pack & label', [note('Pack the order, print the label and stick it on every parcel.'), cl('logistics', PC), h('div', { key: 'b' }, Btn('Print label', () => this.printLabel(j.label)))]),
-        this.pDispatchCard(j, pr, acts)];
+      if (!inDept(this, 'logistics')) return this.acC('Logistics', note('Received by logistics — being packed.'));
+      return this.pDispatchCard(j, pr, acts, cl);
     }
+    // Shipped — complete when the customer or outlet receives it, or the scheduler confirms delivery
     if (st === 'dispatched') {
       const toCustomer = (j.destination || {}).type === 'customer';
-      return [this.acC('In transit', [this.acDL([['Courier', j.courier], ['Tracking', j.tracking], ['To', (j.destination || {}).name]]),
-        toCustomer ? note('Once the courier confirms delivery and the customer has been told, confirm it here.') : note('The outlet confirms when it receives the parcel.'),
-        h('div', { key: 'b', style: { display: 'flex', flexDirection: 'column', gap: 8 } }, toCustomer && acts.deliver ? Btn('Delivery confirmed', () => act('deliver', {}, 'Delivery confirmed.'), 'primary') : null, delayBtn('logistics'))]),
-        inDept(this, 'logistics') && pr.dispatchDelivery ? this.pDispatchCard(j, pr, acts) : null];
+      return this.acC('Shipped', [this.acDL([['Courier', j.courier], ['Tracking', j.tracking], ['To', ((j.destination || {}).name || '') + ((j.destination || {}).address ? ', ' + j.destination.address : '')]]),
+        note(toCustomer ? 'Complete when the customer confirms they received it, or when the scheduler confirms delivery.' : 'Complete when the outlet receives it.'),
+        toCustomer && acts.deliver && inDept(this, 'scheduler') ? h('div', { key: 'b' }, Btn('Delivered — mark complete', () => act('deliver', {}, 'Marked delivered.'), 'primary')) : null]);
     }
+    if (st === 'at_hub') return this.acC('At the hub', note('This parcel was sent to a hub before hubs were removed from the flow. The hub team forwards it.'));
     if (st === 'ready_collect') return this.acC('At the outlet', note('Ready for the customer to collect.'));
     if (st === 'completed') return this.acC('Completed', box('Delivered / collected.', 'ok'));
     return null;
   };
   // Delivery SOP (§4.5): courier from HQ's list, dispatch (time recorded), then confirmation
-  P.pDispatchCard = function (j, pr, acts) {
+  P.pDispatchCard = function (j, pr, acts, cl) {
     const cfg = this.state.opsConfig || { couriers: [] }; const dd = pr.dispatchDelivery || {}; const packing = j.status === 'logistics';
     const F = (k, def) => this.acF(k) !== '' ? this.acF(k) : def;
     const tracking = F('dTracking', (dd.tracking || []).join('\n')), courier = F('dCourier', dd.company || cfg.couriers[0] || '');
     const a = acts.dispatch;
-    return this.acC('Delivery', [
+    const PC = [['verified', 'Checked — order vs item, quantity and quality'], ['packed', 'Packed — protected from damage'], ['labelled', 'Shipping label stuck on every parcel']];
+    return this.acC('Pack & ship', [
+      note('Pack the order, print the shipping label, then enter the courier and tracking number and press Ship.'),
+      cl ? cl('logistics', PC) : null,
+      h('div', { key: 'lb' }, Btn('View Shipping Label (PDF)', () => this.openJobDoc(j.id, 'shipping-label'))),
       this.acDL([['Deliver to', ((j.destination || {}).name || '—') + ((j.destination || {}).address ? ', ' + j.destination.address : '')], ['Parcels', j.parcels || 1]]),
       FG('Courier', h('select', { value: courier, onChange: e => this.acSetF('dCourier', e.target.value), style: inp }, cfg.couriers.map(c => h('option', { key: c }, c))), 1, 'Only the delivery companies selected by HQ.'),
       FG('Tracking number', ta(tracking, v => this.acSetF('dTracking', v), 3), 1, 'One per line if there is more than one parcel.'),
       FG('Delivery order', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, dd.document ? link('📄 ' + dd.document.name, () => this.jDownload('/api/jobs/' + j.id + '/files/' + dd.document.id, dd.document.name)) : null, this.jPickFile('dDoc'))),
       packing && a && a.blockedBy && a.blockedBy.length ? box(a.blockedBy.join(' '), 'bad') : null,
-      h('div', { key: 'b' }, Btn(packing ? 'Dispatch' : 'Save changes', () => this.jPost('/api/jobs/' + j.id + '/delivery', { tracking, company: courier, documentData: this.acF('dDocData') || undefined, documentName: this.acF('dDocName') || undefined }, packing ? 'Dispatched.' : 'Delivery details saved.', () => this.setState({ acForm: {} })), 'primary', !tracking.trim() || (packing && (!a || !a.enabled))))]);
+      h('div', { key: 'b' }, Btn(packing ? 'Ship' : 'Save changes', () => this.jPost('/api/jobs/' + j.id + '/delivery', { tracking, company: courier, documentData: this.acF('dDocData') || undefined, documentName: this.acF('dDocName') || undefined }, packing ? 'Dispatched.' : 'Delivery details saved.', () => this.setState({ acForm: {} })), 'primary', !tracking.trim() || (packing && (!a || !a.enabled))))]);
   };
   // outsourcing (§3.5 rules: cost, production time, logistics — never preference or pressure)
   P.pOutsourceCard = function (j, pr) {
@@ -305,28 +374,6 @@
       FG('Suggested correction', ta(this.acF('suggestion'), v => this.acSetF('suggestion', v), 3), 1, 'e.g. Move the text 5 mm inwards and resend the PDF'),
       h('div', { key: 'b' }, Btn('Reject and return to outlet', () => this.aFetchJ('/api/jobs/' + j.id + '/proof', { name: this.acF('proofName'), data: this.acF('proofData') }).then(f => {
         if (!this.acDone(f)) return; this.jPost('/api/jobs/' + j.id + '/transition', { action: 'reject_major', payload: { reason: this.acF('reason'), proof: f.file.id, suggestion: this.acF('suggestion') } }, 'Rejected and returned to the outlet.', () => this.setState({ acModal: null, acForm: {} })); }), 'primary', !this.acF('reason') || !this.acF('suggestion') || !this.acF('proofData')))] } });
-  };
-  P.pDelayModal = function (j) {
-    this.setState({ acForm: {}, acModal: { title: 'Report a delay', body: () => [
-      note('Your manager and the affected outlet are told straight away.'),
-      FG('Cause of the delay', ta(this.acF('reason'), v => this.acSetF('reason', v), 3), 1),
-      FG('New expected date', h('input', { type: 'date', value: this.acF('eta'), onChange: e => this.acSetF('eta', e.target.value), style: inp })),
-      h('div', { key: 'b' }, Btn('Report delay', () => this.jPost('/api/jobs/' + j.id + '/delay', { reason: this.acF('reason'), newEta: this.acF('eta') || null }, 'Delay reported.', () => this.setState({ acModal: null, acForm: {} })), 'primary', !this.acF('reason')))] } });
-  };
-  P.pMachineModal = function (j) {
-    const cfg = this.state.opsConfig || { machines: [] }; const others = cfg.machines.filter(m => m !== j.machine);
-    this.setState({ acForm: {}, acModal: { title: 'Machine down', body: () => [
-      note('Every job on ' + j.machine + ' moves to the machine you pick. Logistics and the affected outlets are told, and the incident is logged.'),
-      FG('What is wrong with ' + j.machine + '?', ta(this.acF('reason'), v => this.acSetF('reason', v), 3), 1),
-      FG('Move to', h('select', { value: this.acF('machine') || others[0] || '', onChange: e => this.acSetF('machine', e.target.value), style: inp }, others.map(m => h('option', { key: m }, m))), 1),
-      h('div', { key: 'b' }, Btn('Move jobs', () => this.jPost('/api/jobs/' + j.id + '/machine-down', { reason: this.acF('reason'), machine: this.acF('machine') || others[0] }, 'Jobs moved.', () => this.setState({ acModal: null, acForm: {} })), 'primary', !this.acF('reason') || !others.length))] } });
-  };
-  P.pErrorModal = function (j) {
-    const T = [['file_issue', 'File issue — Prepress'], ['late_job', 'Late job — Scheduler'], ['wrong_spec', 'Wrong spec — Scheduler'], ['quality', 'Quality — Scheduler'], ['wrong_item', 'Wrong item sent — Logistics'], ['damage', 'Damaged — Logistics']];
-    this.setState({ acForm: {}, acModal: { title: 'Log an error', body: () => [
-      FG('Error', h('select', { value: this.acF('type') || T[0][0], onChange: e => this.acSetF('type', e.target.value), style: inp }, T.map(t => h('option', { key: t[0], value: t[0] }, t[1]))), 1, 'The department responsible is set by the guidebook.'),
-      FG('What happened', ta(this.acF('note'), v => this.acSetF('note', v), 3)),
-      h('div', { key: 'b' }, Btn('Log error', () => this.jPost('/api/jobs/' + j.id + '/incident', { type: this.acF('type') || T[0][0], note: this.acF('note') }, 'Error logged.', () => this.setState({ acModal: null, acForm: {} })), 'primary'))] } });
   };
   P.pAwardModal = function (j, q) {
     const pickup = j.finalDestination && j.finalDestination.type === 'outlet'; const vendors = (this.acGet('vendors', '/api/vendors') || {}).vendors || [];
@@ -368,11 +415,10 @@
         field('status', 'Machine / manpower status', 'e.g. Offset press under service until 11am; 1 staff on leave'),
         h('div', { key: 'b' }, Btn('Submit to Production Director', () => this.jPost('/api/ops/daily-report', { dept, kind, status: this.acF('status') }, 'Morning report submitted.', () => { this.acDrop('drl_'); this.setState({ acForm: {} }); }), 'primary'))] : [
         this.acDL([['Jobs completed', String(f.completed)], ['Tomorrow’s backlog', f.backlog.length + ' job(s)']]),
-        h('b', { key: 'd' }, 'Jobs delayed'), list(f.delayed, x => x.id + ' · ' + x.product + ' — ' + x.reason, 'No delays.'),
-        h('b', { key: 'e' }, 'Errors'), list(f.errors, x => x.jobId + ' — ' + x.note, 'No errors.'),
-        field('delays', 'Notes on delays'), field('errors', 'Notes on errors'), field('backlog', 'Notes for tomorrow'),
-        h('div', { key: 'b' }, Btn('Submit to Production Director', () => this.jPost('/api/ops/daily-report', { dept, kind, delays: this.acF('delays'), errors: this.acF('errors'), backlog: this.acF('backlog') }, 'End-of-day report submitted.', () => { this.acDrop('drl_'); this.setState({ acForm: {} }); }), 'primary'))]),
-      h('div', { key: 'p' }, this.dataCard(['Date', 'Report', 'By', 'Pending', 'Completed', 'Delayed', 'Errors'], past.map(r => [r.date, r.kind === 'morning' ? 'Morning' : 'End of day', r.by, String(r.figures.pending), r.kind === 'evening' ? String(r.figures.completed) : '—', r.kind === 'evening' ? String(r.figures.delayed.length) : '—', r.kind === 'evening' ? String(r.figures.errors.length) : '—']), { minWidth: 640, empty: 'No reports submitted yet.' }))];
+        h('b', { key: 'd' }, 'Jobs past the customer deadline'), list(f.delayed, x => x.id + ' · ' + x.product, 'None.'),
+        field('backlog', 'Notes for tomorrow'),
+        h('div', { key: 'b' }, Btn('Submit to Production Director', () => this.jPost('/api/ops/daily-report', { dept, kind, backlog: this.acF('backlog') }, 'End-of-day report submitted.', () => { this.acDrop('drl_'); this.setState({ acForm: {} }); }), 'primary'))]),
+      h('div', { key: 'p' }, this.dataCard(['Date', 'Report', 'By', 'Pending', 'Completed', 'Past deadline'], past.map(r => [r.date, r.kind === 'morning' ? 'Morning' : 'End of day', r.by, String(r.figures.pending), r.kind === 'evening' ? String(r.figures.completed) : '—', r.kind === 'evening' ? String((r.figures.delayed || []).length) : '—']), { minWidth: 600, empty: 'No reports submitted yet.' }))];
   };
   P.pReports = function () {
     const rs = (this.acGet('drl_all', '/api/ops/reports') || {}).reports || [];
@@ -381,20 +427,11 @@
     return [h('h1', { key: 't', style: { fontSize: 34, fontWeight: 600, margin: '6px 0 0' } }, 'Daily reports'),
       this.dataCard(['Department', 'Morning report', 'End-of-day report'], ['prepress', 'scheduler', 'logistics'].map(d => [d[0].toUpperCase() + d.slice(1), this.pillDot(has(d, 'morning') ? 'Submitted' : 'Not yet', has(d, 'morning') ? 'ok' : 'warn'), this.pillDot(has(d, 'evening') ? 'Submitted' : 'Not yet', has(d, 'evening') ? 'ok' : 'warn')]), { minWidth: 480 }),
       h('div', { key: 'l', style: { display: 'flex', flexDirection: 'column', gap: 12 } }, rs.map(r => this.acC(r.date + ' · ' + r.dept[0].toUpperCase() + r.dept.slice(1) + ' · ' + (r.kind === 'morning' ? 'Morning' : 'End of day') + ' · ' + r.by, [
-        this.acDL([['Pending', String(r.figures.pending)], ['Urgent', r.figures.urgent.map(x => x.id).join(', ') || '—'], r.kind === 'evening' ? ['Completed', String(r.figures.completed)] : null, r.kind === 'evening' ? ['Delayed', r.figures.delayed.map(x => x.id + ' (' + x.reason + ')').join('; ') || '—'] : null, r.kind === 'evening' ? ['Errors', r.figures.errors.map(x => x.jobId).join(', ') || '—'] : null,
-          r.notes.status ? ['Machine / manpower', r.notes.status] : null, r.notes.delays ? ['Notes on delays', r.notes.delays] : null, r.notes.errors ? ['Notes on errors', r.notes.errors] : null, r.notes.backlog ? ['Notes for tomorrow', r.notes.backlog] : null])])))];
+        this.acDL([['Pending', String(r.figures.pending)], ['Urgent', r.figures.urgent.map(x => x.id).join(', ') || '—'], r.kind === 'evening' ? ['Completed', String(r.figures.completed)] : null, r.kind === 'evening' ? ['Past deadline', (r.figures.delayed || []).map(x => x.id).join(', ') || '—'] : null,
+          r.notes.status ? ['Machine / manpower', r.notes.status] : null, r.notes.backlog ? ['Notes for tomorrow', r.notes.backlog] : null])])))];
   };
 
   // ---------------------------------------------------------------- settings
-  P.pMachines = function () {
-    const cfg = this.state.opsConfig; if (!cfg) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
-    const jobs = this.opsJobs();
-    const text = this.acF('machines') !== '' ? this.acF('machines') : cfg.machines.join('\n');
-    return [h('h1', { key: 't', style: { fontSize: 34, fontWeight: 600, margin: '6px 0 0' } }, 'Machines'),
-      this.dataCard(['Machine', { label: 'Printing now', right: true }], cfg.machines.map(m => [m, String(jobs.filter(j => j.status === 'printing' && j.machine === m).length)]), { minWidth: 420 }),
-      this.acC('Edit machines', [FG('One machine per line', ta(text, v => this.acSetF('machines', v), 8)),
-        h('div', { key: 'b' }, Btn('Save', () => this.opsFetch('/api/ops/config', { machines: text.split('\n').map(s => s.trim()).filter(Boolean) }).then(d => { if (this.acDone(d, 'Machines saved.')) this.setState({ opsConfig: d.config, acForm: {} }); }), 'primary'))])];
-  };
   P.pSettings = function () {
     const cfg = this.state.opsConfig; if (!cfg) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
     const F = (k, def) => this.acF(k) !== '' ? this.acF(k) : def;
@@ -409,14 +446,6 @@
   };
 
   // ---------------------------------------------------------------- custom quotes (HQ prices the outlets' quote requests)
-  P.pQuotes = function () {
-    const qs = (this.acGet('p_quotes', '/api/quotes') || {}).quotes;
-    if (!qs) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
-    const label = q => ({ requested: 'To price', amendment: 'To price', issued: 'Quoted', reviewed: 'Quoted', accepted: 'Accepted', rejected: 'Rejected', declined: 'Rejected' })[q.status] || q.status;
-    return this.acList({ key: 'cq', title: 'Custom quotes', cols: ['Quote', 'Product', 'Customer', 'Outlet', { label: 'Price', right: true }, 'Status'],
-      rows: qs.slice().sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt))).map(q => ({ date: q.createdAt, status: label(q), search: [q.id, q.customer && q.customer.name, q.requirement && q.requirement.product],
-        cells: [link(q.id, () => this.acOpen({ kind: 'quote', id: q.id })), (q.requirement && q.requirement.product) || '—', (q.customer && q.customer.name) || '—', q.outlet || 'Online', q.price != null ? this.rm(q.price) : '—', this.pillDot(label(q), label(q) === 'To price' ? 'warn' : label(q) === 'Accepted' ? 'ok' : 'teal')] })) });
-  };
   P.pQuote = function (qid, tabs) {
     const qs = (this.acGet('p_quotes', '/api/quotes') || {}).quotes; if (!qs) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
     const q = qs.find(x => x.id === qid); if (!q) return [h('div', { key: 'e' }, 'Quote not found.')];
@@ -433,8 +462,9 @@
           FG('Lead time (days)', h('input', { type: 'number', value: this.acF('lead') !== '' ? this.acF('lead') : (q.leadDays || ''), onChange: e => this.acSetF('lead', e.target.value), style: inp }))),
         h('div', { key: 'b' }, Btn('Issue quote to customer', () => this.aFetchJ('/api/quotes/' + q.id + '/price', { price: this.acF('price') || q.price, leadDays: this.acF('lead') || q.leadDays }).then(d => { if (this.acDone(d, 'Quote issued to the customer.')) { this.acDrop('p_quotes'); this.setState({ acForm: {} }); } }), 'primary', !(this.acF('price') || q.price)))]) : null,
     ];
-    const aside = [this.acC('Customer', this.acDL([['Name', q.customer && q.customer.name], ['Email', q.customer && q.customer.email], ['Phone', q.customer && q.customer.phone], ['Outlet', q.outlet || 'Online']])),
-      this.acC('History', this.acStatusList((q.history || []).slice().reverse().map(e => ({ title: String(e.action || '').replace(/^./, c => c.toUpperCase()), text: e.note || (e.price ? 'RM ' + e.price : ''), by: e.actor, at: e.ts }))))];
-    return this.acSingle({ home: tabs[0], type: 'Custom quotes', title: q.id, status: q.status }, main, aside);
+    // opening the quote marks received printer quotes as seen ("Quote Pending from Printer" → done)
+    if (pq.some(p => p.submittedAt && !p.seenAt) && !(this._pqSeen || {})[q.id]) { this._pqSeen = Object.assign({}, this._pqSeen, { [q.id]: 1 }); this.aFetchJ('/api/quotes/' + q.id + '/printer-quotes').then(() => this.acDrop('p_quotes')); }
+    const aside = [this.acC('Customer', this.acDL([['From', quoteFrom(q)], ['Name', q.customer && q.customer.name], ['Email', q.customer && q.customer.email], ['Phone', q.customer && q.customer.phone]]))];
+    return this.acSingle({ home: tabs[0], type: 'Quote request', title: q.id, statusNode: this.pillDot(qrState(q)[0], qrState(q)[1]) }, main, aside);
   };
 })();

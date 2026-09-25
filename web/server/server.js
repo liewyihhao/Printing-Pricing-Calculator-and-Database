@@ -91,11 +91,13 @@ async function api(req, res, pathname, query) {
     const j = store.job(seg[1]); if (!j) return send(res, 404, { error: 'not found' });
     if (!supplier.canSee(j, me0)) return send(res, 403, { error: 'Access denied: You are not authorized to view this.' });
     if (me0.type === 'vendor') return send(res, 200, { job: supplier.vendorJob(j, me0), printing: supplier.view(j, me0), audit: [], order: null });
+    // "Quote Pending from Printer" is done once a received printer quote has been opened by the scheduler
+    if (['scheduler_staff', 'scheduler_manager', 'production_director'].indexOf(role) >= 0 && j.outsource) { let seen = false; (j.outsource.vendors || []).forEach(v => { if (v.submittedAt && !v.seenAt) { v.seenAt = store.now(); seen = true; } }); if (seen) store.save(); }
     const o = j.orderId ? store.order(j.orderId) : null;
     return send(res, 200, { job: jobView(j, role), printing: supplier.view(j, me0), audit: store.audit({ jobId: seg[1] }), order: o && me0.type !== 'hub' ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items, files: (o.files || []).filter(f => f.kind === 'artwork') } : null });
   }
   // ---- printers & hubs (original printoka-3rd-party-supplier flow) ----
-  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'draft', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'delay', 'machine-down', 'incident', 'proof'].indexOf(seg[2]) >= 0) {
+  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'draft', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'proof'].indexOf(seg[2]) >= 0) {
     const j0 = store.job(seg[1]); if (!j0) return send(res, 404, { error: 'not found' });
     if (!supplier.canSee(j0, me0)) return send(res, 403, { error: 'Access denied: You are not authorized to view this.' });
     const out = r => send(res, r && r.error ? (r.code || 400) : 200, r);
@@ -105,9 +107,6 @@ async function api(req, res, pathname, query) {
     if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
     const b = await readBody(req);
     if (me0.type !== 'vendor' && me0.type !== 'hub') {
-      if (seg[2] === 'delay') return out(ops.reportDelay(seg[1], role, actor, b));
-      if (seg[2] === 'machine-down') return out(ops.machineDown(seg[1], role, actor, b));
-      if (seg[2] === 'incident') return out(ops.logIncident(seg[1], role, actor, b));
       if (seg[2] === 'proof') return ['prepress_staff', 'prepress_manager', 'production_director'].indexOf(role) >= 0 ? out(supplier.saveProof(seg[1], me0, b)) : send(res, 403, { error: 'prepress only' });
     }
     if (seg[2] === 'vendor-quote') return me0.type === 'vendor' ? out(supplier.submitQuote(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
@@ -348,6 +347,14 @@ async function api(req, res, pathname, query) {
     if (r.error) return send(res, 400, r);
     return send(res, 200, { ok: true, order: store.orderView(seg[1]) });
   }
+  // POST /api/orders/:id/received — the customer confirms their shipped order arrived (completes the shipment)
+  if (seg[0] === 'orders' && seg[2] === 'received' && req.method === 'POST') {
+    const cm = store.sessionCustomer(token); const o = store.order(seg[1]);
+    if (!cm || cm.type !== 'customer' || !o || o.userId !== cm.id) return send(res, 403, { error: 'Only the customer who placed the order can confirm it arrived.' });
+    const done = (o.jobIds || []).map(jid => ops.transition(jid, 'customer', cm.name || cm.email, 'customer_received', {})).filter(r => !r.error).length;
+    if (!done) return send(res, 400, { error: 'Nothing on this order is out for delivery yet.' });
+    return send(res, 200, { ok: true, order: store.orderView(seg[1]) });
+  }
 
   // GET /api/catalogue  — persisted admin overrides (merged over catalogue.js defaults client-side)
   if (seg[0] === 'catalogue' && !seg[1]) {
@@ -488,7 +495,10 @@ async function api(req, res, pathname, query) {
     const me = store.sessionCustomer(token); if (!me || ['admin', 'production'].indexOf(me.type) < 0) return send(res, 401, { error: 'staff sign-in required' });
     if (seg[3] && seg[4] === 'document') { const r = supplier.readCustomQuoteDoc(seg[1], seg[3], me); if (r.error) return send(res, r.code || 400, r); res.writeHead(200, { 'Content-Type': r.type, 'Content-Disposition': 'attachment; filename="' + r.file.name.replace(/"/g, '') + '"', 'Cache-Control': 'private, no-store' }); return res.end(r.data); }
     if (req.method === 'POST') { const r = supplier.requestPrinterQuotes(seg[1], await readBody(req), me.name || me.email); return send(res, r.error ? 400 : 200, r); }
-    const q = store.quote(seg[1]); return q ? send(res, 200, { printerQuotes: q.printerQuotes || null }) : send(res, 404, { error: 'not found' });
+    const q = store.quote(seg[1]); if (!q) return send(res, 404, { error: 'not found' });
+    // opened by the scheduler → received printer quotes count as seen ("Quote Pending from Printer" done)
+    if (q.printerQuotes) { let seen = false; q.printerQuotes.printers.forEach(p => { if (p.submittedAt && !p.seenAt) { p.seenAt = store.now(); seen = true; } }); if (seen) store.save(); }
+    return send(res, 200, { printerQuotes: q.printerQuotes || null });
   }
   if (seg[0] === 'jobs' && seg[2] === 'award' && req.method === 'POST') {
     if (['production_director', 'scheduler_manager', 'scheduler_staff'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });

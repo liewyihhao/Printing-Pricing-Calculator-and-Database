@@ -196,12 +196,53 @@
     return doc;
   };
   P.openJobDoc = function (jobId, kind) {
-    const win = window.open('', '_blank'); if (win) win.document.write('<p style="font:14px sans-serif;padding:20px">Preparing document…</p>');
+    const title = ({ 'purchase-order': 'Purchase Order', 'shipping-label': 'Shipping Label', 'hub-label': 'Delivery Label' })[kind] || 'Document';
+    const v = pdfViewer(title);
     fetch('/api/jobs/' + encodeURIComponent(jobId) + '/doc/' + kind, { headers: this.authHeaders() }).then(r => r.json())
       .then(d => { if (d.error) throw new Error(d.error); return this.buildJobDoc(d).then(doc => [doc, d]); })
-      .then(([doc, d]) => { const blob = doc.output('blob'); const name = kind + '-' + (d.poNumber || jobId) + '.pdf'; if (win) win.location.href = URL.createObjectURL(blob); else this.saveBlob(blob, name); })
-      .catch(e => { if (win) win.close(); this.setState({ acMsg: { bad: true, text: 'Could not open the document: ' + e.message } }); });
+      .then(([doc, d]) => v.show(doc.output('blob'), title + ' ' + (d.poNumber || jobId) + '.pdf'))
+      .catch(e => v.fail(e.message));
   };
+  // ---------------------------------------------------------------- on-page PDF viewer (every page drawn with pdf.js + a download button)
+  const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+  let pdfjsP = null;
+  const loadPdfjs = () => pdfjsP || (pdfjsP = (window.pdfjsLib ? Promise.resolve() : loadScript(PDFJS)).then(() => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS.replace('pdf.min.js', 'pdf.worker.min.js'); return window.pdfjsLib; }));
+  function pdfViewer(title) {
+    const ov = document.createElement('div');
+    ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', title);
+    ov.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(15,20,25,.6);display:flex;flex-direction:column;font:14px Montserrat,sans-serif';
+    ov.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:12px 18px;background:#fff;border-bottom:1px solid #eaeaea"><b style="font-size:16px" data-t></b><span style="flex:1"></span>' +
+      '<button data-dl disabled style="font:600 13.5px Montserrat,sans-serif;padding:9px 16px;border-radius:8px;border:1px solid #E52220;background:#E52220;color:#fff;cursor:pointer">Download PDF</button>' +
+      '<button data-x style="font:600 13.5px Montserrat,sans-serif;padding:9px 16px;border-radius:8px;border:1px solid #d9d9d9;background:#fff;cursor:pointer">Close</button></div>' +
+      '<div data-body style="flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;align-items:center;gap:16px"><p style="color:#fff">Preparing the PDF…</p></div>';
+    ov.querySelector('[data-t]').textContent = title;
+    const close = () => ov.remove();
+    ov.querySelector('[data-x]').onclick = close;
+    ov.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    document.body.appendChild(ov);
+    const body = ov.querySelector('[data-body]');
+    return {
+      show: async (blob, name) => {
+        const dl = ov.querySelector('[data-dl]'); dl.disabled = false;
+        dl.onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000); };
+        try {
+          const lib = await loadPdfjs(); const pdf = await lib.getDocument({ data: await blob.arrayBuffer() }).promise;
+          body.innerHTML = '';
+          const width = Math.min(900, body.clientWidth - 40);
+          for (let i = 1; i <= pdf.numPages; i++) {
+            const page = await pdf.getPage(i); const base = page.getViewport({ scale: 1 });
+            const scale = width / base.width, ratio = window.devicePixelRatio || 1;
+            const vp = page.getViewport({ scale: scale * ratio });
+            const c = document.createElement('canvas'); c.width = vp.width; c.height = vp.height;
+            c.style.cssText = 'width:' + (vp.width / ratio) + 'px;height:' + (vp.height / ratio) + 'px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.35);max-width:100%';
+            body.appendChild(c); await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+          }
+        } catch (e) { body.innerHTML = '<p style="color:#fff">Could not display the PDF here — use Download PDF.</p>'; }
+      },
+      fail: msg => { body.innerHTML = ''; const p = document.createElement('p'); p.style.color = '#fff'; p.textContent = 'Could not open the document: ' + msg; body.appendChild(p); },
+    };
+  }
+  P.showPdf = function (blob, title, name) { pdfViewer(title).show(blob, name || title + '.pdf'); };
 
   // ---------------------------------------------------------------- open / download
   P.fetchOrderFull = function (oid) { return fetch('/api/orders/' + encodeURIComponent(oid), { headers: this.authHeaders() }).then(r => r.json()).then(d => d.order || null); };
@@ -209,11 +250,11 @@
   const origOpenDoc = P.openDoc;
   P.openDoc = function (id, kind) {
     if (!(kind === 'invoice' || kind === 'slip') || !/^PO-/.test(String(id))) return origOpenDoc.call(this, id, kind);
-    const win = window.open('', '_blank'); if (win) win.document.write('<p style="font:14px sans-serif;padding:20px">Preparing ' + (kind === 'invoice' ? 'invoice' : 'order slip') + '…</p>');
+    const title = (kind === 'invoice' ? 'Invoice INV-' : 'Order Slip ') + String(id).replace(/^PO-/, '');
+    const v = pdfViewer(title);
     this.fetchOrderFull(id).then(o => { if (!o) throw new Error('Order not found'); return this.buildOrderPdf(o, kind); })
-      .then(doc => { const blob = doc.output('blob'); const name = (kind === 'invoice' ? 'Invoice INV-' : 'Order Slip ') + String(id).replace(/^PO-/, '') + '.pdf';
-        if (win) { win.location.href = URL.createObjectURL(blob); } else this.saveBlob(blob, name); })
-      .catch(e => { if (win) win.close(); this.setState({ docErr: e.message }); });
+      .then(doc => v.show(doc.output('blob'), title + '.pdf'))
+      .catch(e => v.fail(e.message));
   };
   // the full order bundle: invoice + order slip + every artwork + payment proof, zipped
   P.downloadOrder = async function (oid) {

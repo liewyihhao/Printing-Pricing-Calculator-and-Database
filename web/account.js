@@ -123,14 +123,14 @@
     const rows = (o.rows || []).filter(r => (!q || JSON.stringify(r.search || '').toLowerCase().indexOf(q) >= 0) && (ssel === 'All status' || r.status === ssel) && (!DAYS[dsel] || Date.now() - Date.parse(r.date) <= DAYS[dsel] * 864e5));
     const statuses = Array.from(new Set((o.rows || []).map(r => r.status).filter(Boolean)));
     return [
-      h('h1', { key: 't', style: { fontSize: 34, fontWeight: 600, margin: '6px 0 0', letterSpacing: '-.02em' } }, o.title),
-      h('div', { key: 'f', style: { display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' } },
+      h('h1', { key: k + '_t', style: { fontSize: 34, fontWeight: 600, margin: '6px 0 0', letterSpacing: '-.02em' } }, o.title),
+      h('div', { key: k + '_f', style: { display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' } },
         h('input', { placeholder: 'Search', value: this.state[k + '_q'] || '', onChange: e => this.setField(k + '_q', e.target.value), style: pillInp }),
         h('select', { value: dsel, onChange: e => this.setField(k + '_d', e.target.value), style: pillInp }, ['All dates', 'Last month', 'Last 3 months', 'Last 12 months'].map(x => h('option', { key: x }, x))),
         h('select', { value: ssel, onChange: e => this.setField(k + '_s', e.target.value), style: pillInp }, ['All status'].concat(statuses).map(x => h('option', { key: x }, x))),
         h('span', { onClick: () => this.setState({ [k + '_q']: '', [k + '_d']: 'All dates', [k + '_s']: 'All status' }), style: { fontSize: 13, fontWeight: 600, cursor: 'pointer', color: INK, padding: '0 8px' } }, '↺ Reset'),
         o.action ? h('span', { style: { marginLeft: 'auto' } }, o.action) : null),
-      h('div', { key: 'tb' }, this.dataCard(o.cols.map(c => typeof c === 'string' ? { label: c } : c), rows.map(r => r.cells), { minWidth: 900, empty: o.empty || 'No data available in table' })),
+      h('div', { key: k + '_tb' }, this.dataCard(o.cols.map(c => typeof c === 'string' ? { label: c } : c), rows.map(r => r.cells), { minWidth: 900, empty: o.empty || 'No data available in table' })),
     ];
   };
   // period metric: current range total vs the range before it

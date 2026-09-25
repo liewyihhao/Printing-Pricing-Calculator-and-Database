@@ -132,7 +132,11 @@ function migrate() {
   store.customers().filter(c => c.type === 'vendor' && c.role === 'vendor').forEach(c => { c.role = 'printer_manager'; });
   const lf = store.customers().find(c => c.email === 'vendor@printoka.com');
   if (lf) add('vendor-staff@printoka.com', 'LargeFormat Co — Print Staff', 'vendor', 'printer_staff', { vendorId: lf.id });
-  (db.jobs || []).forEach(j => { normalizeJob(j); const lp = j.progress && j.progress.logistics; if (lp && lp.picked && !lp.verified) lp.verified = lp.picked; });
+  (db.jobs || []).forEach(j => { normalizeJob(j); const lp = j.progress && j.progress.logistics; if (lp && lp.picked && !lp.verified) lp.verified = lp.picked;
+    // hubs are no longer in the production flow: jobs still in production go to production / their own destination
+    if ((j.destination || {}).type === 'hub' && ['scheduling', 'printing', 'printed', 'logistics'].indexOf(j.status) >= 0) { j.destination = Object.assign({}, j.finalDestination); makeLabel(j); }
+    if ((j.destination || {}).type === 'hub' && j.status === 'outsourcing') { j.destination = destOf('production', null, j); makeLabel(j); }
+  });
   store.save();
 }
 
@@ -148,7 +152,7 @@ function syncOrder(oid) {
   else if (all(['completed'])) p = 'completed';
   else if (all(['ready_collect', 'completed'])) p = 'ready_for_collection';
   else if (all(['dispatched', 'at_hub', 'ready_collect', 'completed'])) p = 'shipped';
-  else if (any(['scheduling', 'printing', 'outsourcing', 'inbound', 'logistics', 'dispatched', 'at_hub', 'ready_collect', 'completed'])) p = 'in_production';
+  else if (any(['scheduling', 'printing', 'outsourcing', 'printed', 'inbound', 'logistics', 'dispatched', 'at_hub', 'ready_collect', 'completed'])) p = 'in_production';
   else if (any(['prepress', 'prepress_issue', 'escalated'])) p = 'artwork_check';
   if (o.progress !== p) { o.progress = p; o.progressLabel = PROGRESS_LABEL[p]; o.progressAt = now(); }
   return o;
@@ -188,11 +192,11 @@ function afterTransition(j, from, to, action, actor, payload) {
     makeLabel(j); j.label.from = (hubById(j.hub) || {}).name || 'Hub';
   }
   if (action === 'dispatch' || action === 'vendor_ship' || action === 'vendor_ship_outlet' || action === 'forward') ship(payload.courier, payload.tracking);
-  if (action === 'receive' || action === 'receive_hub' || action === 'receive_outlet' || action === 'deliver') { const last = (j.shipments || [])[j.shipments.length - 1]; if (last && !last.receivedAt) { last.receivedAt = now(); last.receivedBy = actor; } }
+  if (action === 'receive' || action === 'receive_hub' || action === 'receive_outlet' || action === 'deliver') { const legs = j.shipments || []; const last = legs[legs.length - 1]; if (last && !last.receivedAt) { last.receivedAt = now(); last.receivedBy = actor; } }
   // outsourced job received at production (§4.4): relabel it for its final destination
   if (action === 'receive') { j.destination = Object.assign({}, j.finalDestination); makeLabel(j); j.label.from = config().productionSite; }
   if (to === 'inbound') store.notify({ type: 'role', role: 'logistics' }, { kind: 'inbound', title: 'Outsourced job on its way to production', body: j.id + ' · ' + j.product + ' for ' + j.customer + ' via ' + (j.courier || 'the printer') + (j.tracking ? ' · ' + j.tracking : '') + '. Receive and verify it when it arrives.', jobId: j.id });
-  if (to === 'logistics' && action === 'finish') store.notify({ type: 'role', role: 'logistics' }, { kind: 'to_pack', title: 'Printed job ready to pack', body: j.id + ' · ' + j.product + ' for ' + j.customer + ' → ' + ((j.destination || {}).name || 'customer') + '.', jobId: j.id });
+  if (to === 'printed') store.notify({ type: 'role', role: 'logistics' }, { kind: 'to_pack', title: 'In-house job printed — receive it', body: j.id + ' · ' + j.product + ' for ' + j.customer + ' → ' + ((j.destination || {}).name || 'customer') + '.', jobId: j.id });
   if (to === 'scheduling') store.notify({ type: 'role', role: 'scheduler' }, { kind: 'to_schedule', title: 'Approved job ready to queue', body: j.id + ' · ' + j.product + ' for ' + j.customer + (j.deadline ? ' · due ' + j.deadline.slice(0, 10) : '') + '.', jobId: j.id });
   if (to === 'escalated') store.notify({ type: 'role', role: 'prepress_manager' }, { kind: 'escalated', title: 'Critical file escalated to you', body: j.id + ' · ' + j.product + ': ' + (payload.reason || '') , jobId: j.id });
   const o = store.order(j.orderId);
@@ -327,55 +331,9 @@ function dailySeries(events, days) {
   }
   return out;
 }
-// ---- delay management (§3.6), machine downtime (§3.7), error responsibility (§5.3) ----------
-const MANAGER_OF = { prepress: 'prepress_manager', scheduler: 'scheduler_manager', logistics: 'logistics_manager' };
-const DELAY_STATUS = { scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['inbound', 'logistics', 'dispatched'], prepress: ['prepress', 'prepress_issue', 'escalated'] };
-function reportDelay(jid, role, actor, body) {
-  const j = store.job(jid); if (!j) return { error: 'Job not found' };
-  const dept = role === 'production_director' ? (D.STATUS[j.status] || {}).queue : D.deptOf(role);
-  if (!DELAY_STATUS[dept] || DELAY_STATUS[dept].indexOf(j.status) < 0) return { error: 'You can only report a delay on a job in your department’s queue.' };
-  const reason = String(body.reason || '').trim(); if (!reason) return { error: 'Identify the cause of the delay.' };
-  j.delays = j.delays || []; j.delays.push({ at: now(), by: actor, dept, reason: reason.slice(0, 400), newEta: body.newEta || null });
-  store.logEvent({ actor, role, action: 'report_delay', jobId: jid, from: null, to: null, note: reason });
-  // 1 cause identified · 2 inform manager · 3 re-prioritised by the system priority · 4 notify affected outlet
-  store.notify({ type: 'role', role: MANAGER_OF[dept] || 'director' }, { kind: 'delay', title: 'Delay reported — ' + jid, body: j.product + ' for ' + j.customer + ': ' + reason + (body.newEta ? ' · new ETA ' + body.newEta : ''), jobId: jid });
-  const oo = outletOfJob(j); if (oo) store.notify({ type: 'outlet', outlet: oo }, { kind: 'delay', title: 'Order delayed — ' + (j.orderId || jid), body: j.product + ' for ' + j.customer + ' is delayed: ' + reason + (body.newEta ? '. New ETA ' + body.newEta : '') + '.', jobId: jid });
-  store.save(); return { job: j };
-}
-function machineDown(jid, role, actor, body) {
-  const j = store.job(jid); if (!j) return { error: 'Job not found' };
-  if (['scheduler_staff', 'scheduler_manager', 'production_director'].indexOf(role) < 0) return { error: 'Only the scheduler reassigns machines.' };
-  if (j.status !== 'printing') return { error: 'Only a job printing in-house can be moved to another machine.' };
-  const to = String(body.machine || '').trim(); const reason = String(body.reason || '').trim();
-  if (!to || !reason) return { error: 'Pick the alternative machine and describe the fault.' };
-  if (to === j.machine) return { error: 'Pick a different machine.' };
-  const from = j.machine;
-  // 1 stop affected jobs · 2 reassign · 3 inform logistics + outlet · 4 log incident
-  const affected = store.jobs().filter(x => x.status === 'printing' && x.machine === from);
-  affected.forEach(x => { x.machine = to; if (body.slot) x.slot = body.slot; x.incidents = x.incidents || []; x.incidents.push({ at: now(), by: actor, type: 'machine_down', dept: 'scheduler', note: from + ' down (' + reason + ') → ' + to }); });
-  store.logEvent({ actor, role, action: 'machine_down', jobId: jid, from: null, to: null, note: from + ' down: ' + reason + ' → moved ' + affected.length + ' job(s) to ' + to });
-  store.notify({ type: 'role', role: 'logistics' }, { kind: 'machine_down', title: 'Machine down: ' + from, body: affected.length + ' job(s) moved to ' + to + '. Expect later hand-over for ' + affected.map(x => x.id).join(', ') + '.', jobId: jid });
-  store.notify({ type: 'role', role: 'scheduler_manager' }, { kind: 'machine_down', title: 'Machine down: ' + from, body: reason + ' — ' + affected.length + ' job(s) moved to ' + to + '.', jobId: jid });
-  const outlets = {}; affected.forEach(x => { const oo = outletOfJob(x); if (oo) outlets[oo] = (outlets[oo] || []).concat([x.id]); });
-  Object.keys(outlets).forEach(oo => store.notify({ type: 'outlet', outlet: oo }, { kind: 'delay', title: 'Production machine down', body: 'Jobs ' + outlets[oo].join(', ') + ' were moved to another machine and may be delayed.', jobId: jid }));
-  const mc = machineLog(); mc.push({ at: now(), by: actor, machine: from, reason, movedTo: to, jobs: affected.map(x => x.id) });
-  store.save(); return { job: store.job(jid), moved: affected.map(x => x.id) };
-}
-function machineLog() { const db = store.load(); db.machineIncidents = db.machineIncidents || []; return db.machineIncidents; }
-function logIncident(jid, role, actor, body) {
-  const j = store.job(jid); if (!j) return { error: 'Job not found' };
-  if (['manager', 'director'].indexOf(D.tierOf(role)) < 0) return { error: 'Errors are recorded by managers or the production director.' };
-  const t = D.ERROR_TYPES[body.type]; if (!t) return { error: 'Pick the error type.' };
-  j.incidents = j.incidents || []; const rec = { at: now(), by: actor, type: body.type, dept: t.dept, note: String(body.note || '').slice(0, 400) };
-  j.incidents.push(rec);
-  store.logEvent({ actor, role, action: 'incident', jobId: jid, from: null, to: null, note: t.label + ' → ' + t.dept + (rec.note ? ' — ' + rec.note : ''), dept: t.dept, errorType: body.type });
-  if (MANAGER_OF[t.dept]) store.notify({ type: 'role', role: MANAGER_OF[t.dept] }, { kind: 'incident', title: t.label + ' logged against your department', body: jid + ' · ' + j.product + (rec.note ? ': ' + rec.note : ''), jobId: jid });
-  store.save(); return { job: j };
-}
-
 // ---- daily reporting (§1.6): morning (start of day) and end-of-day, manager → director ----------
-const QUEUE = { prepress: ['prepress', 'prepress_issue', 'escalated'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['inbound', 'logistics', 'dispatched'] };
-const LEAVES = { prepress: ['approve', 'reject_major'], scheduler: ['finish', 'vendor_ship', 'vendor_ship_outlet'], logistics: ['deliver', 'receive_outlet', 'dispatch'] };
+const QUEUE = { prepress: ['prepress', 'prepress_issue', 'escalated'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
+const LEAVES = { prepress: ['approve', 'reject_major'], scheduler: ['finish', 'vendor_ship', 'vendor_ship_outlet'], logistics: ['dispatch'] };
 const startOfDay = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
 function reportFigures(dept) {
   const jobs = store.jobs(), q = jobs.filter(j => QUEUE[dept].indexOf(j.status) >= 0);
@@ -386,14 +344,10 @@ function reportFigures(dept) {
     pending: q.length,
     urgent: q.filter(j => j.urgent || (j.deadline && Date.parse(j.deadline) <= soon)).sort(D.priorityCompare).map(view),
     completed: today.filter(e => LEAVES[dept].indexOf(e.action) >= 0).length,
-    delayed: jobs.filter(j => (j.delays || []).some(d => d.dept === dept && Date.parse(d.at) >= startOfDay())).map(j => Object.assign(view(j), { reason: j.delays.filter(d => d.dept === dept).slice(-1)[0].reason }))
-      .concat(q.filter(j => j.deadline && Date.parse(j.deadline) < Date.now() && !(j.delays || []).some(d => d.dept === dept && Date.parse(d.at) >= startOfDay())).map(j => Object.assign(view(j), { reason: 'Overdue — no delay reason recorded' }))),
-    errors: today.filter(e => e.action === 'incident' && e.dept === dept).map(e => ({ jobId: e.jobId, note: e.note, by: e.actor })),
+    delayed: q.filter(j => j.deadline && Date.parse(j.deadline) < Date.now()).map(j => Object.assign(view(j), { reason: 'Past the customer deadline' })),
     backlog: q.sort(D.priorityCompare).map(view),
   };
-  if (dept === 'scheduler') {
-    figures.machines = config().machines.map(m => ({ machine: m, jobs: jobs.filter(j => j.status === 'printing' && j.machine === m).length, downToday: machineLog().filter(x => x.machine === m && Date.parse(x.at) >= startOfDay()).length }));
-  }
+  if (dept === 'scheduler') figures.machines = config().machines.map(m => ({ machine: m, jobs: jobs.filter(j => j.status === 'printing' && j.machine === m).length }));
   return figures;
 }
 function reports() { const db = store.load(); db.dailyReports = db.dailyReports || []; return db.dailyReports; }
@@ -406,7 +360,7 @@ function submitReport(dept, kind, body, me, role) {
     notes: { status: String(body.status || '').slice(0, 1000), delays: String(body.delays || '').slice(0, 1000), errors: String(body.errors || '').slice(0, 1000), backlog: String(body.backlog || '').slice(0, 1000) } };
   const list = reports(); const i = list.findIndex(r => r.id === rec.id); if (i >= 0) list[i] = rec; else list.unshift(rec);
   store.logEvent({ actor: me.name, role, action: 'daily_report', jobId: null, from: null, to: null, note: dept + ' ' + (kind === 'morning' ? 'morning' : 'end-of-day') + ' report' });
-  store.notify({ type: 'role', role: 'director' }, { kind: 'daily_report', title: (kind === 'morning' ? 'Morning' : 'End-of-day') + ' report — ' + dept, body: me.name + ': ' + rec.figures.pending + ' pending, ' + rec.figures.urgent.length + ' urgent' + (kind === 'evening' ? ', ' + rec.figures.completed + ' completed, ' + rec.figures.delayed.length + ' delayed, ' + rec.figures.errors.length + ' error(s)' : '') + '.' });
+  store.notify({ type: 'role', role: 'director' }, { kind: 'daily_report', title: (kind === 'morning' ? 'Morning' : 'End-of-day') + ' report — ' + dept, body: me.name + ': ' + rec.figures.pending + ' pending, ' + rec.figures.urgent.length + ' urgent' + (kind === 'evening' ? ', ' + rec.figures.completed + ' completed, ' + rec.figures.delayed.length + ' past deadline' : '') + '.' });
   store.save(); return { report: rec };
 }
 function listReports(role, days) {
@@ -416,44 +370,36 @@ function listReports(role, days) {
 
 const DEPT_ACTIONS = {
   prepress: ['approve', 'reject_major', 'flag_minor', 'escalate', 'resubmit'],
-  scheduler: ['assign_inhouse', 'assign_outsource', 'award_po', 'award_direct', 'request_quotes', 'quote_priced', 'finish', 'draft_approve', 'draft_reject', 'report_delay', 'machine_down'],
-  logistics: ['receive', 'dispatch', 'deliver', 'progress_logistics', 'progress_receiving', 'dispatch_details'],
+  scheduler: ['assign_inhouse', 'assign_outsource', 'award_po', 'award_direct', 'request_quotes', 'quote_priced', 'finish', 'draft_approve', 'draft_reject', 'deliver'],
+  logistics: ['receive', 'dispatch', 'progress_logistics', 'progress_receiving', 'dispatch_details'],
   hub: ['receive_hub', 'forward', 'progress_hub'],
 };
 // the guidebook's KPIs (§7), computed from the audit log and the jobs — never typed in
 function guideKpi(dept, days) {
   const ev = store.audit().filter(e => e.jobId && inRange(e.ts, days));
   const jobs = store.jobs(); const byId = {}; jobs.forEach(j => { byId[j.id] = j; });
-  const inc = (types) => ev.filter(e => e.action === 'incident' && types.indexOf(e.errorType) >= 0).length;
   const onTime = acts => { const xs = ev.filter(e => acts.indexOf(e.action) >= 0 && byId[e.jobId] && byId[e.jobId].deadline); return pct(xs.filter(e => Date.parse(e.ts) <= Date.parse(byId[e.jobId].deadline)).length, xs.length); };
   const m = (label, value, note) => ({ label, value, note });
   if (dept === 'prepress') {
-    const checks = ev.filter(e => ['approve', 'reject_major', 'flag_minor', 'escalate'].indexOf(e.action) >= 0 && ['prepress'].indexOf(e.from) >= 0);
+    const checks = ev.filter(e => ['approve', 'reject_major', 'flag_minor', 'escalate'].indexOf(e.action) >= 0 && e.from === 'prepress');
     const times = checks.map(e => { const t0 = enteredAt(e.jobId, ['prepress'], e.ts); return t0 ? mins(t0, e.ts) : null; }).filter(x => x != null);
     const inSla = checks.filter(e => { const t0 = enteredAt(e.jobId, ['prepress'], e.ts); return t0 && mins(t0, e.ts) <= ((byId[e.jobId] || {}).urgent ? 10 : 30); }).length;
     const flagged = checks.filter(e => e.action !== 'approve').length, rejects = checks.filter(e => e.action === 'reject_major').length;
-    return [m('File check speed', avg(times) == null ? '—' : avg(times) + ' min', pct(inSla, checks.length) == null ? 'no checks yet' : pct(inSla, checks.length) + '% within SLA (30 min · urgent 10 min)'),
-      m('Files checked', checks.length, flagged + ' flagged'), m('Error detection rate', pct(flagged, checks.length) == null ? '—' : pct(flagged, checks.length) + '%', 'files flagged ÷ files checked'),
-      m('Rejections', rejects, inc(['file_issue']) + ' file issue(s) missed and logged later')];
+    return [m('File check speed', avg(times) == null ? '—' : avg(times) + ' min', pct(inSla, checks.length) == null ? 'no checks yet' : pct(inSla, checks.length) + '% within 30 min (urgent 10 min)'),
+      m('Files checked', checks.length, flagged + ' with an issue'), m('Rejections', rejects, 'returned to the outlet')];
   }
   if (dept === 'scheduler') {
-    const awards = ev.filter(e => e.action === 'assign_outsource');
-    const outT = awards.map(e => { const t0 = enteredAt(e.jobId, ['scheduling'], e.ts); return t0 ? mins(t0, e.ts) : null; }).filter(x => x != null);
-    const outsourced = ev.filter(e => e.action === 'assign_outsource').map(e => e.jobId);
-    const badOut = ev.filter(e => e.action === 'incident' && ['wrong_spec', 'quality'].indexOf(e.errorType) >= 0 && outsourced.indexOf(e.jobId) >= 0).length;
+    const outT = ev.filter(e => e.action === 'assign_outsource').map(e => { const t0 = enteredAt(e.jobId, ['scheduling'], e.ts); return t0 ? mins(t0, e.ts) : null; }).filter(x => x != null);
     const inhouse = ev.filter(e => e.action === 'assign_inhouse'); const machines = config().machines;
     const used = machines.filter(mc => inhouse.some(e => ((e.payload || {}).machine) === mc)).length;
+    const ot = onTime(['finish', 'vendor_ship', 'vendor_ship_outlet']);
     return [m('Time to outsource', avg(outT) == null ? '—' : (avg(outT) < 60 ? avg(outT) + ' min' : (avg(outT) / 60).toFixed(1) + ' h'), 'approved → printer awarded'),
-      m('Outsourcing accuracy', pct(outsourced.length - badOut, outsourced.length) == null ? '—' : pct(outsourced.length - badOut, outsourced.length) + '%', outsourced.length + ' outsourced · ' + badOut + ' wrong spec / quality'),
-      m('On-time completion', onTime(['finish', 'vendor_ship', 'vendor_ship_outlet']) == null ? '—' : onTime(['finish', 'vendor_ship', 'vendor_ship_outlet']) + '%', 'printed before the customer deadline'),
-      m('Machine utilisation', used + ' of ' + machines.length, inhouse.length + ' in-house job(s) · ' + machineLog().filter(x => inRange(x.at, days)).length + ' breakdown(s)'),
-      m('Delay incidents', ev.filter(e => e.action === 'report_delay' && D.deptOf(e.role) !== 'logistics').length + inc(['late_job']), 'delays reported + late jobs logged')];
+      m('On-time completion', ot == null ? '—' : ot + '%', 'printed before the customer deadline'),
+      m('Machine utilisation', used + ' of ' + machines.length, inhouse.length + ' in-house job(s)')];
   }
-  const deliveries = ev.filter(e => e.action === 'deliver' || e.action === 'receive_outlet').length;
-  return [m('Delivery accuracy', pct(deliveries - inc(['wrong_item']), deliveries) == null ? '—' : pct(deliveries - inc(['wrong_item']), deliveries) + '%', deliveries + ' delivered · ' + inc(['wrong_item']) + ' wrong item'),
-    m('Damage rate', pct(inc(['damage']), deliveries) == null ? '—' : pct(inc(['damage']), deliveries) + '%', inc(['damage']) + ' damaged'),
-    m('On-time delivery', onTime(['deliver', 'receive_outlet']) == null ? '—' : onTime(['deliver', 'receive_outlet']) + '%', 'delivered before the customer deadline'),
-    m('Dispatched', ev.filter(e => e.action === 'dispatch').length, ev.filter(e => e.action === 'receive').length + ' outsourced job(s) received')];
+  const od = onTime(['deliver', 'customer_received', 'receive_outlet']);
+  return [m('On-time delivery', od == null ? '—' : od + '%', 'received before the customer deadline'),
+    m('Received', ev.filter(e => e.action === 'receive').length, 'from in-house and printers'), m('Shipped', ev.filter(e => e.action === 'dispatch').length, 'dispatched to customers and outlets')];
 }
 function kpi(dept, days) {
   days = Number(days) || 30;
@@ -534,4 +480,4 @@ function actions(dept, opts) {
 }
 
 module.exports = { config, saveConfig, migrate, normalizeJob, makeLabel, syncOrder, onOrderCreated, afterTransition, transition, setStep, sendInternal, award, kpi, sales, hubPerformance, actions, hubById, outletById, STEP_GROUPS, PROGRESS_LABEL,
-  reportDelay, machineDown, logIncident, reportFigures, submitReport, listReports, outletOfJob, destOf };
+  reportFigures, submitReport, listReports, outletOfJob, destOf };

@@ -276,7 +276,7 @@ function documentData(j, kind, me) {
   if (!documents(j, me).some(d => d.id === kind)) return { error: 'Not allowed.' };
   const o = j.outsource || {}; const v = o.awardedTo && store.findCustomer(o.awardedTo); const mine = (o.vendors || []).find(x => x.vendorId === o.awardedTo) || {};
   const base = { kind, jobId: j.id, job: jobDetails(j), hub: deliverTo(j) };
-  if (kind === 'purchase-order') return Object.assign(base, { poNumber: poNumber(j), vendor: { name: (v && (v.company || v.name)) || mine.vendorName, address: (v && ((v.addresses || [])[0] ? [v.addresses[0].line1, v.addresses[0].line2, [v.addresses[0].postcode, v.addresses[0].city].filter(Boolean).join(' '), v.addresses[0].state].filter(Boolean).join(', ') : v.address)) || '' }, shipping: me.type === 'vendor' ? { name: (j.destination || {}).name, address: (j.destination || {}).address } : orderDetails(j), amount: mine.price });
+  if (kind === 'purchase-order') return Object.assign(base, { poNumber: poNumber(j), vendor: { name: (v && (v.company || v.name)) || mine.vendorName, address: (v && ((v.addresses || [])[0] ? [v.addresses[0].line1, v.addresses[0].line2, [v.addresses[0].postcode, v.addresses[0].city].filter(Boolean).join(' '), v.addresses[0].state].filter(Boolean).join(', ') : v.address)) || '' }, shipping: deliverTo(j), amount: mine.price });
   if (kind === 'hub-label') return Object.assign(base, { poNumber: poNumber(j) });
   return Object.assign(base, { order: orderDetails(j) });
 }

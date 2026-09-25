@@ -12,9 +12,10 @@
  *   2 Prepress checks & approves the file   PASS → scheduler · MINOR → fix + approval · MAJOR → reject
  *                                           to outlet · CRITICAL → escalate to the prepress manager (§2.5)
  *   3 Scheduler queues the job              in-house: machine + time slot · outsourced: best quote (§3.5)
- *   4 Printing execution                    scheduler monitors; delays and machine downtime logged (§3.6/3.7)
- *   5 Logistics packs & delivers            outsourced parcels are received at production first (§4.4),
- *                                           then packed, labelled, dispatched, delivery confirmed (§4.5)
+ *   4 Printing execution                    in-house printing done → logistics; the printer ships to production
+ *   5 Logistics receives, packs & ships     the scheduler's job is done once logistics receives it; a shipment
+ *                                           is complete when the customer / outlet receives it or the
+ *                                           scheduler confirms delivery
  * Printers deliver to production (logistics receives) or straight to the outlet (§3.5).
  */
 
@@ -37,6 +38,7 @@ const ROLES = {
   hub_manager: { label: 'Hub Manager', dept: 'hub', tier: 'manager' },
   // external
   printer: { label: 'Outsource Printer', dept: 'vendor', tier: 'staff' },
+  customer: { label: 'Customer', dept: 'customer', tier: 'staff' },
 };
 
 // ---- job statuses: each belongs to one department queue ----------------------
@@ -49,9 +51,10 @@ const STATUS = {
   scheduling: { label: 'Scheduler — in queue', queue: 'scheduler', step: 3 },
   printing: { label: 'Printing — in-house', queue: 'scheduler', step: 4 },
   outsourcing: { label: 'Printing — outsourced', queue: 'scheduler', step: 4 },
-  inbound: { label: 'Logistics — receiving outsourced job', queue: 'logistics', step: 5 },
-  logistics: { label: 'Logistics — packing & labelling', queue: 'logistics', step: 5 },
-  dispatched: { label: 'Dispatched — in transit', queue: 'logistics', step: 5 },
+  printed: { label: 'Printed — waiting for logistics to receive', queue: 'logistics', step: 5 },
+  inbound: { label: 'Printer shipped — waiting for logistics to receive', queue: 'logistics', step: 5 },
+  logistics: { label: 'Received by logistics — packing', queue: 'logistics', step: 5 },
+  dispatched: { label: 'Shipped', queue: 'logistics', step: 5 },
   at_hub: { label: 'At hub (legacy)', queue: 'hub', step: 5 },
   ready_collect: { label: 'Ready for collection at outlet', queue: 'outlet', step: 5 },
   completed: { label: 'Completed / delivered', queue: 'done', step: 5 },
@@ -134,7 +137,11 @@ const TRANSITIONS = {
   ],
   // Step 4 — Printing execution, monitored by the scheduler (§3.5 step 4)
   printing: [
-    { action: 'finish', to: 'logistics', roles: SCHEDULER, requires: ['qc'], note: 'Printed; spec and quality checked — handed to logistics.' },
+    { action: 'finish', to: 'printed', roles: SCHEDULER, requires: ['qc'], note: 'Printed; spec and quality checked — handed to logistics.' },
+  ],
+  // in-house job done — the scheduler's job is complete once logistics receives it
+  printed: [
+    { action: 'receive', to: 'logistics', roles: LOGISTICS, note: 'Received from in-house production.' },
   ],
   outsourcing: [
     { action: 'vendor_ship', to: 'inbound', roles: SCHEDULER.concat(['printer'], LOGISTICS), gates: ['draftApproved', 'destProduction'], requires: ['courier'], note: 'Printer shipped the job to production for receiving.' },
@@ -148,7 +155,9 @@ const TRANSITIONS = {
     { action: 'dispatch', to: 'dispatched', roles: LOGISTICS, gates: ['packingDone'], requires: ['courier'], note: 'Assigned to the courier and dispatched.' },
   ],
   dispatched: [
-    { action: 'deliver', to: 'completed', roles: LOGISTICS, gates: ['destCustomer'], note: 'Delivery confirmed and the receiver notified.' },
+    // shipped → complete when the customer (or outlet) receives it, or the scheduler confirms delivery
+    { action: 'customer_received', to: 'completed', roles: ['customer'], gates: ['destCustomer'], note: 'Customer confirmed they received the order.' },
+    { action: 'deliver', to: 'completed', roles: SCHEDULER, gates: ['destCustomer'], note: 'Scheduler confirmed the delivery.' },
     { action: 'receive_outlet', to: 'ready_collect', roles: OUTLET, gates: ['destOutlet'], note: 'Outlet received the parcel — customer notified it is ready for collection.' },
     { action: 'receive_hub', to: 'at_hub', roles: HUB, gates: ['destHub'], note: 'Hub received the parcel (legacy hub routing).' },
   ],
@@ -191,15 +200,6 @@ function priorityCompare(a, b) {
   return pa - pb;
 }
 
-// Error responsibility alignment (§5.3)
-const ERROR_TYPES = {
-  file_issue: { label: 'File issue', dept: 'prepress' },
-  late_job: { label: 'Late job', dept: 'scheduler' },
-  wrong_spec: { label: 'Wrong spec', dept: 'scheduler' },
-  quality: { label: 'Quality', dept: 'scheduler' },
-  wrong_item: { label: 'Wrong item sent', dept: 'logistics' },
-  damage: { label: 'Damaged in packing / delivery', dept: 'logistics' },
-};
 
 // Staff account role (login) → state-machine role, decided on the SERVER from the session.
 // production_manager / production_staff are legacy logins: production and scheduler are one department.
@@ -220,4 +220,4 @@ function opsRoleFor(account) {
 const deptOf = role => (ROLES[role] || {}).dept || null;
 const tierOf = role => (ROLES[role] || {}).tier || null;
 
-module.exports = { ROLES, STATUS, STEPS, CHECKLISTS, GATES, TRANSITIONS, ERROR_TYPES, roleCan, availableActions, resolveTransition, priorityCompare, opsRoleFor, deptOf, tierOf };
+module.exports = { ROLES, STATUS, STEPS, CHECKLISTS, GATES, TRANSITIONS, roleCan, availableActions, resolveTransition, priorityCompare, opsRoleFor, deptOf, tierOf };

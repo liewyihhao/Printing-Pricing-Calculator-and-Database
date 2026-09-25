@@ -4745,7 +4745,7 @@ class Component extends DCLogic {
 
   // ===== ORDER TRACKING =====
   trackStage(status) {
-    const map = { intake: 0, prepress: 1, prepress_issue: 1, escalated: 1, rejected: 1, scheduling: 2, printing: 2, outsourcing: 2, logistics: 3, dispatched: 3, at_hub: 3, ready_collect: 3, completed: 4 };
+    const map = { intake: 0, prepress: 1, prepress_issue: 1, escalated: 1, rejected: 1, scheduling: 2, printing: 2, outsourcing: 2, printed: 2, inbound: 2, logistics: 2, dispatched: 3, at_hub: 3, ready_collect: 3, completed: 4 };
     return map[status] != null ? map[status] : 0;
   }
   s_track() {
@@ -4775,7 +4775,13 @@ class Component extends DCLogic {
               h('span', { style: { height: 14, width: 14, borderRadius: '50%', flex: 'none', background: i > cur ? '#eaeaea' : (i === cur ? AMBER : TEAL) } }),
               i < STAGES.length - 1 && h('span', { style: { flex: 1, height: 2, background: i < cur ? TEAL : '#eaeaea' } })),
             h('div', { style: { fontSize: 12.5, fontWeight: i === cur ? 600 : 500, color: i > cur ? FAINT : INK } }, s)))),
-        !paid ? h('div', { style: { marginTop: 16, background: '#fff5e2', color: '#a1660a', borderRadius: 8, padding: '11px 13px', fontSize: 12.5, lineHeight: 1.6 } }, 'Payment is pending — production starts once payment is confirmed. Paid by bank transfer? Our team validates it shortly.') : null),
+        !paid ? h('div', { style: { marginTop: 16, background: '#fff5e2', color: '#a1660a', borderRadius: 8, padding: '11px 13px', fontSize: 12.5, lineHeight: 1.6 } }, 'Payment is pending — production starts once payment is confirmed. Paid by bank transfer? Our team validates it shortly.') : null,
+        // shipped to the customer: they confirm it arrived (completes the delivery)
+        this.userType() === 'customer' && o.userId === (this.state.user || {}).id && jobs.some(j => j.status === 'dispatched' && (j.destination || {}).type === 'customer')
+          ? h('div', { style: { marginTop: 16, display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', background: '#e6f4ea', borderRadius: 8, padding: '11px 13px' } },
+            h('span', { style: { fontSize: 13, color: '#1f5e2a', flex: 1 } }, 'Your order is on its way. Let us know once it arrives.'),
+            h('span', { onClick: () => fetch('/api/orders/' + o.id + '/received', { method: 'POST', headers: this.authHeaders() }).then(r => r.json()).then(d => { if (d.order) this.setState({ trackOrder: d.order }); }).catch(() => {}),
+              style: { background: TEAL, color: '#fff', fontWeight: 600, fontSize: 13.5, padding: '10px 18px', borderRadius: 8, cursor: 'pointer' } }, 'I’ve received my order')) : null),
       h('div', { key: 'j', style: { display: 'flex', flexDirection: 'column', gap: 14 } },
         jobs.map((j, i) => h('div', { key: i, style: { border: '1px solid ' + HAIR, borderRadius: 12, padding: 16, display: 'flex', gap: 14, background: '#fff' } },
           h('div', { style: { flex: '0 0 96px' } }, this.art((this.pkProducts().find(p => p.name === j.product) || {}).name || j.product)),
