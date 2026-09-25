@@ -74,20 +74,24 @@
   const jobsIn = (c, statuses) => c.opsJobs().filter(j => statuses.indexOf(j.status) >= 0);
 
   // ================================================================== PREPRESS
-  P.s_prepress = function () {
-    const tabs = ['Dashboard', 'Files', 'KPI'].concat(isManager(this) ? ['Daily report'] : []);
-    return this.pShell('prepress', tabs, tab => {
-      if (tab === 'Files') return this.pTable('pf', 'Files', jobsIn(this, ['prepress', 'prepress_issue', 'escalated', 'rejected']));
-      if (tab === 'KPI') return this.pKpi('prepress');
-      if (tab === 'Daily report') return this.pDaily('prepress');
-      const q = jobsIn(this, Q.prepress);
-      return [this.pTiles([
-        { label: 'Files to check', value: jobsIn(this, ['prepress']).length, icon: 'check', color: 'teal', onClick: () => this.setState({ sTab: 'Files', pf_s: 'Prepress — file check' }) },
-        { label: 'Minor issues', value: jobsIn(this, ['prepress_issue']).length, icon: 'edit-3', color: 'orange', onClick: () => this.setState({ sTab: 'Files', pf_s: 'Prepress — minor issue, awaiting approval' }) },
-        { label: 'Escalated to manager', value: jobsIn(this, ['escalated']).length, icon: 'layers', color: 'red', onClick: () => this.setState({ sTab: 'Files', pf_s: 'Prepress — escalated to manager' }) },
-        { label: 'Rejected to outlet', value: jobsIn(this, ['rejected']).length, icon: 'file', color: 'red', onClick: () => this.setState({ sTab: 'Files', pf_s: 'Rejected — returned to outlet' }) }])]
-        .concat(this.pTable('pd', 'Your queue', q));
-    });
+  // each department's tabs; the Production Director sees the same dashboards inside the director account
+  const DEPT_TABS = {
+    prepress: c => ['Dashboard', 'Files', 'KPI'].concat(isManager(c) ? ['Daily report'] : []),
+    scheduler: c => ['Dashboard', 'Quote request', 'Quote Pending from Printer', 'Jobs Outsourced', 'Jobs Inhouse'].concat(isManager(c) ? ['KPI', 'Daily report'] : []),
+    logistics: c => ['Dashboard', 'Incoming Jobs', 'Completed Jobs', 'Shipped'].concat(isManager(c) ? ['KPI', 'Daily report'] : []),
+  };
+  P.s_prepress = function () { return this.pShell('prepress', DEPT_TABS.prepress(this), tab => this.pPrepress(tab, (t, extra) => this.setState(Object.assign({ sTab: t }, extra)))); };
+  P.pPrepress = function (tab, go) {
+    if (tab === 'Files') return this.pTable('pf', 'Files', jobsIn(this, ['prepress', 'prepress_issue', 'escalated', 'rejected']));
+    if (tab === 'KPI') return this.pKpi('prepress');
+    if (tab === 'Daily report') return this.pDaily('prepress');
+    const q = jobsIn(this, Q.prepress);
+    return [this.pTiles([
+      { label: 'Files to check', value: jobsIn(this, ['prepress']).length, icon: 'check', color: 'teal', onClick: () => go('Files', { pf_s: 'Prepress — file check' }) },
+      { label: 'Minor issues', value: jobsIn(this, ['prepress_issue']).length, icon: 'edit-3', color: 'orange', onClick: () => go('Files', { pf_s: 'Prepress — minor issue, awaiting approval' }) },
+      { label: 'Escalated to manager', value: jobsIn(this, ['escalated']).length, icon: 'layers', color: 'red', onClick: () => go('Files', { pf_s: 'Prepress — escalated to manager' }) },
+      { label: 'Rejected to outlet', value: jobsIn(this, ['rejected']).length, icon: 'file', color: 'red', onClick: () => go('Files', { pf_s: 'Rejected — returned to outlet' }) }])]
+      .concat(this.pTable('pd', 'Your queue', q));
   };
 
   // ================================================================== SCHEDULER
@@ -141,27 +145,24 @@
     return this.pStateList('ji', 'Jobs Inhouse', this.opsJobs().filter(j => j.route === 'inhouse' && ['scheduling'].indexOf(j.status) < 0).map(j => ({ date: j.createdAt, due: j.deadline, state: inState(j), search: [j.id, j.product, j.customer, j.machine],
       cells: [link(j.id, () => openJob(this, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), (j.machine || '—') + (j.slot ? ' · ' + when(j.slot) : ''), j.deadline ? dmy(j.deadline) : '—'] })), ['Job', 'Product', 'Machine · slot', 'Due']);
   };
-  P.s_scheduler = function () {
-    const tabs = ['Dashboard', 'Quote request', 'Quote Pending from Printer', 'Jobs Outsourced', 'Jobs Inhouse'].concat(isManager(this) ? ['KPI', 'Daily report'] : []);
-    return this.pShell('scheduler', tabs, tab => {
-      if (tab === 'Quote request') return this.pQuoteRequests();
-      if (tab === 'Quote Pending from Printer') return this.pPrinterPending();
-      if (tab === 'Jobs Outsourced') return this.pJobsOutsourced();
-      if (tab === 'Jobs Inhouse') return this.pJobsInhouse();
-      if (tab === 'KPI') return this.pKpi('scheduler');
-      if (tab === 'Daily report') return this.pDaily('scheduler');
-      const qs = ((this.acGet('p_quotes', '/api/quotes') || {}).quotes) || [], jobs = this.opsJobs();
-      const open = arr => arr.filter(s => !s[2]).length;
-      const pending = jobs.filter(j => j.outsource && (j.outsource.vendors || []).length && j.outsource.requestedAt).map(j => pqState(j.outsource.vendors, !!j.outsource.awardedTo)).concat(qs.filter(q => q.printerQuotes && q.printerQuotes.printers.length).map(q => pqState(q.printerQuotes.printers, false)));
-      return [this.pTiles([
-        { label: 'Quote request', value: open(qs.map(qrState)), icon: 'edit-3', color: 'teal', onClick: () => this.setState({ sTab: 'Quote request' }) },
-        { label: 'Quote Pending from Printer', value: open(pending), icon: 'file', color: 'orange', onClick: () => this.setState({ sTab: 'Quote Pending from Printer' }) },
-        { label: 'Jobs Outsourced', value: open(jobs.filter(j => j.outsource && j.outsource.awardedTo).map(outState)), icon: 'truck', color: 'teal', onClick: () => this.setState({ sTab: 'Jobs Outsourced' }) },
-        { label: 'Jobs Inhouse', value: open(jobs.filter(j => j.route === 'inhouse' && j.status !== 'scheduling').map(inState)), icon: 'printer', color: 'teal', onClick: () => this.setState({ sTab: 'Jobs Inhouse' }) }])]
-        .concat(this.pTable('sd', 'New jobs — print in-house or outsource', jobsIn(this, ['scheduling'])))
-        .concat(this.pTable('sdl', 'Shipped to customers — confirm delivery', jobs.filter(j => j.status === 'dispatched' && (j.destination || {}).type === 'customer')))
-        ;
-    });
+  P.s_scheduler = function () { return this.pShell('scheduler', DEPT_TABS.scheduler(this), tab => this.pScheduler(tab, t => this.setState({ sTab: t }))); };
+  P.pScheduler = function (tab, go) {
+    if (tab === 'Quote request') return this.pQuoteRequests();
+    if (tab === 'Quote Pending from Printer') return this.pPrinterPending();
+    if (tab === 'Jobs Outsourced') return this.pJobsOutsourced();
+    if (tab === 'Jobs Inhouse') return this.pJobsInhouse();
+    if (tab === 'KPI') return this.pKpi('scheduler');
+    if (tab === 'Daily report') return this.pDaily('scheduler');
+    const qs = ((this.acGet('p_quotes', '/api/quotes') || {}).quotes) || [], jobs = this.opsJobs();
+    const open = arr => arr.filter(s => !s[2]).length;
+    const pending = jobs.filter(j => j.outsource && (j.outsource.vendors || []).length && j.outsource.requestedAt).map(j => pqState(j.outsource.vendors, !!j.outsource.awardedTo)).concat(qs.filter(q => q.printerQuotes && q.printerQuotes.printers.length).map(q => pqState(q.printerQuotes.printers, false)));
+    return [this.pTiles([
+      { label: 'Quote request', value: open(qs.map(qrState)), icon: 'edit-3', color: 'teal', onClick: () => go('Quote request') },
+      { label: 'Quote Pending from Printer', value: open(pending), icon: 'file', color: 'orange', onClick: () => go('Quote Pending from Printer') },
+      { label: 'Jobs Outsourced', value: open(jobs.filter(j => j.outsource && j.outsource.awardedTo).map(outState)), icon: 'truck', color: 'teal', onClick: () => go('Jobs Outsourced') },
+      { label: 'Jobs Inhouse', value: open(jobs.filter(j => j.route === 'inhouse' && j.status !== 'scheduling').map(inState)), icon: 'printer', color: 'teal', onClick: () => go('Jobs Inhouse') }])]
+      .concat(this.pTable('sd', 'New jobs — print in-house or outsource', jobsIn(this, ['scheduling'])))
+      .concat(this.pTable('sdl', 'Shipped to customers — confirm delivery', jobs.filter(j => j.status === 'dispatched' && (j.destination || {}).type === 'customer')));
   };
 
   // ================================================================== LOGISTICS
@@ -171,33 +172,43 @@
   const logRows = (c, list, st) => list.map(j => ({ date: j.createdAt, due: j.deadline, state: st(j), search: [j.id, j.product, j.customer],
     cells: [link(j.id, () => openJob(c, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), j.customer, (j.finalDestination || {}).name || '—'] }));
   const wasShipped = j => !!(j.dispatchDelivery || (j.statusAt && j.statusAt.logistics && ['dispatched', 'ready_collect', 'completed'].indexOf(j.status) >= 0));
-  P.s_logistics = function () {
-    const tabs = ['Dashboard', 'Incoming Jobs', 'Completed Jobs', 'Shipped'].concat(isManager(this) ? ['KPI', 'Daily report'] : []);
+  P.s_logistics = function () { return this.pShell('logistics', DEPT_TABS.logistics(this), tab => this.pLogistics(tab, t => this.setState({ sTab: t }))); };
+  P.pLogistics = function (tab, go) {
     const jobs = this.opsJobs();
     const incoming = jobs.filter(j => j.route === 'outsource' && (['inbound', 'logistics'].indexOf(j.status) >= 0 || wasShipped(j)));
     const completed = jobs.filter(j => j.route === 'inhouse' && (['printed', 'logistics'].indexOf(j.status) >= 0 || wasShipped(j)));
     const shipped = jobs.filter(j => (j.destination || {}).type !== 'hub' && (j.status === 'dispatched' || (wasShipped(j) && ['ready_collect', 'completed'].indexOf(j.status) >= 0)));
     const cols = ['Job', 'Product', 'Customer', 'Deliver to'];
-    return this.pShell('logistics', tabs, tab => {
-      if (tab === 'Incoming Jobs') return this.pStateList('li', 'Incoming Jobs — from printers', logRows(this, incoming, logState), cols);
-      if (tab === 'Completed Jobs') return this.pStateList('lc', 'Completed Jobs — from in-house', logRows(this, completed, logState), cols);
-      if (tab === 'Shipped') return this.pStateList('ls', 'Shipped', logRows(this, shipped, shipState), cols);
-      if (tab === 'KPI') return this.pKpi('logistics');
-      if (tab === 'Daily report') return this.pDaily('logistics');
-      const open = (list, st) => list.filter(j => !st(j)[2]).length;
-      return [this.pTiles([
-        { label: 'Incoming Jobs', value: open(incoming, logState), icon: 'truck', color: 'orange', onClick: () => this.setState({ sTab: 'Incoming Jobs' }) },
-        { label: 'Completed Jobs', value: open(completed, logState), icon: 'printer', color: 'teal', onClick: () => this.setState({ sTab: 'Completed Jobs' }) },
-        { label: 'Shipped', value: open(shipped, shipState), icon: 'box', color: 'teal', onClick: () => this.setState({ sTab: 'Shipped' }) }])]
-        .concat(this.pStateList('ld', 'To receive and ship', logRows(this, incoming.concat(completed).filter(j => !logState(j)[2]), logState), cols));
-    });
+    if (tab === 'Incoming Jobs') return this.pStateList('li', 'Incoming Jobs — from printers', logRows(this, incoming, logState), cols);
+    if (tab === 'Completed Jobs') return this.pStateList('lc', 'Completed Jobs — from in-house', logRows(this, completed, logState), cols);
+    if (tab === 'Shipped') return this.pStateList('ls', 'Shipped', logRows(this, shipped, shipState), cols);
+    if (tab === 'KPI') return this.pKpi('logistics');
+    if (tab === 'Daily report') return this.pDaily('logistics');
+    const open = (list, st) => list.filter(j => !st(j)[2]).length;
+    return [this.pTiles([
+      { label: 'Incoming Jobs', value: open(incoming, logState), icon: 'truck', color: 'orange', onClick: () => go('Incoming Jobs') },
+      { label: 'Completed Jobs', value: open(completed, logState), icon: 'printer', color: 'teal', onClick: () => go('Completed Jobs') },
+      { label: 'Shipped', value: open(shipped, shipState), icon: 'box', color: 'teal', onClick: () => go('Shipped') }])]
+      .concat(this.pStateList('ld', 'To receive and ship', logRows(this, incoming.concat(completed).filter(j => !logState(j)[2]), logState), cols));
   };
 
   // ================================================================== PRODUCTION DIRECTOR
+  // sub-tabs inside a director tab (same pill style as the account tabs)
+  P.pSubTabs = function (tabs, active, go) {
+    return h('div', { key: 'subtabs', style: { display: 'flex', gap: 6, flexWrap: 'wrap' } }, tabs.map(t => h('button', { key: t, type: 'button', onClick: () => go(t),
+      style: { font: '600 13px Montserrat,sans-serif', padding: '8px 14px', borderRadius: 999, cursor: 'pointer', border: '1px solid ' + (t === active ? TEAL : HAIR), background: t === active ? TEAL : '#fff', color: t === active ? '#fff' : INK } }, t)));
+  };
+  const DEPT_VIEW = { prepress: 'pPrepress', scheduler: 'pScheduler', logistics: 'pLogistics' };
   P.s_production = function () {
     const tabs = ['Dashboard', 'Prepress', 'Scheduler', 'Logistics', 'Reports', 'Settings'];
     return this.pShell('production', tabs, tab => {
-      if (tab === 'Prepress' || tab === 'Scheduler' || tab === 'Logistics') { const d = tab.toLowerCase(); return this.pKpiTiles(d).concat(this.pTable('dir_' + d, tab, jobsIn(this, Q[d].concat(d === 'prepress' ? ['rejected'] : [])))); }
+      // the director works every department exactly as that department does
+      if (tab === 'Prepress' || tab === 'Scheduler' || tab === 'Logistics') {
+        const d = tab.toLowerCase(), key = 'dirSub_' + d, subs = DEPT_TABS[d](this);
+        const sub = subs.indexOf(this.state[key]) >= 0 ? this.state[key] : 'Dashboard';
+        const go = (t, extra) => this.setState(Object.assign({ [key]: t }, extra));
+        return [this.pSubTabs(subs, sub, go)].concat(this[DEPT_VIEW[d]](sub, go));
+      }
       if (tab === 'Reports') return this.pReports();
       if (tab === 'Settings') return this.pSettings();
       const all = this.opsJobs();
@@ -228,7 +239,9 @@
     // who took the job in each part (the first person in each department to open it)
     const hb = (d.handlers || []).map(x => [x.part, x.who ? h('span', null, x.who, x.at ? h('span', { style: { display: 'block', fontSize: 12, color: FAINT } }, when(x.at)) : null) : h('span', { style: { color: FAINT } }, 'Not yet')]);
     const aside = [hb.length ? this.acC('Handled by', this.acDL(hb)) : null, docs.length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, docs.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null];
-    const typeTab = tabs.indexOf('Files') >= 0 ? 'Files'
+    const st = STEP[j.status] || 1;
+    const typeTab = tabs.indexOf('Reports') >= 0 ? (st <= 2 ? 'Prepress' : st <= 4 ? 'Scheduler' : 'Logistics')
+      : tabs.indexOf('Files') >= 0 ? 'Files'
       : tabs.indexOf('Jobs Inhouse') >= 0 ? (j.route === 'inhouse' ? 'Jobs Inhouse' : j.route === 'outsource' ? 'Jobs Outsourced' : 'Dashboard')
       : tabs.indexOf('Incoming Jobs') >= 0 ? (j.status === 'dispatched' || j.status === 'completed' || j.status === 'ready_collect' ? 'Shipped' : j.route === 'inhouse' ? 'Completed Jobs' : 'Incoming Jobs') : tabs[1];
     return this.acSingle({ home: tabs[0], type: typeTab, title: '#' + id, statusNode: this.pillDot(j.statusLabel || j.status, tone(j)) }, main, aside);
@@ -337,6 +350,7 @@
     return this.acC('Pack & ship', [
       note('Pack the order, print the shipping label, then enter the courier and tracking number and press Ship.'),
       cl ? cl('logistics', PC) : null,
+      packing ? this.pSendTo(j) : null,
       h('div', { key: 'lb' }, Btn('View Shipping Label (PDF)', () => this.openJobDoc(j.id, 'shipping-label'))),
       this.acDL([['Deliver to', ((j.destination || {}).name || '—') + ((j.destination || {}).address ? ', ' + j.destination.address : '')], ['Parcels', j.parcels || 1]]),
       FG('Courier', h('select', { value: courier, onChange: e => this.acSetF('dCourier', e.target.value), style: inp }, cfg.couriers.map(c => h('option', { key: c }, c))), 1, 'Only the delivery companies selected by HQ.'),
@@ -344,6 +358,17 @@
       FG('Delivery order', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, dd.document ? link('📄 ' + dd.document.name, () => this.jDownload('/api/jobs/' + j.id + '/files/' + dd.document.id, dd.document.name)) : null, this.jPickFile('dDoc'))),
       packing && a && a.blockedBy && a.blockedBy.length ? box(a.blockedBy.join(' '), 'bad') : null,
       h('div', { key: 'b' }, Btn(packing ? 'Ship' : 'Save changes', () => this.jPost('/api/jobs/' + j.id + '/delivery', { tracking, company: courier, documentData: this.acF('dDocData') || undefined, documentName: this.acF('dDocName') || undefined }, packing ? 'Dispatched.' : 'Delivery details saved.', () => this.setState({ acForm: {} })), 'primary', !tracking.trim() || (packing && (!a || !a.enabled))))]);
+  };
+  // Send to: the customer directly, or an outlet (the shipping label follows the choice)
+  P.pSendTo = function (j) {
+    const outlets = (this.acGet('p_outlets', '/api/ops/outlets') || {}).outlets || [];
+    const d = j.destination || {}; const isOutlet = d.type === 'outlet';
+    const set = body => this.jPost('/api/jobs/' + j.id + '/send-to', body, body.type === 'outlet' ? 'Will be sent to the outlet.' : 'Will be sent to the customer.');
+    const opt = (on, label, click) => h('label', { style: { display: 'flex', alignItems: 'center', gap: 8, fontSize: 14, cursor: 'pointer', fontWeight: on ? 600 : 400 } }, h('input', { type: 'radio', checked: on, onChange: click }), label);
+    return FG('Send to', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } },
+      opt(!isOutlet, 'Customer — deliver to their address', () => set({ type: 'customer' })),
+      opt(isOutlet, 'Outlet — customer collects there', () => set({ type: 'outlet', outletId: (outlets[0] || {}).id })),
+      isOutlet ? h('select', { value: d.id || '', onChange: e => set({ type: 'outlet', outletId: e.target.value }), style: Object.assign({}, inp, { marginLeft: 24, width: 'calc(100% - 24px)' }) }, outlets.map(o => h('option', { key: o.id, value: o.id }, o.name))) : null), 1, 'The shipping label updates to match. Print it after choosing.');
   };
   // outsourcing (§3.5 rules: cost, production time, logistics — never preference or pressure)
   P.pOutsourceCard = function (j, pr) {

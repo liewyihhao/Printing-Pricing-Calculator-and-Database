@@ -1145,7 +1145,8 @@ class Component extends DCLogic {
       if (home === 'vendor') this.loadVendorRequests();
       if (home === 'production') this.loadVendors();
       const r2 = this.opsRoleFor(home);
-      if (r2 && typeof fetch === 'function') fetch('/api/jobs?role=' + this.opsRoleForUser(c), { headers: this.authHeaders() }).then(x => x.json()).then(j => this.setState({ ops: { jobs: j.jobs || [], role: this.opsRoleForUser(c), loaded: true } })).catch(() => {});
+      // jobs + ops settings (couriers, machines, outlets) + the 30-second refresh
+      if (r2) this.opsLoad();
     }).catch(() => {});
   }
   // ---------- notifications ----------

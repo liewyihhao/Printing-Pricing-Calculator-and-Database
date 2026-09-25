@@ -129,6 +129,11 @@ async function api(req, res, pathname, query) {
     const b = await readBody(req); const r = ops.setStep(seg[1], b.group, b.key, b.done !== false, role, actor, b.note);
     return r.error ? send(res, 400, r) : send(res, 200, { ok: true, job: jobView(r.job, role) });
   }
+  // POST /api/jobs/:id/send-to  { type: 'customer'|'outlet', outletId }  — logistics picks where the parcel goes before shipping
+  if (seg[0] === 'jobs' && seg[2] === 'send-to' && req.method === 'POST') {
+    const r = ops.sendTo(seg[1], role, actor, await readBody(req));
+    return r.error ? send(res, 400, r) : send(res, 200, { ok: true, job: jobView(r.job, role) });
+  }
   // POST /api/jobs/:id/send-internal  { machine, destType, destId, instructions, parcels }  (Qn 752 CF1)
   if (seg[0] === 'jobs' && seg[2] === 'send-internal' && req.method === 'POST') {
     const r = ops.sendInternal(seg[1], role, actor, await readBody(req));

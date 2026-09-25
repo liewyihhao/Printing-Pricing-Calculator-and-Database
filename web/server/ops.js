@@ -300,6 +300,24 @@ function sendInternal(jid, role, actor, body) {
   return { job: store.job(jid) };
 }
 
+// logistics chooses where a received job is shipped: the customer's delivery address, or an outlet
+function sendTo(jid, role, actor, body) {
+  const j = store.job(jid); if (!j) return { error: 'Job not found' };
+  if (['logistics_staff', 'logistics_manager', 'production_director'].indexOf(role) < 0) return { error: 'Only logistics chooses where the parcel goes.' };
+  if (j.status !== 'logistics') return { error: 'Receive the job first; the destination can be changed until it is shipped.' };
+  normalizeJob(j);
+  const type = body.type === 'outlet' ? 'outlet' : 'customer';
+  if (type === 'outlet' && !outletById(body.outletId)) return { error: 'Pick the outlet.' };
+  // "customer" always goes back to the order's own delivery address
+  if (j.finalDestination && j.finalDestination.type === 'customer' && !j.customerDestination) j.customerDestination = Object.assign({}, j.finalDestination);
+  const d = type === 'outlet' ? destOf('outlet', body.outletId, j) : destOf('customer', null, Object.assign({}, j, { finalDestination: j.customerDestination || null }), store.order(j.orderId));
+  if (type === 'customer' && !d.address) return { error: 'This order has no delivery address. Send it to an outlet instead.' };
+  j.finalDestination = Object.assign({}, d); j.destination = Object.assign({}, d);
+  makeLabel(j); j.label.from = config().productionSite;
+  store.logEvent({ actor, role, action: 'send_to', jobId: jid, from: null, to: null, note: 'Send to ' + (type === 'outlet' ? d.name : 'customer — ' + (d.address || d.name)) });
+  store.save(); return { job: j };
+}
+
 // ---- award (quoted, or Qn 752 CF2 direct award without a submitted quote) ------
 function award(jid, role, actor, body) {
   const j = store.job(jid); if (!j) return { error: 'Job not found' };
@@ -552,5 +570,5 @@ function individual(me, staffId) {
   return { performance: r, staff: individualStaff(me) };
 }
 
-module.exports = { individual, individualStaff, config, saveConfig, migrate, normalizeJob, makeLabel, syncOrder, onOrderCreated, afterTransition, transition, setStep, sendInternal, award, kpi, sales, hubPerformance, actions, hubById, outletById, STEP_GROUPS, PROGRESS_LABEL,
+module.exports = { sendTo, individual, individualStaff, config, saveConfig, migrate, normalizeJob, makeLabel, syncOrder, onOrderCreated, afterTransition, transition, setStep, sendInternal, award, kpi, sales, hubPerformance, actions, hubById, outletById, STEP_GROUPS, PROGRESS_LABEL,
   reportFigures, submitReport, listReports, outletOfJob, destOf, claim, handlers };
