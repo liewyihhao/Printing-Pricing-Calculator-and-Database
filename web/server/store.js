@@ -246,9 +246,17 @@ function productName(n) {
   return s || String(n || '').trim();
 }
 // ---- create an order/job at intake (outlet walk-in or online) ----
+// a 5-digit number no job or order uses yet (random numbers alone collided: two jobs shared one ID)
+function freeJobNumber(db) {
+  const used = {}; (db.jobs || []).forEach(j => { const m = /^J-(\d+)-/.exec(j.id); if (m) used[m[1]] = 1; });
+  (db.orders || []).forEach(o => { const m = /-(\d+)$/.exec(o.id || ''); if (m) used[m[1]] = 1; });
+  for (let i = 0; i < 1000; i++) { const n = 10000 + Math.floor(Math.random() * 89999); if (!used[n]) return n; }
+  for (let n = 10000; n < 100000; n++) if (!used[n]) return n;
+  return 100000 + (db.jobs || []).length;
+}
 function createJob(body) {
   const db = load();
-  const jid = 'J-' + (10000 + Math.floor(Math.random() * 89999)) + '-1';
+  const jid = 'J-' + freeJobNumber(db) + '-1';
   const j = {
     id: jid, orderId: 'O-' + jid.slice(2, 7), channel: body.channel || 'outlet',
     customer: body.customer || 'Walk-in customer', product: productName(body.product || 'Business Card'),
@@ -270,7 +278,7 @@ function order(oid) { return orders().find(o => o.id === oid); }
 function createOrder(body) {
   const db = load();
   const yr = new Date().getFullYear();
-  const num = 10000 + Math.floor(Math.random() * 89999);
+  const num = freeJobNumber(db);
   const oid = 'PO-' + yr + '-' + num;
   const cust = body.customer || {};
   const items = (body.items || []).map((it, i) => ({

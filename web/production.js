@@ -167,10 +167,12 @@
 
   // ================================================================== LOGISTICS
   // Incoming Jobs (from printers) · Completed Jobs (from in-house) · Shipped
-  const logState = j => j.status === 'inbound' ? ['Waiting to receive', 'warn', false]
-    : (j.status === 'printed' || j.status === 'logistics') ? (((j.progress || {}).logistics || {}).labelled && j.status === 'logistics' ? ['Label printed — enter tracking and ship', 'teal', false] : ['Print the shipping label', 'warn', false])
-    : ['Done — shipped', 'ok', true];
-  const shipState = j => j.status === 'dispatched' ? ['Shipped — waiting for delivery', 'teal', false] : ['Done — ' + (j.status === 'completed' ? 'delivered' : 'received by the outlet'), 'ok', true];
+  // statuses (user, 2026-09-25): Pending Receiving → Pending Pickup → Shipped → Completed (outlet or customer received it)
+  const logState = j => ['inbound', 'printed'].indexOf(j.status) >= 0 ? ['Pending Receiving', 'warn', false]
+    : j.status === 'logistics' ? ['Pending Pickup', 'teal', false]
+    : j.status === 'dispatched' ? ['Shipped', 'teal', false]
+    : ['Completed', 'ok', true];
+  const shipState = logState;
   const logRows = (c, list, st) => list.map(j => ({ date: j.createdAt, due: j.deadline, state: st(j), search: [j.id, j.product, j.customer],
     cells: [link(j.id, () => openJob(c, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), j.customer, (j.finalDestination || {}).name || '—'] }));
   const wasShipped = j => !!(j.dispatchDelivery || (j.statusAt && j.statusAt.logistics && ['dispatched', 'ready_collect', 'completed'].indexOf(j.status) >= 0));
@@ -186,12 +188,13 @@
     if (tab === 'Shipped') return this.pStateList('ls', 'Shipped', logRows(this, shipped, shipState), cols);
     if (tab === 'KPI') return this.pKpi('logistics');
     if (tab === 'Daily report') return this.pDaily('logistics');
-    const open = (list, st) => list.filter(j => !st(j)[2]).length;
+    // counters: only work still open — Completed jobs drop off the dashboard
+    const waiting = j => ['inbound', 'printed', 'logistics'].indexOf(j.status) >= 0;
     return [this.pTiles([
-      { label: 'Incoming Jobs', value: open(incoming, logState), icon: 'truck', color: 'orange', onClick: () => go('Incoming Jobs') },
-      { label: 'Completed Jobs', value: open(completed, logState), icon: 'printer', color: 'teal', onClick: () => go('Completed Jobs') },
-      { label: 'Shipped', value: open(shipped, shipState), icon: 'box', color: 'teal', onClick: () => go('Shipped') }])]
-      .concat(this.pStateList('ld', 'To receive and ship', logRows(this, incoming.concat(completed).filter(j => !logState(j)[2]), logState), cols));
+      { label: 'Incoming Jobs', value: incoming.filter(waiting).length, icon: 'truck', color: 'orange', onClick: () => go('Incoming Jobs') },
+      { label: 'Completed Jobs', value: completed.filter(waiting).length, icon: 'printer', color: 'teal', onClick: () => go('Completed Jobs') },
+      { label: 'Shipped', value: shipped.filter(j => j.status === 'dispatched').length, icon: 'box', color: 'teal', onClick: () => go('Shipped') }])]
+      .concat(this.pStateList('ld', 'To receive and ship', logRows(this, incoming.concat(completed).filter(waiting), logState), cols));
   };
 
   // ================================================================== PRODUCTION DIRECTOR

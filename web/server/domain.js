@@ -51,13 +51,14 @@ const STATUS = {
   scheduling: { label: 'Scheduler — in queue', queue: 'scheduler', step: 3 },
   printing: { label: 'Printing — in-house', queue: 'scheduler', step: 4 },
   outsourcing: { label: 'Printing — outsourced', queue: 'scheduler', step: 4 },
-  printed: { label: 'Printed — shipping label to print', queue: 'logistics', step: 5 },
-  inbound: { label: 'Printer shipped — waiting for logistics to receive', queue: 'logistics', step: 5 },
-  logistics: { label: 'Received by logistics — packing', queue: 'logistics', step: 5 },
+  // logistics statuses (user, 2026-09-25): Pending Receiving → Pending Pickup → Shipped → Completed
+  printed: { label: 'Pending Receiving', queue: 'logistics', step: 5 },
+  inbound: { label: 'Pending Receiving', queue: 'logistics', step: 5 },
+  logistics: { label: 'Pending Pickup', queue: 'logistics', step: 5 },
   dispatched: { label: 'Shipped', queue: 'logistics', step: 5 },
   at_hub: { label: 'At hub (legacy)', queue: 'hub', step: 5 },
   ready_collect: { label: 'Ready for collection at outlet', queue: 'outlet', step: 5 },
-  completed: { label: 'Completed / delivered', queue: 'done', step: 5 },
+  completed: { label: 'Completed', queue: 'done', step: 5 },
   cancelled: { label: 'Cancelled', queue: 'done', step: 5 },
 };
 const STEPS = ['Order entered', 'Prepress', 'Scheduler', 'Printing', 'Logistics'];
