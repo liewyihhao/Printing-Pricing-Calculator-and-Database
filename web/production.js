@@ -40,8 +40,8 @@
   const inDept = (c, d) => isDirector(c) || deptOf(c) === d;
 
   // queues (guidebook §1.8 steps)
-  const Q = { prepress: ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected', 'artwork_ready'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
-  const STEP = { intake: 1, prepress: 2, prepress_issue: 2, escalated: 2, rejected: 2, artwork_ready: 2, scheduling: 3, printing: 4, outsourcing: 4, printed: 5, inbound: 5, logistics: 5, dispatched: 5, at_hub: 5, ready_collect: 5, completed: 5, cancelled: 5 };
+  const Q = { prepress: ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected', 'artwork_ready'], scheduler: ['scheduling', 'to_outsource', 'to_inhouse', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
+  const STEP = { intake: 1, prepress: 2, prepress_issue: 2, escalated: 2, rejected: 2, artwork_ready: 2, scheduling: 3, to_outsource: 3, to_inhouse: 3, printing: 4, outsourcing: 4, printed: 5, inbound: 5, logistics: 5, dispatched: 5, at_hub: 5, ready_collect: 5, completed: 5, cancelled: 5 };
   const STEPS = ['Order entered', 'Prepress', 'Scheduler', 'Printing', 'Logistics'];
   const overdue = j => j.deadline && Date.parse(j.deadline) < Date.now() && ['completed', 'cancelled', 'ready_collect'].indexOf(j.status) < 0;
   // how many days the job has sat at its current step without moving forward (from the order date for a new order):
@@ -70,7 +70,7 @@
   P.pTable = function (key, title, jobs, extra) {
     const list = jobs.slice().sort((a, b) => { const da = a.deadline ? Date.parse(a.deadline) : Infinity, db = b.deadline ? Date.parse(b.deadline) : Infinity; if (da !== db) return da - db; return (Date.parse(a.paymentValidatedAt || 0) || Infinity) - (Date.parse(b.paymentValidatedAt || 0) || Infinity); });
     // "Handled by": who took the job in the department it is in now
-    const handler = j => { const dq = j.queue || ({ intake: 'prepress', prepress: 'prepress', prepress_issue: 'prepress', escalated: 'prepress', rejected: 'prepress', artwork_ready: 'prepress', scheduling: 'scheduler', printing: 'scheduler', outsourcing: 'scheduler' })[j.status] || 'logistics'; return (j.owner || {})[dq] || '—'; };
+    const handler = j => { const dq = j.queue || ({ intake: 'prepress', prepress: 'prepress', prepress_issue: 'prepress', escalated: 'prepress', rejected: 'prepress', artwork_ready: 'prepress', scheduling: 'scheduler', to_outsource: 'scheduler', to_inhouse: 'scheduler', printing: 'scheduler', outsourcing: 'scheduler' })[j.status] || 'logistics'; return (j.owner || {})[dq] || '—'; };
     return this.acList({ key, title, action: extra, cols: ['Date', 'Job', 'Product', 'Customer', 'Days', 'Handled by', 'Status'],
       rows: list.map(j => ({ date: j.createdAt, status: j.statusLabel || j.status, search: [j.id, j.orderId, j.customer, j.product, handler(j)],
         cells: [h('span', { style: { whiteSpace: 'nowrap' } }, dmy(j.createdAt)), link('#' + j.id, () => openJob(this, j)), j.product, j.customer, daysBadge(j), handler(j), this.pillDot(j.statusLabel || j.status, tone(j))] })) });
@@ -120,13 +120,17 @@
     return ['Waiting for Printers (' + got.length + ' of ' + printers.length + ')', 'warn', false];
   };
   const receivedByLogistics = j => !!(j.statusAt && (j.statusAt.logistics || j.statusAt.dispatched && j.dispatchDelivery)) || ['logistics'].indexOf(j.status) >= 0;
+  // the Outsourced / In House lists: jobs the scheduler sent that way (still being set up, or already running)
+  const outJobs = c => c.opsJobs().filter(j => j.status === 'to_outsource' || (j.outsource && j.outsource.awardedTo));
+  const inJobs = c => c.opsJobs().filter(j => j.status === 'to_inhouse' || (j.route === 'inhouse' && ['scheduling', 'to_outsource'].indexOf(j.status) < 0));
   const outState = j => {
+    if (j.status === 'to_outsource') return [j.outsource && j.outsource.requestedAt ? 'Quotes Requested' : 'To Outsource', 'warn', false];
     if (j.status === 'outsourcing') return [j.printing ? j.printing.status : 'Printing', 'teal', false];
     if (j.status === 'inbound') return ['Pending Receiving', 'warn', false];
     if (j.status === 'dispatched' && !receivedByLogistics(j)) return ['Shipped to Outlet', 'warn', false];
     return ['Received', 'ok', true];
   };
-  const inState = j => j.status === 'printing' ? ['Printing on ' + (j.machine || 'machine'), 'teal', false] : j.status === 'printed' ? ['Pending Receiving', 'warn', false] : ['Received', 'ok', true];
+  const inState = j => j.status === 'to_inhouse' ? ['To Print In House', 'warn', false] : j.status === 'printing' ? ['Printing on ' + (j.machine || 'machine'), 'teal', false] : j.status === 'printed' ? ['Pending Receiving', 'warn', false] : ['Received', 'ok', true];
   // a list with a clear state per row; open rows first, done rows (last 30 days) after
   P.pStateList = function (key, title, rows, cols) {
     rows = rows.filter(r => !r.state[2] || recent(r.date)).sort((a, b) => (a.state[2] - b.state[2]) || String(a.due || '9').localeCompare(String(b.due || '9')));
@@ -147,16 +151,16 @@
     return this.pStateList('pq', 'Quote Pending Response from Printer', rows, ['Ref', 'For', 'Product', 'Printers']);
   };
   P.pJobsOutsourced = function () {
-    return this.pStateList('jo', 'Outsourced', this.opsJobs().filter(j => j.outsource && j.outsource.awardedTo).map(j => ({ date: j.createdAt, due: j.deadline, state: outState(j), search: [j.id, j.product, j.customer, j.outsource.po],
-      cells: [link('#' + j.id, () => openJob(this, j)), j.product, ((j.outsource.vendors || []).find(v => v.vendorId === j.outsource.awardedTo) || {}).vendorName || '—', daysBadge(j)] })), ['Job', 'Product', 'Printer', 'Days']);
+    return this.pStateList('jo', 'Outsourced', outJobs(this).map(j => ({ date: j.createdAt, due: j.deadline, state: outState(j), search: [j.id, j.product, j.customer, (j.outsource || {}).po],
+      cells: [link('#' + j.id, () => openJob(this, j)), j.product, (((j.outsource || {}).vendors || []).find(v => v.vendorId === (j.outsource || {}).awardedTo) || {}).vendorName || '—', daysBadge(j)] })), ['Job', 'Product', 'Printer', 'Days']);
   };
   P.pJobsInhouse = function () {
-    return this.pStateList('ji', 'In House', this.opsJobs().filter(j => j.route === 'inhouse' && ['scheduling'].indexOf(j.status) < 0).map(j => ({ date: j.createdAt, due: j.deadline, state: inState(j), search: [j.id, j.product, j.customer, j.machine],
+    return this.pStateList('ji', 'In House', inJobs(this).map(j => ({ date: j.createdAt, due: j.deadline, state: inState(j), search: [j.id, j.product, j.customer, j.machine],
       cells: [link('#' + j.id, () => openJob(this, j)), j.product, (j.machine || '—') + (j.slot ? ' · ' + when(j.slot) : ''), daysBadge(j)] })), ['Job', 'Product', 'Machine · slot', 'Days']);
   };
   P.s_scheduler = function () { return this.pShell('scheduler', DEPT_TABS.scheduler(this), tab => this.pScheduler(tab, t => this.setState({ sTab: t }))); };
   P.pScheduler = function (tab, go) {
-    // New Order: passed preflight — review it, then request printer quotes or process it in-house
+    // Artwork Approved: passed preflight — choose Outsource or Print In House
     if (tab === 'Artwork Approved') return this.pTable('sn', 'Artwork Approved', jobsIn(this, ['scheduling']));
     if (tab === 'Quote Requests') return this.pQuoteRequests();
     if (tab === 'Quote Pending Response from Printer') return this.pPrinterPending();
@@ -170,8 +174,8 @@
     // two rows (user, 2026-09-26): Orders, then Quotations
     return [this.pTiles([
       { label: 'Artwork Approved', value: jobsIn(this, ['scheduling']).length, icon: 'file', color: 'red', onClick: () => go('Artwork Approved') },
-      { label: 'Outsourced', value: open(jobs.filter(j => j.outsource && j.outsource.awardedTo).map(outState)), icon: 'truck', color: 'teal', onClick: () => go('Outsourced') },
-      { label: 'In House', value: open(jobs.filter(j => j.route === 'inhouse' && j.status !== 'scheduling').map(inState)), icon: 'printer', color: 'teal', onClick: () => go('In House') }], 'Orders'),
+      { label: 'Outsourced', value: open(outJobs(this).map(outState)), icon: 'truck', color: 'teal', onClick: () => go('Outsourced') },
+      { label: 'In House', value: open(inJobs(this).map(inState)), icon: 'printer', color: 'teal', onClick: () => go('In House') }], 'Orders'),
       this.pTiles([
       { label: 'Quote Requests', value: open(qs.map(qrState)), icon: 'edit-3', color: 'teal', onClick: () => go('Quote Requests') },
       { label: 'Quote Pending Response from Printer', value: open(pending), icon: 'file', color: 'orange', onClick: () => go('Quote Pending Response from Printer') }], 'Quotations')]
@@ -253,7 +257,8 @@
     // logistics pages (1 Received · 2 Print label · 3 Shipping): the step on the left, order details on the right
     const logPage = ['inbound', 'printed', 'logistics'].indexOf(j.status) >= 0 && inDept(this, 'logistics') && deptOf(this) !== 'scheduler';
     const card = this.pStepCard(j, pr, acts, d.order, d.siblings); if (card) main.push(card);
-    if (j.outsource && inDept(this, 'scheduler') && !logPage) main.push(this.pOutsourceCard(j, pr));
+    // Outsource page: shown once the scheduler chose Outsource (and afterwards, while the printer works on it)
+    if ((j.outsource || j.status === 'to_outsource') && j.status !== 'scheduling' && j.status !== 'to_inhouse' && inDept(this, 'scheduler') && !logPage) main.push(this.pOutsourceCard(j, pr));
     const orderCard = this.acC('Order details', [h('b', { key: 'p' }, j.product), this.acSpec((pr.job && pr.job.spec) || j.spec),
       this.acDL([['Quantity', (j.qty || 0).toLocaleString()], ['Customer', j.customer], ['Due', j.deadline ? when(j.deadline) + (overdue(j) ? ' — overdue' : '') : '—'], ['Deliver to', j.finalDestination ? (j.finalDestination.name || j.finalDestination.type) + (j.finalDestination.address ? ', ' + j.finalDestination.address : '') : '—'], j.instructions ? ['Instructions', j.instructions] : null, j.machine ? ['Machine', j.machine + (j.slot ? ' · ' + when(j.slot) : '')] : null]),
       (pr.job && pr.job.artworks || []).length ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12, display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 12.5 } }, 'Artwork'), pr.job.artworks.map((a, i) => a.id ? h('span', { key: i }, link('📄 ' + a.name, () => this.openOrderFile(a.orderId, a))) : h('span', { key: i, style: { color: MUT } }, '📄 ' + a.name))) : null]);
@@ -270,7 +275,7 @@
     const st = STEP[j.status] || 1;
     const typeTab = tabs.indexOf('Reports') >= 0 ? (st <= 2 ? 'Prepress' : st <= 4 ? 'Scheduler' : 'Logistics')
       : tabs.indexOf('Preflight') >= 0 ? (Object.keys(PREPRESS_TABS).find(k => PREPRESS_TABS[k].indexOf(j.status) >= 0) || 'Dashboard')
-      : tabs.indexOf('In House') >= 0 ? (j.status === 'scheduling' ? 'Artwork Approved' : j.route === 'inhouse' ? 'In House' : j.route === 'outsource' ? 'Outsourced' : 'Dashboard')
+      : tabs.indexOf('In House') >= 0 ? (j.status === 'scheduling' ? 'Artwork Approved' : j.status === 'to_outsource' ? 'Outsourced' : j.status === 'to_inhouse' ? 'In House' : j.route === 'inhouse' ? 'In House' : j.route === 'outsource' ? 'Outsourced' : 'Dashboard')
       : tabs.indexOf('Incoming Jobs') >= 0 ? (j.status === 'dispatched' || j.status === 'completed' || j.status === 'ready_collect' ? 'Shipped' : j.route === 'inhouse' ? 'Completed Jobs' : 'Incoming Jobs') : tabs[1];
     return this.acSingle({ home: tabs[0], type: typeTab, title: '#' + id, statusNode: this.pillDot(j.statusLabel || j.status, tone(j)) }, main, aside);
   };
@@ -356,21 +361,30 @@
           acts.flag_minor && st !== 'prepress_issue' ? Btn('Amended', () => this.pAmendedModal(j, order)) : null,
           acts.reject_major ? Btn('Request', () => this.pRejectModal(j), 'danger') : null)]);
     }
-    // Step 3 — scheduler (§3.5): confirm approval + payment, then in-house (machine + slot) or outsource
+    // Step 3 — scheduler: first choose Outsource or Print In House (each changes the status and opens its page)
     if (st === 'scheduling') {
       if (!inDept(this, 'scheduler')) return this.acC('Scheduler', note('Order processed to Scheduler.'));
+      return this.acC('Artwork approved', [
+        note('This job has been approved by Prepress. Choose how to produce it.'),
+        h('div', { key: 'b', style: { display: 'flex', gap: 8, flexWrap: 'wrap' } },
+          acts.choose_outsource ? Btn('Outsource', () => act('choose_outsource', {}, 'Moved to Outsourced.'), 'primary') : null,
+          acts.choose_inhouse ? Btn('Print In House', () => act('choose_inhouse', {}, 'Moved to In House.'), 'primary') : null)]);
+    }
+    if (st === 'to_outsource') return inDept(this, 'scheduler') ? null : this.acC('Scheduler', note('The scheduler is outsourcing this job.'));
+    // In House page: machine, time slot, parcels, delivery instructions → Queue in-house
+    if (st === 'to_inhouse') {
+      if (!inDept(this, 'scheduler')) return this.acC('Scheduler', note('The scheduler is queueing this job in-house.'));
       const a = acts.assign_inhouse; const cfg = this.state.opsConfig || { machines: [] };
       const machine = this.acF('machine') || cfg.machines[0] || '', slot = this.acF('slot'), parcels = this.acF('parcels') || '1';
-      return this.acC('Schedule this job', [
-        note('Priority is set only by the customer’s deadline, then payment time. Print it on one of our machines, or outsource it to the printer with the best quote below.'),
+      return this.acC('Print In House', [
         blocked(a),
-        h('b', { key: 'h1' }, 'Print in-house'),
         h('div', { key: 'f', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12 } },
           FG('Machine', h('select', { value: machine, onChange: e => this.acSetF('machine', e.target.value), style: inp }, cfg.machines.map(m => h('option', { key: m }, m))), 1),
           FG('Time slot', h('input', { type: 'datetime-local', value: slot, onChange: e => this.acSetF('slot', e.target.value), style: inp }), 1),
           FG('Parcels', h('input', { type: 'number', min: 1, value: parcels, onChange: e => this.acSetF('parcels', e.target.value), style: inp }))),
         FG('Delivery instructions for logistics', h('input', { value: this.acF('instr'), onChange: e => this.acSetF('instr', e.target.value), placeholder: 'optional', style: inp })),
-        h('div', { key: 'b' }, Btn('Queue in-house', () => this.jPost('/api/jobs/' + id + '/send-internal', { machine, slot, parcels, instructions: this.acF('instr') || undefined }, 'Queued on ' + machine + '.', () => this.setState({ acForm: {} })), 'primary', !a || !a.enabled || !machine || !slot))]);
+        h('div', { key: 'b', style: { display: 'flex', gap: 8, flexWrap: 'wrap' } }, Btn('Queue in-house', () => this.jPost('/api/jobs/' + id + '/send-internal', { machine, slot, parcels, instructions: this.acF('instr') || undefined }, 'Queued on ' + machine + '.', () => this.setState({ acForm: {} })), 'primary', !a || !a.enabled || !machine || !slot),
+          acts.choose_outsource ? Btn('Outsource instead', () => act('choose_outsource', {}, 'Moved to Outsourced.')) : null)]);
     }
     // Step 4 — printing (in-house), monitored by the scheduler (§3.5 step 4, §3.6, §3.7)
     if (st === 'printing') {
@@ -460,7 +474,8 @@
   P.pOutsourceCard = function (j, pr) {
     const o = j.outsource || {}; const id = j.id; const vendors = (this.acGet('vendors', '/api/vendors') || {}).vendors || [];
     const quotes = pr.quotes || [];
-    const canAward = !o.awardedTo && j.status === 'scheduling';
+    const canAward = !o.awardedTo && ['scheduling', 'to_outsource'].indexOf(j.status) >= 0;
+    const toInhouse = (j.actions || []).find(a => a.action === 'choose_inhouse' && a.permitted);
     const rows = quotes.map(q => h('tr', { key: q.vendorId }, [q.vendorName, q.amount != null ? 'RM ' + Number(q.amount).toFixed(2) : 'no quote yet', q.leadDays ? q.leadDays + ' days' : '—',
       q.document ? link(q.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + q.document.id, q.document.name)) : '—',
       q.awarded ? this.pillDot('Awarded', 'ok') : canAward && q.submittedAt ? Btn('Award', () => this.pAwardModal(j, q)) : ''].map((c, i) => h('td', { key: i, style: { padding: '9px 8px', borderTop: '1px solid ' + LINE, fontSize: 13 } }, c))));
@@ -475,7 +490,8 @@
       o.awardedTo && j.status === 'outsourcing' ? note('Purchase order sent. Waiting for the printer to finish the job and enter the delivery details.') : null,
       // the scheduler pays the printer once Printoka has received the job
       inDept(this, 'scheduler') && pr.awarded && !pr.paidAt && pr.status && pr.status.id === 'shipped' ? Btn('Mark printer paid', () => this.pModal('Mark printer paid', [['reference', 'Payment reference', 'e.g. IBG-7781']], v => this.jPost('/api/jobs/' + id + '/vendor-paid', v, 'Printer marked paid.', () => this.setState({ acModal: null }))), 'primary') : null,
-      pr.paidAt ? box('Printer paid.', 'ok') : null]);
+      pr.paidAt ? box('Printer paid.', 'ok') : null,
+      toInhouse && !o.awardedTo ? h('div', { key: 'ih' }, Btn('Print in house instead', () => this.jPost('/api/jobs/' + id + '/transition', { action: 'choose_inhouse', payload: {} }, 'Moved to In House.'))) : null]);
   };
 
   // ---------------------------------------------------------------- pop-ups (one question each, one button)

@@ -158,7 +158,7 @@ function syncOrder(oid) {
   else if (all(['completed'])) p = 'completed';
   else if (all(['ready_collect', 'completed'])) p = 'ready_for_collection';
   else if (all(['dispatched', 'at_hub', 'ready_collect', 'completed'])) p = 'shipped';
-  else if (any(['scheduling', 'printing', 'outsourcing', 'printed', 'inbound', 'logistics', 'dispatched', 'at_hub', 'ready_collect', 'completed'])) p = 'in_production';
+  else if (any(['scheduling', 'to_outsource', 'to_inhouse', 'printing', 'outsourcing', 'printed', 'inbound', 'logistics', 'dispatched', 'at_hub', 'ready_collect', 'completed'])) p = 'in_production';
   else if (any(['prepress', 'prepress_issue', 'escalated', 'artwork_ready'])) p = 'artwork_check';
   if (o.progress !== p) { o.progress = p; o.progressLabel = PROGRESS_LABEL[p]; o.progressAt = now(); }
   return o;
@@ -389,7 +389,7 @@ function award(jid, role, actor, body) {
   normalizeJob(j);
   const vendor = store.findCustomer(body.vendorId);
   if (!vendor || vendor.type !== 'vendor') return { error: 'Pick a printer.' };
-  if (j.status !== 'scheduling') return { error: 'Only jobs waiting in the production queue can be awarded.' };
+  if (['scheduling', 'to_outsource'].indexOf(j.status) < 0) return { error: 'Only jobs waiting to be outsourced can be awarded.' };
   j.outsource = j.outsource || { status: 'direct', requestedAt: null, vendors: [], awardedTo: null, po: null };
   let v = j.outsource.vendors.find(x => x.vendorId === vendor.id);
   const quoted = !!(v && v.submittedAt);
@@ -443,7 +443,7 @@ function dailySeries(events, days) {
   return out;
 }
 // ---- daily reporting (§1.6): morning (start of day) and end-of-day, manager → director ----------
-const QUEUE = { prepress: ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected', 'artwork_ready'], scheduler: ['scheduling', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
+const QUEUE = { prepress: ['intake', 'prepress', 'prepress_issue', 'escalated', 'rejected', 'artwork_ready'], scheduler: ['scheduling', 'to_outsource', 'to_inhouse', 'printing', 'outsourcing'], logistics: ['printed', 'inbound', 'logistics', 'dispatched'] };
 const LEAVES = { prepress: ['approve', 'reject_major'], scheduler: ['finish', 'vendor_ship', 'vendor_ship_outlet'], logistics: ['dispatch'] };
 const startOfDay = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return d.getTime(); };
 function reportFigures(dept) {

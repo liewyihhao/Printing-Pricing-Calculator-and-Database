@@ -52,6 +52,9 @@ const STATUS = {
   artwork_ready: { label: 'Awaiting Other Items', queue: 'prepress', step: 2 },
   rejected: { label: 'Pending Amendment', queue: 'prepress', step: 2 },
   scheduling: { label: 'Artwork Approved', queue: 'scheduler', step: 3 },
+  // the scheduler's choice on an approved job (user, 2026-09-26): outsource it, or print it in-house
+  to_outsource: { label: 'To Outsource', queue: 'scheduler', step: 3 },
+  to_inhouse: { label: 'To Print In House', queue: 'scheduler', step: 3 },
   printing: { label: 'Printing — in-house', queue: 'scheduler', step: 4 },
   outsourcing: { label: 'Printing — outsourced', queue: 'scheduler', step: 4 },
   // logistics statuses (user, 2026-09-25): Pending Receiving → Pending Pickup → Shipped → Completed
@@ -134,8 +137,18 @@ const TRANSITIONS = {
   ],
   // Step 3 — Scheduler (§3.5 SOP: confirm prepress approval + payment, assign machine/printer, queue with a time slot)
   scheduling: [
+    { action: 'choose_outsource', to: 'to_outsource', roles: SCHEDULER, note: 'Scheduler chose to outsource this job.' },
+    { action: 'choose_inhouse', to: 'to_inhouse', roles: SCHEDULER, note: 'Scheduler chose to print this job in-house.' },
     { action: 'assign_inhouse', to: 'printing', roles: SCHEDULER, gates: ['payment'], requires: ['machine', 'slot'], note: 'Queued in-house on a machine and time slot.' },
     { action: 'assign_outsource', to: 'outsourcing', roles: SCHEDULER, gates: ['payment'], requires: ['printer'], note: 'Outsourced to the printer with the best quote (cost, time, logistics).' },
+  ],
+  to_outsource: [
+    { action: 'assign_outsource', to: 'outsourcing', roles: SCHEDULER, gates: ['payment'], requires: ['printer'], note: 'Outsourced to the printer with the best quote (cost, time, logistics).' },
+    { action: 'choose_inhouse', to: 'to_inhouse', roles: SCHEDULER, note: 'Scheduler switched this job to in-house printing.' },
+  ],
+  to_inhouse: [
+    { action: 'assign_inhouse', to: 'printing', roles: SCHEDULER, gates: ['payment'], requires: ['machine', 'slot'], note: 'Queued in-house on a machine and time slot.' },
+    { action: 'choose_outsource', to: 'to_outsource', roles: SCHEDULER, note: 'Scheduler switched this job to outsourcing.' },
   ],
   // Step 4 — Printing execution, monitored by the scheduler (§3.5 step 4)
   printing: [
