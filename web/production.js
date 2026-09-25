@@ -328,11 +328,10 @@
         st !== 'prepress_issue' ? h('div', { key: 'secs', style: { display: 'flex', flexDirection: 'column', gap: 10 } }, CL.map(sectionRow)) : null,
         blocked(approve),
         h('div', { key: 'b', style: { display: 'flex', flexDirection: 'column', gap: 8 } },
-          approve && st === 'prepress_issue' ? Btn('Customer approved — pass to scheduler', () => this.pModal('Customer approved', [['approval', 'How did the customer approve it?', 'e.g. Approved by WhatsApp, 25 Sep 10:30']], v => act('approve', { approval: v.approval }, 'Passed to the scheduler.')), 'primary', !approve.enabled) : null,
-          approve && st !== 'prepress_issue' ? Btn('Approve — pass to scheduler', () => act('approve', {}, 'Approved — passed to the scheduler.'), 'primary', !approve.enabled || !allTicked) : null,
-          approve && st !== 'prepress_issue' && !allTicked ? note('Tick every check to approve the artwork.') : null,
-          acts.flag_minor && st !== 'prepress_issue' ? Btn('Minor issue — amended, pending customer approval', () => this.pModal('Minor issue', [['reason', 'What did you amend?', 'e.g. Extended the bleed from 2 mm to 3 mm']], v => act('flag_minor', v, 'Pending customer approval.'))) : null,
-          acts.reject_major ? Btn(st === 'prepress_issue' ? 'Customer wants a new file — pending amendment' : 'Major issue — ask the customer for a new file', () => this.pRejectModal(j), 'danger') : null)]);
+          approve && st === 'prepress_issue' ? Btn('Proceed', () => this.pModal('Customer approved', [['approval', 'How did the customer approve it?', 'e.g. Approved by WhatsApp, 25 Sep 10:30']], v => act('approve', { approval: v.approval }, 'Passed to the scheduler.')), 'primary', !approve.enabled) : null,
+          approve && st !== 'prepress_issue' ? Btn('Proceed', () => act('approve', {}, 'Passed to the scheduler.'), 'primary', !approve.enabled || !allTicked) : null,
+          acts.flag_minor && st !== 'prepress_issue' ? Btn('Amended', () => this.pModal('Amended', [['reason', 'What did you amend?', 'e.g. Extended the bleed from 2 mm to 3 mm']], v => act('flag_minor', v, 'Pending customer approval.'))) : null,
+          acts.reject_major ? Btn('Request', () => this.pRejectModal(j), 'danger') : null)]);
     }
     // Step 3 — scheduler (§3.5): confirm approval + payment, then in-house (machine + slot) or outsource
     if (st === 'scheduling') {
@@ -464,7 +463,7 @@
   P.pRejectModal = function (j) {
     // major issue: prepress contacts the customer for a new file → Pending Customer Amendment
     const send = proofId => this.jPost('/api/jobs/' + j.id + '/transition', { action: 'reject_major', payload: { reason: this.acF('reason'), proof: proofId || undefined, suggestion: this.acF('suggestion') || undefined } }, 'Pending customer amendment.', () => this.setState({ acModal: null, acForm: {} }));
-    this.setState({ acForm: {}, acModal: { title: 'Major issue — ask for a new file', body: () => [
+    this.setState({ acForm: {}, acModal: { title: 'Request a new file', body: () => [
       FG('Issue', ta(this.acF('reason'), v => this.acSetF('reason', v), 3), 1, 'e.g. Text runs into the 3 mm bleed on the right edge'),
       FG('Screenshot', this.jPickFile('proof')),
       FG('Suggested correction', ta(this.acF('suggestion'), v => this.acSetF('suggestion', v), 3)),
