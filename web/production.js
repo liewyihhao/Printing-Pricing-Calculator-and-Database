@@ -335,7 +335,7 @@
     }
     // Step 3 — scheduler (§3.5): confirm approval + payment, then in-house (machine + slot) or outsource
     if (st === 'scheduling') {
-      if (!inDept(this, 'scheduler')) return this.acC('Scheduler', note('Waiting for the scheduler to queue this job.'));
+      if (!inDept(this, 'scheduler')) return this.acC('Scheduler', note('Order processed to Scheduler.'));
       const a = acts.assign_inhouse; const cfg = this.state.opsConfig || { machines: [] };
       const machine = this.acF('machine') || cfg.machines[0] || '', slot = this.acF('slot'), parcels = this.acF('parcels') || '1';
       return this.acC('Schedule this job', [
