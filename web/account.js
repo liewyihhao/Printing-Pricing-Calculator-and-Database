@@ -326,15 +326,19 @@
     }
     if (mode === 'edit-spec') {
       const F = k => this.acF(k) !== '' ? this.acF(k) : (q ? ({ product: q.product, specifications: q.spec, requesterId: q.requester && q.requester.id })[k] || '' : '');
-      const cust = (this.acGet('cust_' + (this.state.acCustQ || ''), '/api/outlet/customers?q=' + encodeURIComponent(this.state.acCustQ || '')) || {}).customers || [];
-      const reqLabel = F('requesterId') ? ((cust.find(c => c.value === F('requesterId')) || {}).label || (q && q.requester ? q.requester.name + ' (' + q.requester.email + ')' : F('requesterId'))) : '';
+      // the requester list only appears once the staff member starts typing a name or email
+      const custQ = (this.state.acCustQ || '').trim();
+      const custRes = custQ ? this.acGet('cust_' + custQ, '/api/outlet/customers?q=' + encodeURIComponent(custQ)) : null;
+      const cust = (custRes || {}).customers || [];
+      const reqLabel = F('requesterId') ? ((cust.find(c => c.value === F('requesterId')) || {}).label || this.acF('requesterLabel') || (q && q.requester ? q.requester.name + ' (' + q.requester.email + ')' : F('requesterId'))) : '';
       main.push(this.acC('Specifications', [
         FG('Product', h('input', { value: F('product'), onChange: e => this.acSetF('product', e.target.value), style: inp }), 1),
-        FG('Specifications', h('textarea', { rows: 8, value: F('specifications'), onChange: e => this.acSetF('specifications', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1),
+        FG('Specifications', h('textarea', { rows: 8, className: 'ac-hint', placeholder: 'Please finalize the size, material, finishing, add-on remarks and quantity. Include the customer’s target price, if any.', value: F('specifications'), onChange: e => this.acSetF('specifications', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1),
         FG('Requester', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } },
           reqLabel ? h('div', { style: { fontSize: 13, background: ALT, borderRadius: 8, padding: '8px 12px' } }, reqLabel) : null,
           h('input', { placeholder: 'Search customer name or email…', value: this.state.acCustQ || '', onChange: e => this.setState({ acCustQ: e.target.value }), style: inp }),
-          h('div', { style: { maxHeight: 160, overflow: 'auto', border: '1px solid ' + LINE, borderRadius: 8 } }, cust.map(c => h('div', { key: c.value, onClick: () => this.acSetF('requesterId', c.value), style: { padding: '8px 12px', fontSize: 13, cursor: 'pointer', background: F('requesterId') === c.value ? '#fdf2f2' : '#fff', borderTop: '1px solid ' + LINE } }, c.label)))), 1),
+          custQ && custRes && !cust.length ? h('div', { style: { fontSize: 13, color: FAINT, padding: '4px 2px' } }, 'No customer found. Create the account first.') : null,
+          custQ && cust.length ? h('div', { style: { maxHeight: 160, overflow: 'auto', border: '1px solid ' + LINE, borderRadius: 8 } }, cust.map(c => h('div', { key: c.value, onClick: () => { this.acSetF('requesterId', c.value); this.acSetF('requesterLabel', c.label); this.setState({ acCustQ: '' }); }, style: { padding: '8px 12px', fontSize: 13, cursor: 'pointer', background: F('requesterId') === c.value ? '#fdf2f2' : '#fff', borderTop: '1px solid ' + LINE } }, c.label))) : null), 1),
         h('div', { key: 'aw', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 12 } },
           FG('Artwork name', h('input', { value: this.acF('artworkName'), onChange: e => this.acSetF('artworkName', e.target.value), style: inp })),
           FG('Artwork file', h('input', { type: 'file', onChange: e => this.acReadFile(e.target.files[0]).then(f => { if (f) { this.acSetF('artworkData', f.data); this.acSetF('artworkFileName', f.name); } }), style: inp }))),
