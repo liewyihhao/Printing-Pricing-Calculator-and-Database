@@ -207,7 +207,7 @@
       { label: 'Quote requests', value: n(p => /^quote/.test(p.statusId) && !p.submitted), icon: 'edit-3', color: 'teal', onClick: () => go('Printing Jobs', 'vj_s', 'Quote requested') },
       { label: 'Upload draft', value: n(p => p.statusId === 'printer-assigned'), icon: 'upload', color: 'red', onClick: () => go('Printing Jobs', 'vj_s', 'Printer assigned') },
       { label: 'Ready to print & ship', value: n(p => p.statusId === 'draft-approved'), icon: 'truck', color: 'orange', onClick: () => go('Printing Jobs', 'vj_s', 'Draft approved') },
-      { label: 'Custom quotes', value: cqs.filter(q => q.status === 'Pending quote').length, icon: 'file', color: 'teal', onClick: () => go('Custom Quotes', 'vc_s', 'Pending quote') }])), this.notifPanel()];
+      { label: 'Custom quotes', value: cqs.filter(q => q.status === 'Pending quote').length, icon: 'file', color: 'teal', onClick: () => go('Custom Quotes', 'vc_s', 'Pending quote') }]))];
   };
   P.vJobs = function () {
     const d = this.acGet('v_jobs', '/api/jobs'); if (!d) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];

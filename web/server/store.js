@@ -568,11 +568,12 @@ function createQuote(body, user) {
 function priceQuote(qid, body, actor) {
   const q = quote(qid); if (!q) return { error: 'quote not found' };
   q.price = Number(body.price) || 0; q.leadDays = Number(body.leadDays) || 0; q.note = body.note || ''; q.status = 'issued'; q.issuedAt = now(); q.viewedAt = null;
-  q.history.push({ ts: now(), actor: actor || 'staff', action: 'issued', price: q.price });
+  // what the price is based on: the internal production price, or a printer's quote
+  q.priceBasis = body.basis ? String(body.basis).slice(0, 120) : (q.priceBasis || '');
+  q.history.push({ ts: now(), actor: actor || 'staff', action: 'issued', price: q.price, note: q.priceBasis });
   // quote sent to the customer's account → notify customer, and the originating outlet (if walk-in)
   const qprod = (q.requirement && q.requirement.product) || 'your job';
   if (q.userId) notify({ type: 'customer', id: q.userId }, { kind: 'quote_issued', title: 'Good news — your quote is ready! 🎉', body: 'Your quote for ' + qprod + ' comes to RM ' + q.price.toLocaleString() + (q.leadDays ? ', ready in about ' + q.leadDays + ' day' + (q.leadDays === 1 ? '' : 's') : '') + '. Take a look whenever you like and let us know what you’d like to do.', cta: 'View your quote →', quoteId: qid });
-  if (q.outlet) notify({ type: 'outlet', outlet: q.outlet }, { kind: 'quote_issued', title: 'Your customer’s quote is on its way to them', body: 'We’ve priced ' + ((q.customer && q.customer.name) || 'your customer') + '’s quote for ' + qprod + ' at RM ' + q.price.toLocaleString() + ' and sent it to their account. We’ll let you know as soon as they’ve had a look.', cta: 'See the quote →', quoteId: qid });
   if (q.customer && q.customer.email) sendEmail('quote-issued', { to: q.customer.email, name: q.customer.name, subject: 'Your quote ' + qid + ' is ready — RM ' + q.price.toLocaleString(), body: 'Hi ' + ((q.customer && q.customer.name) || 'there') + ',\n\nGood news — your quote for ' + qprod + ' is ready: RM ' + q.price.toLocaleString() + (q.leadDays ? ', ready in about ' + q.leadDays + ' days' : '') + '.\nSign in to view it and accept & pay, or ask for changes.' });
   logEvent({ actor: actor || 'staff', role: 'scheduler_staff', action: 'quote_issued', jobId: null, from: 'requested', to: 'issued', note: qid + ' · RM ' + q.price });
   save(); return { quote: q };

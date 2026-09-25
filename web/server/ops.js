@@ -168,6 +168,31 @@ function custNotify(j, kind, title, body) {
   if (o && o.userId) store.notify({ type: 'customer', id: o.userId }, { kind, title, body, cta: 'Track your order →', orderId: o.id });
   return o;
 }
+// who took the job in each part — shown on the job page ("Handled by")
+function claim(j, role, actor) {
+  const dq = (D.STATUS[j.status] || {}).queue;
+  if (['prepress', 'scheduler', 'logistics'].indexOf(dq) < 0 || D.deptOf(role) !== dq) return false;
+  j.owner = j.owner || {}; if (j.owner[dq]) return false;
+  j.owner[dq] = actor; j.ownerAt = Object.assign({}, j.ownerAt, { [dq]: now() });
+  store.logEvent({ actor, role, action: 'claim', jobId: j.id, from: null, to: null, note: dq }); store.save(); return true;
+}
+function handlers(j) {
+  const o = j.orderId && store.order(j.orderId); const ow = j.owner || {}, at = j.ownerAt || {};
+  const firstAt = (acts) => { const e = store.audit({ jobId: j.id }).find(x => acts.indexOf(x.action) >= 0); return e || null; };
+  const q = o && o.fromQuote && store.quote(o.fromQuote);
+  const orderBy = q && q.issuedBy ? 'Outlet — ' + q.issuedBy.name : o && o.outlet && o.createdByStaff ? 'Outlet — ' + o.createdByStaff : 'Online — ' + ((o && o.customer && o.customer.name) || j.customer);
+  const printer = j.outsource && j.outsource.awardedTo ? ((j.outsource.vendors || []).find(v => v.vendorId === j.outsource.awardedTo) || {}).vendorName : null;
+  const dl = firstAt(['customer_received', 'receive_outlet', 'deliver']);
+  const ev = a => { const e = firstAt(a); return e ? e.ts : null; };
+  return [
+    { part: 'Order', who: orderBy, at: (o && o.createdAt) || j.createdAt },
+    { part: 'Prepress', who: ow.prepress || null, at: at.prepress || ev(['approve', 'flag_minor', 'reject_major', 'escalate']) },
+    { part: 'Scheduler', who: ow.scheduler || null, at: at.scheduler || ev(['assign_inhouse', 'assign_outsource']) },
+    { part: 'Printing', who: j.route === 'inhouse' ? 'In-house — ' + (j.machine || 'machine') : printer ? 'Printer — ' + printer : null, at: ev(['assign_inhouse', 'assign_outsource']) },
+    { part: 'Logistics', who: ow.logistics || null, at: at.logistics || ev(['receive', 'dispatch']) },
+    { part: 'Delivery', who: dl ? (dl.action === 'customer_received' ? 'Customer — ' + dl.actor : dl.action === 'receive_outlet' ? 'Outlet — ' + dl.actor : 'Scheduler — ' + dl.actor) : null, at: dl ? dl.ts : null },
+  ];
+}
 // the outlet a job belongs to (its quote/counter outlet, or the pickup outlet)
 function outletOfJob(j) {
   const o = j.orderId && store.order(j.orderId);
@@ -480,4 +505,4 @@ function actions(dept, opts) {
 }
 
 module.exports = { config, saveConfig, migrate, normalizeJob, makeLabel, syncOrder, onOrderCreated, afterTransition, transition, setStep, sendInternal, award, kpi, sales, hubPerformance, actions, hubById, outletById, STEP_GROUPS, PROGRESS_LABEL,
-  reportFigures, submitReport, listReports, outletOfJob, destOf };
+  reportFigures, submitReport, listReports, outletOfJob, destOf, claim, handlers };

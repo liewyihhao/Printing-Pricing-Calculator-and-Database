@@ -292,6 +292,7 @@ function requestPrinterQuotes(qid, b, actor) {
     store.notify({ type: 'customer', id }, { kind: 'printer_custom_quote', title: 'New custom quote request', body: ((q.requirement && q.requirement.product) || 'Custom job') + ' — submit your weight and price.', quoteId: qid });
     if (v.email) store.sendEmail('request-quote-printer', { to: v.email, name: v.name, subject: 'Custom quote request — ' + ((q.requirement && q.requirement.product) || qid), body: 'Hi ' + v.name + ',\n\nPrintoka would like your price for a custom job. Sign in to your printer account → Custom Quotes to submit it.' }); });
   q.printerActivity = q.printerActivity || []; q.printerActivity.push({ ts: now(), actor, action: 'Quote requested', note: ids.length + ' printer(s)' });
+  q.history = q.history || []; q.history.push({ ts: now(), actor, action: 'Asked printer for a quote', note: ids.map(id => (store.findCustomer(id) || {}).name).filter(Boolean).join(', ') });
   store.save(); return { quote: q };
 }
 function customQuoteStatus(q, co) { const p = ((q.printerQuotes || {}).printers || []).find(x => x.vendorId === co); return p && p.submittedAt ? 'Quote submitted' : 'Pending quote'; }
@@ -320,6 +321,7 @@ function submitCustomQuote(qid, me, b) {
   if (b.documentData) { const f = saveBlob(path.join(QROOT, qid), { data: b.documentData, name: b.documentName || 'quote.pdf' }, 'P'); if (f.error) return f; p.document = f; }
   p.amount = amount; p.weight = weight; p.submittedAt = now(); p.by = me.name;
   q.printerActivity = q.printerActivity || []; q.printerActivity.push({ ts: now(), actor: me.name, vendorId: co, action: 'Amount changed', note: 'to RM ' + amount.toFixed(2) });
+  q.history = q.history || []; q.history.push({ ts: now(), actor: p.vendorName, action: 'Printer replied', note: 'RM ' + amount.toFixed(2) + ' · ' + weight + ' kg' });
   if (q.printerQuotes.printers.every(x => x.submittedAt)) store.notify({ type: 'role', role: 'scheduler' }, { kind: 'printer_quotes_in', title: 'All printer quotes received — ' + qid, body: ((q.requirement && q.requirement.product) || 'Custom job') + ': ' + q.printerQuotes.printers.map(x => x.vendorName + ' RM ' + x.amount).join(', '), quoteId: qid });
   store.save(); return { ok: true, message: 'Quote update successfully!' };
 }

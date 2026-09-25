@@ -63,9 +63,11 @@
   // one table for every list: job, product, customer, due, status
   P.pTable = function (key, title, jobs, extra) {
     const list = jobs.slice().sort((a, b) => { const da = a.deadline ? Date.parse(a.deadline) : Infinity, db = b.deadline ? Date.parse(b.deadline) : Infinity; if (da !== db) return da - db; return (Date.parse(a.paymentValidatedAt || 0) || Infinity) - (Date.parse(b.paymentValidatedAt || 0) || Infinity); });
-    return this.acList({ key, title, action: extra, cols: ['Job', 'Product', 'Customer', 'Due', 'Status'],
-      rows: list.map(j => ({ date: j.createdAt, status: j.statusLabel || j.status, search: [j.id, j.orderId, j.customer, j.product],
-        cells: [link(j.id, () => openJob(this, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), j.customer, h('span', { style: { color: overdue(j) ? '#c71917' : MUT, fontWeight: overdue(j) ? 700 : 400 } }, j.deadline ? dmy(j.deadline) + (overdue(j) ? ' · overdue' : '') : '—'), this.pillDot(j.statusLabel || j.status, tone(j))] })) });
+    // "Handled by": who took the job in the department it is in now
+    const handler = j => { const dq = j.queue || ({ prepress: 'prepress', prepress_issue: 'prepress', escalated: 'prepress', scheduling: 'scheduler', printing: 'scheduler', outsourcing: 'scheduler' })[j.status] || 'logistics'; return (j.owner || {})[dq] || '—'; };
+    return this.acList({ key, title, action: extra, cols: ['Job', 'Product', 'Customer', 'Due', 'Handled by', 'Status'],
+      rows: list.map(j => ({ date: j.createdAt, status: j.statusLabel || j.status, search: [j.id, j.orderId, j.customer, j.product, handler(j)],
+        cells: [link(j.id, () => openJob(this, j)), j.product + ' × ' + (j.qty || 0).toLocaleString(), j.customer, h('span', { style: { color: overdue(j) ? '#c71917' : MUT, fontWeight: overdue(j) ? 700 : 400 } }, j.deadline ? dmy(j.deadline) + (overdue(j) ? ' · overdue' : '') : '—'), handler(j), this.pillDot(j.statusLabel || j.status, tone(j))] })) });
   };
   P.pTiles = function (items) { return this.acCard(this.acQuick(items)); };
   const jobsIn = (c, statuses) => c.opsJobs().filter(j => statuses.indexOf(j.status) >= 0);
@@ -83,7 +85,7 @@
         { label: 'Minor issues', value: jobsIn(this, ['prepress_issue']).length, icon: 'edit-3', color: 'orange', onClick: () => this.setState({ sTab: 'Files', pf_s: 'Prepress — minor issue, awaiting approval' }) },
         { label: 'Escalated to manager', value: jobsIn(this, ['escalated']).length, icon: 'layers', color: 'red', onClick: () => this.setState({ sTab: 'Files', pf_s: 'Prepress — escalated to manager' }) },
         { label: 'Rejected to outlet', value: jobsIn(this, ['rejected']).length, icon: 'file', color: 'red', onClick: () => this.setState({ sTab: 'Files', pf_s: 'Rejected — returned to outlet' }) }])]
-        .concat(this.pTable('pd', 'Your queue', q)).concat([this.notifPanel()]);
+        .concat(this.pTable('pd', 'Your queue', q));
     });
   };
 
@@ -120,7 +122,7 @@
   P.pQuoteRequests = function () {
     const qs = (this.acGet('p_quotes', '/api/quotes') || {}).quotes; if (!qs) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
     return this.pStateList('qr', 'Quote request', qs.map(q => ({ date: q.createdAt, state: qrState(q), search: [q.id, q.customer && q.customer.name, q.requirement && q.requirement.product, q.outlet],
-      cells: [link(q.id, () => this.acOpen({ kind: 'quote', id: q.id })), quoteFrom(q), (q.requirement && q.requirement.product) || '—', (q.customer && q.customer.name) || '—', q.price != null ? this.rm(q.price) : '—'] })), ['Quote', 'From', 'Product', 'Customer', { label: 'Price', right: true }]);
+      cells: [link(q.id, () => this.acOpen({ kind: 'quote', id: q.id })), quoteFrom(q) + (q.issuedBy ? ' · ' + q.issuedBy.name : ''), (q.requirement && q.requirement.product) || '—', (q.customer && q.customer.name) || '—', (q.handler && q.handler.name) || '—', q.price != null ? this.rm(q.price) : '—'] })), ['Quote', 'From', 'Product', 'Customer', 'Handled by', { label: 'Price', right: true }]);
   };
   P.pPrinterPending = function () {
     const qs = ((this.acGet('p_quotes', '/api/quotes') || {}).quotes) || [];
@@ -157,7 +159,7 @@
         { label: 'Jobs Inhouse', value: open(jobs.filter(j => j.route === 'inhouse' && j.status !== 'scheduling').map(inState)), icon: 'printer', color: 'teal', onClick: () => this.setState({ sTab: 'Jobs Inhouse' }) }])]
         .concat(this.pTable('sd', 'New jobs — print in-house or outsource', jobsIn(this, ['scheduling'])))
         .concat(this.pTable('sdl', 'Shipped to customers — confirm delivery', jobs.filter(j => j.status === 'dispatched' && (j.destination || {}).type === 'customer')))
-        .concat([this.notifPanel()]);
+        ;
     });
   };
 
@@ -186,7 +188,7 @@
         { label: 'Incoming Jobs', value: open(incoming, logState), icon: 'truck', color: 'orange', onClick: () => this.setState({ sTab: 'Incoming Jobs' }) },
         { label: 'Completed Jobs', value: open(completed, logState), icon: 'printer', color: 'teal', onClick: () => this.setState({ sTab: 'Completed Jobs' }) },
         { label: 'Shipped', value: open(shipped, shipState), icon: 'box', color: 'teal', onClick: () => this.setState({ sTab: 'Shipped' }) }])]
-        .concat(this.pStateList('ld', 'To receive and ship', logRows(this, incoming.concat(completed).filter(j => !logState(j)[2]), logState), cols)).concat([this.notifPanel()]);
+        .concat(this.pStateList('ld', 'To receive and ship', logRows(this, incoming.concat(completed).filter(j => !logState(j)[2]), logState), cols));
     });
   };
 
@@ -204,7 +206,7 @@
         { label: 'Scheduler', value: jobsIn(this, Q.scheduler).length, icon: 'printer', color: 'teal', onClick: () => this.setState({ sTab: 'Scheduler' }) },
         { label: 'Logistics', value: jobsIn(this, Q.logistics).length, icon: 'truck', color: 'orange', onClick: () => this.setState({ sTab: 'Logistics' }) },
         { label: 'Needs attention', value: attention.length, icon: 'layers', color: 'red' }])]
-        .concat(this.pTable('dir_att', 'Needs attention — escalated or overdue', attention)).concat([this.notifPanel()]);
+        .concat(this.pTable('dir_att', 'Needs attention — escalated or overdue', attention));
     });
   };
 
@@ -222,7 +224,9 @@
       (pr.job && pr.job.artworks || []).length ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12, display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 12.5 } }, 'Artwork'), pr.job.artworks.map((a, i) => a.id ? h('span', { key: i }, link('📄 ' + a.name, () => this.openOrderFile(a.orderId, a))) : h('span', { key: i, style: { color: MUT } }, '📄 ' + a.name))) : null]));
     // documents open as PDFs on the page (not for prepress — they only check files)
     const docs = deptOf(this) === 'prepress' ? [] : (pr.documents || []);
-    const aside = [docs.length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, docs.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null];
+    // who took the job in each part (the first person in each department to open it)
+    const hb = (d.handlers || []).map(x => [x.part, x.who ? h('span', null, x.who, x.at ? h('span', { style: { display: 'block', fontSize: 12, color: FAINT } }, when(x.at)) : null) : h('span', { style: { color: FAINT } }, 'Not yet')]);
+    const aside = [hb.length ? this.acC('Handled by', this.acDL(hb)) : null, docs.length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, docs.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null];
     const typeTab = tabs.indexOf('Files') >= 0 ? 'Files'
       : tabs.indexOf('Jobs Inhouse') >= 0 ? (j.route === 'inhouse' ? 'Jobs Inhouse' : j.route === 'outsource' ? 'Jobs Outsourced' : 'Dashboard')
       : tabs.indexOf('Incoming Jobs') >= 0 ? (j.status === 'dispatched' || j.status === 'completed' || j.status === 'ready_collect' ? 'Shipped' : j.route === 'inhouse' ? 'Completed Jobs' : 'Incoming Jobs') : tabs[1];
@@ -445,26 +449,44 @@
         .then(d => { if (this.acDone(d, 'Settings saved.')) this.setState({ opsConfig: d.config, acForm: {} }); }), 'primary'))];
   };
 
-  // ---------------------------------------------------------------- custom quotes (HQ prices the outlets' quote requests)
+  // ---------------------------------------------------------------- a quote request (from an outlet or a website customer)
+  // Opening it takes it (the scheduler's name goes in the log). Reply with the internal production
+  // price, or ask printers first and reply using their quote. The reply goes to the customer and the outlet.
   P.pQuote = function (qid, tabs) {
-    const qs = (this.acGet('p_quotes', '/api/quotes') || {}).quotes; if (!qs) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
-    const q = qs.find(x => x.id === qid); if (!q) return [h('div', { key: 'e' }, 'Quote not found.')];
+    const d = this.acGet('q1_' + qid, '/api/quotes/' + encodeURIComponent(qid)); if (!d) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
+    const q = d.quote; if (!q) return [h('div', { key: 'e' }, 'Quote not found.')];
+    if (!(this._pqOpened || {})[qid]) { this._pqOpened = Object.assign({}, this._pqOpened, { [qid]: 1 }); setTimeout(() => this.acDrop('p_quotes'), 0); } // list shows the new handler
+    const refresh =() => { this.acDrop('q1_'); this.acDrop('p_quotes'); this.setState({ acForm: {} }); };
     const r = q.requirement || {}; const open = ['requested', 'amendment', 'issued', 'reviewed'].indexOf(q.status) >= 0;
     const pq = (q.printerQuotes || {}).printers || [];
+    const replied = pq.filter(p => p.submittedAt);
+    const bases = ['Internal production price'].concat(replied.map(p => 'Printer quote — ' + p.vendorName + ' (RM ' + Number(p.amount).toFixed(2) + ')'));
+    const basis = this.acF('basis') || q.priceBasis || bases[0];
     const main = [
       this.acC('Specifications', [h('b', { key: 'p' }, r.product || 'Custom job'), h('div', { key: 's', style: { whiteSpace: 'pre-wrap', lineHeight: 1.7 } }, r.quoteData || [r.size, r.material, r.finishing, r.qty && 'Qty ' + r.qty, r.remarks].filter(Boolean).join('\n'))]),
-      this.acC('Printer quotes', [pq.length ? this.dataCard(['Printer', 'Weight (kg)', { label: 'Amount', right: true }, 'Document'], pq.map(p => [p.vendorName, p.weight || '—', p.amount != null ? this.rm(p.amount) : 'waiting', p.document ? link(p.document.name, () => this.jDownload('/api/quotes/' + q.id + '/printer-quotes/' + p.vendorId + '/document', p.document.name)) : '—']), { minWidth: 480 }) : note('No printer has been asked yet.'),
-        open ? h('div', { key: 'rq', style: { display: 'flex', flexDirection: 'column', gap: 8 } }, h('div', { style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 8 } }, ((this.acGet('vendors', '/api/vendors') || {}).vendors || []).filter(v => !pq.some(p => p.vendorId === v.id)).map(v => { const picked = this.acF('qv') || []; return h('label', { key: v.id, style: { display: 'flex', gap: 8, fontSize: 13, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: picked.indexOf(v.id) >= 0, onChange: () => this.acSetF('qv', picked.indexOf(v.id) >= 0 ? picked.filter(x => x !== v.id) : picked.concat([v.id])) }), v.name); })),
-          h('div', null, Btn('Ask printers to quote', () => this.aFetchJ('/api/quotes/' + q.id + '/printer-quotes', { vendorIds: this.acF('qv') || [] }).then(d => { if (this.acDone(d, 'Printers asked to quote.')) { this.acDrop('p_quotes'); this.setState({ acForm: {} }); } }), null, !(this.acF('qv') || []).length))) : null]),
-      open ? this.acC(q.price != null ? 'Quote issued — change price' : 'Price this quote', [
+      open ? this.acC('Ask a printer for a quote', [
+        note('Optional. Ask one or more printers, wait for their reply, then use their quote below.'),
+        pq.length ? this.dataCard(['Printer', 'Weight (kg)', { label: 'Amount', right: true }, 'Document'], pq.map(p => [p.vendorName, p.weight || '—', p.amount != null ? this.rm(p.amount) : 'Waiting for reply', p.document ? link(p.document.name, () => this.jDownload('/api/quotes/' + q.id + '/printer-quotes/' + p.vendorId + '/document', p.document.name)) : '—']), { minWidth: 480 }) : null,
+        h('div', { key: 'v', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 8 } }, ((this.acGet('vendors', '/api/vendors') || {}).vendors || []).filter(v => !pq.some(p => p.vendorId === v.id)).map(v => { const picked = this.acF('qv') || []; return h('label', { key: v.id, style: { display: 'flex', gap: 8, fontSize: 13, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: picked.indexOf(v.id) >= 0, onChange: () => this.acSetF('qv', picked.indexOf(v.id) >= 0 ? picked.filter(x => x !== v.id) : picked.concat([v.id])) }), v.name); })),
+        h('div', { key: 'b' }, Btn('Ask printer to quote', () => this.aFetchJ('/api/quotes/' + q.id + '/printer-quotes', { vendorIds: this.acF('qv') || [] }).then(x => { if (this.acDone(x, 'Printer asked to quote.')) refresh(); }), null, !(this.acF('qv') || []).length))]) : null,
+      open ? this.acC(q.price != null ? 'Quote sent — change the price' : 'Reply with the price', [
+        note('The customer and the outlet receive the quote as soon as you send it.'),
+        FG('Price based on', h('select', { value: basis, onChange: e => this.acSetF('basis', e.target.value), style: inp }, bases.map(b => h('option', { key: b, value: b }, b))), 1),
         h('div', { key: 'f', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12 } },
-          FG('Price (RM)', h('input', { type: 'number', value: this.acF('price') !== '' ? this.acF('price') : (q.price != null ? q.price : ''), onChange: e => this.acSetF('price', e.target.value), style: inp }), 1),
+          FG('Price to customer (RM)', h('input', { type: 'number', value: this.acF('price') !== '' ? this.acF('price') : (q.price != null ? q.price : ''), onChange: e => this.acSetF('price', e.target.value), style: inp }), 1),
           FG('Lead time (days)', h('input', { type: 'number', value: this.acF('lead') !== '' ? this.acF('lead') : (q.leadDays || ''), onChange: e => this.acSetF('lead', e.target.value), style: inp }))),
-        h('div', { key: 'b' }, Btn('Issue quote to customer', () => this.aFetchJ('/api/quotes/' + q.id + '/price', { price: this.acF('price') || q.price, leadDays: this.acF('lead') || q.leadDays }).then(d => { if (this.acDone(d, 'Quote issued to the customer.')) { this.acDrop('p_quotes'); this.setState({ acForm: {} }); } }), 'primary', !(this.acF('price') || q.price)))]) : null,
+        h('div', { key: 'b' }, Btn('Send quote', () => this.aFetchJ('/api/quotes/' + q.id + '/price', { price: this.acF('price') || q.price, leadDays: this.acF('lead') || q.leadDays, basis }).then(x => { if (this.acDone(x, 'Quote sent to the customer' + (q.outlet ? ' and the outlet.' : '.'))) refresh(); }), 'primary', !(this.acF('price') || q.price)))]) : null,
     ];
     // opening the quote marks received printer quotes as seen ("Quote Pending from Printer" → done)
-    if (pq.some(p => p.submittedAt && !p.seenAt) && !(this._pqSeen || {})[q.id]) { this._pqSeen = Object.assign({}, this._pqSeen, { [q.id]: 1 }); this.aFetchJ('/api/quotes/' + q.id + '/printer-quotes').then(() => this.acDrop('p_quotes')); }
-    const aside = [this.acC('Customer', this.acDL([['From', quoteFrom(q)], ['Name', q.customer && q.customer.name], ['Email', q.customer && q.customer.email], ['Phone', q.customer && q.customer.phone]]))];
+    if (pq.some(p => p.submittedAt && !p.seenAt) && !(this._pqSeen || {})[q.id]) { this._pqSeen = Object.assign({}, this._pqSeen, { [q.id]: 1 }); this.aFetchJ('/api/quotes/' + q.id + '/printer-quotes').then(() => { this.acDrop('p_quotes'); }); }
+    // the log: who took the quote at each step
+    const LABEL = { issued: 'Quoted', reviewed: 'Opened by the customer', accepted: 'Accepted by the customer', rejected: 'Rejected', 'Pending Quote': 'Quote request sent to the scheduler' };
+    const log = (q.history || []).filter(x => !(x.action === 'issued' && q.outlet)).slice().reverse().map(x => ({ title: LABEL[x.action] || String(x.action || '').replace(/^./, c => c.toUpperCase()), by: x.actor, at: x.ts, text: [x.price != null ? 'RM ' + Number(x.price).toFixed(2) : '', x.note || ''].filter(Boolean).join(' · ') }));
+    const aside = [
+      this.acC('Handled by', this.acDL([['Requested by', q.issuedBy ? q.issuedBy.name + ' (' + quoteFrom(q) + ')' : 'Website customer'], ['Scheduler', q.handler ? q.handler.name : ((q.history || []).find(x => x.action === 'issued') || {}).actor || 'Not yet'], ['Printer', pq.length ? pq.map(p => p.vendorName).join(', ') : '—']])),
+      this.acC('Customer', this.acDL([['Name', q.customer && q.customer.name], ['Email', q.customer && q.customer.email], ['Phone', q.customer && q.customer.phone]])),
+      this.acC('Log', this.acStatusList(log)),
+    ];
     return this.acSingle({ home: tabs[0], type: 'Quote request', title: q.id, statusNode: this.pillDot(qrState(q)[0], qrState(q)[1]) }, main, aside);
   };
 })();

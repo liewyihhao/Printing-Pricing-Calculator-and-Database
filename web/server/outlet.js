@@ -113,14 +113,23 @@ function saveSpec(qid, b, me) {
   store.save(); return { quote: quoteView(q, true) };
 }
 // HQ priced / re-priced: start the 7-day follow-up clock
-function onIssued(q) { if (!q) return; q.remarks = 'Issued'; q.followUpDueAt = new Date(Date.now() + 7 * DAY).toISOString(); q.history.push({ ts: now(), actor: 'HQ', action: 'Quoted', note: 'RM ' + q.price }); store.save(); }
+// the scheduler replied with a price → the outlet staff who raised it follows up with the customer 2 days later
+const FOLLOW_UP_DAYS = 2;
+function onIssued(q, by) {
+  if (!q) return;
+  q.remarks = 'Issued'; q.followUpDueAt = new Date(Date.now() + FOLLOW_UP_DAYS * DAY).toISOString();
+  q.history.push({ ts: now(), actor: by || 'Scheduler', action: 'Quoted', note: 'RM ' + Number(q.price).toFixed(2) + (q.priceBasis ? ' · ' + q.priceBasis : '') });
+  const due = new Date(Date.parse(q.followUpDueAt)).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  store.notify({ type: 'outlet', outlet: q.outlet }, { kind: 'quote_responded', title: 'Quote ' + q.id + ' has been responded', body: (by || 'The scheduler') + ' quoted RM ' + Number(q.price).toFixed(2) + ' for ' + ((q.requirement && q.requirement.product) || 'the job') + ' (' + ((q.customer && q.customer.name) || 'customer') + '). The customer has it too — follow up with their decision on ' + due + '.', quoteId: q.id });
+  store.save();
+}
 function outletPrice(qid, b, me) {
   const q = store.quote(qid); if (!canQuote(q, me)) return { error: 'Access denied: You are not authorized to view this.' };
   if (!b.weight || !b.price) return { error: 'Please fill in the required field.' };
   const price = r2(b.price); if (!(price > 0)) return { error: 'Enter a valid price.' };
   const old = q.price; q.weight = String(b.weight); q.currency = b.currency || q.currency || 'MYR';
   if (old == null || r2(old) !== price) { q.price = price; q.history.push({ ts: now(), actor: me.name, action: 'Amount changed', note: 'to ' + q.currency + ' ' + price.toFixed(2) }); }
-  q.status = 'issued'; q.issuedAt = q.issuedAt || now(); q.remarks = 'Issued'; q.lastFollowUpAt = null; q.followUpDueAt = new Date(Date.now() + 7 * DAY).toISOString();
+  q.status = 'issued'; q.issuedAt = q.issuedAt || now(); q.remarks = 'Issued'; q.lastFollowUpAt = null; q.followUpDueAt = new Date(Date.now() + FOLLOW_UP_DAYS * DAY).toISOString();
   q.history.push({ ts: now(), actor: me.name, action: 'Quoted' });
   if (q.userId) store.notify({ type: 'customer', id: q.userId }, { kind: 'quote_issued', title: 'Your quote is ready', body: 'Quote ' + q.id + ' for ' + q.requirement.product + ': RM ' + q.price.toFixed(2) + '.', cta: 'View your quote →', quoteId: q.id });
   store.save(); return { quote: quoteView(q, true) };

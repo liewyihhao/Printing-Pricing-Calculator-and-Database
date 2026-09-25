@@ -93,8 +93,9 @@ async function api(req, res, pathname, query) {
     if (me0.type === 'vendor') return send(res, 200, { job: supplier.vendorJob(j, me0), printing: supplier.view(j, me0), audit: [], order: null });
     // "Quote Pending from Printer" is done once a received printer quote has been opened by the scheduler
     if (['scheduler_staff', 'scheduler_manager', 'production_director'].indexOf(role) >= 0 && j.outsource) { let seen = false; (j.outsource.vendors || []).forEach(v => { if (v.submittedAt && !v.seenAt) { v.seenAt = store.now(); seen = true; } }); if (seen) store.save(); }
+    ops.claim(j, role, actor); // the first staff member of the job's department to open it takes that part
     const o = j.orderId ? store.order(j.orderId) : null;
-    return send(res, 200, { job: jobView(j, role), printing: supplier.view(j, me0), audit: store.audit({ jobId: seg[1] }), order: o && me0.type !== 'hub' ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items, files: (o.files || []).filter(f => f.kind === 'artwork') } : null });
+    return send(res, 200, { job: jobView(j, role), handlers: ops.handlers(j), printing: supplier.view(j, me0), audit: store.audit({ jobId: seg[1] }), order: o && me0.type !== 'hub' ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items, files: (o.files || []).filter(f => f.kind === 'artwork') } : null });
   }
   // ---- printers & hubs (original printoka-3rd-party-supplier flow) ----
   if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'draft', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'proof'].indexOf(seg[2]) >= 0) {
@@ -404,9 +405,17 @@ async function api(req, res, pathname, query) {
     const me = store.sessionCustomer(token); if (!me || me.type === 'customer' || me.type === 'vendor') return send(res, 401, { error: 'staff sign-in required' });
     const b = await readBody(req); const r = store.setQuoteRemark(seg[1], b.remarks, me.name || me.email); return send(res, r.error ? 400 : 200, r);
   }
+  // what a customer may see of a quote: never the printers, their prices, the price basis or internal handling
+  const pubQuote = (q, me) => {
+    if (!q || !me || me.type !== 'customer') return q;
+    const c = Object.assign({}, q);
+    ['printerQuotes', 'printerActivity', 'priceBasis', 'handler', 'outletOpenedAt', 'outletOpenedBy', 'followUpDueAt', 'remarks', 'lastFollowUpAt', 'lastFollowUpBy', 'followups', 'issuedBy', 'requestedByStaff'].forEach(k => { delete c[k]; });
+    c.history = (q.history || []).filter(x => ['issued', 'reviewed', 'accepted', 'rejected'].indexOf(x.action) >= 0).map(x => ({ ts: x.ts, action: x.action, price: x.price }));
+    return c;
+  };
   if (seg[0] === 'quotes' && seg[2] === 'view' && req.method === 'POST') {
     const me = store.sessionCustomer(token); if (!me) return send(res, 401, { error: 'sign-in required' });
-    return send(res, 200, store.viewQuote(seg[1], me));
+    const r = store.viewQuote(seg[1], me); return send(res, 200, r.quote ? Object.assign({}, r, { quote: pubQuote(r.quote, me) }) : r);
   }
   if (seg[0] === 'quotes' && seg[2] === 'decision' && req.method === 'POST') {
     const me = store.sessionCustomer(token); if (!me || me.type !== 'outlet') return send(res, 401, { error: 'outlet sign-in required' });
@@ -416,8 +425,9 @@ async function api(req, res, pathname, query) {
     const me = store.sessionCustomer(token);
     if (!me) return send(res, 200, { quotes: [] });
     let list = store.quotes();
-    if (me && me.type === 'customer') list = store.quotesForUser(me.id);
-    else if (me && me.type === 'outlet') list = list.filter(q => q.outlet === me.outlet); // outlet sees only its own quotes
+    if (me.type === 'customer') list = store.quotesForUser(me.id).map(q => pubQuote(q, me));
+    else if (me.type === 'outlet') list = list.filter(q => q.outlet === me.outlet); // outlet sees only its own quotes
+    else if (me.type !== 'production' && me.type !== 'admin') list = []; // printers / hubs: not customers' quotes
     return send(res, 200, { quotes: list });
   }
   // a quote is visible to its requester, the staff, and (for outlet quotes) that outlet only
@@ -426,11 +436,20 @@ async function api(req, res, pathname, query) {
     const q = store.quote(seg[1]); if (!q) return send(res, 404, { error: 'not found' });
     if (!quoteAccess(q, store.sessionCustomer(token))) return send(res, 403, { error: 'Access denied: You are not authorized to view this.' });
   }
-  if (seg[0] === 'quotes' && seg[1] && !seg[2]) return send(res, 200, { quote: store.quote(seg[1]) });
+  if (seg[0] === 'quotes' && seg[1] && !seg[2]) {
+    // the first scheduler to open a quote request takes it — their name goes in the quote's log
+    const q = store.quote(seg[1]), me = store.sessionCustomer(token);
+    if (me && me.type === 'production' && /^scheduler/.test(me.role) && !q.handler && ['requested', 'amendment'].indexOf(q.status) >= 0) {
+      q.handler = { id: me.id, name: me.name, at: store.now() };
+      q.history.push({ ts: store.now(), actor: me.name, action: 'Handled by ' + me.name + ' (Scheduler)' }); store.save();
+    }
+    return send(res, 200, { quote: pubQuote(q, me) });
+  }
   if (seg[0] === 'quotes' && seg[2] === 'price' && req.method === 'POST') {
     const me = store.sessionCustomer(token); if (!me || me.type === 'customer' || me.type === 'vendor') return send(res, 401, { error: 'staff sign-in required' });
     const r = store.priceQuote(seg[1], await readBody(req), me.name || me.email);
-    if (!r.error && r.quote && r.quote.outlet) outlet.onIssued(r.quote);
+    if (!r.error && r.quote && !r.quote.handler) r.quote.handler = { id: me.id, name: me.name, at: store.now() };
+    if (!r.error && r.quote && r.quote.outlet) outlet.onIssued(r.quote, me.name || me.email);
     return send(res, r.error ? 400 : 200, r);
   }
   // ---- outlet account (the original printoka.com outlet dashboard) ----
@@ -459,10 +478,10 @@ async function api(req, res, pathname, query) {
     return send(res, 404, { error: 'unknown outlet route' });
   }
   if (seg[0] === 'quotes' && seg[2] === 'accept' && req.method === 'POST') {
-    const me = store.sessionCustomer(token); const r = store.acceptQuote(seg[1], me ? me.email : 'customer'); if (r.order) { outlet.onAccepted(r.quote, store.order(r.order.id)); ops.onOrderCreated(r.order); } return send(res, r.error ? 400 : 200, r);
+    const me = store.sessionCustomer(token); const r = store.acceptQuote(seg[1], me ? me.email : 'customer'); if (r.order) { outlet.onAccepted(r.quote, store.order(r.order.id)); ops.onOrderCreated(r.order); } return send(res, r.error ? 400 : 200, r.quote ? Object.assign({}, r, { quote: pubQuote(r.quote, me) }) : r);
   }
   if (seg[0] === 'quotes' && seg[2] === 'reject' && req.method === 'POST') {
-    const b = await readBody(req); const me = store.sessionCustomer(token); const r = store.rejectQuote(seg[1], b.reason, me ? me.email : 'customer'); return send(res, r.error ? 400 : 200, r);
+    const b = await readBody(req); const me = store.sessionCustomer(token); const r = store.rejectQuote(seg[1], b.reason, me ? me.email : 'customer'); return send(res, r.error ? 400 : 200, r.quote ? Object.assign({}, r, { quote: pubQuote(r.quote, me) }) : r);
   }
 
   // ---- outsource / vendor quotation flow ----
