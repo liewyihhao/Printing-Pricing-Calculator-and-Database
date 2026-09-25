@@ -35,8 +35,20 @@
   // cached GET, refetched when invalidated
   P.acGet = function (key, url) { this._ac = this._ac || {}; const c = this._ac[key]; if (c && c.data) return c.data; if (!c) { this._ac[key] = { loading: true }; setTimeout(() => this.aFetchJ(url).then(d => { this._ac[key] = { data: d }; this.forceUpdate(); }), 0); } return null; };
   P.acDrop = function (prefix) { if (!this._ac) return; Object.keys(this._ac).forEach(k => { if (!prefix || k.indexOf(prefix) === 0) delete this._ac[k]; }); this.forceUpdate(); };
-  P.acMsg = function () { const m = this.state.acMsg; if (!m) return null; return h('div', { key: 'acm', role: 'status', style: { position: 'fixed', right: 16, bottom: 16, zIndex: 130, maxWidth: 420, fontSize: 13, borderRadius: 10, padding: '12px 16px', background: m.bad ? '#fdecec' : '#e6f4ea', color: m.bad ? '#8c1c13' : '#1f5e2a', border: '1px solid ' + (m.bad ? '#f5c8c7' : '#cfe8d4'), boxShadow: '0 10px 30px rgba(0,0,0,.12)', display: 'flex', gap: 10 } }, h('span', { style: { flex: 1 } }, m.text), h('span', { onClick: () => this.setState({ acMsg: null }), style: { cursor: 'pointer', fontWeight: 700 } }, '×')); };
-  P.acDone = function (d, ok) { if (!d || d.error) { this.setState({ acMsg: { bad: true, text: (d && d.error) || 'Something went wrong. Please try again.' } }); return false; } if (ok) this.setState({ acMsg: { bad: false, text: ok } }); return true; };
+  // notifications as on the original site (toka_toast / Toastify): white, top centre, green tick or red cross, close icon
+  const asset = p => (window.__asset ? window.__asset(p) : p);
+  P.pkToastView = function (m, close, key) {
+    if (!m) return null;
+    return h('div', { key: key || 'pktoast', role: m.bad ? 'alert' : 'status', className: 'pk-toast', onClick: close,
+      style: { position: 'fixed', top: 15, left: '50%', transform: 'translateX(-50%)', zIndex: 2147483647, display: 'flex', alignItems: 'center', background: '#fff', color: '#000', fontSize: 14, fontWeight: 500, lineHeight: 1.5, padding: 12, borderRadius: 4, boxShadow: '0 6px 12px rgba(33,33,33,.2)', maxWidth: 'calc(100vw - 32px)', whiteSpace: 'break-spaces', cursor: 'pointer' } },
+      h('img', { src: asset('assets/icons/' + (m.bad ? 'failed1.svg' : 'checkmark2.svg')), alt: '', height: 23, style: { height: 23, width: 23, marginRight: 12, flex: 'none' } }),
+      h('span', null, m.text),
+      h('img', { src: asset('assets/icons/close.svg'), alt: 'Close', height: 20, style: { height: 20, width: 20, marginLeft: 16, flex: 'none', opacity: .8 } }));
+  };
+  P.acMsg = function () { return this.pkToastView(this.state.acMsg, () => this.setState({ acMsg: null }), 'acm'); };
+  // shown for 5 s, errors for 10 s (original durations)
+  P.acToast = function (bad, text) { const m = { bad, text, at: Date.now() }; this.setState({ acMsg: m }); setTimeout(() => { if (this.state.acMsg === m) this.setState({ acMsg: null }); }, bad ? 10000 : 5000); };
+  P.acDone = function (d, ok) { if (!d || d.error) { this.acToast(true, (d && d.error) || 'Something went wrong. Please try again.'); return false; } if (ok) this.acToast(false, ok); return true; };
   P.acOpen = function (view) { this.setState({ acView: view, acModal: null, acForm: {} }); if (typeof window !== 'undefined') window.scrollTo(0, 0); };
 
   // header — logo · nav tabs (or progress bar on single pages) · user menu (original outlet header.pug)

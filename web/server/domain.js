@@ -46,9 +46,9 @@ const STATUS = {
   // prepress statuses (user, 2026-09-25): New Order → Preflight → (Pending Customer Approval | Pending Customer Amendment) → scheduler New Order
   intake: { label: 'New Order', queue: 'prepress', step: 2 },
   prepress: { label: 'Preflight', queue: 'prepress', step: 2 },
-  prepress_issue: { label: 'Pending Customer Approval', queue: 'prepress', step: 2 },
+  prepress_issue: { label: 'Pending Approval', queue: 'prepress', step: 2 },
   escalated: { label: 'Escalated to Manager', queue: 'prepress', step: 2 },
-  rejected: { label: 'Pending Customer Amendment', queue: 'prepress', step: 2 },
+  rejected: { label: 'Pending Amendment', queue: 'prepress', step: 2 },
   scheduling: { label: 'New Order', queue: 'scheduler', step: 3 },
   printing: { label: 'Printing — in-house', queue: 'scheduler', step: 4 },
   outsourcing: { label: 'Printing — outsourced', queue: 'scheduler', step: 4 },

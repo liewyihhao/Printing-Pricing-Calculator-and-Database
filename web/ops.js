@@ -102,7 +102,7 @@
     if (!c) { this._od[key] = { loading: true }; setTimeout(() => this.opsFetch(url).then(d => { this._od[key] = { data: d }; this.forceUpdate(); }), 0); }
     return null;
   };
-  P.opsToastSet = function (bad, text) { this.setState({ opsMsg: { bad, text, at: Date.now() } }); setTimeout(() => { if (this.state.opsMsg && Date.now() - this.state.opsMsg.at > 5500) this.setState({ opsMsg: null }); }, 6000); };
+  P.opsToastSet = function (bad, text) { const m = { bad, text, at: Date.now() }; this.setState({ opsMsg: m }); setTimeout(() => { if (this.state.opsMsg === m) this.setState({ opsMsg: null }); }, bad ? 10000 : 5000); };
   P.opsDone = function (d, okText) {
     if (!d || d.error) { this.opsToastSet(true, (d && d.error) || 'Something went wrong.'); return false; }
     if (okText) this.opsToastSet(false, okText);
@@ -185,9 +185,8 @@
         i < steps.length - 1 ? h('span', { style: { color: '#d5dae0' } }, '›') : null)));
   };
   P.oToast = function () {
-    const m = this.state.opsMsg; if (!m) return null;
-    return h('div', { key: 'toast', role: 'status', style: { position: 'fixed', right: 18, bottom: 18, zIndex: 120, maxWidth: 420, background: m.bad ? '#fdecec' : '#e6f4ea', color: m.bad ? '#8c1c13' : '#1f5e2a', border: '1px solid ' + (m.bad ? '#f5c8c7' : '#cfe8d4'), borderRadius: 10, padding: '12px 16px', fontSize: 13, boxShadow: '0 10px 30px rgba(0,0,0,.12)', display: 'flex', gap: 10, alignItems: 'flex-start' } },
-      h('span', { style: { flex: 1, lineHeight: 1.5 } }, m.text), h('span', { onClick: () => this.setState({ opsMsg: null }), style: { cursor: 'pointer', fontWeight: 700 } }, '×'));
+    // same notification as the account screens (original toka_toast look)
+    return this.pkToastView(this.state.opsMsg, () => this.setState({ opsMsg: null }), 'toast');
   };
   // department switcher for managers / admin who oversee several screens
   P.oDeptSwitch = function (active) {

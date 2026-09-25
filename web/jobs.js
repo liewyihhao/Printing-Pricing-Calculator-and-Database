@@ -32,7 +32,7 @@
   // ---------------------------------------------------------------- shared plumbing
   P.jDownload = function (url, name) {
     fetch(url, { headers: this.authHeaders() }).then(r => { if (!r.ok) throw new Error('not allowed'); return r.blob(); })
-      .then(b => this.saveBlob(b, name)).catch(() => this.setState({ acMsg: { bad: true, text: 'Could not open ' + name + '.' } }));
+      .then(b => this.saveBlob(b, name)).catch(() => this.acToast(true, 'Could not open ' + name + '.'));
   };
   P.jPost = function (url, body, okText, then) {
     return this.aFetchJ(url, body).then(d => {
