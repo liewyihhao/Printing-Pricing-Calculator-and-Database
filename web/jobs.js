@@ -155,7 +155,7 @@
       this.acC('Job documents', h('ol', { style: { margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 8 } },
         (pr.documents || []).map(x => h('li', { key: x.id }, link(x.label, () => this.openJobDoc(id, x.id)))).concat(j.label ? [h('li', { key: 'lbl' }, link('Parcel label (' + (j.label.toName || '') + ')', () => this.printLabel(j.label)))] : []))),
       pr.customer ? this.acC('Customer detail', [h('b', { key: 'n' }, pr.customer.name), pr.customer.phone ? h('a', { key: 'p', href: 'https://wa.me/' + String(pr.customer.phone).replace(/\D/g, '').replace(/^0/, '60'), target: '_blank', rel: 'noopener', style: { color: TEAL, fontWeight: 600 } }, pr.customer.phone) : null, h('p', { key: 'a', style: { margin: 0, color: MUT, lineHeight: 1.6 } }, pr.customer.address), pr.customer.orderNumber ? muted('Order #' + pr.customer.orderNumber) : null]) : null,
-      !isHub && pr.hub ? this.acC('Hub detail', [h('b', { key: 'n' }, pr.hub.name), h('p', { key: 'a', style: { margin: 0, color: MUT, whiteSpace: 'pre-wrap' } }, pr.hub.address), pr.hub.phone ? muted('Phone ' + pr.hub.phone) : null]) : null,
+      !isHub && pr.deliverTo && j.outsource ? this.acC('Printer delivers to', [h('b', { key: 'n' }, pr.deliverTo.name), h('p', { key: 'a', style: { margin: 0, color: MUT, whiteSpace: 'pre-wrap' } }, pr.deliverTo.address), pr.deliverTo.phone ? muted('Phone ' + pr.deliverTo.phone) : null]) : null,
       !isHub ? this.acC('General', this.acDL([['Order', o ? h('span', { 'data-go': 'vieworder:' + o.id, style: { color: TEAL, fontWeight: 600, cursor: 'pointer' } }, o.id) : j.orderId], ['Date created', when(j.createdAt)], ['Payment', j.paymentValidated ? 'Confirmed' : j.creditTerms ? 'Credit terms' : 'Pending'], ['Value', this.rm(j.price || 0)], ['Route', j.route === 'inhouse' ? 'In-house' : j.route === 'outsource' ? 'Outsourced' : '—'], pr.status ? ['Printing job', jobPill(pr.status)] : null])) : null,
     ];
     const home = tabs[0], typeTab = tabs.indexOf('Orders') >= 0 ? 'Orders' : tabs[1];
@@ -248,8 +248,8 @@
       const st = this.acF('jStatus') || 'draft-approved';
       main.push(this.acC('Job Status', [
         alertBox('The administrator has approved the draft. You may proceed with printing.', 'ok'),
-        muted('After shipping the items to the hub, update the status to "Shipped to hub" below, then click save changes.'),
-        h('select', { key: 's', value: st, onChange: e => this.acSetF('jStatus', e.target.value), style: inp }, [['draft-approved', 'Draft approved'], ['shipped-to-hub', (j.destination && j.destination.type !== 'hub') ? 'Shipped to ' + (j.destination.name || j.destination.type) : 'Shipped to hub']].map(o => h('option', { key: o[0], value: o[0] }, o[1]))),
+        muted('After shipping the items to ' + (j.destination && j.destination.type === 'outlet' ? 'the outlet' : 'production') + ', update the status below, then click save changes.'),
+        h('select', { key: 's', value: st, onChange: e => this.acSetF('jStatus', e.target.value), style: inp }, [['draft-approved', 'Draft approved'], ['shipped-to-hub', 'Shipped to ' + ((j.destination && j.destination.name) || 'production')]].map(o => h('option', { key: o[0], value: o[0] }, o[1]))),
         st === 'shipped-to-hub' ? h('div', { key: 'c', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 10 } },
           FG('Courier', h('input', { list: 'pk-couriers', value: this.acF('jCourier'), onChange: e => this.acSetF('jCourier', e.target.value), placeholder: 'e.g. J&T Express, own van', style: inp }), 0),
           FG('Tracking number', h('input', { value: this.acF('jTracking'), onChange: e => this.acSetF('jTracking', e.target.value), style: inp })),
@@ -268,7 +268,7 @@
     const aside = [
       this.acC('Activities', this.acStatusList(p.activities || [])),
       (p.documents || []).length ? this.acC('Job documents', h('ol', { style: { margin: 0, paddingLeft: 18, display: 'flex', flexDirection: 'column', gap: 8 } }, p.documents.map(x => h('li', { key: x.id }, link(x.label, () => this.openJobDoc(id, x.id)))))) : null,
-      p.hub ? this.acC('Hub detail', [h('b', { key: 'n' }, p.hub.name), h('p', { key: 'a', style: { margin: 0, color: MUT, whiteSpace: 'pre-wrap' } }, p.hub.address), p.hub.phone ? [h('b', { key: 'pt' }, 'Phone'), h('p', { key: 'pv', style: { margin: 0, color: MUT } }, p.hub.phone)] : null]) : null,
+      p.deliverTo ? this.acC('Deliver to', [h('b', { key: 'n' }, p.deliverTo.name), h('p', { key: 'a', style: { margin: 0, color: MUT, whiteSpace: 'pre-wrap' } }, p.deliverTo.address), p.deliverTo.phone ? [h('b', { key: 'pt' }, 'Phone'), h('p', { key: 'pv', style: { margin: 0, color: MUT } }, p.deliverTo.phone)] : null]) : null,
     ];
     return this.acSingle({ home: 'Dashboard', type: 'Printing Jobs', title: id, statusNode: jobPill(s) }, main, aside);
   };

@@ -44,7 +44,7 @@ function seed() {
     { email: 'prepress@printoka.com', name: 'Nazri (Prepress)', type: 'production', role: 'prepress' },
     { email: 'scheduler@printoka.com', name: 'Hafiz (Scheduler)', type: 'production', role: 'scheduler' },
     { email: 'logistics@printoka.com', name: 'Logistics Staff', type: 'production', role: 'logistics' },
-    { email: 'production@printoka.com', name: 'Production Manager', type: 'production', role: 'production_manager' },
+    { email: 'production@printoka.com', name: 'Production Director', type: 'production', role: 'production_director' },
     { email: 'vendor@printoka.com', name: 'LargeFormat Co', type: 'vendor', role: 'vendor' },
     { email: 'vendor2@printoka.com', name: 'Cetak Utara', type: 'vendor', role: 'vendor' },
     { email: 'vendor3@printoka.com', name: 'Borneo Press', type: 'vendor', role: 'vendor' },
@@ -143,11 +143,14 @@ function userCoversRole(user, role) {
   if (!user) return false;
   if (user.type === 'admin') return true;
   const r = user.role;
-  if (role === 'scheduler') return r === 'scheduler' || r === 'scheduler_manager' || r === 'production_manager';
-  if (role === 'production') return r === 'production_staff' || r === 'production_manager';
+  // reporting line (guidebook §1.5): staff → manager → production director
+  if (r === 'production_director' || r === 'production_manager') return role !== 'hub';
+  if (role === 'director') return false;
+  if (role === 'scheduler') return r === 'scheduler' || r === 'scheduler_manager' || r === 'production_staff';
+  if (role === 'prepress') return r === 'prepress' || r === 'prepress_manager';
+  if (role === 'logistics') return r === 'logistics' || r === 'logistics_manager';
+  if (role === 'scheduler_manager' || role === 'prepress_manager' || role === 'logistics_manager') return r === role;
   if (role === 'hub') return r === 'hub_staff' || r === 'hub_manager';
-  if (role === 'prepress') return r === 'prepress' || r === 'prepress_manager' || r === 'production_manager';
-  if (role === 'logistics') return r === 'logistics' || r === 'logistics_manager' || r === 'production_manager';
   return false;
 }
 function notificationsFor(user) {
@@ -719,7 +722,7 @@ function updateCustomInvoice(cid, patch, actor) {
 // ---- staff accounts (admin: WordPress Users → Add New / Edit) ----
 const STAFF_ROLES = {
   outlet: ['outlet_staff', 'outlet_manager'],
-  production: ['prepress', 'prepress_manager', 'production_staff', 'production_manager', 'scheduler', 'scheduler_manager', 'logistics', 'logistics_manager'],
+  production: ['production_director', 'prepress', 'prepress_manager', 'scheduler', 'scheduler_manager', 'logistics', 'logistics_manager'],
   vendor: ['printer_staff', 'printer_manager'],
   hub: ['hub_staff', 'hub_manager'],
   admin: ['admin'],

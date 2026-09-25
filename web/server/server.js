@@ -95,24 +95,30 @@ async function api(req, res, pathname, query) {
     return send(res, 200, { job: jobView(j, role), printing: supplier.view(j, me0), audit: store.audit({ jobId: seg[1] }), order: o && me0.type !== 'hub' ? { id: o.id, customer: o.customer, shipTo: o.shipTo, fulfillment: o.fulfillment, payment: o.payment, total: o.total, progressLabel: o.progressLabel, createdAt: o.createdAt, items: o.items, files: (o.files || []).filter(f => f.kind === 'artwork') } : null });
   }
   // ---- printers & hubs (original printoka-3rd-party-supplier flow) ----
-  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'draft', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files'].indexOf(seg[2]) >= 0) {
+  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'draft', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'delay', 'machine-down', 'incident', 'proof'].indexOf(seg[2]) >= 0) {
     const j0 = store.job(seg[1]); if (!j0) return send(res, 404, { error: 'not found' });
     if (!supplier.canSee(j0, me0)) return send(res, 403, { error: 'Access denied: You are not authorized to view this.' });
     const out = r => send(res, r && r.error ? (r.code || 400) : 200, r);
-    const APPROVERS = ['scheduler_staff', 'scheduler_manager', 'production_manager', 'production_director'];
+    const APPROVERS = ['scheduler_staff', 'scheduler_manager', 'production_director'];
     if (seg[2] === 'doc') return out(supplier.documentData(j0, seg[3], me0));
     if (seg[2] === 'files') { const r = supplier.readJobFile(j0, seg[3], me0); if (r.error) return out(r); res.writeHead(200, { 'Content-Type': r.type, 'Content-Disposition': 'attachment; filename="' + r.file.name.replace(/"/g, '') + '"', 'Cache-Control': 'private, no-store' }); return res.end(r.data); }
     if (req.method !== 'POST') return send(res, 405, { error: 'POST only' });
     const b = await readBody(req);
+    if (me0.type !== 'vendor' && me0.type !== 'hub') {
+      if (seg[2] === 'delay') return out(ops.reportDelay(seg[1], role, actor, b));
+      if (seg[2] === 'machine-down') return out(ops.machineDown(seg[1], role, actor, b));
+      if (seg[2] === 'incident') return out(ops.logIncident(seg[1], role, actor, b));
+      if (seg[2] === 'proof') return ['prepress_staff', 'prepress_manager', 'production_director'].indexOf(role) >= 0 ? out(supplier.saveProof(seg[1], me0, b)) : send(res, 403, { error: 'prepress only' });
+    }
     if (seg[2] === 'vendor-quote') return me0.type === 'vendor' ? out(supplier.submitQuote(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
     if (seg[2] === 'draft') {
       if (me0.type === 'vendor') return out(supplier.uploadDraft(seg[1], me0, b));
-      if (APPROVERS.indexOf(role) < 0) return send(res, 403, { error: 'Only the scheduler, production manager or admin can approve a printer draft.' });
+      if (APPROVERS.indexOf(role) < 0) return send(res, 403, { error: 'Only the scheduler or the production director can approve a printer draft.' });
       return out(supplier.decideDraft(seg[1], b.decision, b.reason, actor, role));
     }
     if (seg[2] === 'ship-to-hub') return me0.type === 'vendor' ? out(supplier.shipToHub(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
     if (seg[2] === 'delivery') return me0.type === 'vendor' ? send(res, 403, { error: 'not available to printers' }) : out(supplier.deliveryDetails(seg[1], me0, role, b));
-    if (seg[2] === 'vendor-paid') return ['scheduler_manager', 'production_manager', 'production_director'].indexOf(role) >= 0 ? out(supplier.markPaid(seg[1], actor, role, b)) : send(res, 403, { error: 'managers only' });
+    if (seg[2] === 'vendor-paid') return ['scheduler_manager', 'production_director'].indexOf(role) >= 0 ? out(supplier.markPaid(seg[1], actor, role, b)) : send(res, 403, { error: 'managers only' });
   }
   // POST /api/jobs/:id/transition  { action, payload }
   if (seg[0] === 'jobs' && seg[2] === 'transition' && req.method === 'POST') {
@@ -137,14 +143,25 @@ async function api(req, res, pathname, query) {
   if (seg[0] === 'ops' && seg[1] === 'outlets') return send(res, 200, { outlets: ops.config().outlets.filter(o => o.pickup !== false).map(o => ({ id: o.id, name: o.name, address: o.address })) });
   if (seg[0] === 'ops' && seg[1] === 'config') {
     if (req.method === 'POST') {
-      if (['production_director', 'scheduler_manager', 'production_manager', 'hub_manager', 'logistics_manager'].indexOf(role) < 0) return send(res, 403, { error: 'managers only' });
+      if (['production_director', 'scheduler_manager', 'hub_manager', 'logistics_manager'].indexOf(role) < 0) return send(res, 403, { error: 'managers only' });
       return send(res, 200, { config: ops.saveConfig(await readBody(req), actor) });
     }
-    return send(res, 200, { config: ops.config() });
+    return send(res, 200, { config: ops.config(), checklists: D.CHECKLISTS, errorTypes: D.ERROR_TYPES });
   }
   if (seg[0] === 'ops' && seg[1] === 'kpi') return send(res, 200, { kpi: ops.kpi(query.dept, query.days) });
+  // daily reporting (guidebook §1.6): the department manager submits; the production director reads all
+  if (seg[0] === 'ops' && seg[1] === 'daily-report') {
+    const dept = String(query.dept || (req.method === 'POST' ? '' : D.deptOf(role)) || '');
+    if (req.method === 'POST') { const b = await readBody(req); const r = ops.submitReport(b.dept || D.deptOf(role), b.kind, b, me0, role); return send(res, r.error ? 400 : 200, r); }
+    if (role !== 'production_director' && (D.deptOf(role) !== dept || D.tierOf(role) !== 'manager')) return send(res, 403, { error: 'Daily reports are for the department manager and the production director.' });
+    return send(res, 200, { figures: ops.reportFigures(dept) });
+  }
+  if (seg[0] === 'ops' && seg[1] === 'reports') {
+    if (['manager', 'director'].indexOf(D.tierOf(role)) < 0) return send(res, 403, { error: 'managers only' });
+    return send(res, 200, { reports: ops.listReports(role, query.days) });
+  }
   if (seg[0] === 'ops' && seg[1] === 'sales') {
-    if (['production_director', 'scheduler_manager', 'production_manager'].indexOf(role) < 0) return send(res, 403, { error: 'managers only' });
+    if (['production_director', 'scheduler_manager'].indexOf(role) < 0) return send(res, 403, { error: 'managers only' });
     return send(res, 200, { sales: ops.sales(query.days) });
   }
   if (seg[0] === 'ops' && seg[1] === 'hub-performance') return send(res, 200, { performance: ops.hubPerformance(query.hub || (me0.type === 'hub' ? me0.hub : null), query.days) });
@@ -448,7 +465,7 @@ async function api(req, res, pathname, query) {
     return send(res, 200, { jobs: store.vendorRequests(me.vendorId || me.id).map(j => Object.assign(supplier.vendorJob(j, me), { printing: supplier.listRow(j, me) })), company: me.vendorId || me.id, canQuote: me.role !== 'printer_staff' });
   }
   if (seg[0] === 'jobs' && seg[2] === 'request-quotes' && req.method === 'POST') {
-    if (['production_director', 'scheduler_manager', 'scheduler_staff', 'production_manager'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });
+    if (['production_director', 'scheduler_manager', 'scheduler_staff'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });
     const b = await readBody(req); const r = store.requestVendorQuotes(seg[1], b.vendorIds, actor);
     return send(res, r.error ? 400 : 200, r);
   }
@@ -474,7 +491,7 @@ async function api(req, res, pathname, query) {
     const q = store.quote(seg[1]); return q ? send(res, 200, { printerQuotes: q.printerQuotes || null }) : send(res, 404, { error: 'not found' });
   }
   if (seg[0] === 'jobs' && seg[2] === 'award' && req.method === 'POST') {
-    if (['production_director', 'scheduler_manager', 'scheduler_staff', 'production_manager'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });
+    if (['production_director', 'scheduler_manager', 'scheduler_staff'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });
     const r = ops.award(seg[1], role, actor, await readBody(req));
     return r.error ? send(res, 400, r) : send(res, 200, { ok: true, job: jobView(r.job, role) });
   }

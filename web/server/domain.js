@@ -1,204 +1,187 @@
 /*
- * Printoka operations domain — the unified job/quote state machine, hard gates,
- * RBAC, priority function and audit contract from the two operations guidebooks.
- * Pure logic, no I/O. Consumed by server.js.
+ * Printoka operations domain — the job state machine, hard gates, RBAC and priority rules from the
+ * PRINTOKA PRODUCTION OPERATION MANUAL (Guidebook to Printoka Production, v1.0). Pure logic, no I/O.
  *
- * Guidebook anchors:
- *   Prod §1.7 non-negotiables (system entry, payment validated, artwork==order, traceable)
- *   Prod §1.8 workflow (Prepress → Scheduler → Logistics)  ·  Prepress §2.5 status classes
- *   Scheduler §3.4 priority (deadline, then payment-confirmation time)
- *   Outlet §4 intake  ·  Prod §1.4/§1.5 roles & strict reporting
- *   Qn 732 Hub system · Qn 750 Production/Prepress/Logistics · Qn 752 order-sent + direct award
+ * Organisation (§1.2): Production Director → Prepress / Scheduler / Logistics managers → their staff.
+ *   Director: final authority, inter-department conflicts, overall KPI (§1.4)
+ *   Managers: oversee daily operations, approve escalations, own the department KPI, report daily (§1.4)
+ *   Staff:    execute tasks only, no override authority, escalate immediately (§1.4)
  *
- * Physical flow after production (in-house or vendor):
- *   ready (logistics) ─dispatch→ in transit to the job's current destination
- *     destination = customer → deliver → completed
- *     destination = outlet   → receive_outlet → ready for collection → collect → completed
- *     destination = hub      → receive_hub → at hub (QC, relabel/repack) → forward → in transit to
- *                              the final destination (outlet or customer) → …
- *   A vendor ships straight from its own press (vendor_ship) to the destination on its label.
+ * Workflow (§1.8) — no skipping steps, no parallel shortcuts:
+ *   1 Order enters system (payment confirmed)
+ *   2 Prepress checks & approves the file   PASS → scheduler · MINOR → fix + approval · MAJOR → reject
+ *                                           to outlet · CRITICAL → escalate to the prepress manager (§2.5)
+ *   3 Scheduler queues the job              in-house: machine + time slot · outsourced: best quote (§3.5)
+ *   4 Printing execution                    scheduler monitors; delays and machine downtime logged (§3.6/3.7)
+ *   5 Logistics packs & delivers            outsourced parcels are received at production first (§4.4),
+ *                                           then packed, labelled, dispatched, delivery confirmed (§4.5)
+ * Printers deliver to production (logistics receives) or straight to the outlet (§3.5).
  */
 
-// ---- roles ----------------------------------------------------------------
+// ---- roles (§1.2 / §1.4) -----------------------------------------------------
 const ROLES = {
   // outlet
   cs_walkin: { label: 'Customer Service (Walk-in)', dept: 'outlet', tier: 'staff' },
   print_consultant: { label: 'Printing Consultant (B2B)', dept: 'outlet', tier: 'staff' },
   store_manager: { label: 'Store / Assistant Manager', dept: 'outlet', tier: 'manager' },
-  // production departments
+  // production
+  production_director: { label: 'Production Director', dept: 'all', tier: 'director' },
   prepress_staff: { label: 'Prepress Staff', dept: 'prepress', tier: 'staff' },
   prepress_manager: { label: 'Prepress Manager', dept: 'prepress', tier: 'manager' },
   scheduler_staff: { label: 'Scheduler Staff', dept: 'scheduler', tier: 'staff' },
   scheduler_manager: { label: 'Scheduler Manager', dept: 'scheduler', tier: 'manager' },
-  production_staff: { label: 'Production Staff', dept: 'production', tier: 'staff' },
-  production_manager: { label: 'Production Manager', dept: 'production', tier: 'manager' },
   logistics_staff: { label: 'Logistics Staff', dept: 'logistics', tier: 'staff' },
   logistics_manager: { label: 'Logistics Manager', dept: 'logistics', tier: 'manager' },
-  production_director: { label: 'Production Director', dept: 'all', tier: 'director' },
-  // hub (consolidation / relabel / repack)
+  // hub (legacy: no longer part of the production flow; kept for parcels already routed to a hub)
   hub: { label: 'Hub Staff', dept: 'hub', tier: 'staff' },
   hub_manager: { label: 'Hub Manager', dept: 'hub', tier: 'manager' },
   // external
   printer: { label: 'Outsource Printer', dept: 'vendor', tier: 'staff' },
 };
 
-// ---- job statuses ---------------------------------------------------------
-// Each status belongs to a department "queue" (drives GET /queues/:dept).
+// ---- job statuses: each belongs to one department queue ----------------------
 const STATUS = {
-  intake: { label: 'Intake — acknowledge', queue: 'outlet' },
-  prepress: { label: 'Prepress — file check', queue: 'prepress' },
-  prepress_issue: { label: 'Prepress — issue / fixing', queue: 'prepress' },
-  escalated: { label: 'Escalated to manager', queue: 'prepress' },
-  rejected: { label: 'Artwork rejected — awaiting new file', queue: 'outlet' },
-  scheduling: { label: 'Scheduler — queue & allocate', queue: 'scheduler' },
-  printing: { label: 'In production (in-house floor)', queue: 'production' },
-  outsourcing: { label: 'Outsourced — printer producing', queue: 'scheduler' },
-  logistics: { label: 'Logistics — pack & dispatch', queue: 'logistics' },
-  dispatched: { label: 'In transit', queue: 'logistics' },
-  at_hub: { label: 'At hub — check, relabel & forward', queue: 'hub' },
-  ready_collect: { label: 'Ready for collection at outlet', queue: 'outlet' },
-  completed: { label: 'Completed / delivered', queue: 'done' },
-  cancelled: { label: 'Cancelled', queue: 'done' },
+  intake: { label: 'Order received — awaiting payment confirmation', queue: 'outlet', step: 1 },
+  prepress: { label: 'Prepress — file check', queue: 'prepress', step: 2 },
+  prepress_issue: { label: 'Prepress — minor issue, awaiting approval', queue: 'prepress', step: 2 },
+  escalated: { label: 'Prepress — escalated to manager', queue: 'prepress', step: 2 },
+  rejected: { label: 'Rejected — returned to outlet', queue: 'outlet', step: 2 },
+  scheduling: { label: 'Scheduler — in queue', queue: 'scheduler', step: 3 },
+  printing: { label: 'Printing — in-house', queue: 'scheduler', step: 4 },
+  outsourcing: { label: 'Printing — outsourced', queue: 'scheduler', step: 4 },
+  inbound: { label: 'Logistics — receiving outsourced job', queue: 'logistics', step: 5 },
+  logistics: { label: 'Logistics — packing & labelling', queue: 'logistics', step: 5 },
+  dispatched: { label: 'Dispatched — in transit', queue: 'logistics', step: 5 },
+  at_hub: { label: 'At hub (legacy)', queue: 'hub', step: 5 },
+  ready_collect: { label: 'Ready for collection at outlet', queue: 'outlet', step: 5 },
+  completed: { label: 'Completed / delivered', queue: 'done', step: 5 },
+  cancelled: { label: 'Cancelled', queue: 'done', step: 5 },
 };
+const STEPS = ['Order entered', 'Prepress', 'Scheduler', 'Printing', 'Logistics'];
 
 const OUTLET = ['cs_walkin', 'print_consultant', 'store_manager'];
 const PREPRESS = ['prepress_staff', 'prepress_manager'];
-const SCHEDULER = ['scheduler_staff', 'scheduler_manager', 'production_manager'];
-const FLOOR = ['production_staff', 'production_manager'];
-const PRODUCTION = SCHEDULER;
+const SCHEDULER = ['scheduler_staff', 'scheduler_manager'];
 const LOGISTICS = ['logistics_staff', 'logistics_manager'];
 const HUB = ['hub', 'hub_manager'];
 
-// ---- gates (server-side, non-negotiable) ----------------------------------
-// Return null if the gate passes, or a human-readable reason if it blocks.
+// ---- checklists the system holds staff to (SOPs) -------------------------------
+const CHECKLISTS = {
+  // Receiving SOP §4.4
+  receiving: [['matched', 'Outsourced order matches the physical item'], ['quantity', 'Quantity checked'], ['quality', 'Finishing quality checked'], ['unlabelled', 'Printer labels removed for relabelling']],
+  // Packing / Repacking SOP §4.5
+  logistics: [['verified', 'Verified — order vs item, quantity, finishing quality'], ['packed', 'Packed — right materials, no damage risk, items grouped'], ['labelled', 'Labelled — label printed from the dashboard (customer, order ID, destination, parcel count)']],
+  hub: [['checked', 'Parcel checked against the order'], ['qc', 'Quality check passed'], ['relabelled', 'Relabelled / repacked']],
+};
+const checklistGate = (group, what) => job => {
+  const s = (job.progress && job.progress[group]) || {}; const missing = CHECKLISTS[group].filter(c => !s[c[0]]).map(c => c[0]);
+  return missing.length ? 'Complete the ' + what + ' first (' + missing.join(', ') + ').' : null;
+};
+
+// ---- gates: non-negotiable production policy (§1.7) ----------------------------
 const destType = job => (job.destination && job.destination.type) || 'customer';
 const GATES = {
   payment: job => (job.paymentValidated || job.creditTerms)
-    ? null : 'No production without payment confirmation (bank transfer must be validated), unless on credit terms.',
+    ? null : 'No job proceeds without payment confirmation (bank transfer has to be validated).',
   artworkMatch: job => (job.artworkMatches || job.customerAuthorizedMismatch)
-    ? null : 'Order details do not match the artwork requirement — needs customer authorization to proceed.',
+    ? null : 'Order details do not match the artwork requirement — the customer has to authorise it first.',
   artworkPresent: job => job.artwork && job.artwork.file && !/^pending-upload/.test(job.artwork.file)
     ? null : 'No artwork file attached to this job yet.',
-  // in-house progress form: every production step ticked before it leaves the floor
-  productionDone: job => {
-    const steps = (job.progress && job.progress.inhouse) || {};
-    const missing = ['setup', 'printing', 'finishing', 'qc'].filter(k => !steps[k]);
-    return missing.length ? 'Complete the production progress form first (' + missing.join(', ') + ').' : null;
-  },
-  // logistics packing form / hub progress form: every step ticked before the parcel leaves
-  logisticsDone: job => {
-    const s = (job.progress && job.progress.logistics) || {}; const missing = ['picked', 'packed', 'labelled'].filter(k => !s[k]);
-    return missing.length ? 'Complete the logistics status update first (' + missing.join(', ') + ').' : null;
-  },
-  hubDone: job => {
-    const s = (job.progress && job.progress.hub) || {}; const missing = ['checked', 'qc', 'relabelled'].filter(k => !s[k]);
-    return missing.length ? 'Complete the hub progress form first (' + missing.join(', ') + ').' : null;
-  },
+  receivingDone: checklistGate('receiving', 'receiving checklist'),
+  packingDone: checklistGate('logistics', 'packing checklist'),
+  logisticsDone: checklistGate('logistics', 'packing checklist'),
+  hubDone: checklistGate('hub', 'hub progress form'),
   // original supplier flow: the printer prints only after HQ approves its draft
   draftApproved: job => (!job.outsource || !job.outsource.awardedTo || (job.outsource.draft && job.outsource.draft.approvedAt))
     ? null : 'Please wait for admin approve the draft before start printing.',
   destCustomer: job => destType(job) === 'customer' ? null : 'This parcel is going to a ' + destType(job) + ', not the customer.',
   destOutlet: job => destType(job) === 'outlet' ? null : 'This parcel is not addressed to an outlet.',
+  destProduction: job => destType(job) === 'production' ? null : 'This parcel is not addressed to production.',
   destHub: job => destType(job) === 'hub' ? null : 'This parcel is not addressed to a hub.',
 };
 
-// ---- transition table -----------------------------------------------------
-// from -> [{ action, to, roles:[...], gates:[...], requires:[fields], note }]
-// production_director may perform any transition (override authority, Prod §1.4).
+// ---- transition table ----------------------------------------------------------
+// from -> [{ action, to, roles, gates, requires, note }]. The Production Director may perform any
+// transition (final authority, §1.4). Staff never approve escalations — managers do.
 const TRANSITIONS = {
   intake: [
-    { action: 'acknowledge', to: 'prepress', roles: OUTLET,
-      gates: ['payment'], note: 'Acknowledge within 5 min and release to prepress (Outlet §4.2).' },
+    { action: 'acknowledge', to: 'prepress', roles: OUTLET, gates: ['payment'], note: 'Payment confirmed — released to prepress.' },
   ],
+  // Step 2 — Prepress (§2.4–2.7)
   prepress: [
-    { action: 'approve', to: 'scheduling', roles: PREPRESS,
-      gates: ['artworkPresent', 'artworkMatch'], note: 'PASS → release to production (Prepress §2.5).' },
-    { action: 'flag_minor', to: 'prepress_issue', roles: PREPRESS,
-      requires: ['reason'], note: 'MINOR ISSUE → fix internally & seek approval (Prepress §2.5).' },
-    { action: 'reject_major', to: 'rejected', roles: PREPRESS,
-      requires: ['reason', 'proof'], note: 'MAJOR ISSUE → reject to outlet/customer with issue + visual proof (Prepress §2.7).' },
-    { action: 'escalate', to: 'escalated', roles: ['prepress_staff'],
-      requires: ['reason'], note: 'CRITICAL → escalate to manager (Prepress §2.5).' },
+    { action: 'approve', to: 'scheduling', roles: PREPRESS, gates: ['artworkPresent', 'artworkMatch'], note: 'PASS — released to the scheduler.' },
+    { action: 'flag_minor', to: 'prepress_issue', roles: PREPRESS, requires: ['reason'], note: 'MINOR ISSUE — fixing internally; approval needed before release.' },
+    { action: 'reject_major', to: 'rejected', roles: PREPRESS, requires: ['reason', 'proof', 'suggestion'], note: 'MAJOR ISSUE — rejected and returned to the outlet with proof and a suggested correction.' },
+    { action: 'escalate', to: 'escalated', roles: ['prepress_staff'], requires: ['reason'], note: 'CRITICAL — escalated to the prepress manager.' },
   ],
   prepress_issue: [
-    { action: 'approve', to: 'scheduling', roles: ['prepress_manager'],
-      gates: ['artworkPresent', 'artworkMatch'], note: 'Manager approves the internal fix.' },
-    { action: 'reject_major', to: 'rejected', roles: PREPRESS, requires: ['reason', 'proof'] },
+    { action: 'approve', to: 'scheduling', roles: PREPRESS, gates: ['artworkPresent', 'artworkMatch'], requires: ['approval'], note: 'Fix approved — released to the scheduler.' },
+    { action: 'reject_major', to: 'rejected', roles: PREPRESS, requires: ['reason', 'proof', 'suggestion'] },
+    { action: 'escalate', to: 'escalated', roles: ['prepress_staff'], requires: ['reason'] },
   ],
   escalated: [
-    { action: 'approve', to: 'scheduling', roles: ['prepress_manager'], gates: ['artworkPresent', 'artworkMatch'] },
-    { action: 'reject_major', to: 'rejected', roles: ['prepress_manager'], requires: ['reason', 'proof'] },
+    { action: 'approve', to: 'scheduling', roles: ['prepress_manager'], gates: ['artworkPresent', 'artworkMatch'], note: 'Manager approved — released to the scheduler.' },
+    { action: 'flag_minor', to: 'prepress_issue', roles: ['prepress_manager'], requires: ['reason'], note: 'Manager: fix internally and seek approval.' },
+    { action: 'reject_major', to: 'rejected', roles: ['prepress_manager'], requires: ['reason', 'proof', 'suggestion'] },
   ],
   rejected: [
-    { action: 'resubmit', to: 'prepress', roles: OUTLET.concat(PREPRESS),
-      requires: ['file'], note: 'Customer sent a corrected file — back to prepress for a fresh check.' },
+    { action: 'resubmit', to: 'prepress', roles: OUTLET.concat(PREPRESS), requires: ['file'], note: 'Corrected file received — back to prepress for a fresh check.' },
   ],
+  // Step 3 — Scheduler (§3.5 SOP: confirm prepress approval + payment, assign machine/printer, queue with a time slot)
   scheduling: [
-    { action: 'assign_inhouse', to: 'printing', roles: PRODUCTION,
-      gates: ['payment'], requires: ['machine'], note: 'Send to internal production with delivery instructions (Qn 752 CF1).' },
-    { action: 'assign_outsource', to: 'outsourcing', roles: PRODUCTION,
-      gates: ['payment'], requires: ['printer'], note: 'Award to printer by best quote/time/logistics (Scheduler §3.5).' },
+    { action: 'assign_inhouse', to: 'printing', roles: SCHEDULER, gates: ['payment'], requires: ['machine', 'slot'], note: 'Queued in-house on a machine and time slot.' },
+    { action: 'assign_outsource', to: 'outsourcing', roles: SCHEDULER, gates: ['payment'], requires: ['printer'], note: 'Outsourced to the printer with the best quote (cost, time, logistics).' },
   ],
+  // Step 4 — Printing execution, monitored by the scheduler (§3.5 step 4)
   printing: [
-    { action: 'finish', to: 'logistics', roles: FLOOR, gates: ['productionDone'],
-      note: 'Set-up → Printing → Finishing → QC done — hand to logistics.' },
+    { action: 'finish', to: 'logistics', roles: SCHEDULER, requires: ['qc'], note: 'Printed; spec and quality checked — handed to logistics.' },
   ],
   outsourcing: [
-    { action: 'vendor_ship', to: 'dispatched', roles: PRODUCTION.concat(['printer'], LOGISTICS),
-      gates: ['draftApproved'], requires: ['courier'], note: 'Printer shipped the parcel with the Printoka label to its destination.' },
+    { action: 'vendor_ship', to: 'inbound', roles: SCHEDULER.concat(['printer'], LOGISTICS), gates: ['draftApproved', 'destProduction'], requires: ['courier'], note: 'Printer shipped the job to production for receiving.' },
+    { action: 'vendor_ship_outlet', to: 'dispatched', roles: SCHEDULER.concat(['printer'], LOGISTICS), gates: ['draftApproved', 'destOutlet'], requires: ['courier'], note: 'Printer shipped the job straight to the outlet.' },
+  ],
+  // Step 5 — Logistics (§4.4 receiving · §4.5 packing, delivery)
+  inbound: [
+    { action: 'receive', to: 'logistics', roles: LOGISTICS, gates: ['receivingDone'], note: 'Outsourced job received and verified — to packing.' },
   ],
   logistics: [
-    { action: 'dispatch', to: 'dispatched', roles: LOGISTICS,
-      gates: ['logisticsDone'], requires: ['courier'], note: 'Pack, label, assign courier, dispatch (Logistics §4.5).' },
+    { action: 'dispatch', to: 'dispatched', roles: LOGISTICS, gates: ['packingDone'], requires: ['courier'], note: 'Assigned to the courier and dispatched.' },
   ],
   dispatched: [
-    { action: 'deliver', to: 'completed', roles: LOGISTICS, gates: ['destCustomer'],
-      note: 'Courier confirmed delivery to the customer.' },
-    { action: 'receive_hub', to: 'at_hub', roles: HUB.concat(LOGISTICS), gates: ['destHub'],
-      note: 'Hub received the parcel (Logistics §4.4).' },
-    { action: 'receive_outlet', to: 'ready_collect', roles: OUTLET, gates: ['destOutlet'],
-      note: 'Outlet received the parcel — customer notified it is ready for collection.' },
+    { action: 'deliver', to: 'completed', roles: LOGISTICS, gates: ['destCustomer'], note: 'Delivery confirmed and the receiver notified.' },
+    { action: 'receive_outlet', to: 'ready_collect', roles: OUTLET, gates: ['destOutlet'], note: 'Outlet received the parcel — customer notified it is ready for collection.' },
+    { action: 'receive_hub', to: 'at_hub', roles: HUB, gates: ['destHub'], note: 'Hub received the parcel (legacy hub routing).' },
   ],
   at_hub: [
-    { action: 'forward', to: 'dispatched', roles: HUB, gates: ['hubDone'], requires: ['courier'],
-      note: 'Checked, relabelled/repacked and forwarded to the final destination.' },
+    { action: 'forward', to: 'dispatched', roles: HUB, gates: ['hubDone'], requires: ['courier'], note: 'Forwarded from the hub (legacy hub routing).' },
   ],
   ready_collect: [
-    { action: 'collect', to: 'completed', roles: OUTLET, note: 'Customer collected the order (Outlet §4.5).' },
+    { action: 'collect', to: 'completed', roles: OUTLET, note: 'Customer collected the order.' },
   ],
 };
 
 function roleCan(role, t) {
-  if (role === 'production_director') return true; // override authority
+  if (role === 'production_director') return true; // final authority (§1.4)
   return (t.roles || []).indexOf(role) !== -1;
 }
-
-// Compute the transitions a given role may attempt on a job right now,
-// annotated with any blocking gate/requirement (so the UI can show *why* disabled).
 function availableActions(job, role) {
   const list = TRANSITIONS[job.status] || [];
   return list.map(t => {
     const permitted = roleCan(role, t);
     const gateBlock = (t.gates || []).map(g => GATES[g](job)).filter(Boolean);
-    return {
-      action: t.action, to: t.to, toLabel: STATUS[t.to] && STATUS[t.to].label,
-      note: t.note, requires: t.requires || [],
-      permitted, blockedBy: gateBlock, enabled: permitted && gateBlock.length === 0,
-    };
+    return { action: t.action, to: t.to, toLabel: STATUS[t.to] && STATUS[t.to].label, note: t.note, requires: t.requires || [], permitted, blockedBy: gateBlock, enabled: permitted && gateBlock.length === 0 };
   });
 }
-
-// Validate + return the resolved transition (or an error object). Does not mutate.
 function resolveTransition(job, role, action, payload) {
   const t = (TRANSITIONS[job.status] || []).find(x => x.action === action);
   if (!t) return { error: `Action "${action}" is not valid from status "${job.status}".` };
-  if (!roleCan(role, t)) return { error: `Role "${role}" may not perform "${action}".` };
+  if (!roleCan(role, t)) return { error: (ROLES[role] ? ROLES[role].label : role) + ' may not perform "' + action + '".' };
   for (const g of (t.gates || [])) { const r = GATES[g](job); if (r) return { error: r, gate: g }; }
-  for (const f of (t.requires || [])) { if (!payload || payload[f] == null || payload[f] === '') return { error: `Missing required field "${f}" for "${action}".` }; }
+  for (const f of (t.requires || [])) { if (!payload || payload[f] == null || payload[f] === '' || payload[f] === false) return { error: `Missing required field "${f}" for "${action}".` }; }
   return { transition: t };
 }
 
-// Priority: ONLY (1) customer deadline, then (2) payment-confirmation time (Scheduler §3.4).
+// Priority is determined ONLY by (1) customer deadline, then (2) payment-confirmation time (§3.4).
 function priorityCompare(a, b) {
   const da = a.deadline ? Date.parse(a.deadline) : Infinity;
   const db = b.deadline ? Date.parse(b.deadline) : Infinity;
@@ -208,10 +191,20 @@ function priorityCompare(a, b) {
   return pa - pb;
 }
 
-// Staff account role (login) → state-machine role. Decided on the SERVER from the session,
-// never from what the browser claims.
+// Error responsibility alignment (§5.3)
+const ERROR_TYPES = {
+  file_issue: { label: 'File issue', dept: 'prepress' },
+  late_job: { label: 'Late job', dept: 'scheduler' },
+  wrong_spec: { label: 'Wrong spec', dept: 'scheduler' },
+  quality: { label: 'Quality', dept: 'scheduler' },
+  wrong_item: { label: 'Wrong item sent', dept: 'logistics' },
+  damage: { label: 'Damaged in packing / delivery', dept: 'logistics' },
+};
+
+// Staff account role (login) → state-machine role, decided on the SERVER from the session.
+// production_manager / production_staff are legacy logins: production and scheduler are one department.
 const ACCOUNT_ROLE = {
-  admin: 'production_director', production_manager: 'production_manager', production_staff: 'production_staff',
+  admin: 'production_director', production_director: 'production_director', production_manager: 'production_director', production_staff: 'scheduler_staff',
   prepress: 'prepress_staff', prepress_manager: 'prepress_manager',
   scheduler: 'scheduler_staff', scheduler_manager: 'scheduler_manager',
   logistics: 'logistics_staff', logistics_manager: 'logistics_manager',
@@ -224,5 +217,7 @@ function opsRoleFor(account) {
   if (account.type === 'admin') return 'production_director';
   return ACCOUNT_ROLE[account.role] || null;
 }
+const deptOf = role => (ROLES[role] || {}).dept || null;
+const tierOf = role => (ROLES[role] || {}).tier || null;
 
-module.exports = { ROLES, STATUS, GATES, TRANSITIONS, roleCan, availableActions, resolveTransition, priorityCompare, opsRoleFor };
+module.exports = { ROLES, STATUS, STEPS, CHECKLISTS, GATES, TRANSITIONS, ERROR_TYPES, roleCan, availableActions, resolveTransition, priorityCompare, opsRoleFor, deptOf, tierOf };

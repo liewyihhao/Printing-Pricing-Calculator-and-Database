@@ -62,8 +62,8 @@
       feats: [['Inbound parcels from production & printers', 'truck'], ['Interactive progress form', 'check'], ['Hub performance', 'layers'], ['Manager / staff action tracker', 'clock']] },
     outlet: { title: 'Outlet Login', path: '/account/outlet-login/', bg: 'linear-gradient(90deg,#6a3de8,#b44bd6)', accent: '#6a3de8', head: 'Outlet counter', sub: 'Walk-in quotes, online orders and collections for your outlet.',
       feats: [['Walk-in quotes & follow-ups', 'edit-3'], ['Online orders for your outlet', 'file'], ['Collections & customer pickup', 'box'], ['Outlet sales performance', 'layers']] },
-    production: { title: 'Production Login', path: '/account/production-login/', bg: 'linear-gradient(90deg,#1f3b73,#2e6bd9)', accent: '#2e6bd9', head: 'Production system', sub: 'Prepress, scheduler, production floor and logistics — one live pipeline.',
-      feats: [['Prepress file check', 'check'], ['Scheduler allocation & outsourcing', 'layers'], ['In-house production progress', 'printer'], ['Logistics & dispatch', 'truck']] },
+    production: { title: 'Production Login', path: '/account/production-login/', bg: 'linear-gradient(90deg,#1f3b73,#2e6bd9)', accent: '#2e6bd9', head: 'Production system', sub: 'Prepress, Scheduler and Logistics under the Production Director.',
+      feats: [['Prepress file check', 'check'], ['Scheduling, printing & outsourcing', 'printer'], ['Receiving, packing & delivery', 'truck'], ['Daily reports to the Production Director', 'layers']] },
     admin: { title: 'Admin Login', path: '/account/admin-login/', bg: 'linear-gradient(90deg,#1b1b1f,#4a4a55)', accent: '#212121', head: 'Printoka admin', sub: 'Orders, products, customers, users & roles, content and settings.',
       feats: [['Orders & customers', 'file'], ['Products & pricing', 'layers'], ['Users & roles', 'user-plus'], ['Content & settings', 'edit-3']] },
   };

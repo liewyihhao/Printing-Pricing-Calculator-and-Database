@@ -169,7 +169,7 @@
 
   // ---------------------------------------------------------------- Users & roles (every staff type)
   const TYPES = { outlet: 'Outlet', production: 'Production', vendor: 'Printer', hub: 'Hub', admin: 'Admin' };
-  const ROLE_LABEL = { outlet_staff: 'Outlet staff', outlet_manager: 'Outlet manager', prepress: 'Prepress staff', prepress_manager: 'Prepress manager', production_staff: 'Production staff', production_manager: 'Production manager', scheduler: 'Scheduler staff', scheduler_manager: 'Scheduler manager', logistics: 'Logistics staff', logistics_manager: 'Logistics manager', printer_staff: 'Printer staff', printer_manager: 'Printer manager', hub_staff: 'Hub staff', hub_manager: 'Hub manager', admin: 'Administrator', vendor: 'Printer manager', hub: 'Hub staff' };
+  const ROLE_LABEL = { outlet_staff: 'Outlet staff', outlet_manager: 'Outlet manager', production_director: 'Production Director', prepress: 'Prepress staff', prepress_manager: 'Prepress manager', production_staff: 'Scheduler staff', production_manager: 'Production Director', scheduler: 'Scheduler staff', scheduler_manager: 'Scheduler manager', logistics: 'Logistics staff', logistics_manager: 'Logistics manager', printer_staff: 'Printer staff', printer_manager: 'Printer manager', hub_staff: 'Hub staff', hub_manager: 'Hub manager', admin: 'Administrator', vendor: 'Printer manager', hub: 'Hub staff' };
   P.aUsers = function () {
     const staff = this.state.admStaff || [];
     const SR = (this.state.admStaffRoles) || (this.aGet('roles', '/api/admin/roles') || {}).staffRoles || {};

@@ -182,7 +182,7 @@ function orderStatus(o) {
   if (any(['at_hub'])) return ['hub-arrived', 'Arrived at Hub'];
   if (js.some(toHub)) return ['hub-shipped', 'Shipped to Hub'];
   if (all(['dispatched', 'completed', 'ready_collect'])) return ['shipped', 'Shipped'];
-  if (any(['scheduling', 'printing', 'outsourcing', 'logistics', 'dispatched'])) return ['processing', 'Processing'];
+  if (any(['scheduling', 'printing', 'outsourcing', 'inbound', 'logistics', 'dispatched'])) return ['processing', 'Processing'];
   return ['payment-received', 'Payment Received'];
 }
 const STAGES = ['draft', 'pending_payment', 'payment_received', 'processing', 'shipped'];

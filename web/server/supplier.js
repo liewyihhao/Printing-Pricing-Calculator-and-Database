@@ -32,7 +32,7 @@ const STATUSES = {
   'printer-assigned': { label: 'Printer assigned', color: '#00C2B2', icon: 'printer' },
   'draft-pending-approval': { label: 'Draft Pending Approval', color: '#00A0D2', icon: 'clipboard' },
   'draft-approved': { label: 'Draft approved', color: '#00C2B2', icon: 'check' },
-  'shipped-to-hub': { label: 'Shipped to hub', color: '#009D9A', icon: 'truck' },
+  'shipped-to-hub': { label: 'Shipped to production', color: '#009D9A', icon: 'truck' },
   shipped: { label: 'Shipped', color: '#005082', icon: 'box' },
   paid: { label: 'Paid', color: '#67A2B2', icon: 'dollar-sign' },
 };
@@ -42,10 +42,9 @@ function printingStatus(j) {
   if (o.paidAt) return 'paid';
   if (!o.awardedTo) return o.status === 'quotes_received' ? 'quotes-received' : o.status === 'partly_received' ? 'quote-partly-received' : 'quote-requested';
   if (j.status === 'outsourcing') { const d = o.draft; if (d && d.approvedAt) return 'draft-approved'; if (d && d.file && !d.rejectedAt) return 'draft-pending-approval'; return 'printer-assigned'; }
-  const printerLeg = (j.shipments || []).find(s => s.byVendor) || (j.shipments || [])[0];
+  // with production: the printer delivered, logistics is receiving / repacking it
+  if (['inbound', 'logistics', 'at_hub'].indexOf(j.status) >= 0) return 'shipped-to-hub';
   if (j.status === 'dispatched' && (j.destination || {}).type === 'hub') return 'shipped-to-hub';
-  if (j.status === 'at_hub') return 'shipped-to-hub';
-  if (printerLeg && printerLeg.to && printerLeg.to.type === 'hub' && !j.hubDelivery && ['dispatched', 'at_hub'].indexOf(j.status) >= 0) return 'shipped-to-hub';
   return 'shipped';
 }
 const statusInfo = slug => slug ? Object.assign({ id: slug, step: ORDER.indexOf(slug) + 1, of: ORDER.length }, STATUSES[slug]) : null;
@@ -66,7 +65,16 @@ function jobFiles(j) { const out = []; const o = j.outsource || {};
   (o.draftHistory || []).concat(o.draft && o.draft.file ? [o.draft.file] : []).forEach(f => out.push(Object.assign({ kind: 'draft', vendorId: o.awardedTo }, f)));
   if (j.hubDelivery && j.hubDelivery.document) out.push(Object.assign({ kind: 'delivery-order' }, j.hubDelivery.document));
   if (j.dispatchDelivery && j.dispatchDelivery.document) out.push(Object.assign({ kind: 'dispatch-order' }, j.dispatchDelivery.document));
+  (j.proofs || []).forEach(f => out.push(Object.assign({ kind: 'proof' }, f)));
   return out; }
+// prepress rejection proof (§2.7: attach a visual proof — screenshot)
+function saveProof(jid, me, b) {
+  const j = store.job(jid); if (!j) return { error: 'Job not found.' };
+  if (!/\.(png|jpe?g|webp|pdf)$/i.test(String(b.name || ''))) return { error: 'The proof must be a screenshot (PNG / JPG) or a PDF.' };
+  const f = saveBlob(path.join(ROOT, jid), b, 'R'); if (f.error) return f;
+  f.by = me.name; j.proofs = j.proofs || []; j.proofs.push(f); store.save();
+  return { file: { id: f.id, name: f.name } };
+}
 function readJobFile(j, fid, me) {
   const f = jobFiles(j).find(x => x.id === fid); if (!f) return { error: 'File not found.', code: 404 };
   if (me.type === 'vendor') { const co = me.vendorId || me.id; if (f.vendorId !== co) return { error: 'Not allowed.', code: 403 }; }
@@ -81,6 +89,13 @@ function vendorCanSee(j, me) { const co = coOf(me); return !!(co && j.outsource 
 function hubCanSee(j, me) { return !me.hub || j.hub === me.hub || ((j.destination || {}).type === 'hub' && j.destination.id === me.hub) || (j.shipments || []).some(s => s.to && s.to.type === 'hub' && s.to.id === me.hub); }
 function canSee(j, me) { if (!j || !me) return false; if (me.type === 'vendor') return vendorCanSee(j, me); if (me.type === 'hub') return hubCanSee(j, me); return me.type !== 'customer'; }
 function hubDetails(j, hubId) { const cfg = ops().config(); const hb = (cfg.hubs || []).find(x => x.id === (hubId || j.hub)); return hb ? { id: hb.id, name: hb.name, address: hb.address || '', phone: hb.phone || '' } : null; }
+// where the printer delivers: production (logistics receives) or the outlet (legacy: a hub)
+function deliverTo(j) {
+  const d = j.destination || {};
+  if (d.type === 'production' || d.type === 'outlet') { const o = d.type === 'outlet' ? ops().outletById(d.id) : null; return { type: d.type, name: d.name, address: d.address || (o && o.address) || '', phone: d.phone || '' }; }
+  if (d.type === 'hub') return Object.assign({ type: 'hub' }, hubDetails(j, d.id));
+  const p = ops().destOf('production'); return { type: 'production', name: p.name, address: p.address, phone: p.phone };
+}
 function activities(j, me) {
   const out = [];
   store.audit({ jobId: j.id }).forEach(e => {
@@ -98,7 +113,7 @@ const ACT_TITLE = { submit_quote: 'Quote submitted', award_po: 'Printer assigned
 function documents(j, me) {
   const o = j.outsource || {}; const d = [];
   const staff = me.type !== 'vendor' && me.type !== 'hub';
-  if (o.awardedTo && ((me.type === 'vendor' && o.awardedTo === coOf(me)) || staff)) { d.push({ id: 'purchase-order', label: 'Purchase Order' }); if (j.hub) d.push({ id: 'hub-label', label: 'Hub Label' }); }
+  if (o.awardedTo && ((me.type === 'vendor' && o.awardedTo === coOf(me)) || staff)) { d.push({ id: 'purchase-order', label: 'Purchase Order' }); d.push({ id: 'hub-label', label: 'Delivery Label' }); }
   if (me.type === 'hub' || staff) d.push({ id: 'shipping-label', label: 'Shipping Label' });
   return d;
 }
@@ -122,7 +137,7 @@ function view(j, me) {
   const v = {
     status: statusFor(j, me), po: o.po || null, poNumber: o.poNumber || null, awarded: !!o.awardedTo, awardedToMe: !!(co && o.awardedTo === co), paidAt: o.paidAt || null,
     draft: o.draft ? { file: pub(o.draft.file), at: o.draft.at, by: o.draft.by, approvedAt: o.draft.approvedAt || null, approvedBy: o.draft.approvedBy || null, rejectedAt: o.draft.rejectedAt || null, rejectReason: o.draft.rejectReason || '' } : null,
-    job: (me.type === 'vendor' && o.awardedTo && o.awardedTo !== co) ? Object.assign(jobDetails(j), { artworks: [] }) : jobDetails(j), hub: hubDetails(j), documents: documents(j, me), activities: activities(j, me),
+    job: (me.type === 'vendor' && o.awardedTo && o.awardedTo !== co) ? Object.assign(jobDetails(j), { artworks: [] }) : jobDetails(j), deliverTo: deliverTo(j), documents: documents(j, me), activities: activities(j, me),
     hubDelivery: j.hubDelivery ? { tracking: j.hubDelivery.tracking, company: j.hubDelivery.company, document: pub(j.hubDelivery.document), at: j.hubDelivery.at, by: j.hubDelivery.by } : null,
     dispatchDelivery: j.dispatchDelivery && me.type !== 'vendor' ? { tracking: j.dispatchDelivery.tracking, company: j.dispatchDelivery.company, document: pub(j.dispatchDelivery.document), at: j.dispatchDelivery.at, by: j.dispatchDelivery.by } : null,
   };
@@ -205,7 +220,8 @@ function shipToHub(jid, me, b) {
   const j = store.job(jid); const co = coOf(me); if (!j || !j.outsource || j.outsource.awardedTo !== co) return { error: 'This job is not awarded to your company.' };
   if (b.status && b.status !== 'shipped-to-hub') return { error: 'No changes required.' };
   if (!(j.outsource.draft && j.outsource.draft.approvedAt)) return { error: 'Please wait for admin approve the draft before start printing.' };
-  const r = ops().transition(jid, 'printer', me.name, 'vendor_ship', { courier: b.courier || 'Printer delivery', tracking: b.tracking || '' });
+  const action = (j.destination || {}).type === 'outlet' ? 'vendor_ship_outlet' : 'vendor_ship';
+  const r = ops().transition(jid, 'printer', me.name, action, { courier: b.courier || 'Printer delivery', tracking: b.tracking || '' });
   if (r.error) return r;
   const last = (j.shipments || []).slice(-1)[0]; if (last) last.byVendor = co;
   store.save(); return { ok: true, message: 'Status update successfully!' };
@@ -259,7 +275,7 @@ function poNumber(j) {
 function documentData(j, kind, me) {
   if (!documents(j, me).some(d => d.id === kind)) return { error: 'Not allowed.' };
   const o = j.outsource || {}; const v = o.awardedTo && store.findCustomer(o.awardedTo); const mine = (o.vendors || []).find(x => x.vendorId === o.awardedTo) || {};
-  const base = { kind, jobId: j.id, job: jobDetails(j), hub: hubDetails(j) };
+  const base = { kind, jobId: j.id, job: jobDetails(j), hub: deliverTo(j) };
   if (kind === 'purchase-order') return Object.assign(base, { poNumber: poNumber(j), vendor: { name: (v && (v.company || v.name)) || mine.vendorName, address: (v && ((v.addresses || [])[0] ? [v.addresses[0].line1, v.addresses[0].line2, [v.addresses[0].postcode, v.addresses[0].city].filter(Boolean).join(' '), v.addresses[0].state].filter(Boolean).join(', ') : v.address)) || '' }, shipping: me.type === 'vendor' ? { name: (j.destination || {}).name, address: (j.destination || {}).address } : orderDetails(j), amount: mine.price });
   if (kind === 'hub-label') return Object.assign(base, { poNumber: poNumber(j) });
   return Object.assign(base, { order: orderDetails(j) });
@@ -315,5 +331,5 @@ function readCustomQuoteDoc(qid, vendorId, me) {
   return { file: p.document, data: fs.readFileSync(f), type: MIME[(p.document.name.split('.').pop() || '').toLowerCase()] || 'application/octet-stream' };
 }
 
-module.exports = { STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, uploadDraft, decideDraft, shipToHub, deliveryDetails, markPaid, documentData, readJobFile,
+module.exports = { STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, uploadDraft, decideDraft, shipToHub, deliveryDetails, markPaid, saveProof, deliverTo, documentData, readJobFile,
   requestPrinterQuotes, vendorCustomQuotes, vendorCustomQuote, submitCustomQuote, readCustomQuoteDoc };
