@@ -533,13 +533,13 @@ function setOverride(pid, patch, actor) {
 // Scheduler requests quotes from vendors → vendors respond price+lead time →
 // scheduler awards a PO to the best → vendor prints a shipping label. (audit §5 lifecycle)
 function vendorAccounts() { return customers().filter(c => c.type === 'vendor'); }
-function requestVendorQuotes(jobId, vendorIds, actor) {
+function requestVendorQuotes(jobId, vendorIds, actor, remarks) {
   const j = job(jobId); if (!j) return { error: 'job not found' };
   if (!vendorIds || !vendorIds.length) return { error: 'pick at least one vendor' };
   j.outsource = { status: 'requested', requestedAt: now(),
     vendors: vendorIds.map(vid => { const v = findCustomer(vid) || {}; return { vendorId: vid, vendorName: v.name || vid, price: null, leadDays: null, note: '', submittedAt: null }; }),
-    awardedTo: null, po: null, label: null };
-  vendorIds.forEach(vid => { const v = findCustomer(vid); if (v && v.email) sendEmail('request-quote-printer', { to: v.email, name: v.name, subject: 'Quote request — ' + j.product + ' (job ' + jobId + ')', body: 'Hi ' + v.name + ',\n\nWe’d like your best price and lead time for:\n' + j.product + ' · ' + (j.spec || '') + ' · qty ' + j.qty + '\nDeliver to: ' + (j.fulfillmentOutlet || 'destination outlet') + '.\n\nSubmit your quote in your vendor portal.' }); });
+    awardedTo: null, po: null, label: null, remarks: String(remarks || '').slice(0, 1000), remarksBy: actor || null };
+  vendorIds.forEach(vid => { const v = findCustomer(vid); if (v && v.email) sendEmail('request-quote-printer', { to: v.email, name: v.name, subject: 'Quote request — ' + j.product + ' (job ' + jobId + ')', body: 'Hi ' + v.name + ',\n\nWe’d like your best price and lead time for:\n' + j.product + ' · ' + (j.spec || '') + ' · qty ' + j.qty + '\nDeliver to: ' + (j.fulfillmentOutlet || 'destination outlet') + '.' + (remarks ? '\nRemarks: ' + remarks : '') + '\n\nSubmit your quote in your vendor portal.' }); });
   logEvent({ actor: actor || 'scheduler', role: 'scheduler_staff', action: 'request_quotes', jobId, from: j.status, to: 'requested', note: 'Quotes requested from ' + vendorIds.length + ' vendor(s)' });
   save(); return { job: j };
 }

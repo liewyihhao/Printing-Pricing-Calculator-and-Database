@@ -174,7 +174,7 @@ function orderDetails(j) {
 function jobDetails(j) {
   const o = j.orderId && store.order(j.orderId); const idx = o ? (o.jobIds || []).indexOf(j.id) : -1; const it = o && idx >= 0 ? o.items[idx] : null;
   const arts = o ? (o.files || []).filter(f => f.kind === 'artwork' && f.line === idx + 1).map(f => ({ id: f.id, name: f.name, orderId: o.id })) : [];
-  return { product: j.product, spec: (it && it.spec) || j.spec || '', qty: j.qty, artworks: arts.length ? arts : ((j.artwork && j.artwork.file && !/^pending-upload/.test(j.artwork.file)) ? [{ name: j.artwork.file }] : []), deadline: j.deadline, instructions: j.instructions || '' };
+  return { product: j.product, spec: (it && it.spec) || j.spec || '', specLines: j.specLines || (it && it.specLines) || null, qty: j.qty, artworks: arts.length ? arts : ((j.artwork && j.artwork.file && !/^pending-upload/.test(j.artwork.file)) ? [{ name: j.artwork.file }] : []), deadline: j.deadline, instructions: j.instructions || '' };
 }
 // the printing-job view every account shares (printer: only its own quote, no customer contact)
 function view(j, me) {
@@ -190,12 +190,14 @@ function view(j, me) {
     dispatchDelivery: j.dispatchDelivery && me.type !== 'vendor' ? { tracking: j.dispatchDelivery.tracking, company: j.dispatchDelivery.company, document: pub(j.dispatchDelivery.document), at: j.dispatchDelivery.at, by: j.dispatchDelivery.by } : null,
   };
   if (me.type === 'vendor') {
+    v.requestRemarks = o.remarks || ''; // the scheduler's remarks on the quote request (delivery details)
     v.myQuote = mine ? { amount: mine.price, leadDays: mine.leadDays, note: mine.note, submittedAt: mine.submittedAt, document: pub(mine.document), awardedAmount: o.awardedTo === co ? mine.price : null } : null;
     v.canQuote = me.role !== 'printer_staff' && !o.awardedTo;
     // enter (or correct) the delivery details until Printoka has received the job
     v.canShip = o.awardedTo === co && (j.status === 'outsourcing' || printingStatus(j) === 'shipped-to-hub');
   } else {
-    v.quotes = (o.vendors || []).map(x => ({ vendorId: x.vendorId, vendorName: x.vendorName, amount: x.price, leadDays: x.leadDays, submittedAt: x.submittedAt, document: pub(x.document), awarded: x.vendorId === o.awardedTo }));
+    v.requestRemarks = o.remarks || '';
+    v.quotes = (o.vendors || []).map(x => ({ vendorId: x.vendorId, vendorName: x.vendorName, amount: x.price, leadDays: x.leadDays, remarks: x.note || '', submittedAt: x.submittedAt, document: pub(x.document), awarded: x.vendorId === o.awardedTo }));
     v.customer = orderDetails(j);
   }
   return v;
@@ -223,9 +225,12 @@ function submitQuote(jid, me, b) {
   if (j.outsource.awardedTo) return { error: 'This job has already been awarded.' };
   const amount = Number(b.amount != null ? b.amount : b.price);
   if (!(amount > 0)) return { error: 'Please enter a quote amount.' };
-  const changed = v.price !== amount || !!b.documentData;
+  // the printer replies with a PDF quotation, the price and remarks
+  if (!b.documentData && !v.document) return { error: 'Please upload your quotation (PDF).' };
+  if (b.documentData && !/\.pdf$/i.test(String(b.documentName || ''))) return { error: 'The quotation must be a PDF.' };
+  const changed = v.price !== amount || !!b.documentData || (b.remarks != null && String(b.remarks) !== (v.note || ''));
   if (!changed && v.submittedAt) return { error: 'No changes required.' };
-  v.price = amount; v.leadDays = Number(b.leadDays) || v.leadDays || 0; v.note = b.note || v.note || ''; v.submittedAt = now();
+  v.price = amount; v.leadDays = Number(b.leadDays) || v.leadDays || 0; v.note = String(b.remarks != null ? b.remarks : (b.note || v.note || '')).slice(0, 1000); v.submittedAt = now();
   if (b.documentData) { const f = saveBlob(path.join(ROOT, jid), { data: b.documentData, name: b.documentName || 'quote.pdf' }, 'Q'); if (f.error) return f; v.document = f; }
   const n = j.outsource.vendors.filter(x => x.submittedAt).length;
   j.outsource.status = n === j.outsource.vendors.length ? 'quotes_received' : 'partly_received';

@@ -226,12 +226,17 @@
     if (['quote-requested', 'quote-partly-received', 'quotes-received'].indexOf(s.id) >= 0) {
       const amt = this.acF('qAmount') !== '' ? this.acF('qAmount') : (mq.amount != null ? String(mq.amount) : '');
       const lead = this.acF('qLead') !== '' ? this.acF('qLead') : (mq.leadDays ? String(mq.leadDays) : '');
+      // reply to the quote request: PDF quotation, price, lead time, remarks
+      const rem = this.acF('qRem') !== '' ? this.acF('qRem') : (mq.note || '');
       main.push(this.acC('Request Quote', p.canQuote ? [
-        FG('Quote amount (RM)', h('input', { type: 'text', value: amt, onChange: e => this.acSetF('qAmount', e.target.value), style: inp }), 1),
-        FG('Lead time (days)', h('input', { type: 'number', value: lead, onChange: e => this.acSetF('qLead', e.target.value), style: inp })),
-        FG('Quote document', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, mq.document ? fileLink(mq.document) : null, this.jPickFile('qDoc'))),
-        h('div', { key: 'b' }, Btn('Submit quote', () => this.jPost('/api/jobs/' + id + '/vendor-quote', { amount: amt, leadDays: lead, documentData: this.acF('qDocData') || undefined, documentName: this.acF('qDocName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !amt))]
-        : [mq.submittedAt ? this.acDL([['Quote amount (RM)', Number(mq.amount).toFixed(2)], ['Quote document', mq.document ? fileLink(mq.document) : '—']]) : null, muted(staff ? 'Your printer manager submits the price for this job.' : 'Quoting is closed for this job.')]));
+        p.requestRemarks ? this.acDL([['Remarks from Printoka', p.requestRemarks]]) : null,
+        FG('Quotation (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, mq.document ? fileLink(mq.document) : null, h('input', { type: 'file', accept: 'application/pdf,.pdf', onChange: e => this.acReadFile(e.target.files[0]).then(f => { if (f) { this.acSetF('qDocData', f.data); this.acSetF('qDocName', f.name); } }), style: inp })), 1),
+        h('div', { key: 'pl', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12 } },
+          FG('Price (RM)', h('input', { type: 'text', value: amt, onChange: e => this.acSetF('qAmount', e.target.value), style: inp }), 1),
+          FG('Lead time (days)', h('input', { type: 'number', value: lead, onChange: e => this.acSetF('qLead', e.target.value), style: inp }))),
+        FG('Remarks', h('textarea', { rows: 3, value: rem, onChange: e => this.acSetF('qRem', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) })),
+        h('div', { key: 'b' }, Btn('Submit quote', () => this.jPost('/api/jobs/' + id + '/vendor-quote', { amount: amt, leadDays: lead, remarks: rem, documentData: this.acF('qDocData') || undefined, documentName: this.acF('qDocName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !amt || !(this.acF('qDocData') || mq.document)))]
+        : [p.requestRemarks ? this.acDL([['Remarks from Printoka', p.requestRemarks]]) : null, mq.submittedAt ? this.acDL([['Price (RM)', Number(mq.amount).toFixed(2)], ['Quotation', mq.document ? fileLink(mq.document) : '—'], mq.note ? ['Remarks', mq.note] : null]) : null, muted(staff ? 'Your printer manager submits the price for this job.' : 'Quoting is closed for this job.')]));
     }
     // purchase order issued → print the job, ship it, then enter the delivery details (logistics sees "Incoming Jobs")
     if (['printer-assigned', 'shipped-to-hub'].indexOf(s.id) >= 0) {
@@ -251,11 +256,10 @@
     if (['shipped', 'paid'].indexOf(s.id) >= 0) main.push(quoteCard(), this.acC('Payment', p.paidAt ? alertBox('Paid by Printoka.', 'ok') : muted('Printoka received the job. The scheduler will make the payment.')));
     if (s.id === 'not-awarded') main.push(this.acC('Quote', [muted('This job was awarded to another printer. Thank you for quoting.'), mq.submittedAt ? this.acDL([['Your quote (RM)', Number(mq.amount).toFixed(2)]]) : null]));
     const J = p.job || {};
-    main.push(this.acC('Job details', [
-      h('b', { key: 'p' }, J.product || j.product), this.acSpec(J.spec || j.spec),
-      this.acDL([['Quantity', (J.qty || j.qty || 0).toLocaleString()], ['Deadline', J.deadline ? when(J.deadline) : '—'], ['Deliver to', j.destination ? (j.destination.name || j.destination.type) + (j.destination.address ? ', ' + j.destination.address : '') : '—'], J.instructions ? ['Instructions', J.instructions] : null, p.po ? ['Purchase order', p.po] : null]),
-      (J.artworks || []).length ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12, display: 'flex', flexDirection: 'column', gap: 8 } }, h('b', { style: { fontSize: 12.5 } }, 'Artworks'),
-        h('ol', { style: { margin: 0, paddingLeft: 18 } }, J.artworks.map((a, i) => h('li', { key: i, style: { marginBottom: 4 } }, a.id && p.awardedToMe ? link(a.name, () => this.openOrderFile(a.orderId, a)) : h('span', { style: { color: MUT } }, a.name))))) : null]));
+    // the item required, in the same layout as the configurator summary (artwork files open once awarded)
+    main.push(this.acC('Job details', this.pSummary({ product: J.product || j.product, specLines: J.specLines, spec: J.spec || j.spec, qty: J.qty || j.qty,
+      rows: [J.instructions ? ['Instructions', J.instructions] : null, p.po ? ['Purchase order', p.po] : null],
+      artworks: (J.artworks || []).map(a => p.awardedToMe ? a : { name: a.name }) })));
     const aside = [
       (p.documents || []).length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, p.documents.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null,
       p.deliverTo ? this.acC('Deliver to', [h('b', { key: 'n' }, p.deliverTo.name), h('p', { key: 'a', style: { margin: 0, color: MUT, whiteSpace: 'pre-wrap' } }, p.deliverTo.address), p.deliverTo.phone ? [h('b', { key: 'pt' }, 'Phone'), h('p', { key: 'pv', style: { margin: 0, color: MUT } }, p.deliverTo.phone)] : null]) : null,
