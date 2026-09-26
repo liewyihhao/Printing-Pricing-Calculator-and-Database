@@ -285,6 +285,8 @@ function createOrder(body) {
   const cust = body.customer || {};
   const items = (body.items || []).map((it, i) => ({
     lineNo: i + 1, productId: it.productId, product: productName(it.product || it.name), spec: it.spec || '',
+    // the configurator's labelled summary lines ([label, value]) — shown as-is on the production job page
+    specLines: Array.isArray(it.specLines) ? it.specLines.slice(0, 40).filter(l => Array.isArray(l) && l.length >= 2).map(l => [String(l[0]).slice(0, 60), String(l[1]).slice(0, 200)]) : null,
     qty: Number(it.qty) || 1, unitPrice: Number(it.unitPrice) || 0, lineTotal: Number(it.lineTotal) || 0,
     artworks: it.artworks || (it.artworkFile ? [it.artworkFile] : []),
   }));
@@ -299,7 +301,7 @@ function createOrder(body) {
     const jid = 'J-' + num + '-' + it.lineNo;
     const j = {
       id: jid, orderId: oid, channel: 'online', customer: cust.name || 'Online customer',
-      product: it.product, spec: it.spec, qty: it.qty, price: it.lineTotal, status: 'intake',
+      product: it.product, spec: it.spec, specLines: it.specLines, qty: it.qty, price: it.lineTotal, status: 'intake',
       paymentValidated: paid, paymentValidatedAt: paid ? now() : null, creditTerms: method === 'credit_term',
       artwork: { file: (it.artworks && it.artworks[0]) || it.artworkFile || 'pending-upload.pdf', checkStatus: 'pending' }, artworkMatches: true,
       deadline: body.deadline || null, createdAt: now(), owner: {},

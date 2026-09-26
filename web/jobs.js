@@ -139,7 +139,7 @@
     if (dStage === 'logistics' && (isLog || admin)) main.push(this.deliveryCard(j, pr, 'logistics'));
     // HQ pays the printer (original status "Paid")
     if (manager && pr.awarded && pr.status && ['shipped-to-hub', 'shipped'].indexOf(pr.status.id) >= 0) main.push(this.acC('Printer payment', [
-      muted('Once the printer has been paid for ' + (pr.po || 'this job') + ', record it here — the printing job moves to “Paid”.'),
+      null,
       FG('Payment reference', h('input', { value: this.acF('payref'), onChange: e => this.acSetF('payref', e.target.value), style: inp })),
       h('div', { key: 'b' }, Btn('Mark printer paid', () => this.jPost('/api/jobs/' + id + '/vendor-paid', { reference: this.acF('payref') }, 'Printer marked paid.'), 'primary'))]));
     // job details (original card)
@@ -175,7 +175,7 @@
     const dest = j.destination || {};
     return this.acC('Delivery Details', [
       stage === 'logistics' ? this.acDL([['Deliver to', (dest.name || dest.type || '—') + (dest.address ? ', ' + dest.address : '')], j.instructions ? ['Instructions', j.instructions] : null]) : null,
-      FG('Delivery Order / Tracking Number', h('textarea', { rows: 6, value: tracking, onChange: e => this.acSetF('hdTracking', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1, 'Enter a least 1 tracking number. Enter new line for additional tracking numbers.'),
+      FG('Delivery Order / Tracking Number', h('textarea', { rows: 6, value: tracking, onChange: e => this.acSetF('hdTracking', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1),
       FG('Delivery Company', h('select', { value: company, onChange: e => this.acSetF('hdCompany', e.target.value), style: inp }, (cfg.couriers.length ? cfg.couriers : [company]).map(c => h('option', { key: c, value: c }, c))), 1),
       at && stage === 'hub' ? FG('Deliver to', h('select', { value: destType, onChange: e => this.acSetF('hdDest', e.target.value), style: inp }, [['customer', 'Customer — ' + ((j.finalDestination && j.finalDestination.type === 'customer' && j.finalDestination.address) || 'delivery address')], ['outlet', 'Outlet — ' + ((j.finalDestination && j.finalDestination.type === 'outlet' && j.finalDestination.name) || 'pickup outlet')]].map(o => h('option', { key: o[0], value: o[0] }, o[1])))) : null,
       FG('Delivery Order', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, hd.document ? link('📄 ' + hd.document.name, () => this.jDownload('/api/jobs/' + j.id + '/files/' + hd.document.id, hd.document.name)) : null, this.jPickFile('hdDoc'))),
@@ -240,8 +240,8 @@
       const tracking = F('pTracking', (pd.tracking || []).join('\n')), company = F('pCompany', pd.company || '');
       const to = (j.destination && j.destination.type === 'outlet') ? 'the outlet' : 'Printoka production';
       main.push(this.acC('Delivery Details', p.canShip ? [
-        s.id === 'printer-assigned' ? muted('When the job is completed, ship it to ' + to + ' and enter the delivery details below. Printoka logistics will receive it.') : alertBox('Delivery details sent. Printoka will confirm when it receives the job.', 'ok'),
-        FG('Delivery Order / Tracking Number', h('textarea', { rows: 4, value: tracking, onChange: e => this.acSetF('pTracking', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1, 'Enter at least 1 tracking number. Enter a new line for additional tracking numbers.'),
+        s.id === 'printer-assigned' ? null : alertBox('Delivery details sent.', 'ok'),
+        FG('Delivery Order / Tracking Number', h('textarea', { rows: 4, value: tracking, onChange: e => this.acSetF('pTracking', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1),
         FG('Delivery Company', h('input', { value: company, onChange: e => this.acSetF('pCompany', e.target.value), placeholder: 'e.g. J&T Express, GDEX, own van', style: inp }), 1),
         FG('Delivery Order', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, pd.document ? fileLink(pd.document) : null, this.jPickFile('pDo'))),
         h('div', { key: 'b' }, Btn('Save Changes', () => this.jPost('/api/jobs/' + id + '/ship-to-hub', { tracking, company, documentData: this.acF('pDoData') || undefined, documentName: this.acF('pDoName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !tracking.trim() || !company.trim()))]
