@@ -236,7 +236,7 @@
       const lead = this.acF('qLead') !== '' ? this.acF('qLead') : (mq.leadDays ? String(mq.leadDays) : '');
       // reply to the quote request: PDF quotation, price, lead time, remarks
       const rem = this.acF('qRem') !== '' ? this.acF('qRem') : (mq.note || '');
-      main.push(this.acC('Request Quote', p.canQuote ? [
+      main.push(this.acC('Fill in Quote', p.canQuote ? [
         p.requestRemarks ? this.acDL([['Remarks from Printoka', p.requestRemarks]]) : null,
         FG('Quotation (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, mq.document ? fileLink(mq.document) : null, h('input', { type: 'file', accept: 'application/pdf,.pdf', onChange: e => this.acReadFile(e.target.files[0]).then(f => { if (f) { this.acSetF('qDocData', f.data); this.acSetF('qDocName', f.name); } }), style: inp })), 1),
         h('div', { key: 'pl', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12 } },
@@ -275,15 +275,14 @@
     const J = p.job || {};
     // the item required, in the same layout as the configurator summary (artwork files open once awarded)
     // exactly the configurator's order summary (every option, quantity, production time) — no customer details, no selling price
-    main.push(this.acC('Job details', this.pSummary({ product: J.product || j.product, specLines: J.specLines, spec: J.spec || j.spec, qty: J.qty || j.qty, productionTime: J.productionTime,
+    const jobCard = this.acC('Job details', this.pSummary({ product: J.product || j.product, specLines: J.specLines, spec: J.spec || j.spec, qty: J.qty || j.qty, productionTime: J.productionTime,
       rows: [],
       // before the award: only the approved artwork watermarked "PRINTOKA"; the original files once the job is awarded to this printer
-      artworks: p.awardedToMe ? (J.artworks || []) : p.artworkPreview ? [{ name: p.artworkPreview.name, open: () => this.jDownload('/api/jobs/' + id + '/files/' + p.artworkPreview.id, p.artworkPreview.name) }] : [] })));
-    const aside = [
-      (p.documents || []).length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, p.documents.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null,
-      p.deliverTo ? this.acC('Deliver to', [h('b', { key: 'n' }, p.deliverTo.name), h('p', { key: 'a', style: { margin: 0, color: MUT, whiteSpace: 'pre-wrap' } }, p.deliverTo.address), p.deliverTo.phone ? [h('b', { key: 'pt' }, 'Phone'), h('p', { key: 'pv', style: { margin: 0, color: MUT } }, p.deliverTo.phone)] : null]) : null,
-    ];
-    return this.acSingle({ home: 'Dashboard', type: 'Printing Jobs', title: id, statusNode: jobPill(s) }, main, aside);
+      artworks: p.awardedToMe ? (J.artworks || []) : p.artworkPreview ? [{ name: p.artworkPreview.name, open: () => this.jDownload('/api/jobs/' + id + '/files/' + p.artworkPreview.id, p.artworkPreview.name) }] : [] }));
+    const deliverCard = p.deliverTo ? this.acC('Deliver to', this.pDeliver(p.deliverTo, p.deliverTo.phone)) : null;
+    const docCard = (p.documents || []).length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, p.documents.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null;
+    // layout (user, 2026-09-26): Job details top-left, Deliver to bottom-left; the step to fill in (quote, order, invoice, shipping) on the right
+    return this.acSingle({ home: 'Dashboard', type: 'Printing Jobs', title: id, statusNode: jobPill(s) }, [jobCard, deliverCard], main.concat([docCard]));
   };
   // ---- printer custom quotes (original printer-custom-quotes + single-printer-custom-quotes)
   P.vCustomQuotes = function () {
