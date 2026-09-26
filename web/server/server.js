@@ -524,7 +524,7 @@ async function api(req, res, pathname, query) {
   if (seg[0] === 'vendors' && !seg[1]) { const vj = query.job && store.job(query.job); if (vj) return send(res, 200, supplier.vendorsForJob(vj)); return send(res, 200, { vendors: store.vendorAccounts().filter(v => !v.vendorId).map(v => ({ id: v.id, name: v.name, internal: !!v.internal })) }); }
   if (seg[0] === 'vendor' && seg[1] === 'requests') {
     const me = store.sessionCustomer(token); if (!me || me.type !== 'vendor') return send(res, 401, { error: 'vendor sign-in required' });
-    return send(res, 200, { jobs: store.vendorRequests(me.vendorId || me.id).map(j => Object.assign(supplier.vendorJob(j, me), { printing: supplier.listRow(j, me) })), company: me.vendorId || me.id, canQuote: me.role !== 'printer_staff' });
+    return send(res, 200, { jobs: store.vendorRequests(me.vendorId || me.id).filter(j => supplier.vendorCanSee(j, me)).map(j => Object.assign(supplier.vendorJob(j, me), { printing: supplier.listRow(j, me) })), company: me.vendorId || me.id, canQuote: me.role !== 'printer_staff' });
   }
   if (seg[0] === 'jobs' && seg[2] === 'request-quotes' && req.method === 'POST') {
     if (['production_director', 'scheduler_manager', 'scheduler_staff'].indexOf(role) < 0) return send(res, 403, { error: 'scheduler only' });

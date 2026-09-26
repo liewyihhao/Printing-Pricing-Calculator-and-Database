@@ -224,6 +224,19 @@
       rows: (d.jobs || []).map(j => { const p = j.printing || {}; return { date: p.date, status: p.status, search: [j.id, j.product, p.po],
         cells: [link(j.id, () => this.acOpen({ kind: 'job', id: j.id })), j.product, p.amount != null ? 'RM' + Number(p.amount).toFixed(2) : '', jobPill({ label: p.status, color: p.color }), dmy(p.date)] }; }) });
   };
+  // confirm every detail before the quote goes out: it cannot be changed after submission
+  P.vQuoteConfirm = function (id, p, q) {
+    const J = p.job || {}; const box = { display: 'flex', flexDirection: 'column', gap: 10, border: '1px solid ' + HAIR, borderRadius: 10, padding: 14 };
+    const send = () => { this.setState({ qSending: true });
+      return this.jPost('/api/jobs/' + id + '/vendor-quote', { amount: q.amt, leadDays: q.lead, remarks: q.rem, documentData: q.docData || undefined, documentName: q.docData ? q.docName : undefined }, 'Quote submitted.',
+        () => this.setState({ acModal: null, acForm: {}, acView: null, sTab: 'Dashboard' })).then(() => this.setState({ qSending: false })); };
+    this.setState({ acModal: { title: 'Confirm your quote', wide: true, body: () => [
+      h('div', { key: 'j', style: box }, this.pSummary({ product: J.product, specLines: J.specLines, spec: J.spec, qty: J.qty, productionTime: J.productionTime, rows: [], artworks: [] })),
+      p.deliverTo ? h('div', { key: 'd', style: box }, h('b', { style: { fontSize: 13 } }, 'Deliver to'), this.pDeliver(p.deliverTo, p.deliverTo.phone)) : null,
+      h('div', { key: 'q', style: Object.assign({ fontSize: 13 }, box) }, h('b', { style: { fontSize: 13 } }, 'Your quote'), this.acDL([['Quotation (PDF)', q.docName], ['Price (RM)', Number(q.amt).toFixed(2)], ['Lead time', q.lead ? q.lead + ' days' : ''], ['Remarks', q.rem]])),
+      muted('No changes can be made after submission.'),
+      h('div', { key: 'b' }, Btn(this.state.qSending ? 'Submitting…' : 'Confirm and submit', send, 'primary', !!this.state.qSending))] } });
+  };
   P.vJob = function (d) {
     if (!d) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
     if (d.error) return [h('div', { key: 'e', style: { color: '#c0392b' } }, d.error)];
@@ -247,7 +260,7 @@
           FG('Price (RM)', h('input', { type: 'text', value: amt, onChange: e => this.acSetF('qAmount', e.target.value), style: inp }), 1),
           FG('Lead time (days)', h('input', { type: 'number', value: lead, onChange: e => this.acSetF('qLead', e.target.value), style: inp }))),
         FG('Remarks', h('textarea', { rows: 3, value: rem, onChange: e => this.acSetF('qRem', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) })),
-        h('div', { key: 'b' }, Btn('Submit quote', () => this.jPost('/api/jobs/' + id + '/vendor-quote', { amount: amt, leadDays: lead, remarks: rem, documentData: this.acF('qDocData') || undefined, documentName: this.acF('qDocName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !amt || !(this.acF('qDocData') || mq.document)))]
+        h('div', { key: 'b' }, Btn('Submit quote', () => this.vQuoteConfirm(id, p, { amt, lead, rem, docName: this.acF('qDocName') || (mq.document || {}).name, docData: this.acF('qDocData') }), 'primary', !amt || !(this.acF('qDocData') || mq.document)))]
         : [p.requestRemarks ? h('p', { key: 'rr', style: { margin: 0, fontSize: 13.5, lineHeight: 1.6, whiteSpace: 'pre-wrap' } }, p.requestRemarks) : null, mq.submittedAt ? this.acDL([['Price (RM)', Number(mq.amount).toFixed(2)], ['Quotation', mq.document ? fileLink(mq.document) : '—'], mq.note ? ['Remarks', mq.note] : null]) : null, muted(staff ? 'Your printer manager submits the price for this job.' : 'Quoting is closed for this job.')]));
     }
     // quote accepted: New Order → (download the artwork, print) Mark as Processed → Unbilled → upload the invoice (PDF) → Prepare for Shipping

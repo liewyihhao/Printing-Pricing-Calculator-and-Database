@@ -139,7 +139,12 @@ function readJobFile(j, fid, me) {
 
 // ---------------------------------------------------------------- what each account may see of a job
 const coOf = me => me && me.type === 'vendor' ? (me.vendorId || me.id) : null;
-function vendorCanSee(j, me) { const co = coOf(me); return !!(co && j.outsource && (j.outsource.vendors || []).some(v => v.vendorId === co)); }
+// a printer sees an open quote request until it submits its quote; after that only a job awarded to it (with a PO)
+function vendorCanSee(j, me) {
+  const co = coOf(me); const o = j && j.outsource; if (!co || !o) return false;
+  if (o.awardedTo) return o.awardedTo === co;
+  const v = (o.vendors || []).find(x => x.vendorId === co); return !!(v && !v.submittedAt);
+}
 function hubCanSee(j, me) { return !me.hub || j.hub === me.hub || ((j.destination || {}).type === 'hub' && j.destination.id === me.hub) || (j.shipments || []).some(s => s.to && s.to.type === 'hub' && s.to.id === me.hub); }
 function canSee(j, me) { if (!j || !me) return false; if (me.type === 'vendor') return vendorCanSee(j, me); if (me.type === 'hub') return hubCanSee(j, me); return me.type !== 'customer'; }
 function hubDetails(j, hubId) { const cfg = ops().config(); const hb = (cfg.hubs || []).find(x => x.id === (hubId || j.hub)); return hb ? { id: hb.id, name: hb.name, address: hb.address || '', phone: hb.phone || '' } : null; }
@@ -262,8 +267,7 @@ function submitQuote(jid, me, b) {
   // the printer replies with a PDF quotation, the price and remarks
   if (!b.documentData && !v.document) return { error: 'Please upload your quotation (PDF).' };
   if (b.documentData && !/\.pdf$/i.test(String(b.documentName || ''))) return { error: 'The quotation must be a PDF.' };
-  const changed = v.price !== amount || !!b.documentData || (b.remarks != null && String(b.remarks) !== (v.note || ''));
-  if (!changed && v.submittedAt) return { error: 'No changes required.' };
+  if (v.submittedAt) return { error: 'Your quote has already been submitted.' }; // one quote per request; the request then closes
   v.price = amount; v.leadDays = Number(b.leadDays) || v.leadDays || 0; v.note = String(b.remarks != null ? b.remarks : (b.note || v.note || '')).slice(0, 1000); v.submittedAt = now();
   if (b.documentData) { const f = saveBlob(path.join(ROOT, jid), { data: b.documentData, name: b.documentName || 'quote.pdf' }, 'Q'); if (f.error) return f; v.document = f; }
   const n = j.outsource.vendors.filter(x => x.submittedAt).length;
