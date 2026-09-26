@@ -301,7 +301,8 @@
     const arts = s.artworks || [];
     // no stored artwork file yet: staff upload the file (it must be downloadable for printing)
     const upload = s.onUpload && !arts.some(a => a.id || a.open) ? h('div', { key: 'up', style: { display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 12.5 } }, 'Upload artwork file'),
-      h('input', { type: 'file', onChange: e => { const f = e.target.files[0]; if (f) this.acReadFile(f).then(x => s.onUpload(x)); e.target.value = ''; }, style: { font: '400 13px Montserrat,sans-serif' } })) : null;
+      h('label', { style: { color: TEAL, fontWeight: 600, fontSize: 14, cursor: 'pointer', alignSelf: 'flex-start' } }, 'Upload',
+        h('input', { type: 'file', style: { display: 'none' }, onChange: e => { const f = e.target.files[0]; if (f) this.acReadFile(f).then(x => s.onUpload(x)); e.target.value = ''; } }))) : null;
     return [h('b', { key: 'p', style: { fontSize: 15 } }, s.product),
       rows.length ? h('div', { key: 's', style: { display: 'flex', flexDirection: 'column', gap: 8 } }, rows.map((r, i) => row(r[0], r[1], i))) : null,
       h('div', { key: 'q', style: { display: 'flex', flexDirection: 'column', gap: 8, borderTop: '1px solid ' + LINE, paddingTop: 12 } },
@@ -313,7 +314,7 @@
   // where it goes: collection or delivery, name, full address, phone
   P.pDeliver = function (fd, phone, fallbackName) {
     fd = fd || {};
-    return [h('div', { key: 'k' }, this.pillDot(fd.type === 'outlet' ? 'Outlet Collection' : fd.type === 'production' ? 'Printoka Production' : 'Customer Delivery', fd.type === 'customer' || !fd.type ? 'ok' : 'teal')),
+    return [fd.type === 'production' ? null : h('div', { key: 'k' }, this.pillDot(fd.type === 'outlet' ? 'Outlet Collection' : 'Customer Delivery', fd.type === 'customer' || !fd.type ? 'ok' : 'teal')),
       h('b', { key: 'n', style: { fontSize: 14 } }, fd.name || fallbackName || '—'),
       fd.address ? h('div', { key: 'a', style: { fontSize: 13.5, lineHeight: 1.6, whiteSpace: 'pre-wrap' } }, fd.address) : null,
       phone ? h('div', { key: 't', style: { fontSize: 13.5, color: MUT } }, phone) : null];

@@ -41,8 +41,12 @@
       if (then) then(d); return true;
     });
   };
-  P.jPickFile = function (key) {
-    return h('input', { type: 'file', onChange: e => this.acReadFile(e.target.files[0]).then(f => { if (f) { this.acSetF(key + 'Data', f.data); this.acSetF(key + 'Name', f.name); } }), style: inp });
+  // file picker: a red "Upload" link (the file name once chosen, click to change)
+  P.jPickFile = function (key, accept) {
+    const name = this.acF(key + 'Name');
+    return h('label', { style: { display: 'inline-flex', alignItems: 'center', gap: 8, color: TEAL, fontWeight: 600, fontSize: 14, cursor: 'pointer', alignSelf: 'flex-start' } },
+      name ? h('span', null, '📄 ' + name, h('span', { style: { color: MUT, fontWeight: 500, marginLeft: 8 } }, 'Change')) : 'Upload',
+      h('input', { type: 'file', accept: accept || undefined, style: { display: 'none' }, onChange: e => { const f0 = e.target.files[0]; e.target.value = ''; this.acReadFile(f0).then(f => { if (f) { this.acSetF(key + 'Data', f.data); this.acSetF(key + 'Name', f.name); } }); } }));
   };
   const origDone = P.opsDone;
   P.opsDone = function (d, okText) { const r = origDone.call(this, d, okText); if (r) this.acDrop('job_'); return r; };
@@ -228,7 +232,7 @@
     const fileLink = f => f ? link('📄 ' + f.name, () => this.jDownload('/api/jobs/' + id + '/files/' + f.id, f.name)) : null;
     // the quotation PDF is compulsory: without it the printer must upload it (Upload Quotation)
     const quoteCard = () => this.acC('Quote', [this.acDL([['Quote amount (RM)', (mq.awardedAmount != null ? mq.awardedAmount : mq.amount) != null ? Number(mq.awardedAmount != null ? mq.awardedAmount : mq.amount).toFixed(2) : '—'], mq.document ? ['Quote document', fileLink(mq.document)] : null]),
-      !mq.document && mq.submittedAt && !staff ? [FG('Quotation (PDF)', h('input', { type: 'file', accept: 'application/pdf,.pdf', onChange: e => this.acReadFile(e.target.files[0]).then(f => { if (f) { this.acSetF('qdData', f.data); this.acSetF('qdName', f.name); } }), style: inp }), 1),
+      !mq.document && mq.submittedAt && !staff ? [FG('Quotation (PDF)', this.jPickFile('qd', 'application/pdf,.pdf'), 1),
         h('div', { key: 'ub' }, Btn('Upload Quotation', () => this.jPost('/api/jobs/' + id + '/vendor-quote-doc', { documentData: this.acF('qdData'), documentName: this.acF('qdName') }, 'Quotation uploaded.', () => this.setState({ acForm: {} })), 'primary', !this.acF('qdData')))] : null]);
     const main = [];
     if (['quote-requested', 'quote-partly-received', 'quotes-received'].indexOf(s.id) >= 0) {
@@ -237,14 +241,14 @@
       // reply to the quote request: PDF quotation, price, lead time, remarks
       const rem = this.acF('qRem') !== '' ? this.acF('qRem') : (mq.note || '');
       main.push(this.acC('Fill in Quote', p.canQuote ? [
-        p.requestRemarks ? this.acDL([['Remarks from Printoka', p.requestRemarks]]) : null,
-        FG('Quotation (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, mq.document ? fileLink(mq.document) : null, h('input', { type: 'file', accept: 'application/pdf,.pdf', onChange: e => this.acReadFile(e.target.files[0]).then(f => { if (f) { this.acSetF('qDocData', f.data); this.acSetF('qDocName', f.name); } }), style: inp })), 1),
+        p.requestRemarks ? h('p', { key: 'rr', style: { margin: 0, fontSize: 13.5, lineHeight: 1.6, whiteSpace: 'pre-wrap' } }, p.requestRemarks) : null,
+        FG('Quotation (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, mq.document && !this.acF('qDocName') ? fileLink(mq.document) : null, this.jPickFile('qDoc', 'application/pdf,.pdf')), 1),
         h('div', { key: 'pl', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12 } },
           FG('Price (RM)', h('input', { type: 'text', value: amt, onChange: e => this.acSetF('qAmount', e.target.value), style: inp }), 1),
           FG('Lead time (days)', h('input', { type: 'number', value: lead, onChange: e => this.acSetF('qLead', e.target.value), style: inp }))),
         FG('Remarks', h('textarea', { rows: 3, value: rem, onChange: e => this.acSetF('qRem', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) })),
         h('div', { key: 'b' }, Btn('Submit quote', () => this.jPost('/api/jobs/' + id + '/vendor-quote', { amount: amt, leadDays: lead, remarks: rem, documentData: this.acF('qDocData') || undefined, documentName: this.acF('qDocName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !amt || !(this.acF('qDocData') || mq.document)))]
-        : [p.requestRemarks ? this.acDL([['Remarks from Printoka', p.requestRemarks]]) : null, mq.submittedAt ? this.acDL([['Price (RM)', Number(mq.amount).toFixed(2)], ['Quotation', mq.document ? fileLink(mq.document) : '—'], mq.note ? ['Remarks', mq.note] : null]) : null, muted(staff ? 'Your printer manager submits the price for this job.' : 'Quoting is closed for this job.')]));
+        : [p.requestRemarks ? h('p', { key: 'rr', style: { margin: 0, fontSize: 13.5, lineHeight: 1.6, whiteSpace: 'pre-wrap' } }, p.requestRemarks) : null, mq.submittedAt ? this.acDL([['Price (RM)', Number(mq.amount).toFixed(2)], ['Quotation', mq.document ? fileLink(mq.document) : '—'], mq.note ? ['Remarks', mq.note] : null]) : null, muted(staff ? 'Your printer manager submits the price for this job.' : 'Quoting is closed for this job.')]));
     }
     // quote accepted: New Order → (download the artwork, print) Mark as Processed → Unbilled → upload the invoice (PDF) → Prepare for Shipping
     const art = p.approvedArtwork;
@@ -254,7 +258,7 @@
       this.acDL([['Artwork', artLink], ['Purchase order', link('📄 ' + (p.po || 'Purchase Order'), () => this.openJobDoc(id, 'purchase-order'))]]),
       p.canProcess ? h('div', { key: 'b' }, Btn('Mark as Processed', () => this.jPost('/api/jobs/' + id + '/vendor-processed', {}, 'Marked as processed.'), 'primary', !mq.document)) : null]), quoteCard());
     if (s.id === 'processed') main.push(this.acC('Unbilled', [
-      FG('Invoice (PDF)', h('input', { type: 'file', accept: 'application/pdf,.pdf', onChange: e => this.acReadFile(e.target.files[0]).then(f => { if (f) { this.acSetF('invData', f.data); this.acSetF('invName', f.name); } }), style: inp }), 1),
+      FG('Invoice (PDF)', this.jPickFile('inv', 'application/pdf,.pdf'), 1),
       p.canInvoice ? h('div', { key: 'b' }, Btn('Submit', () => this.jPost('/api/jobs/' + id + '/vendor-invoice', { documentData: this.acF('invData'), documentName: this.acF('invName') }, 'Invoice submitted.', () => this.setState({ acForm: {} })), 'primary', !this.acF('invData'))) : null]), quoteCard());
     // Prepare for Shipping → download the shipping label, ship to Printoka Production, enter the delivery details (logistics: Incoming Jobs)
     if (['invoiced', 'shipped-to-hub'].indexOf(s.id) >= 0) {
