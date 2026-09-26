@@ -409,10 +409,8 @@ function award(jid, role, actor, body) {
   j.outsource.awardedTo = vendor.id; j.outsource.status = 'awarded'; j.outsource.po = po; j.outsource.awardedAt = now(); j.outsource.direct = !quoted;
   // where the printer delivers (§3.5): to production (logistics receives, repacks, relabels, delivers),
   // or straight to the outlet when the customer collects there
-  const type = body.destType || 'production';
-  if (type !== 'production' && type !== 'outlet') return { error: 'Printers deliver to production or to the outlet.' };
-  if (type === 'outlet' && !(j.finalDestination && j.finalDestination.type === 'outlet')) return { error: 'This order is delivered to the customer — the printer must deliver to production so logistics can pack and send it.' };
-  j.destination = type === 'outlet' ? Object.assign({}, j.finalDestination) : destOf('production', null, j);
+  // printers deliver only to Printoka Production (user, 2026-09-26); logistics packs and sends it on
+  j.destination = destOf('production', null, j);
   if (body.instructions) j.instructions = String(body.instructions).slice(0, 600);
   j.route = 'outsource';
   makeLabel(j);

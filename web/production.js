@@ -266,7 +266,7 @@
     const fd = j.finalDestination || {}, ship = (d.order && d.order.shipTo) || {};
     const deliverCard = this.acC('Deliver to', this.pDeliver(fd, fd.phone || (fd.type !== 'outlet' && ship.phone), j.customer));
     // Outsource page: shown once the scheduler chose Outsource (and afterwards, while the printer works on it)
-    if ((j.outsource || j.status === 'to_outsource') && j.status !== 'scheduling' && j.status !== 'to_inhouse' && inDept(this, 'scheduler') && !logPage) main.push(this.pOutsourceCard(j, pr, { summary, fd, phone: fd.phone || ship.phone }));
+    if ((j.outsource || j.status === 'to_outsource') && j.status !== 'scheduling' && j.status !== 'to_inhouse' && inDept(this, 'scheduler') && !logPage) main.push(this.pOutsourceCard(j, pr, { summary, pr }));
     // documents open as PDFs on the page (not for prepress — they only check files).
     // On the logistics pages the purchase order shows only on the receiving page; after that only the shipping label.
     let docs = deptOf(this) === 'prepress' ? [] : (pr.documents || []);
@@ -286,8 +286,13 @@
   };
   // the configurator-style summary (job page, quote-request confirmation, printer's item details):
   // product, every option as label / value, then quantity and any extra rows, then the artwork
+  // older orders stored only the values ("A5 · 128gsm · 4C both"): name them like the configurator does
+  const guessLabel = v => /^(A\d|B\d|DL|\d+(\.\d+)?\s*(mm|cm|in)?\s*[x×]\s*\d)/i.test(v) ? 'Size'
+    : /gsm|paper|card|vinyl|sticker|woodfree|mirrorkote|acrylic|canvas|pvc/i.test(v) ? 'Material'
+    : /\b\dC\b|4\/\d|colou?r|both side|single side|print/i.test(v) ? 'Printing'
+    : /\blam(ination)?\b|matt|gloss/i.test(v) ? 'Lamination' : /saddle|perfect|wire|binding/i.test(v) ? 'Binding' : '';
   P.pSummary = function (s) {
-    const rows = (s.specLines || String(s.spec || '').split(/\s*·\s*|\n/).filter(Boolean).map(p => { const i = p.indexOf(':'); return i > 0 ? [p.slice(0, i).trim(), p.slice(i + 1).trim()] : ['', p.trim()]; }))
+    const rows = (s.specLines || String(s.spec || '').split(/\s*·\s*|\n/).filter(Boolean).map(p => { const i = p.indexOf(':'); return i > 0 ? [p.slice(0, i).trim(), p.slice(i + 1).trim()] : [guessLabel(p.trim()), p.trim()]; }))
       .filter(r => r[1] && !/^(order )?(quantity|qty)/i.test(r[0]) && !(!r[0] && /^[\d,.]+\s*(pcs|pieces|books|sets|units)?$/i.test(r[1])));
     const row = (l, v, k) => h('div', { key: k, style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 14, fontSize: 13, lineHeight: 1.5 } },
       h('span', { style: { color: FAINT, flex: '0 0 auto' } }, l), h('span', { style: { color: INK, fontWeight: 500, textAlign: 'right', whiteSpace: 'pre-wrap' } }, v));
@@ -297,7 +302,7 @@
       h('div', { key: 'q', style: { display: 'flex', flexDirection: 'column', gap: 8, borderTop: '1px solid ' + LINE, paddingTop: 12 } },
         row('Order Quantity', (s.qty || 0).toLocaleString() + ' pcs', 'q'), (s.rows || []).filter(Boolean).map((r, i) => row(r[0], r[1], 'x' + i))),
       arts.length ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12, display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 12.5 } }, 'Artwork'),
-        arts.map((a, i) => a.id ? h('span', { key: i }, link('📄 ' + a.name, () => this.openOrderFile(a.orderId, a))) : h('span', { key: i, style: { color: MUT } }, '📄 ' + a.name))) : null];
+        arts.map((a, i) => a.open ? h('span', { key: i }, link('📄 ' + a.name, a.open)) : a.id ? h('span', { key: i }, link('📄 ' + a.name, () => this.openOrderFile(a.orderId, a))) : h('span', { key: i, style: { color: MUT } }, '📄 ' + a.name))) : null];
   };
   // where it goes: collection or delivery, name, full address, phone
   P.pDeliver = function (fd, phone, fallbackName) {
@@ -505,13 +510,22 @@
   // outsourcing (§3.5 rules: cost, production time, logistics — never preference or pressure)
   // Request quotes → confirm what the printers will see (order details, delivery) + remarks, then Send
   P.pQuoteConfirm = function (j, ctx, picked) {
-    const s = Object.assign({}, ctx.summary || { product: j.product, spec: j.spec, qty: j.qty }, { rows: [] }); // printers never see the customer
+    // what the printers will see: no customer, deliver to Printoka Production, the approved artwork watermarked "PRINTOKA"
+    const pr = ctx.pr || {}, art = pr.approvedArtwork;
+    const s = Object.assign({}, ctx.summary || { product: j.product, spec: j.spec, qty: j.qty }, { rows: [], artworks: art ? [{ name: art.name + ' (watermarked PRINTOKA)' }] : [] });
+    const send = () => {
+      this.setState({ qSending: true });
+      const url = art ? (art.src === 'order' ? '/api/orders/' + art.orderId + '/files/' + art.id : '/api/jobs/' + j.id + '/files/' + art.id) : null;
+      const wm = url ? fetch(url, { headers: this.authHeaders() }).then(r => r.ok ? r.blob() : null).then(b => b ? this.watermarkArtwork(b, art.name) : null).catch(() => null) : Promise.resolve(null);
+      return wm.then(w => this.jPost('/api/jobs/' + j.id + '/request-quotes', { vendorIds: picked.map(v => v.id), remarks: this.acF('qRemarks'), watermarked: w || undefined },
+        'Quote requests sent.', () => this.setState({ acModal: null, acForm: {} }))).then(() => this.setState({ qSending: false }));
+    };
     this.setState({ acModal: { title: 'Confirm quote request', wide: true, body: () => [
       h('div', { key: 'o', style: { display: 'flex', flexDirection: 'column', gap: 10, border: '1px solid ' + HAIR, borderRadius: 10, padding: 14 } }, this.pSummary(s)),
-      h('div', { key: 'd', style: { display: 'flex', flexDirection: 'column', gap: 6, border: '1px solid ' + HAIR, borderRadius: 10, padding: 14 } }, h('b', { style: { fontSize: 13 } }, 'Deliver to'), this.pDeliver(ctx.fd, ctx.phone, j.customer)),
+      h('div', { key: 'd', style: { display: 'flex', flexDirection: 'column', gap: 6, border: '1px solid ' + HAIR, borderRadius: 10, padding: 14 } }, h('b', { style: { fontSize: 13 } }, 'Deliver to'), this.pDeliver(pr.deliverTo || { type: 'production', name: 'Printoka Production' }, (pr.deliverTo || {}).phone)),
       this.acDL([['Printers', picked.map(v => v.name).join(', ')]]),
       FG('Remarks', ta(this.acF('qRemarks'), v => this.acSetF('qRemarks', v), 3), 1),
-      h('div', { key: 'b' }, Btn('Send', () => this.jPost('/api/jobs/' + j.id + '/request-quotes', { vendorIds: picked.map(v => v.id), remarks: this.acF('qRemarks') }, 'Quote requests sent.', () => this.setState({ acModal: null, acForm: {} })), 'primary', !String(this.acF('qRemarks') || '').trim()))] } });
+      h('div', { key: 'b' }, Btn(this.state.qSending ? 'Sending…' : 'Send', send, 'primary', this.state.qSending || !String(this.acF('qRemarks') || '').trim()))] } });
   };
   P.pOutsourceCard = function (j, pr, ctx) {
     ctx = ctx || {};
@@ -522,7 +536,7 @@
     const canAward = !o.awardedTo && ['scheduling', 'to_outsource'].indexOf(j.status) >= 0;
     const rows = quotes.map(q => h('tr', { key: q.vendorId }, [q.vendorName, q.amount != null ? 'RM ' + Number(q.amount).toFixed(2) : 'no quote yet', q.leadDays ? q.leadDays + ' days' : '—',
       q.document ? link(q.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + q.document.id, q.document.name)) : '—', q.remarks || '—',
-      q.awarded ? this.pillDot('Awarded', 'ok') : canAward && q.submittedAt ? Btn('Award', () => this.pAwardModal(j, q)) : ''].map((c, i) => h('td', { key: i, style: { padding: '9px 8px', borderTop: '1px solid ' + LINE, fontSize: 13 } }, c))));
+      q.awarded ? this.pillDot('Awarded', 'ok') : canAward && q.submittedAt ? Btn('Accept', () => this.pAwardModal(j, q)) : ''].map((c, i) => h('td', { key: i, style: { padding: '9px 8px', borderTop: '1px solid ' + LINE, fontSize: 13 } }, c))));
     return this.acC(o.awardedTo ? 'Outsourced' : 'Outsource', [
       !o.awardedTo && !quotes.length ? note('Select the printers to request for quotation.') : null,
       canAward && !quotes.length && vj.vendors && !vendors.length ? box('No registered printer can make this job. Ask Admin to add the product and finishing to a printer (Users & roles).', 'bad') : null,
@@ -590,12 +604,12 @@
         : send(null), 'primary', !this.acF('reason')))] } });
   };
   P.pAwardModal = function (j, q) {
-    const pickup = j.finalDestination && j.finalDestination.type === 'outlet'; const vendors = (this.acGet('vendors_' + j.id, '/api/vendors?job=' + encodeURIComponent(j.id)) || {}).vendors || [];
-    this.setState({ acForm: {}, acModal: { title: q ? 'Award to ' + q.vendorName : 'Award without a quote', body: () => [
-      q ? this.acDL([['Quote', 'RM ' + Number(q.amount).toFixed(2)], ['Production time', q.leadDays ? q.leadDays + ' days' : '—']]) : FG('Printer', h('select', { value: this.acF('vid'), onChange: e => this.acSetF('vid', e.target.value), style: inp }, [h('option', { key: '', value: '' }, 'Choose a printer…')].concat(vendors.map(v => h('option', { key: v.id, value: v.id }, v.name)))), 1),
-      FG('The printer delivers to', h('select', { value: this.acF('dest') || 'production', onChange: e => this.acSetF('dest', e.target.value), style: inp }, [h('option', { key: 'p', value: 'production' }, 'Production — logistics receives, repacks and delivers')].concat(pickup ? [h('option', { key: 'o', value: 'outlet' }, 'Straight to ' + j.finalDestination.name)] : [])), 1),
+    const vendors = (this.acGet('vendors_' + j.id, '/api/vendors?job=' + encodeURIComponent(j.id)) || {}).vendors || [];
+    // accepting a quote issues the purchase order (PDF) at the printer's quoted price; the printer delivers to Printoka Production
+    this.setState({ acForm: {}, acModal: { title: q ? 'Accept quote — ' + q.vendorName : 'Award without a quote', body: () => [
+      q ? this.acDL([['Quote', 'RM ' + Number(q.amount).toFixed(2)], ['Production time', q.leadDays ? q.leadDays + ' days' : '—'], ['Deliver to', 'Printoka Production']]) : FG('Printer', h('select', { value: this.acF('vid'), onChange: e => this.acSetF('vid', e.target.value), style: inp }, [h('option', { key: '', value: '' }, 'Choose a printer…')].concat(vendors.map(v => h('option', { key: v.id, value: v.id }, v.name)))), 1),
       !q ? h('label', { key: 'c', style: { display: 'flex', gap: 10, fontSize: 13, color: '#8a4b00', background: '#fff8e6', borderRadius: 8, padding: '10px 12px', cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: !!this.acF('confirm'), onChange: e => this.acSetF('confirm', e.target.checked) }), 'This printer didn’t submit a quote yet. Please make sure it is internal production.') : null,
-      h('div', { key: 'b' }, Btn('Confirm award', () => this.jPost('/api/jobs/' + j.id + '/award', { vendorId: q ? q.vendorId : this.acF('vid'), destType: this.acF('dest') || 'production', confirmNoQuote: !q ? !!this.acF('confirm') : undefined }, 'Job awarded.', () => this.setState({ acModal: null, acForm: {} })), 'primary', !q && (!this.acF('vid') || !this.acF('confirm'))))] } });
+      h('div', { key: 'b' }, Btn(q ? 'Accept quote' : 'Confirm award', () => this.jPost('/api/jobs/' + j.id + '/award', { vendorId: q ? q.vendorId : this.acF('vid'), destType: 'production', confirmNoQuote: !q ? !!this.acF('confirm') : undefined }, q ? 'Quote accepted — purchase order sent to ' + q.vendorName + '.' : 'Job awarded.', () => this.setState({ acModal: null, acForm: {} })), 'primary', !q && (!this.acF('vid') || !this.acF('confirm'))))] } });
   };
 
   // ---------------------------------------------------------------- KPI (§7)

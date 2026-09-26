@@ -259,7 +259,8 @@
     // the item required, in the same layout as the configurator summary (artwork files open once awarded)
     main.push(this.acC('Job details', this.pSummary({ product: J.product || j.product, specLines: J.specLines, spec: J.spec || j.spec, qty: J.qty || j.qty,
       rows: [J.instructions ? ['Instructions', J.instructions] : null, p.po ? ['Purchase order', p.po] : null],
-      artworks: (J.artworks || []).map(a => p.awardedToMe ? a : { name: a.name }) })));
+      // before the award: only the approved artwork watermarked "PRINTOKA"; the original files once the job is awarded to this printer
+      artworks: p.awardedToMe ? (J.artworks || []) : p.artworkPreview ? [{ name: p.artworkPreview.name, open: () => this.jDownload('/api/jobs/' + id + '/files/' + p.artworkPreview.id, p.artworkPreview.name) }] : [] })));
     const aside = [
       (p.documents || []).length ? this.acC('Documents (PDF)', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 8 } }, p.documents.map(x => Btn('View ' + x.label, () => this.openJobDoc(id, x.id))))) : null,
       p.deliverTo ? this.acC('Deliver to', [h('b', { key: 'n' }, p.deliverTo.name), h('p', { key: 'a', style: { margin: 0, color: MUT, whiteSpace: 'pre-wrap' } }, p.deliverTo.address), p.deliverTo.phone ? [h('b', { key: 'pt' }, 'Phone'), h('p', { key: 'pv', style: { margin: 0, color: MUT } }, p.deliverTo.phone)] : null]) : null,

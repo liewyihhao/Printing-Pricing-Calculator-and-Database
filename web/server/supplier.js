@@ -105,6 +105,7 @@ function jobFiles(j) { const out = []; const o = j.outsource || {};
   if (j.dispatchDelivery && j.dispatchDelivery.document) out.push(Object.assign({ kind: 'dispatch-order' }, j.dispatchDelivery.document));
   (j.proofs || []).forEach(f => out.push(Object.assign({ kind: 'proof' }, f)));
   if (j.paymentProof) out.push(Object.assign({ kind: 'payment-proof' }, j.paymentProof));
+  if (o.artworkPreview) out.push(Object.assign({ kind: 'artwork-preview' }, o.artworkPreview));
   return out; }
 // payment proof kept on the job itself when there is no web order behind it (counter / legacy jobs)
 function savePaymentProofOnJob(jid, me, b) {
@@ -124,7 +125,8 @@ function saveProof(jid, me, b) {
 }
 function readJobFile(j, fid, me) {
   const f = jobFiles(j).find(x => x.id === fid); if (!f) return { error: 'File not found.', code: 404 };
-  if (me.type === 'vendor') { const co = me.vendorId || me.id; if (f.vendorId !== co) return { error: 'Not allowed.', code: 403 }; }
+  if (me.type === 'vendor') { const co = me.vendorId || me.id; const invited = ((j.outsource || {}).vendors || []).some(v => v.vendorId === co);
+    if (!(f.kind === 'artwork-preview' && invited) && f.vendorId !== co) return { error: 'Not allowed.', code: 403 }; }
   if (me.type === 'hub' && f.kind !== 'delivery-order') return { error: 'Not allowed.', code: 403 };
   const p = path.join(ROOT, j.id, f.stored); if (!p.startsWith(ROOT) || !fs.existsSync(p)) return { error: 'File missing on disk.', code: 404 };
   return { file: f, data: fs.readFileSync(p), type: MIME[(f.name.split('.').pop() || '').toLowerCase()] || 'application/octet-stream' };
@@ -137,11 +139,22 @@ function hubCanSee(j, me) { return !me.hub || j.hub === me.hub || ((j.destinatio
 function canSee(j, me) { if (!j || !me) return false; if (me.type === 'vendor') return vendorCanSee(j, me); if (me.type === 'hub') return hubCanSee(j, me); return me.type !== 'customer'; }
 function hubDetails(j, hubId) { const cfg = ops().config(); const hb = (cfg.hubs || []).find(x => x.id === (hubId || j.hub)); return hb ? { id: hb.id, name: hb.name, address: hb.address || '', phone: hb.phone || '' } : null; }
 // where the printer delivers: production (logistics receives) or the outlet (legacy: a hub)
+// printers deliver only to Printoka Production (user, 2026-09-26) — never to an outlet or the customer (P&C)
 function deliverTo(j) {
-  const d = j.destination || {};
-  if (d.type === 'production' || d.type === 'outlet') { const o = d.type === 'outlet' ? ops().outletById(d.id) : null; return { type: d.type, name: d.name, address: d.address || (o && o.address) || '', phone: d.phone || '' }; }
-  if (d.type === 'hub') return Object.assign({ type: 'hub' }, hubDetails(j, d.id));
   const p = ops().destOf('production'); return { type: 'production', name: p.name, address: p.address, phone: p.phone };
+}
+// the artwork prepress approved: the amended file prepress sent for approval, else the customer's latest upload for this line
+function approvedArtwork(j) {
+  const ar = j.approvalRequest && j.approvalRequest.file;
+  if (ar) return { src: 'job', id: ar.id, name: ar.name };
+  const o = j.orderId && store.order(j.orderId); const idx = o ? (o.jobIds || []).indexOf(j.id) : -1;
+  const f = o ? (o.files || []).filter(x => x.kind === 'artwork' && x.line === idx + 1).slice(-1)[0] : null;
+  return f ? { src: 'order', id: f.id, name: f.name, orderId: o.id } : null;
+}
+// the watermarked copy of that artwork, made when the scheduler requests quotes (PDF only)
+function saveArtworkPreview(jid, b) {
+  if (!b || !b.data || !/\.pdf$/i.test(String(b.name || ''))) return { error: 'The artwork preview must be a PDF.' };
+  return saveBlob(path.join(ROOT, jid), { data: b.data, name: b.name }, 'W');
 }
 function activities(j, me) {
   const out = [];
@@ -191,12 +204,14 @@ function view(j, me) {
   };
   if (me.type === 'vendor') {
     v.requestRemarks = o.remarks || ''; // the scheduler's remarks on the quote request (delivery details)
+    v.artworkPreview = mine && o.artworkPreview ? pub(o.artworkPreview) : null; // watermarked "PRINTOKA" artwork for quoting
     v.myQuote = mine ? { amount: mine.price, leadDays: mine.leadDays, note: mine.note, submittedAt: mine.submittedAt, document: pub(mine.document), awardedAmount: o.awardedTo === co ? mine.price : null } : null;
     v.canQuote = me.role !== 'printer_staff' && !o.awardedTo;
     // enter (or correct) the delivery details until Printoka has received the job
     v.canShip = o.awardedTo === co && (j.status === 'outsourcing' || printingStatus(j) === 'shipped-to-hub');
   } else {
     v.requestRemarks = o.remarks || '';
+    v.approvedArtwork = approvedArtwork(j); v.artworkPreview = pub(o.artworkPreview);
     v.quotes = (o.vendors || []).map(x => ({ vendorId: x.vendorId, vendorName: x.vendorName, amount: x.price, leadDays: x.leadDays, remarks: x.note || '', submittedAt: x.submittedAt, document: pub(x.document), awarded: x.vendorId === o.awardedTo }));
     v.customer = orderDetails(j);
   }
@@ -206,7 +221,7 @@ function view(j, me) {
 function vendorJob(j, me) {
   const d = j.destination || {}; const mineNow = !!(me && j.outsource && j.outsource.awardedTo === coOf(me));
   // the printer has nothing to do with the customer: it only ever learns where to deliver (production or the outlet)
-  const dest = d.type === 'production' || d.type === 'outlet' ? { type: d.type, id: d.id, name: d.name, address: d.address } : Object.assign({ type: 'production' }, (({ name, address }) => ({ name, address }))(ops().destOf('production')));
+  const dest = Object.assign({ type: 'production' }, (({ name, address }) => ({ name, address }))(ops().destOf('production'))); // always Printoka Production
   return { id: j.id, product: j.product, spec: j.spec, qty: j.qty, status: j.status, deadline: j.deadline, createdAt: j.createdAt, instructions: j.instructions || '', parcels: j.parcels || 1,
     destination: dest, outsource: j.outsource ? { po: j.outsource.po, awardedTo: j.outsource.awardedTo, status: j.outsource.status } : null, shipments: (j.shipments || []).filter(s => s.byVendor || s.leg === 1).map(s => ({ courier: s.courier, tracking: s.tracking, at: s.at })) };
 }
@@ -369,5 +384,5 @@ function readCustomQuoteDoc(qid, vendorId, me) {
   return { file: p.document, data: fs.readFileSync(f), type: MIME[(p.document.name.split('.').pop() || '').toLowerCase()] || 'application/octet-stream' };
 }
 
-module.exports = { FINISH_NAMES, requiredFinishes, printerCan, vendorsForJob, cleanCapabilities, STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, shipToHub, deliveryDetails, markPaid, saveProof, savePaymentProofOnJob, deliverTo, documentData, readJobFile,
+module.exports = { approvedArtwork, saveArtworkPreview, FINISH_NAMES, requiredFinishes, printerCan, vendorsForJob, cleanCapabilities, STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, shipToHub, deliveryDetails, markPaid, saveProof, savePaymentProofOnJob, deliverTo, documentData, readJobFile,
   requestPrinterQuotes, vendorCustomQuotes, vendorCustomQuote, submitCustomQuote, readCustomQuoteDoc };

@@ -217,6 +217,41 @@
   const PDFJS = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
   let pdfjsP = null;
   const loadPdfjs = () => pdfjsP || (pdfjsP = (window.pdfjsLib ? Promise.resolve() : loadScript(PDFJS)).then(() => { window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS.replace('pdf.min.js', 'pdf.worker.min.js'); return window.pdfjsLib; }));
+
+  // ---------------------------------------------------------------- artwork watermark for printers' quotes
+  // the prepress-approved artwork goes to printers as a PDF with "PRINTOKA" across every page (PDF pages or an image);
+  // the original file is only released to the printer that is awarded the job
+  const stamp = cv => {
+    const x = cv.getContext('2d'), size = Math.max(28, Math.round(cv.width / 8));
+    x.save(); x.globalAlpha = 0.22; x.fillStyle = '#E52220'; x.font = '700 ' + size + 'px Montserrat, Arial, sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+    x.translate(cv.width / 2, cv.height / 2); x.rotate(-Math.PI / 6);
+    const stepX = size * 6, stepY = size * 2.6, span = Math.hypot(cv.width, cv.height);
+    for (let yy = -span; yy <= span; yy += stepY) for (let xx = -span; xx <= span; xx += stepX) x.fillText('PRINTOKA', xx + ((yy / stepY) % 2 ? stepX / 2 : 0), yy);
+    x.restore();
+  };
+  P.watermarkArtwork = function (blob, name) {
+    const base = String(name || 'artwork').replace(/\.[^.]+$/, '');
+    const isPdf = /pdf/i.test(blob.type) || /\.pdf$/i.test(name || ''), isImg = /^image\/(png|jpe?g|webp)/i.test(blob.type) || /\.(png|jpe?g|webp)$/i.test(name || '');
+    if (!isPdf && !isImg) return Promise.resolve(null); // AI / PSD / ZIP … cannot be previewed — the printer sees the file name only
+    const pages = [];
+    const toPage = cv => { stamp(cv); pages.push({ img: cv.toDataURL('image/jpeg', 0.85), w: cv.width * 0.75, h: cv.height * 0.75 }); };
+    const build = () => loadLibs().then(() => {
+      const { jsPDF } = window.jspdf; let doc = null;
+      pages.forEach((p, i) => { const o = p.w > p.h ? 'l' : 'p'; if (!i) doc = new jsPDF({ unit: 'pt', format: [p.w, p.h], orientation: o }); else doc.addPage([p.w, p.h], o); doc.addImage(p.img, 'JPEG', 0, 0, p.w, p.h); });
+      return doc ? { name: base + '-PRINTOKA.pdf', data: doc.output('datauristring') } : null;
+    });
+    if (isImg) return new Promise((res, rej) => { const img = new Image(), url = URL.createObjectURL(blob);
+      img.onload = () => { const k = Math.min(1, 2400 / Math.max(img.naturalWidth, img.naturalHeight)); const cv = document.createElement('canvas'); cv.width = Math.round(img.naturalWidth * k); cv.height = Math.round(img.naturalHeight * k);
+        const x = cv.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, cv.width, cv.height); x.drawImage(img, 0, 0, cv.width, cv.height); URL.revokeObjectURL(url); toPage(cv); res(); };
+      img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('Could not read the artwork image.')); }; img.src = url; }).then(build);
+    return blob.arrayBuffer().then(buf => loadPdfjs().then(lib => lib.getDocument({ data: buf }).promise)).then(pdf => {
+      const n = Math.min(pdf.numPages, 20); let chain = Promise.resolve();
+      for (let i = 1; i <= n; i++) chain = chain.then(() => pdf.getPage(i)).then(pg => { const vp1 = pg.getViewport({ scale: 1 }), k = Math.min(3, 1400 / vp1.width), vp = pg.getViewport({ scale: k });
+        const cv = document.createElement('canvas'); cv.width = Math.round(vp.width); cv.height = Math.round(vp.height);
+        return pg.render({ canvasContext: cv.getContext('2d'), viewport: vp }).promise.then(() => { stamp(cv); pages.push({ img: cv.toDataURL('image/jpeg', 0.85), w: vp1.width, h: vp1.height }); }); });
+      return chain;
+    }).then(build);
+  };
   function pdfViewer(title) {
     const ov = document.createElement('div');
     ov.setAttribute('role', 'dialog'); ov.setAttribute('aria-label', title);

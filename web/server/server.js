@@ -528,6 +528,8 @@ async function api(req, res, pathname, query) {
     // only printers registered for this product and its finishing may be asked
     if (qj) { const bad = (b.vendorIds || []).map(id => store.findCustomer(id)).filter(v => !v || !supplier.printerCan(v, qj).ok); if (bad.length) return send(res, 400, { error: (bad[0] ? bad[0].name + ': ' + supplier.printerCan(bad[0], qj).why : 'Unknown printer') + '. Pick a printer registered for this job.' }); }
     const r = store.requestVendorQuotes(seg[1], b.vendorIds, actor, b.remarks);
+    // the approved artwork, watermarked "PRINTOKA" in the scheduler's browser, is what the invited printers see
+    if (!r.error && b.watermarked) { const wf = supplier.saveArtworkPreview(seg[1], b.watermarked); if (!wf.error) { r.job.outsource.artworkPreview = wf; store.save(); } }
     return send(res, r.error ? 400 : 200, r);
   }
   if (seg[0] === 'jobs' && seg[2] === 'quote' && req.method === 'POST') {
