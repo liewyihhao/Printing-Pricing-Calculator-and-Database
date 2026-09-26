@@ -253,7 +253,7 @@
     if (d.error) return [h('div', { key: 'e', style: { color: '#c0392b' } }, d.error)];
     const j = d.job, pr = d.printing || {}, id = j.id;
     const acts = {}; (j.actions || []).forEach(a => { if (a.permitted) acts[a.action] = a; });
-    const main = [];
+    const main = []; let top = null;
     // logistics pages (1 Received · 2 Print label · 3 Shipping): the step on the left, order details on the right
     const logPage = ['inbound', 'printed', 'logistics'].indexOf(j.status) >= 0 && inDept(this, 'logistics') && deptOf(this) !== 'scheduler';
     const card = this.pStepCard(j, pr, acts, d.order, d.siblings); if (card) main.push(card);
@@ -266,7 +266,7 @@
     const fd = j.finalDestination || {}, ship = (d.order && d.order.shipTo) || {};
     const deliverCard = this.acC('Deliver to', this.pDeliver(fd, fd.phone || (fd.type !== 'outlet' && ship.phone), j.customer));
     // Outsource page: shown once the scheduler chose Outsource (and afterwards, while the printer works on it)
-    if ((j.outsource || j.status === 'to_outsource') && j.status !== 'scheduling' && j.status !== 'to_inhouse' && inDept(this, 'scheduler') && !logPage) main.push(this.pOutsourceCard(j, pr, { summary, pr }));
+    if ((j.outsource || j.status === 'to_outsource') && j.status !== 'scheduling' && j.status !== 'to_inhouse' && inDept(this, 'scheduler') && !logPage) { const oc = this.pOutsourceCard(j, pr, { summary, pr }); top = oc.top; main.push(oc.card); }
     // documents open as PDFs on the page (not for prepress — they only check files).
     // On the logistics pages the purchase order shows only on the receiving page; after that only the shipping label.
     let docs = deptOf(this) === 'prepress' ? [] : (pr.documents || []);
@@ -282,7 +282,7 @@
       : tabs.indexOf('Preflight') >= 0 ? (Object.keys(PREPRESS_TABS).find(k => PREPRESS_TABS[k].indexOf(j.status) >= 0) || 'Dashboard')
       : tabs.indexOf('In House') >= 0 ? (j.status === 'scheduling' ? 'Artwork Approved' : j.status === 'to_outsource' ? 'Outsourced' : j.status === 'to_inhouse' ? 'In House' : j.route === 'inhouse' ? 'In House' : j.route === 'outsource' ? 'Outsourced' : 'Dashboard')
       : tabs.indexOf('Incoming Jobs') >= 0 ? (j.status === 'dispatched' || j.status === 'completed' || j.status === 'ready_collect' ? 'Shipped' : j.route === 'inhouse' ? 'Completed Jobs' : 'Incoming Jobs') : tabs[1];
-    return this.acSingle({ home: tabs[0], type: typeTab, title: '#' + id, statusNode: this.pillDot(j.statusLabel || j.status, tone(j)) }, main, aside);
+    return this.acSingle({ home: tabs[0], type: typeTab, title: '#' + id, statusNode: this.pillDot(j.statusLabel || j.status, tone(j)), top }, main, aside);
   };
   // the configurator-style summary (job page, quote-request confirmation, printer's item details):
   // product, every option as label / value, then quantity and any extra rows, then the artwork
@@ -534,13 +534,15 @@
     const vj = this.acGet('vendors_' + id, '/api/vendors?job=' + encodeURIComponent(id)) || {}; const vendors = vj.vendors || [];
     const quotes = pr.quotes || [];
     const canAward = !o.awardedTo && ['scheduling', 'to_outsource'].indexOf(j.status) >= 0;
-    const rows = quotes.map(q => h('tr', { key: q.vendorId }, [q.vendorName, q.amount != null ? 'RM ' + Number(q.amount).toFixed(2) : 'no quote yet', q.leadDays ? q.leadDays + ' days' : '—',
-      q.document ? link(q.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + q.document.id, q.document.name)) : '—', q.remarks || '—',
-      q.awarded ? this.pillDot('Awarded', 'ok') : canAward && q.submittedAt ? Btn('Accept', () => this.pAwardModal(j, q)) : ''].map((c, i) => h('td', { key: i, style: { padding: '9px 8px', borderTop: '1px solid ' + LINE, fontSize: 13 } }, c))));
-    return this.acC(o.awardedTo ? 'Outsourced' : 'Outsource', [
+    // the printers asked to quote — a full-width table like the dashboard lists; click a vendor to review and accept its quote
+    const pdfLink = q => q.document ? link('📄 ' + q.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + q.document.id, q.document.name)) : '—';
+    const quoteTable = quotes.length ? [h('h2', { key: 'qh', style: { fontSize: 22, fontWeight: 600, margin: '8px 0 0' } }, 'Quotes'),
+      h('div', { key: 'qt' }, this.dataCard(['Vendor', { label: 'Quoted Price', right: true }, 'Days of Production', 'Location', 'Quote PDF', 'Remarks'],
+        quotes.map(q => [h('span', { style: { display: 'inline-flex', gap: 8, alignItems: 'center' } }, link(q.vendorName, () => this.pQuoteView(j, q, canAward)), q.awarded ? this.pillDot('Accepted', 'ok') : null),
+          q.amount != null ? h('b', null, 'RM ' + Number(q.amount).toFixed(2)) : h('span', { style: { color: FAINT } }, 'Awaiting quote'), q.leadDays ? q.leadDays + ' days' : '—', q.location || '—', pdfLink(q), q.remarks || '—']), { minWidth: 760 }))] : null;
+    const card = this.acC(o.awardedTo ? 'Outsourced' : 'Outsource', [
       !o.awardedTo && !quotes.length ? note('Select the printers to request for quotation.') : null,
       canAward && !quotes.length && vj.vendors && !vendors.length ? box('No registered printer can make this job. Ask Admin to add the product and finishing to a printer (Users & roles).', 'bad') : null,
-      quotes.length ? h('div', { key: 't', style: { overflowX: 'auto' } }, h('table', { style: { width: '100%', borderCollapse: 'collapse' } }, h('thead', null, h('tr', null, ['Printer', 'Quote', 'Time', 'Document', 'Remarks', ''].map(c => h('th', { key: c, style: { textAlign: 'left', padding: '6px 8px', fontSize: 12 } }, c)))), h('tbody', null, rows))) : null,
       canAward && !quotes.length ? [h('div', { key: 'v', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 8 } }, vendors.map(v => { const picked = this.acF('vids') || []; return h('label', { key: v.id, style: { display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: picked.indexOf(v.id) >= 0, onChange: () => this.acSetF('vids', picked.indexOf(v.id) >= 0 ? picked.filter(x => x !== v.id) : picked.concat([v.id])) }), v.name); })),
         h('div', { key: 'rb' }, Btn('Request quotes', () => this.pQuoteConfirm(j, ctx, vendors.filter(v => (this.acF('vids') || []).indexOf(v.id) >= 0)), 'primary', !(this.acF('vids') || []).length))] : null,
       canAward && /scheduler_manager/.test(this.userRole()) || (canAward && isDirector(this)) ? h('div', { key: 'dir' }, Btn('Award without a quote…', () => this.pAwardModal(j, null))) : null,
@@ -550,7 +552,19 @@
       null,
       // the scheduler pays the printer once Printoka has received the job
       inDept(this, 'scheduler') && pr.awarded && !pr.paidAt && pr.status && pr.status.id === 'shipped' ? Btn('Mark printer paid', () => this.pModal('Mark printer paid', [['reference', 'Payment reference', 'e.g. IBG-7781']], v => this.jPost('/api/jobs/' + id + '/vendor-paid', v, 'Printer marked paid.', () => this.setState({ acModal: null }))), 'primary') : null,
+      pr.printerInvoice ? this.acDL([['Printer invoice', link('📄 ' + pr.printerInvoice.name, () => this.jDownload('/api/jobs/' + id + '/files/' + pr.printerInvoice.id, pr.printerInvoice.name))]]) : null,
       pr.paidAt ? box('Printer paid.', 'ok') : null]);
+    return { top: quoteTable, card };
+  };
+  // one printer's quote: the summary and Accept Quote (the scheduler's manual choice — nothing is awarded automatically)
+  P.pQuoteView = function (j, q, canAward) {
+    const id = j.id;
+    this.setState({ acModal: { title: q.vendorName, body: () => [
+      this.acDL([['Quoted price', q.amount != null ? 'RM ' + Number(q.amount).toFixed(2) : 'Awaiting quote'], ['Days of production', q.leadDays ? q.leadDays + ' days' : '—'], ['Location', q.location || '—'],
+        ['Quote PDF', q.document ? link('📄 ' + q.document.name, () => this.jDownload('/api/jobs/' + id + '/files/' + q.document.id, q.document.name)) : '—'], ['Remarks', q.remarks || '—'],
+        q.submittedAt ? ['Submitted', when(q.submittedAt)] : null, ['Deliver to', 'Printoka Production']]),
+      q.awarded ? box('Quote accepted — purchase order issued.', 'ok') : null,
+      canAward && q.submittedAt && !q.awarded ? h('div', { key: 'b' }, Btn('Accept Quote', () => this.jPost('/api/jobs/' + id + '/award', { vendorId: q.vendorId, destType: 'production' }, 'Quote accepted — purchase order sent to ' + q.vendorName + '.', () => this.setState({ acModal: null })), 'primary')) : null] } });
   };
 
   // ---------------------------------------------------------------- pop-ups (one question each, one button)

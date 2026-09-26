@@ -195,15 +195,16 @@
       const toggle = (k, x) => set(k, c[k].indexOf(x) >= 0 ? c[k].filter(y => y !== x) : c[k].filter(y => y !== '*').concat([x]));
       const allP = c.products.indexOf('*') >= 0, allF = c.finishes.indexOf('*') >= 0;
       const chk = (on, label, fn) => h('label', { key: label, style: { display: 'flex', gap: 8, alignItems: 'center', fontSize: 13, cursor: 'pointer' } }, h('input', { type: 'checkbox', checked: on, onChange: fn }), label);
+      const loc = this.state.auLoc != null ? this.state.auLoc : (s.location || '');
       return box([h('b', { key: 't' }, 'Products & finishing — ' + s.name),
-        para('The Scheduler can only ask this printer for quotes on jobs it can make: the product, and every finishing the job needs.'),
+        F('Location', h('input', { value: loc, onChange: e => this.setState({ auLoc: e.target.value }), placeholder: 'City, State', style: inp })),
         h('b', { key: 'ph', style: { fontSize: 13 } }, 'Products'),
         chk(allP, 'All products', () => set('products', allP ? [] : ['*'])),
         !allP ? (PRODUCTS.length ? h('div', { key: 'pl', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(210px,1fr))', gap: 6 } }, PRODUCTS.map(p => chk(c.products.indexOf(p) >= 0, p, () => toggle('products', p)))) : para('Loading products…')) : null,
         h('b', { key: 'fh', style: { fontSize: 13 } }, 'Finishing'),
         chk(allF, 'All finishing', () => set('finishes', allF ? [] : ['*'])),
         !allF ? h('div', { key: 'fl', style: { display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(160px,1fr))', gap: 6 } }, FIN.map(f => chk(c.finishes.indexOf(f) >= 0, f, () => toggle('finishes', f)))) : null,
-        h('div', { key: 'b', style: { display: 'flex', gap: 8 } }, B('Save', () => this.aFetch('/api/admin/staff/' + s.id, { capabilities: c }).then(d => { if (this.aMsg(d, 'Saved — ' + s.name + ' will be offered matching jobs only.')) { this.setState({ auCap: null, auCapDraft: null }); this.loadAdmin(); } }), 'primary'), B('Cancel', () => this.setState({ auCap: null, auCapDraft: null }), 'ghost'))]);
+        h('div', { key: 'b', style: { display: 'flex', gap: 8 } }, B('Save', () => this.aFetch('/api/admin/staff/' + s.id, { capabilities: c, location: loc }).then(d => { if (this.aMsg(d, 'Saved.')) { this.setState({ auCap: null, auCapDraft: null, auLoc: null }); this.loadAdmin(); } }), 'primary'), B('Cancel', () => this.setState({ auCap: null, auCapDraft: null, auLoc: null }), 'ghost'))]);
     };
     return [
       para('Every staff login and its role — Admin, Outlet (staff / manager), Production (Prepress, Scheduler, Production, Logistics — staff / manager), Printer (staff / manager) and Hub (staff / manager). Each role signs in on its own login page and only sees its own screens.'),
@@ -225,7 +226,7 @@
           s.type === 'vendor' && !s.vendorId ? h('span', { style: { fontSize: 12.5, color: MUT } }, capText(s)) : s.outlet || (s.hub ? s.hub.replace('HUB-', 'Hub ') : '') || (s.vendorId ? ((staff.find(x => x.id === s.vendorId) || {}).name || '') : '') || '—',
           this.chip(s.disabled ? 'Disabled' : 'Active', s.disabled ? 'bad' : 'ok'),
           h('span', { style: { display: 'flex', gap: 10, flexWrap: 'wrap' } },
-            s.type === 'vendor' && !s.vendorId ? h('span', { onClick: () => { this.setState({ auCap: s.id, auCapDraft: null }); if (typeof window !== 'undefined') window.scrollTo(0, 0); }, style: { color: TEAL, fontWeight: 600, cursor: 'pointer', fontSize: 12.5 } }, 'Products & finishing') : null,
+            s.type === 'vendor' && !s.vendorId ? h('span', { onClick: () => { this.setState({ auCap: s.id, auCapDraft: null, auLoc: null }); if (typeof window !== 'undefined') window.scrollTo(0, 0); }, style: { color: TEAL, fontWeight: 600, cursor: 'pointer', fontSize: 12.5 } }, 'Products & finishing') : null,
             h('span', { onClick: () => upd(s, { disabled: !s.disabled }, s.disabled ? 'Account enabled.' : 'Account disabled — signed out everywhere.'), style: { color: s.disabled ? TEAL : '#c71917', fontWeight: 600, cursor: 'pointer', fontSize: 12.5 } }, s.disabled ? 'Enable' : 'Disable'),
             h('span', { onClick: () => this.aFetch('/api/admin/staff/' + s.id, { resetPassword: true }).then(d => this.aMsg(d, d.message)), style: { color: TEAL, fontWeight: 600, cursor: 'pointer', fontSize: 12.5 } }, 'Reset password'))]),
         ['16%', null, '100px', '170px', '130px', '90px', '170px']),

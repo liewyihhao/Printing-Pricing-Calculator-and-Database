@@ -29,8 +29,11 @@ const STATUSES = {
   'quote-requested': { label: 'Quote requested', color: '#0073AA', icon: 'file-text' },
   'quote-partly-received': { label: 'Quote partly received', color: '#00A0D2', icon: 'clipboard' },
   'quotes-received': { label: 'Quotes received', color: '#00B9EB', icon: 'check' },
-  'printer-assigned': { label: 'Purchase order issued', color: '#00C2B2', icon: 'printer' },
-  'shipped-to-hub': { label: 'Shipped — delivery details sent', color: '#009D9A', icon: 'truck' },
+  // after the scheduler accepts the quote (user, 2026-09-26): New Order → Unbilled (processed) → Prepare for Shipping (invoiced) → Shipped
+  'printer-assigned': { label: 'New Order', color: '#00C2B2', icon: 'printer' },
+  processed: { label: 'Unbilled', color: '#d99100', icon: 'file' },
+  invoiced: { label: 'Prepare for Shipping', color: '#0073AA', icon: 'box' },
+  'shipped-to-hub': { label: 'Shipped', color: '#009D9A', icon: 'truck' },
   shipped: { label: 'Received by Printoka', color: '#005082', icon: 'box' },
   paid: { label: 'Paid', color: '#67A2B2', icon: 'dollar-sign' },
 };
@@ -39,7 +42,7 @@ function printingStatus(j) {
   const o = j && j.outsource; if (!o) return null;
   if (o.paidAt) return 'paid';
   if (!o.awardedTo) return o.status === 'quotes_received' ? 'quotes-received' : o.status === 'partly_received' ? 'quote-partly-received' : 'quote-requested';
-  if (j.status === 'outsourcing') return 'printer-assigned';
+  if (j.status === 'outsourcing') return o.printerInvoice ? 'invoiced' : o.processedAt ? 'processed' : 'printer-assigned';
   // shipped by the printer, not yet received (by logistics at production, or by the outlet directly)
   if (j.status === 'inbound' || j.status === 'at_hub') return 'shipped-to-hub';
   if (j.status === 'dispatched' && !(j.statusAt && j.statusAt.logistics)) return 'shipped-to-hub';
@@ -105,6 +108,7 @@ function jobFiles(j) { const out = []; const o = j.outsource || {};
   if (j.dispatchDelivery && j.dispatchDelivery.document) out.push(Object.assign({ kind: 'dispatch-order' }, j.dispatchDelivery.document));
   (j.proofs || []).forEach(f => out.push(Object.assign({ kind: 'proof' }, f)));
   if (j.paymentProof) out.push(Object.assign({ kind: 'payment-proof' }, j.paymentProof));
+  if (o.printerInvoice) out.push(Object.assign({ kind: 'printer-invoice', vendorId: o.awardedTo }, o.printerInvoice));
   if (o.artworkPreview) out.push(Object.assign({ kind: 'artwork-preview' }, o.artworkPreview));
   return out; }
 // payment proof kept on the job itself when there is no web order behind it (counter / legacy jobs)
@@ -126,7 +130,8 @@ function saveProof(jid, me, b) {
 function readJobFile(j, fid, me) {
   const f = jobFiles(j).find(x => x.id === fid); if (!f) return { error: 'File not found.', code: 404 };
   if (me.type === 'vendor') { const co = me.vendorId || me.id; const invited = ((j.outsource || {}).vendors || []).some(v => v.vendorId === co);
-    if (!(f.kind === 'artwork-preview' && invited) && f.vendorId !== co) return { error: 'Not allowed.', code: 403 }; }
+    const awardedArt = (j.outsource || {}).awardedTo === co && (approvedArtwork(j) || {}).id === f.id; // the approved (amended) artwork, once awarded
+    if (!(f.kind === 'artwork-preview' && invited) && !awardedArt && f.vendorId !== co) return { error: 'Not allowed.', code: 403 }; }
   if (me.type === 'hub' && f.kind !== 'delivery-order') return { error: 'Not allowed.', code: 403 };
   const p = path.join(ROOT, j.id, f.stored); if (!p.startsWith(ROOT) || !fs.existsSync(p)) return { error: 'File missing on disk.', code: 404 };
   return { file: f, data: fs.readFileSync(p), type: MIME[(f.name.split('.').pop() || '').toLowerCase()] || 'application/octet-stream' };
@@ -139,6 +144,12 @@ function hubCanSee(j, me) { return !me.hub || j.hub === me.hub || ((j.destinatio
 function canSee(j, me) { if (!j || !me) return false; if (me.type === 'vendor') return vendorCanSee(j, me); if (me.type === 'hub') return hubCanSee(j, me); return me.type !== 'customer'; }
 function hubDetails(j, hubId) { const cfg = ops().config(); const hb = (cfg.hubs || []).find(x => x.id === (hubId || j.hub)); return hb ? { id: hb.id, name: hb.name, address: hb.address || '', phone: hb.phone || '' } : null; }
 // where the printer delivers: production (logistics receives) or the outlet (legacy: a hub)
+// where a printer company is (Admin → Products & finishing → Location; else its first address)
+function vendorLocation(vid) {
+  const v = store.findCustomer(vid); if (!v) return '';
+  if (v.location) return v.location;
+  const a = (v.addresses || [])[0]; return a ? [a.city, a.state].filter(Boolean).join(', ') : '';
+}
 // printers deliver only to Printoka Production (user, 2026-09-26) — never to an outlet or the customer (P&C)
 function deliverTo(j) {
   const p = ops().destOf('production'); return { type: 'production', name: p.name, address: p.address, phone: p.phone };
@@ -173,7 +184,8 @@ const ACT_TITLE = { submit_quote: 'Quote submitted', award_po: 'Printer assigned
 function documents(j, me) {
   const o = j.outsource || {}; const d = [];
   const staff = me.type !== 'vendor' && me.type !== 'hub';
-  if (o.awardedTo && ((me.type === 'vendor' && o.awardedTo === coOf(me)) || staff)) { d.push({ id: 'purchase-order', label: 'Purchase Order' }); d.push({ id: 'hub-label', label: 'Delivery Label' }); }
+  // the printer's shipping label is the label for the parcel to Printoka Production
+  if (o.awardedTo && ((me.type === 'vendor' && o.awardedTo === coOf(me)) || staff)) { d.push({ id: 'purchase-order', label: 'Purchase Order' }); d.push({ id: 'hub-label', label: me.type === 'vendor' ? 'Shipping Label' : 'Delivery Label' }); }
   if (me.type === 'hub' || staff) d.push({ id: 'shipping-label', label: 'Shipping Label' });
   return d;
 }
@@ -208,11 +220,17 @@ function view(j, me) {
     v.myQuote = mine ? { amount: mine.price, leadDays: mine.leadDays, note: mine.note, submittedAt: mine.submittedAt, document: pub(mine.document), awardedAmount: o.awardedTo === co ? mine.price : null } : null;
     v.canQuote = me.role !== 'printer_staff' && !o.awardedTo;
     // enter (or correct) the delivery details until Printoka has received the job
-    v.canShip = o.awardedTo === co && (j.status === 'outsourcing' || printingStatus(j) === 'shipped-to-hub');
+    const ps = printingStatus(j), mineJob = o.awardedTo === co;
+    v.canProcess = mineJob && ps === 'printer-assigned';                   // New Order → Mark as Processed
+    v.canInvoice = mineJob && ps === 'processed';                          // Unbilled → upload the invoice (PDF)
+    v.canShip = mineJob && (ps === 'invoiced' || ps === 'shipped-to-hub'); // Prepare for Shipping → shipping label + delivery details
+    v.printerInvoice = mineJob ? pub(o.printerInvoice) : null;
+    v.approvedArtwork = mineJob ? approvedArtwork(j) : null; // the non-watermarked, prepress-approved artwork — only for the awarded printer
   } else {
     v.requestRemarks = o.remarks || '';
     v.approvedArtwork = approvedArtwork(j); v.artworkPreview = pub(o.artworkPreview);
-    v.quotes = (o.vendors || []).map(x => ({ vendorId: x.vendorId, vendorName: x.vendorName, amount: x.price, leadDays: x.leadDays, remarks: x.note || '', submittedAt: x.submittedAt, document: pub(x.document), awarded: x.vendorId === o.awardedTo }));
+    v.quotes = (o.vendors || []).map(x => ({ vendorId: x.vendorId, vendorName: x.vendorName, location: vendorLocation(x.vendorId), amount: x.price, leadDays: x.leadDays, remarks: x.note || '', submittedAt: x.submittedAt, document: pub(x.document), awarded: x.vendorId === o.awardedTo }));
+    v.printerInvoice = pub(o.printerInvoice); v.processedAt = o.processedAt || null;
     v.customer = orderDetails(j);
   }
   return v;
@@ -257,6 +275,8 @@ function submitQuote(jid, me, b) {
 // number(s), delivery company and delivery order → logistics sees it under "Incoming Jobs"
 function shipToHub(jid, me, b) {
   const j = store.job(jid); const co = coOf(me); if (!j || !j.outsource || j.outsource.awardedTo !== co) return { error: 'This job is not awarded to your company.' };
+  // ship only once the order is processed and billed (Prepare for Shipping)
+  if (['invoiced', 'shipped-to-hub'].indexOf(printingStatus(j)) < 0) return { error: j.outsource.processedAt ? 'Upload your invoice first.' : 'Mark the order as processed first.' };
   const tracking = String(b.tracking || '').split(/\r?\n/).map(s => s.trim()).filter(Boolean);
   const company = String(b.company || b.courier || '').trim();
   if (!tracking.length) return { error: 'Please enter tracking number' };
@@ -307,6 +327,25 @@ function deliveryDetails(jid, me, role, b) {
   j[key] = { tracking, company, document: doc || null, at: now(), by: me.name };
   store.logEvent({ actor: me.name, role, action: stage === 'hub' ? 'hub_delivery' : 'dispatch_details', jobId: jid, from: null, to: null, note: company + ' · ' + tracking.join(', ') });
   store.save(); return { ok: true, message: 'Delivery details update successfully!', stage };
+}
+// New Order → the printer has printed the job: Mark as Processed → Unbilled
+function markProcessed(jid, me) {
+  const j = store.job(jid); const co = coOf(me); if (!j || !j.outsource || j.outsource.awardedTo !== co) return { error: 'This job is not awarded to your company.' };
+  if (printingStatus(j) !== 'printer-assigned') return { error: 'This order is already processed.' };
+  j.outsource.processedAt = now(); j.outsource.processedBy = me.name;
+  store.logEvent({ actor: me.name, vendorId: co, role: 'printer', action: 'printer_processed', jobId: jid, from: null, to: null, note: 'Order processed — unbilled' });
+  store.save(); return { ok: true, message: 'Marked as processed.' };
+}
+// Unbilled → the printer uploads its invoice (PDF) → Prepare for Shipping
+function uploadInvoice(jid, me, b) {
+  const j = store.job(jid); const co = coOf(me); if (!j || !j.outsource || j.outsource.awardedTo !== co) return { error: 'This job is not awarded to your company.' };
+  if (printingStatus(j) !== 'processed') return { error: j.outsource.printerInvoice ? 'The invoice is already submitted.' : 'Mark the order as processed first.' };
+  if (!b || !b.documentData) return { error: 'Please upload your invoice (PDF).' };
+  if (!/\.pdf$/i.test(String(b.documentName || ''))) return { error: 'The invoice must be a PDF.' };
+  const f = saveBlob(path.join(ROOT, jid), { data: b.documentData, name: b.documentName }, 'I'); if (f.error) return f;
+  f.by = me.name; j.outsource.printerInvoice = f; j.outsource.invoicedAt = now();
+  store.logEvent({ actor: me.name, vendorId: co, role: 'printer', action: 'printer_invoice', jobId: jid, from: null, to: null, note: 'Invoice ' + f.name + ' — prepare for shipping' });
+  store.save(); return { ok: true, message: 'Invoice submitted.' };
 }
 function markPaid(jid, actor, role, b) {
   const j = store.job(jid); if (!j || !j.outsource || !j.outsource.awardedTo) return { error: 'No printer assigned.' };
@@ -384,5 +423,5 @@ function readCustomQuoteDoc(qid, vendorId, me) {
   return { file: p.document, data: fs.readFileSync(f), type: MIME[(p.document.name.split('.').pop() || '').toLowerCase()] || 'application/octet-stream' };
 }
 
-module.exports = { approvedArtwork, saveArtworkPreview, FINISH_NAMES, requiredFinishes, printerCan, vendorsForJob, cleanCapabilities, STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, shipToHub, deliveryDetails, markPaid, saveProof, savePaymentProofOnJob, deliverTo, documentData, readJobFile,
+module.exports = { markProcessed, uploadInvoice, approvedArtwork, saveArtworkPreview, FINISH_NAMES, requiredFinishes, printerCan, vendorsForJob, cleanCapabilities, STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, shipToHub, deliveryDetails, markPaid, saveProof, savePaymentProofOnJob, deliverTo, documentData, readJobFile,
   requestPrinterQuotes, vendorCustomQuotes, vendorCustomQuote, submitCustomQuote, readCustomQuoteDoc };

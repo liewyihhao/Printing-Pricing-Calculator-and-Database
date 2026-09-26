@@ -204,10 +204,15 @@
     const cqs = (this.acGet('v_cqs', '/api/vendor/custom-quotes') || {}).quotes || [];
     const n = f => jobs.filter(j => j.printing && f(j.printing)).length;
     const go = (tab, key, val) => this.setState({ sTab: tab, [key]: val });
-    return [this.acCard(this.acQuick([
-      { label: 'Quote requests', value: n(p => /^quote/.test(p.statusId) && !p.submitted), icon: 'edit-3', color: 'teal', onClick: () => go('Printing Jobs', 'vj_s', 'Quote requested') },
-      { label: 'Purchase orders to deliver', value: n(p => p.statusId === 'printer-assigned'), icon: 'truck', color: 'orange', onClick: () => go('Printing Jobs', 'vj_s', 'Purchase order issued') },
-      { label: 'Custom quotes', value: cqs.filter(q => q.status === 'Pending quote').length, icon: 'file', color: 'teal', onClick: () => go('Custom Quotes', 'vc_s', 'Pending quote') }]))];
+    // two rows like the scheduler: Orders (New Order → Unbilled → Prepare for Shipping), then Quotations
+    const tiles = (items, title) => this.pTiles ? this.pTiles(items, title) : this.acCard(this.acQuick(items));
+    return [tiles([
+      { label: 'New Order', value: n(p => p.statusId === 'printer-assigned'), icon: 'printer', color: 'red', onClick: () => go('Printing Jobs', 'vj_s', 'New Order') },
+      { label: 'Unbilled', value: n(p => p.statusId === 'processed'), icon: 'file', color: 'orange', onClick: () => go('Printing Jobs', 'vj_s', 'Unbilled') },
+      { label: 'Prepare for Shipping', value: n(p => p.statusId === 'invoiced'), icon: 'box', color: 'teal', onClick: () => go('Printing Jobs', 'vj_s', 'Prepare for Shipping') }], 'Orders'),
+      tiles([
+      { label: 'Quote Requests', value: n(p => /^quote/.test(p.statusId) && !p.submitted), icon: 'edit-3', color: 'teal', onClick: () => go('Printing Jobs', 'vj_s', 'Quote requested') },
+      { label: 'Custom Quotes', value: cqs.filter(q => q.status === 'Pending quote').length, icon: 'file', color: 'teal', onClick: () => go('Custom Quotes', 'vc_s', 'Pending quote') }], 'Quotations')];
   };
   P.vJobs = function () {
     const d = this.acGet('v_jobs', '/api/jobs'); if (!d) return [h('div', { key: 'l', style: { color: FAINT } }, 'Loading…')];
@@ -238,18 +243,26 @@
         h('div', { key: 'b' }, Btn('Submit quote', () => this.jPost('/api/jobs/' + id + '/vendor-quote', { amount: amt, leadDays: lead, remarks: rem, documentData: this.acF('qDocData') || undefined, documentName: this.acF('qDocName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !amt || !(this.acF('qDocData') || mq.document)))]
         : [p.requestRemarks ? this.acDL([['Remarks from Printoka', p.requestRemarks]]) : null, mq.submittedAt ? this.acDL([['Price (RM)', Number(mq.amount).toFixed(2)], ['Quotation', mq.document ? fileLink(mq.document) : '—'], mq.note ? ['Remarks', mq.note] : null]) : null, muted(staff ? 'Your printer manager submits the price for this job.' : 'Quoting is closed for this job.')]));
     }
-    // purchase order issued → print the job, ship it, then enter the delivery details (logistics sees "Incoming Jobs")
-    if (['printer-assigned', 'shipped-to-hub'].indexOf(s.id) >= 0) {
+    // quote accepted: New Order → (download the artwork, print) Mark as Processed → Unbilled → upload the invoice (PDF) → Prepare for Shipping
+    const art = p.approvedArtwork;
+    const artLink = art ? link('📄 ' + art.name, () => art.src === 'order' ? this.openOrderFile(art.orderId, { id: art.id, name: art.name }) : this.jDownload('/api/jobs/' + id + '/files/' + art.id, art.name)) : muted('—');
+    if (s.id === 'printer-assigned') main.push(this.acC('New Order', [
+      this.acDL([['Artwork', artLink], ['Purchase order', link('📄 ' + (p.po || 'Purchase Order'), () => this.openJobDoc(id, 'purchase-order'))]]),
+      p.canProcess ? h('div', { key: 'b' }, Btn('Mark as Processed', () => this.jPost('/api/jobs/' + id + '/vendor-processed', {}, 'Marked as processed.'), 'primary')) : null]), quoteCard());
+    if (s.id === 'processed') main.push(this.acC('Unbilled', [
+      FG('Invoice (PDF)', h('input', { type: 'file', accept: 'application/pdf,.pdf', onChange: e => this.acReadFile(e.target.files[0]).then(f => { if (f) { this.acSetF('invData', f.data); this.acSetF('invName', f.name); } }), style: inp }), 1),
+      p.canInvoice ? h('div', { key: 'b' }, Btn('Submit', () => this.jPost('/api/jobs/' + id + '/vendor-invoice', { documentData: this.acF('invData'), documentName: this.acF('invName') }, 'Invoice submitted.', () => this.setState({ acForm: {} })), 'primary', !this.acF('invData'))) : null]), quoteCard());
+    // Prepare for Shipping → download the shipping label, ship to Printoka Production, enter the delivery details (logistics: Incoming Jobs)
+    if (['invoiced', 'shipped-to-hub'].indexOf(s.id) >= 0) {
       const pd = p.printerDelivery || {};
       const F = (k, def) => this.acF(k) !== '' ? this.acF(k) : def;
       const tracking = F('pTracking', (pd.tracking || []).join('\n')), company = F('pCompany', pd.company || '');
-      const to = (j.destination && j.destination.type === 'outlet') ? 'the outlet' : 'Printoka production';
-      main.push(this.acC('Delivery Details', p.canShip ? [
-        s.id === 'printer-assigned' ? null : alertBox('Delivery details sent.', 'ok'),
+      main.push(this.acC(s.id === 'invoiced' ? 'Prepare for Shipping' : 'Shipped', p.canShip ? [
+        s.id === 'invoiced' ? h('div', { key: 'sl' }, Btn('Download Shipping Label', () => this.openJobDoc(id, 'hub-label'))) : alertBox('Delivery details sent.', 'ok'),
         FG('Delivery Order / Tracking Number', h('textarea', { rows: 4, value: tracking, onChange: e => this.acSetF('pTracking', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1),
         FG('Delivery Company', h('input', { value: company, onChange: e => this.acSetF('pCompany', e.target.value), placeholder: 'e.g. J&T Express, GDEX, own van', style: inp }), 1),
         FG('Delivery Order', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, pd.document ? fileLink(pd.document) : null, this.jPickFile('pDo'))),
-        h('div', { key: 'b' }, Btn('Save Changes', () => this.jPost('/api/jobs/' + id + '/ship-to-hub', { tracking, company, documentData: this.acF('pDoData') || undefined, documentName: this.acF('pDoName') || undefined }, null, () => this.setState({ acForm: {} })), 'primary', !tracking.trim() || !company.trim()))]
+        h('div', { key: 'b' }, Btn(s.id === 'invoiced' ? 'Ship' : 'Save Changes', () => this.jPost('/api/jobs/' + id + '/ship-to-hub', { tracking, company, documentData: this.acF('pDoData') || undefined, documentName: this.acF('pDoName') || undefined }, s.id === 'invoiced' ? 'Shipped to Printoka Production.' : null, () => this.setState({ acForm: {} })), 'primary', !tracking.trim() || !company.trim()))]
         : [this.acDL([['Tracking number', (pd.tracking || []).join(', ') || '—'], ['Delivery company', pd.company || '—'], ['Delivery order', pd.document ? fileLink(pd.document) : '—']])]));
       main.push(quoteCard());
     }

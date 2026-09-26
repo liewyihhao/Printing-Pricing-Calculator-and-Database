@@ -123,6 +123,8 @@
           h('span', { onClick: () => this.setState({ acView: null, sTab: o.home }), style: { color: TEAL, cursor: 'pointer' } }, 'Dashboard'), h('span', { style: { color: FAINT } }, '/'),
           h('span', { onClick: () => this.setState({ acView: null, sTab: o.type }), style: { color: TEAL, cursor: 'pointer' } }, o.type)),
         h('div', { style: { display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' } }, h('h1', { style: { fontSize: 34, fontWeight: 600, margin: 0, letterSpacing: '-.02em' } }, o.title), o.statusNode || (o.status ? this.pillDot(o.status, BADGE(o.status)) : null))),
+      // optional full-width block above the two columns (e.g. the scheduler's quotes table)
+      o.top ? h('div', { key: 'top', style: { display: 'flex', flexDirection: 'column', gap: 12 } }, o.top) : null,
       h('div', { key: 'bd', className: 'pk-acsingle', style: { display: 'flex', gap: 20, alignItems: 'flex-start', flexWrap: 'wrap' } },
         h('div', { style: { flex: '1 1 520px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 20 } }, main),
         h('div', { style: { flex: '1 1 300px', maxWidth: 360, minWidth: 0, display: 'flex', flexDirection: 'column', gap: 20 } }, aside)),

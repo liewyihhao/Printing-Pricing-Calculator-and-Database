@@ -806,6 +806,7 @@ function updateStaffAccount(id, b, actor) {
   const before = c.role + (c.disabled ? ' (disabled)' : '');
   if (b.role) { if ((STAFF_ROLES[c.type] || []).indexOf(b.role) < 0) return { error: 'That role does not fit a ' + c.type + ' account.' }; c.role = b.role; }
   ['name', 'phone', 'outlet', 'hub', 'vendorId'].forEach(k => { if (b[k] !== undefined) c[k] = b[k]; });
+  if (b.location !== undefined && c.type === 'vendor') c.location = String(b.location || '').slice(0, 120); // printer company city / state
   if (b.capabilities && c.type === 'vendor' && !c.vendorId) c.capabilities = b.capabilities; // products + finishing this printer can do
   if (b.disabled !== undefined) { c.disabled = !!b.disabled; if (c.disabled) { const ss = sessions(); Object.keys(ss).forEach(t => { if (ss[t].userId === c.id) delete ss[t]; }); } }
   if (b.resetPassword) { requestPasswordReset(c.email); logEvent({ actor, role: 'admin', action: 'user_password_reset', jobId: null, from: null, to: null, note: c.email }); save(); return { staff: publicCustomer(c), message: 'Password reset email sent to ' + c.email + '.' }; }
