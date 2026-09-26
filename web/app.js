@@ -699,6 +699,31 @@ class Component extends DCLogic {
     });
     return list;
   }
+  // the configurator's questions as plain data: the same fields, labels, options and validity as the
+  // product page (pkFields + display overrides). The outlet "New quote" form keys the answers in by hand.
+  cfgQuestions() {
+    let fields = []; try { fields = this.pkFields(); } catch (e) { return []; }
+    const ov = this.cfgOv(), cfg = this.pkV(), sc = this.state.cfg || {}, ph = ov.placeholder || [];
+    const val = o => Array.isArray(o) ? o[0] : o;
+    return fields.map(({ def, options }) => {
+      const label = niceLabel((ov.label && ov.label[def.key]) || def.label, def.key);
+      if (def.widget === 'foilColours') return { key: def.key, label, type: 'widget', def };
+      if (options && options.length) {
+        const optLabel = (ov.optLabel && ov.optLabel[def.key]) || {};
+        let disp = ov.optionsOverride && ov.optionsOverride[def.key];
+        try { disp = typeof disp === 'function' ? (disp(cfg, options) || options) : (disp || options); } catch (e) { disp = options; }
+        const valid = {}; options.forEach(o => { valid[val(o)] = 1; });
+        const shown = {}; disp.forEach(o => { shown[val(o)] = 1; });
+        const reliable = Object.keys(valid).every(v => shown[v]);
+        const isPh = ph.indexOf(def.key) >= 0;
+        return { key: def.key, label, type: 'select', required: isPh, value: isPh ? (sc[def.key] != null ? sc[def.key] : '') : (cfg[def.key] != null ? cfg[def.key] : ''),
+          options: disp.map(o => ({ value: val(o), label: cleanOpt(optLabel[val(o)] || val(o)), avail: reliable ? !!valid[val(o)] : true })) };
+      }
+      const unit = /\(mm\)/i.test(def.label || '') ? ' mm' : '';
+      const hint = def.min != null && def.max != null ? 'Between ' + def.min + unit + ' and ' + def.max + unit : def.min != null ? 'Minimum ' + def.min + unit : def.max != null ? 'Maximum ' + def.max + unit : '';
+      return { key: def.key, label: niceLabel(def.label, def.key), type: def.type === 'number' ? 'number' : 'text', required: true, value: cfg[def.key] != null ? cfg[def.key] : '', hint, min: def.min, max: def.max };
+    });
+  }
   // option-value map the engine expects. Fields can be listed out of dependency order
   // (e.g. booklet 'ordertype' depends on 'orientation'+'size'), so resolve defaults with a
   // fixpoint loop, and re-validate any stale value that a changed upstream option invalidated.

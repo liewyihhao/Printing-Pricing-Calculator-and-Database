@@ -345,9 +345,33 @@
       const custRes = custQ ? this.acGet('cust_' + custQ, '/api/outlet/customers?q=' + encodeURIComponent(custQ)) : null;
       const cust = (custRes || {}).customers || [];
       const reqLabel = F('requesterId') ? ((cust.find(c => c.value === F('requesterId')) || {}).label || this.acF('requesterLabel') || (q && q.requester ? q.requester.name + ' (' + q.requester.email + ')' : F('requesterId'))) : '';
+      // only products Printoka makes; once one is picked, the configurator's own questions (same options and rules)
+      const prods = this.catProducts ? this.catProducts('all') : [];
+      const pid = this.acF('productId');
+      const prod = pid !== '' ? prods.find(p => String(p.id) === String(pid)) : null;
+      const qs = prod ? this.cfgQuestions() : [];
+      const qobj = prod ? this.pkQtyObj(prod.id) : null;
+      const qty = this.acF('qty'), notes = this.acF('notes');
+      const setCfg = (k, val) => this.setState(st => Object.assign({ cfg: Object.assign({}, st.cfg, { [k]: val }) }, k === 'size' ? { sizeConfirmed: false } : {}));
+      const question = x => {
+        if (x.type === 'widget') return h('div', { key: x.key }, this.foilColourPicker(x.def, this.pkV()));
+        const ctl = x.type === 'select'
+          ? h('select', { value: x.value, onChange: e => setCfg(x.key, e.target.value), style: inp }, [x.value === '' ? h('option', { key: '', value: '' }, 'Please Select') : null].concat(x.options.map(o => h('option', { key: o.value, value: o.value, disabled: !o.avail }, o.label + (o.avail ? '' : ' (not available)')))))
+          : h('input', { type: x.type, min: x.min, max: x.max, value: x.value, onChange: e => setCfg(x.key, e.target.value), style: inp });
+        return FG(x.label, x.hint ? h('div', { style: { display: 'flex', flexDirection: 'column', gap: 4 } }, ctl, h('span', { style: { fontSize: 12, color: FAINT } }, x.hint)) : ctl, x.required ? 1 : 0);
+      };
+      const specDone = prod && qs.every(x => !x.required || x.type === 'widget' || String(x.value) !== '') && Number(qty) > 0;
+      const payload = () => {
+        const sp = this.pkOrderSpec(); const lines = sp.lines;
+        const text = lines.map(l => l[0] + ': ' + l[1]).concat(['Quantity: ' + Number(qty).toLocaleString() + ' pcs'], notes ? ['Remarks: ' + notes] : []).join('\n');
+        return { product: prod.name, productId: prod.id, specLines: lines, qty: Number(qty), notes, config: this.state.cfg || {}, specifications: text };
+      };
       main.push(this.acC('Specifications', [
-        FG('Product', h('input', { value: F('product'), onChange: e => this.acSetF('product', e.target.value), style: inp }), 1),
-        FG('Specifications', h('textarea', { rows: 8, className: 'ac-hint', placeholder: 'Please finalize the size, material, finishing, add-on remarks and quantity. Include the customer’s target price, if any.', value: F('specifications'), onChange: e => this.acSetF('specifications', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1),
+        FG('Product', h('select', { value: pid, onChange: e => { const v = e.target.value; this.acSetF('productId', v); this.setState({ prodId: v === '' ? null : Number(v), cfg: {}, sizeConfirmed: false }); }, style: inp },
+          [h('option', { key: '', value: '' }, prods.length ? 'Please Select' : 'Loading products…')].concat(prods.map(p => h('option', { key: p.id, value: String(p.id) }, p.name)))), 1),
+        prod ? h('div', { key: 'qs', style: { display: 'flex', flexDirection: 'column', gap: 14 } }, qs.map(question),
+          FG('Quantity', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 4 } }, h('input', { type: 'number', min: 1, value: qty, onChange: e => this.acSetF('qty', e.target.value), style: inp }), qobj ? h('span', { style: { fontSize: 12, color: FAINT } }, 'Minimum order ' + qobj.moq.toLocaleString() + ' pcs') : null), 1),
+          FG('Remarks', h('textarea', { rows: 3, className: 'ac-hint', placeholder: 'Add-on remarks and the customer’s target price, if any.', value: notes, onChange: e => this.acSetF('notes', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }))) : null,
         FG('Requester', h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } },
           reqLabel ? h('div', { style: { fontSize: 13, background: ALT, borderRadius: 8, padding: '8px 12px' } }, reqLabel) : null,
           h('input', { placeholder: 'Search customer name or email…', value: this.state.acCustQ || '', onChange: e => this.setState({ acCustQ: e.target.value }), style: inp }),
@@ -357,17 +381,22 @@
           FG('Artwork name', h('input', { value: this.acF('artworkName'), onChange: e => this.acSetF('artworkName', e.target.value), style: inp })),
           FG('Artwork file', h('label', { style: { color: TEAL, fontWeight: 600, fontSize: 14, cursor: 'pointer', padding: '8px 0', alignSelf: 'flex-start' } }, this.acF('artworkFileName') ? '📄 ' + this.acF('artworkFileName') : 'Upload',
             h('input', { type: 'file', style: { display: 'none' }, onChange: e => { const f0 = e.target.files[0]; e.target.value = ''; this.acReadFile(f0).then(f => { if (f) { this.acSetF('artworkData', f.data); this.acSetF('artworkFileName', f.name); } }); } })))),
-        h('div', { key: 'b', style: { display: 'flex', gap: 8 } }, Btn(isNew ? 'Next' : 'Save', () => this.aFetchJ(isNew ? '/api/outlet/quotes' : '/api/outlet/quotes/' + q.id + '/spec', { product: F('product'), specifications: F('specifications'), requesterId: F('requesterId'), artworkName: this.acF('artworkName'), artworkData: this.acF('artworkData'), artworkFileName: this.acF('artworkFileName') }).then(r => done(r, 'Specifications updated successfully', isNew)), 'primary'), !isNew ? Btn('Cancel', () => this.setState({ acEdit: null })) : null)]));
+        h('div', { key: 'b', style: { display: 'flex', gap: 8 } }, Btn(isNew ? 'Next' : 'Save', () => this.aFetchJ(isNew ? '/api/outlet/quotes' : '/api/outlet/quotes/' + q.id + '/spec', Object.assign(payload(), { requesterId: F('requesterId'), artworkName: this.acF('artworkName'), artworkData: this.acF('artworkData'), artworkFileName: this.acF('artworkFileName') })).then(r => done(r, 'Specifications updated successfully', isNew)), 'primary', !specDone || !F('requesterId')), !isNew ? Btn('Cancel', () => this.setState({ acEdit: null })) : null)]));
     } else if (q) {
-      main.push(this.acC('Specifications', [h('b', { key: 'p' }, q.product), h('div', { key: 's', style: { whiteSpace: 'pre-wrap', lineHeight: 1.7 } }, q.spec),
+      main.push(this.acC('Specifications', [q.specLines && this.pSummary ? h('div', { key: 's', style: { display: 'flex', flexDirection: 'column', gap: 10 } }, this.pSummary({ product: q.product, specLines: q.specLines, qty: q.qty, rows: [], artworks: [] })) : [h('b', { key: 'p' }, q.product), h('div', { key: 's', style: { whiteSpace: 'pre-wrap', lineHeight: 1.7 } }, q.spec)],
+        q.specLines && q.notes ? h('p', { key: 'n', style: { margin: 0, whiteSpace: 'pre-wrap', lineHeight: 1.6 } }, q.notes) : null,
         q.artwork ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12 } }, h('a', { href: '#', onClick: e => { e.preventDefault(); fetch('/api/outlet/quotes/' + q.id + '/artwork', { headers: this.authHeaders() }).then(r => r.ok ? r.blob() : null).then(b => b && this.saveBlob(b, q.artwork.file || q.artwork.name)); }, style: { color: TEAL, fontWeight: 700 } }, '📄 ' + (q.artwork.name || 'File'))) : null],
-        q.canEdit ? { icon: 'edit', label: 'Edit specifications', onClick: () => this.setState({ acEdit: 'edit-spec', acForm: {} }) } : null));
+        q.canEdit ? { icon: 'edit', label: 'Edit specifications', onClick: () => this.outEditSpec(q) } : null));
     }
     const aside = q ? [
       mode !== 'edit-quote' && q.price != null ? this.acC('Quote', this.acDL([['Weight', q.weight], ['Price', this.rm(q.price)], ['Issued by', q.issuedBy]]), q.canEdit ? { icon: 'edit', label: 'Edit quote', onClick: () => this.setState({ acEdit: 'edit-quote', acForm: {} }) } : null) : null,
       q.statuses && q.statuses.length ? this.acC('Statuses', this.acStatusList(q.statuses.map(s => ({ title: s.status, at: s.at, by: s.by, text: s.note })))) : null,
-      q.requester && mode !== 'edit-spec' ? this.acC('Requester', [h('b', { key: 'n' }, q.requester.name), q.requester.phone ? h('a', { key: 'p', href: 'https://wa.me/' + String(q.requester.phone).replace(/\D/g, '').replace(/^0/, '60'), target: '_blank', rel: 'noopener', style: { color: TEAL, fontWeight: 600 } }, q.requester.phone) : null, q.requester.address ? h('p', { key: 'a', style: { margin: 0, color: MUT } }, q.requester.address) : null, h('a', { key: 'e', href: 'mailto:' + q.requester.email, style: { color: TEAL, fontWeight: 600 } }, q.requester.email)], q.canEdit ? { icon: 'edit', label: 'Change requester', onClick: () => this.setState({ acEdit: 'edit-spec', acForm: {} }) } : null) : null] : [];
+      q.requester && mode !== 'edit-spec' ? this.acC('Requester', [h('b', { key: 'n' }, q.requester.name), q.requester.phone ? h('a', { key: 'p', href: 'https://wa.me/' + String(q.requester.phone).replace(/\D/g, '').replace(/^0/, '60'), target: '_blank', rel: 'noopener', style: { color: TEAL, fontWeight: 600 } }, q.requester.phone) : null, q.requester.address ? h('p', { key: 'a', style: { margin: 0, color: MUT } }, q.requester.address) : null, h('a', { key: 'e', href: 'mailto:' + q.requester.email, style: { color: TEAL, fontWeight: 600 } }, q.requester.email)], q.canEdit ? { icon: 'edit', label: 'Change requester', onClick: () => this.outEditSpec(q) } : null) : null] : [];
     return this.acSingle({ home: 'Dashboard', type: 'Custom quotes', title: isNew ? 'New quote' : q.id, status: q ? q.status : null }, main, aside);
+  };
+  // edit the specifications: reopen the configurator answers saved with the quote
+  P.outEditSpec = function (q) {
+    this.setState({ acEdit: 'edit-spec', acForm: { productId: q.productId != null ? String(q.productId) : '', qty: q.qty ? String(q.qty) : '', notes: q.notes || '' }, prodId: q.productId != null ? q.productId : this.state.prodId, cfg: q.config || {}, sizeConfirmed: false });
   };
   P.outRejectQuote = function (q, done) {
     this.setState({ acForm: {}, acModal: { title: 'Reject reasons', body: () => [FG('Reject reasons', h('textarea', { rows: 8, value: this.acF('reasons'), onChange: e => this.acSetF('reasons', e.target.value), style: Object.assign({}, inp, { resize: 'vertical' }) }), 1),

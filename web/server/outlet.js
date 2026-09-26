@@ -65,6 +65,8 @@ function quoteView(q, full) {
   return Object.assign(v, {
     spec: (q.requirement && (q.requirement.quoteData || [q.requirement.size, q.requirement.material, q.requirement.finishing, q.requirement.qty && ('Qty ' + q.requirement.qty), q.requirement.remarks].filter(Boolean).join('\n'))) || '',
     artwork: q.artwork || (q.artworkFile ? { name: q.artworkFile } : null),
+    productId: (q.requirement && q.requirement.productId) != null ? q.requirement.productId : null, specLines: (q.requirement && q.requirement.specLines) || null,
+    qty: (q.requirement && q.requirement.qty) || null, config: (q.requirement && q.requirement.config) || null, notes: (q.requirement && q.requirement.notes) || '',
     requester: cust ? { id: cust.id, name: cust.name, email: cust.email, phone: cust.phone || (addr && addr.phone) || '', address: addr ? [addr.line1, addr.line2, [addr.postcode, addr.city].filter(Boolean).join(' '), addr.state, addr.country].filter(Boolean).join(', ') : '' } : (q.customer ? { name: q.customer.name, email: q.customer.email, phone: q.customer.phone } : null),
     rejectReason: q.rejectReason || '', lastFollowUp: q.lastFollowUpAt ? { at: q.lastFollowUpAt, by: q.lastFollowUpBy } : null,
     // HQ's raw 'issued' entry is shown once, as the outlet's "Quoted"
@@ -107,7 +109,10 @@ function saveSpec(qid, b, me) {
     q.history.push({ ts: now(), actor: me.name, action: 'Specifications updated' });
   }
   q.userId = cust.id; q.customer = { name: cust.name, email: cust.email, phone: cust.phone || '', company: cust.company || '' };
-  q.requirement = Object.assign({}, q.requirement, { product: String(b.product), quoteData: String(b.specifications), qty: 1 });
+  // the configurator answers travel with the quote (product, every option, quantity, remarks)
+  const lines = Array.isArray(b.specLines) ? b.specLines.filter(l => Array.isArray(l) && l.length === 2).slice(0, 60).map(l => [String(l[0]).slice(0, 80), String(l[1]).slice(0, 200)]) : null;
+  q.requirement = Object.assign({}, q.requirement, { product: String(b.product), quoteData: String(b.specifications), qty: Math.max(1, Math.floor(Number(b.qty)) || 1),
+    productId: b.productId != null ? Number(b.productId) : null, specLines: lines, config: b.config && typeof b.config === 'object' ? b.config : null, notes: String(b.notes || '').slice(0, 2000) });
   const aw = saveQuoteArtwork(q, b, me); if (aw && aw.error) return aw;
   store.logEvent({ actor: me.name, role: 'outlet', action: qid ? 'quote_spec' : 'quote_create', jobId: null, from: null, to: null, note: q.id + ' · ' + b.product });
   store.save(); return { quote: quoteView(q, true) };
