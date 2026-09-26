@@ -259,8 +259,10 @@
     const card = this.pStepCard(j, pr, acts, d.order, d.siblings); if (card) main.push(card);
     // Order details = the configurator's Summary: every option as label / value, then quantity (no due date)
     const item = d.order && (d.order.items || [])[(Number(String(id).split('-').pop()) || 1) - 1];
-    const summary = { product: j.product, specLines: j.specLines || (item && item.specLines), spec: (pr.job && pr.job.spec) || j.spec, qty: j.qty, artworks: pr.job && pr.job.artworks,
-      rows: [['Customer', j.customer || '—'], j.instructions ? ['Instructions', j.instructions] : null, j.machine ? ['Machine', j.machine + (j.slot ? ' · ' + when(j.slot) : '')] : null] };
+    const summary = { product: j.product, specLines: j.specLines || (item && item.specLines), spec: (pr.job && pr.job.spec) || j.spec, qty: j.qty, productionTime: j.productionTime || (item && item.productionTime), artworks: pr.job && pr.job.artworks,
+      rows: [['Customer', j.customer || '—'], j.instructions ? ['Instructions', j.instructions] : null, j.machine ? ['Machine', j.machine + (j.slot ? ' · ' + when(j.slot) : '')] : null],
+      onUpload: d.order && (inDept(this, 'prepress') || inDept(this, 'scheduler')) ? x => this.aFetchJ('/api/orders/' + encodeURIComponent(d.order.id) + '/files', { kind: 'artwork', line: (Number(String(id).split('-').pop()) || 1), name: x.name, data: x.data })
+        .then(r => { if (this.acDone(r, 'Artwork uploaded.')) { this.acDrop('job_'); this.forceUpdate(); } }) : null };
     const orderCard = this.acC('Order details', this.pSummary(summary));
     // delivery address in its own card, straight under the order details
     const fd = j.finalDestination || {}, ship = (d.order && d.order.shipTo) || {};
@@ -297,12 +299,16 @@
     const row = (l, v, k) => h('div', { key: k, style: { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 14, fontSize: 13, lineHeight: 1.5 } },
       h('span', { style: { color: FAINT, flex: '0 0 auto' } }, l), h('span', { style: { color: INK, fontWeight: 500, textAlign: 'right', whiteSpace: 'pre-wrap' } }, v));
     const arts = s.artworks || [];
+    // no stored artwork file yet: staff upload the file (it must be downloadable for printing)
+    const upload = s.onUpload && !arts.some(a => a.id || a.open) ? h('div', { key: 'up', style: { display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 12.5 } }, 'Upload artwork file'),
+      h('input', { type: 'file', onChange: e => { const f = e.target.files[0]; if (f) this.acReadFile(f).then(x => s.onUpload(x)); e.target.value = ''; }, style: { font: '400 13px Montserrat,sans-serif' } })) : null;
     return [h('b', { key: 'p', style: { fontSize: 15 } }, s.product),
       rows.length ? h('div', { key: 's', style: { display: 'flex', flexDirection: 'column', gap: 8 } }, rows.map((r, i) => row(r[0], r[1], i))) : null,
       h('div', { key: 'q', style: { display: 'flex', flexDirection: 'column', gap: 8, borderTop: '1px solid ' + LINE, paddingTop: 12 } },
-        row('Order Quantity', (s.qty || 0).toLocaleString() + ' pcs', 'q'), (s.rows || []).filter(Boolean).map((r, i) => row(r[0], r[1], 'x' + i))),
+        row('Order Quantity', (s.qty || 0).toLocaleString() + ' pcs', 'q'), s.productionTime ? row('Production time', s.productionTime, 'pt') : null, (s.rows || []).filter(Boolean).map((r, i) => row(r[0], r[1], 'x' + i))),
       arts.length ? h('div', { key: 'a', style: { background: ALT, borderRadius: 6, padding: 12, display: 'flex', flexDirection: 'column', gap: 6 } }, h('b', { style: { fontSize: 12.5 } }, 'Artwork'),
-        arts.map((a, i) => a.open ? h('span', { key: i }, link('📄 ' + a.name, a.open)) : a.id ? h('span', { key: i }, link('📄 ' + a.name, () => this.openOrderFile(a.orderId, a))) : h('span', { key: i, style: { color: MUT } }, '📄 ' + a.name))) : null];
+        arts.map((a, i) => a.open ? h('span', { key: i }, link('📄 ' + a.name, a.open)) : a.id ? h('span', { key: i }, link('📄 ' + a.name, () => this.openOrderFile(a.orderId, a))) : h('span', { key: i, style: { color: MUT } }, '📄 ' + a.name + (s.onUpload ? ' — file not uploaded' : '')))) : null,
+      upload];
   };
   // where it goes: collection or delivery, name, full address, phone
   P.pDeliver = function (fd, phone, fallbackName) {

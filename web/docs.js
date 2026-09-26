@@ -162,7 +162,10 @@
     lines.filter(l => l != null && l !== '').forEach(l => (width ? doc.splitTextToSize(String(l), width) : [String(l)]).forEach(s => { doc.text(s, x, y + size * PT + n * lh); n++; }));
     return n;
   };
-  const jobLines = j => [j.product ? j.product : null].concat(String(j.spec || '').split(/\s·\s|\n/).map(s => s.trim()).filter(Boolean), [j.qty ? 'Quantity: ' + Number(j.qty).toLocaleString('en-US') : null, j.instructions ? 'Instructions: ' + j.instructions : null]);
+  // order details: the configurator's labelled lines when the order has them, else the spec text
+  const jobLines = j => [j.product ? j.product : null].concat(
+    (j.specLines && j.specLines.length ? j.specLines.map(l => l[0] ? l[0] + ': ' + l[1] : l[1]) : String(j.spec || '').split(/\s·\s|\n/).map(s => s.trim()).filter(Boolean)).filter(s => !/^(order )?(quantity|qty)\b/i.test(s)),
+    [j.qty ? 'Quantity: ' + Number(j.qty).toLocaleString('en-US') : null, j.instructions ? 'Instructions: ' + j.instructions : null]);
   P.buildJobDoc = async function (d) {
     await loadLibs();
     const { jsPDF } = window.jspdf; const kind = d.kind, S = PAGE[kind];
@@ -200,13 +203,15 @@
       cellText(doc, String(hb.address || '').split(/\n|,\s*(?=\d{5})/), 25, 40.5, 7.5, 1.5, 70);
       cellText(doc, [hb.phone], 25, 90.5, 7.5, 1.5);
       doc.setFont(FONT, 'bold'); doc.setFontSize(10); cellText(doc, [String(d.poNumber || '')], 112, 10, 10, 1.4);
-      doc.setFont(FONT, 'normal'); doc.setFontSize(7); cellText(doc, jobLines(J), 100, 30, 7, 1.4, 40);
+      // the customer's order number (no customer details), then the order details
+      doc.setFontSize(7); const on = d.orderNumber ? cellText(doc, ['Order No.: ' + d.orderNumber], 100, 30, 7, 1.4, 40) : 0;
+      doc.setFont(FONT, 'normal'); cellText(doc, jobLines(J), 100, 30 + (on ? on * 7 * PT * 1.4 + 1.5 : 0), 7, 1.4, 40);
     }
     doc.setProperties({ title: ({ 'purchase-order': 'Purchase Order ', 'shipping-label': 'Shipping Label ', 'hub-label': 'Hub Label ' })[kind] + (d.poNumber || d.jobId), author: 'Printoka', creator: 'Printoka' });
     return doc;
   };
   P.openJobDoc = function (jobId, kind) {
-    const title = ({ 'purchase-order': 'Purchase Order', 'shipping-label': 'Shipping Label', 'hub-label': 'Delivery Label' })[kind] || 'Document';
+    const title = ({ 'purchase-order': 'Purchase Order', 'shipping-label': 'Shipping Label', 'hub-label': this.userType && this.userType() === 'vendor' ? 'Shipping Label' : 'Delivery Label' })[kind] || 'Document';
     const v = pdfViewer(title);
     fetch('/api/jobs/' + encodeURIComponent(jobId) + '/doc/' + kind, { headers: this.authHeaders() }).then(r => r.json())
       .then(d => { if (d.error) throw new Error(d.error); return this.buildJobDoc(d).then(doc => [doc, d]); })

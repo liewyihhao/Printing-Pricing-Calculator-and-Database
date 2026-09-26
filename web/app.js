@@ -1015,7 +1015,9 @@ class Component extends DCLogic {
     if (!this.pkReady()) { if (typeof window !== 'undefined') window.scrollTo(0, 0); return this.go('product'); }
     const prod = this.pkProduct(), q = this.pkQuote(); if (!prod || !q || !q.ok) return;
     const { short, lines } = this.pkOrderSpec();
-    const item = { productId: prod.id, name: this.catName(prod.id), spec: short, specLines: lines, qty: this.state.qty || 1, unitPrice: q.gross / (this.state.qty || 1), lineTotal: q.gross };
+    // the configurator summary travels with the order: every option, quantity and production time
+    const pd = this.cfgOv().processDays, productionTime = pd != null ? pd + (pd === 1 ? ' working day' : ' working days') : '3 working days';
+    const item = { productId: prod.id, name: this.catName(prod.id), spec: short, specLines: lines, productionTime, qty: this.state.qty || 1, unitPrice: q.gross / (this.state.qty || 1), lineTotal: q.gross };
     const cart = (this.state.cart || []).concat([item]);
     this.setState({ cart }); this.saveCart(cart); this.go('cart');
   }
@@ -1111,7 +1113,7 @@ class Component extends DCLogic {
       customer: { name: this.state.coName || u.name || 'Guest customer', email: this.state.coEmail || u.email || '', phone: this.state.coPhone || u.phone || '', company: this.state.coCompany || u.company || '' },
       fulfillment: { method: this.state.coFulfil || 'delivery', address: addrText, addressId: this.state.coAddrId || null, outlet: this.state.coOutlet || '' },
       payment: { method: this.state.coPay || 'card_test' },
-      items: cart.map(it => ({ productId: it.productId, product: it.name, spec: it.spec, specLines: it.specLines || null, qty: it.qty, unitPrice: it.unitPrice, lineTotal: it.lineTotal })),
+      items: cart.map(it => ({ productId: it.productId, product: it.name, spec: it.spec, specLines: it.specLines || null, productionTime: it.productionTime || null, qty: it.qty, unitPrice: it.unitPrice, lineTotal: it.lineTotal })),
       subtotal: t.subtotal, memberDiscount: t.memberDiscount, coupon: t.couponCode, couponDiscount: t.couponDiscount, tax: t.tax, shipping: t.shipping, total: t.total, creditApplied, tier: this.tier(),
     };
     this.setState({ placing: true, orderErr: null });

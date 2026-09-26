@@ -226,7 +226,10 @@
     const j = d.job, p = d.printing || {}, s = p.status || {}, id = j.id, mq = p.myQuote || {};
     const staff = (this.state.user || {}).role === 'printer_staff';
     const fileLink = f => f ? link('📄 ' + f.name, () => this.jDownload('/api/jobs/' + id + '/files/' + f.id, f.name)) : null;
-    const quoteCard = () => this.acC('Quote', this.acDL([['Quote amount (RM)', (mq.awardedAmount != null ? mq.awardedAmount : mq.amount) != null ? Number(mq.awardedAmount != null ? mq.awardedAmount : mq.amount).toFixed(2) : '—'], ['Quote document', mq.document ? fileLink(mq.document) : '—']]));
+    // the quotation PDF is compulsory: without it the printer must upload it (Upload Quotation)
+    const quoteCard = () => this.acC('Quote', [this.acDL([['Quote amount (RM)', (mq.awardedAmount != null ? mq.awardedAmount : mq.amount) != null ? Number(mq.awardedAmount != null ? mq.awardedAmount : mq.amount).toFixed(2) : '—'], mq.document ? ['Quote document', fileLink(mq.document)] : null]),
+      !mq.document && mq.submittedAt && !staff ? [FG('Quotation (PDF)', h('input', { type: 'file', accept: 'application/pdf,.pdf', onChange: e => this.acReadFile(e.target.files[0]).then(f => { if (f) { this.acSetF('qdData', f.data); this.acSetF('qdName', f.name); } }), style: inp }), 1),
+        h('div', { key: 'ub' }, Btn('Upload Quotation', () => this.jPost('/api/jobs/' + id + '/vendor-quote-doc', { documentData: this.acF('qdData'), documentName: this.acF('qdName') }, 'Quotation uploaded.', () => this.setState({ acForm: {} })), 'primary', !this.acF('qdData')))] : null]);
     const main = [];
     if (['quote-requested', 'quote-partly-received', 'quotes-received'].indexOf(s.id) >= 0) {
       const amt = this.acF('qAmount') !== '' ? this.acF('qAmount') : (mq.amount != null ? String(mq.amount) : '');
@@ -245,10 +248,11 @@
     }
     // quote accepted: New Order → (download the artwork, print) Mark as Processed → Unbilled → upload the invoice (PDF) → Prepare for Shipping
     const art = p.approvedArtwork;
-    const artLink = art ? link('📄 ' + art.name, () => art.src === 'order' ? this.openOrderFile(art.orderId, { id: art.id, name: art.name }) : this.jDownload('/api/jobs/' + id + '/files/' + art.id, art.name)) : muted('—');
+    const artLink = art ? link('📄 ' + art.name, () => art.src === 'order' ? this.openOrderFile(art.orderId, { id: art.id, name: art.name }) : this.jDownload('/api/jobs/' + id + '/files/' + art.id, art.name))
+      : h('span', { style: { color: MUT } }, (((p.job || {}).artworks || [])[0] || {}).name ? p.job.artworks[0].name + ' — file not uploaded yet' : 'File not uploaded yet');
     if (s.id === 'printer-assigned') main.push(this.acC('New Order', [
       this.acDL([['Artwork', artLink], ['Purchase order', link('📄 ' + (p.po || 'Purchase Order'), () => this.openJobDoc(id, 'purchase-order'))]]),
-      p.canProcess ? h('div', { key: 'b' }, Btn('Mark as Processed', () => this.jPost('/api/jobs/' + id + '/vendor-processed', {}, 'Marked as processed.'), 'primary')) : null]), quoteCard());
+      p.canProcess ? h('div', { key: 'b' }, Btn('Mark as Processed', () => this.jPost('/api/jobs/' + id + '/vendor-processed', {}, 'Marked as processed.'), 'primary', !mq.document)) : null]), quoteCard());
     if (s.id === 'processed') main.push(this.acC('Unbilled', [
       FG('Invoice (PDF)', h('input', { type: 'file', accept: 'application/pdf,.pdf', onChange: e => this.acReadFile(e.target.files[0]).then(f => { if (f) { this.acSetF('invData', f.data); this.acSetF('invName', f.name); } }), style: inp }), 1),
       p.canInvoice ? h('div', { key: 'b' }, Btn('Submit', () => this.jPost('/api/jobs/' + id + '/vendor-invoice', { documentData: this.acF('invData'), documentName: this.acF('invName') }, 'Invoice submitted.', () => this.setState({ acForm: {} })), 'primary', !this.acF('invData'))) : null]), quoteCard());
@@ -270,8 +274,9 @@
     if (s.id === 'not-awarded') main.push(this.acC('Quote', [muted('This job was awarded to another printer. Thank you for quoting.'), mq.submittedAt ? this.acDL([['Your quote (RM)', Number(mq.amount).toFixed(2)]]) : null]));
     const J = p.job || {};
     // the item required, in the same layout as the configurator summary (artwork files open once awarded)
-    main.push(this.acC('Job details', this.pSummary({ product: J.product || j.product, specLines: J.specLines, spec: J.spec || j.spec, qty: J.qty || j.qty,
-      rows: [J.instructions ? ['Instructions', J.instructions] : null, p.po ? ['Purchase order', p.po] : null],
+    // exactly the configurator's order summary (every option, quantity, production time) — no customer details, no selling price
+    main.push(this.acC('Job details', this.pSummary({ product: J.product || j.product, specLines: J.specLines, spec: J.spec || j.spec, qty: J.qty || j.qty, productionTime: J.productionTime,
+      rows: [],
       // before the award: only the approved artwork watermarked "PRINTOKA"; the original files once the job is awarded to this printer
       artworks: p.awardedToMe ? (J.artworks || []) : p.artworkPreview ? [{ name: p.artworkPreview.name, open: () => this.jDownload('/api/jobs/' + id + '/files/' + p.artworkPreview.id, p.artworkPreview.name) }] : [] })));
     const aside = [

@@ -159,7 +159,8 @@ function approvedArtwork(j) {
   const ar = j.approvalRequest && j.approvalRequest.file;
   if (ar) return { src: 'job', id: ar.id, name: ar.name };
   const o = j.orderId && store.order(j.orderId); const idx = o ? (o.jobIds || []).indexOf(j.id) : -1;
-  const f = o ? (o.files || []).filter(x => x.kind === 'artwork' && x.line === idx + 1).slice(-1)[0] : null;
+  const arts = o ? (o.files || []).filter(x => x.kind === 'artwork') : [];
+  const f = arts.filter(x => x.line === idx + 1).slice(-1)[0] || arts.find(x => x.id === (j.artwork || {}).fileId) || ((o && (o.jobIds || []).length === 1) ? arts.slice(-1)[0] : null);
   return f ? { src: 'order', id: f.id, name: f.name, orderId: o.id } : null;
 }
 // the watermarked copy of that artwork, made when the scheduler requests quotes (PDF only)
@@ -199,7 +200,7 @@ function orderDetails(j) {
 function jobDetails(j) {
   const o = j.orderId && store.order(j.orderId); const idx = o ? (o.jobIds || []).indexOf(j.id) : -1; const it = o && idx >= 0 ? o.items[idx] : null;
   const arts = o ? (o.files || []).filter(f => f.kind === 'artwork' && f.line === idx + 1).map(f => ({ id: f.id, name: f.name, orderId: o.id })) : [];
-  return { product: j.product, spec: (it && it.spec) || j.spec || '', specLines: j.specLines || (it && it.specLines) || null, qty: j.qty, artworks: arts.length ? arts : ((j.artwork && j.artwork.file && !/^pending-upload/.test(j.artwork.file)) ? [{ name: j.artwork.file }] : []), deadline: j.deadline, instructions: j.instructions || '' };
+  return { product: j.product, spec: (it && it.spec) || j.spec || '', specLines: j.specLines || (it && it.specLines) || null, productionTime: j.productionTime || (it && it.productionTime) || null, qty: j.qty, artworks: arts.length ? arts : ((j.artwork && j.artwork.file && !/^pending-upload/.test(j.artwork.file)) ? [{ name: j.artwork.file }] : []), deadline: j.deadline, instructions: j.instructions || '' };
 }
 // the printing-job view every account shares (printer: only its own quote, no customer contact)
 function view(j, me) {
@@ -328,10 +329,23 @@ function deliveryDetails(jid, me, role, b) {
   store.logEvent({ actor: me.name, role, action: stage === 'hub' ? 'hub_delivery' : 'dispatch_details', jobId: jid, from: null, to: null, note: company + ' · ' + tracking.join(', ') });
   store.save(); return { ok: true, message: 'Delivery details update successfully!', stage };
 }
+// the quotation PDF is compulsory: a printer whose quote has no PDF uploads it (price unchanged)
+function uploadQuoteDoc(jid, me, b) {
+  const j = store.job(jid); const co = coOf(me); const v = j && j.outsource && (j.outsource.vendors || []).find(x => x.vendorId === co);
+  if (!v || !v.submittedAt) return { error: 'No quote from your company on this job.' };
+  if (!b || !b.documentData) return { error: 'Please upload your quotation (PDF).' };
+  if (!/\.pdf$/i.test(String(b.documentName || ''))) return { error: 'The quotation must be a PDF.' };
+  const f = saveBlob(path.join(ROOT, jid), { data: b.documentData, name: b.documentName }, 'Q'); if (f.error) return f;
+  v.document = f;
+  store.logEvent({ actor: me.name, vendorId: co, role: 'printer', action: 'quote_document', jobId: jid, from: null, to: null, note: 'Quotation ' + f.name });
+  store.save(); return { ok: true, message: 'Quotation uploaded.' };
+}
 // New Order → the printer has printed the job: Mark as Processed → Unbilled
 function markProcessed(jid, me) {
   const j = store.job(jid); const co = coOf(me); if (!j || !j.outsource || j.outsource.awardedTo !== co) return { error: 'This job is not awarded to your company.' };
   if (printingStatus(j) !== 'printer-assigned') return { error: 'This order is already processed.' };
+  const mine = (j.outsource.vendors || []).find(x => x.vendorId === co) || {};
+  if (!mine.document) return { error: 'Upload your quotation (PDF) first.' };
   j.outsource.processedAt = now(); j.outsource.processedBy = me.name;
   store.logEvent({ actor: me.name, vendorId: co, role: 'printer', action: 'printer_processed', jobId: jid, from: null, to: null, note: 'Order processed — unbilled' });
   store.save(); return { ok: true, message: 'Marked as processed.' };
@@ -366,7 +380,7 @@ function documentData(j, kind, me) {
   const o = j.outsource || {}; const v = o.awardedTo && store.findCustomer(o.awardedTo); const mine = (o.vendors || []).find(x => x.vendorId === o.awardedTo) || {};
   const base = { kind, jobId: j.id, job: jobDetails(j), hub: deliverTo(j) };
   if (kind === 'purchase-order') return Object.assign(base, { poNumber: poNumber(j), vendor: { name: (v && (v.company || v.name)) || mine.vendorName, address: (v && ((v.addresses || [])[0] ? [v.addresses[0].line1, v.addresses[0].line2, [v.addresses[0].postcode, v.addresses[0].city].filter(Boolean).join(' '), v.addresses[0].state].filter(Boolean).join(', ') : v.address)) || '' }, shipping: deliverTo(j), amount: mine.price });
-  if (kind === 'hub-label') return Object.assign(base, { poNumber: poNumber(j) });
+  if (kind === 'hub-label') return Object.assign(base, { poNumber: poNumber(j), orderNumber: j.orderId || null }); // + the customer's order number (a reference, no personal details)
   return Object.assign(base, { order: orderDetails(j) });
 }
 
@@ -423,5 +437,5 @@ function readCustomQuoteDoc(qid, vendorId, me) {
   return { file: p.document, data: fs.readFileSync(f), type: MIME[(p.document.name.split('.').pop() || '').toLowerCase()] || 'application/octet-stream' };
 }
 
-module.exports = { markProcessed, uploadInvoice, approvedArtwork, saveArtworkPreview, FINISH_NAMES, requiredFinishes, printerCan, vendorsForJob, cleanCapabilities, STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, shipToHub, deliveryDetails, markPaid, saveProof, savePaymentProofOnJob, deliverTo, documentData, readJobFile,
+module.exports = { uploadQuoteDoc, markProcessed, uploadInvoice, approvedArtwork, saveArtworkPreview, FINISH_NAMES, requiredFinishes, printerCan, vendorsForJob, cleanCapabilities, STATUSES, printingStatus, statusInfo, view, vendorJob, listRow, canSee, vendorCanSee, hubCanSee, submitQuote, shipToHub, deliveryDetails, markPaid, saveProof, savePaymentProofOnJob, deliverTo, documentData, readJobFile,
   requestPrinterQuotes, vendorCustomQuotes, vendorCustomQuote, submitCustomQuote, readCustomQuoteDoc };

@@ -104,7 +104,7 @@ async function api(req, res, pathname, query) {
       fromQuote: o.fromQuote || null, outlet: o.outlet || null, channel: o.channel || 'online', account: acct ? { name: acct.name, email: acct.email, phone: acct.phone || '', tier: acct.tier || 'Standard', since: acct.createdAt || null, disabled: !!acct.disabled } : null } : null });
   }
   // ---- printers & hubs (original printoka-3rd-party-supplier flow) ----
-  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'proof', 'payment-proof', 'vendor-processed', 'vendor-invoice'].indexOf(seg[2]) >= 0) {
+  if (seg[0] === 'jobs' && seg[1] && ['vendor-quote', 'ship-to-hub', 'delivery', 'vendor-paid', 'doc', 'files', 'proof', 'payment-proof', 'vendor-processed', 'vendor-invoice', 'vendor-quote-doc'].indexOf(seg[2]) >= 0) {
     const j0 = store.job(seg[1]); if (!j0) return send(res, 404, { error: 'not found' });
     if (!supplier.canSee(j0, me0)) return send(res, 403, { error: 'Access denied: You are not authorized to view this.' });
     const out = r => send(res, r && r.error ? (r.code || 400) : 200, r);
@@ -130,6 +130,7 @@ async function api(req, res, pathname, query) {
     }
     if (seg[2] === 'vendor-quote') return me0.type === 'vendor' ? out(supplier.submitQuote(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
     // printer order steps after the quote is accepted: processed → invoice (PDF) → ship
+    if (seg[2] === 'vendor-quote-doc') return me0.type === 'vendor' && me0.role !== 'printer_staff' ? out(supplier.uploadQuoteDoc(seg[1], me0, b)) : send(res, 403, { error: 'Only your printer manager can upload the quotation.' });
     if (seg[2] === 'vendor-processed') return me0.type === 'vendor' ? out(supplier.markProcessed(seg[1], me0)) : send(res, 403, { error: 'printers only' });
     if (seg[2] === 'vendor-invoice') return me0.type === 'vendor' ? out(supplier.uploadInvoice(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
     if (seg[2] === 'ship-to-hub') return me0.type === 'vendor' ? out(supplier.shipToHub(seg[1], me0, b)) : send(res, 403, { error: 'printers only' });
